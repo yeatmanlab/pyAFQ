@@ -59,6 +59,7 @@ class Segmentation:
                  pruning_thr=12,
                  b0_threshold=50,
                  prob_threshold=0,
+                 roi_dist_tie_break=False,
                  dist_to_waypoint=None,
                  rng=None,
                  return_idx=False,
@@ -144,6 +145,11 @@ class Segmentation:
             from [Hua2008]_. Here, we choose an average probability that
             needs to be exceeded for an individual streamline to be retained.
             Default: 0.
+        roi_dist_tie_break : bool.
+            Whether to use distance from nearest ROI as a tie breaker when a
+            streamline qualifies as a part of multiple bundles. If False,
+            probability maps are used.
+            Default : False.
         dist_to_waypoint : float.
             The distance that a streamline node has to be from the waypoint
             ROI in order to be included or excluded.
@@ -213,6 +219,7 @@ class Segmentation:
             reg_algo = reg_algo.lower()
         self.reg_algo = reg_algo
         self.prob_threshold = prob_threshold
+        self.roi_dist_tie_break = roi_dist_tie_break
         self.dist_to_waypoint = dist_to_waypoint
         self.b0_threshold = b0_threshold
         self.progressive = progressive
@@ -563,10 +570,13 @@ class Segmentation:
         fgarray = np.array(_resample_tg(tg, 100))
         n_streamlines = fgarray.shape[0]
 
-        streamlines_in_bundles = np.zeros(
+        streamlines_in_bundles = np.empty(
             (n_streamlines, len(self.bundle_dict)))
-        min_dist_coords = np.zeros(
-            (n_streamlines, len(self.bundle_dict), 2), dtype=int)
+        streamlines_in_bundles.fill(np.nan)
+        min_dist_coords = np.empty(
+            (n_streamlines, len(self.bundle_dict), 2))
+        min_dist_coords.fill(np.nan)
+
         self.fiber_groups = {}
 
         if self.return_idx:
@@ -673,7 +683,7 @@ class Segmentation:
                     streamlines_in_bundles[sl_idx, bundle_idx] = sl_in_bundles
 
             self.logger.info(
-                (f"{np.sum(streamlines_in_bundles[:, bundle_idx] > 0)} "
+                (f"{np.nansum(streamlines_in_bundles[:, bundle_idx] > 0)} "
                  "streamlines selected with waypoint ROIs"))
 
         # see https://github.com/joblib/joblib/issues/945
@@ -687,7 +697,7 @@ class Segmentation:
             self.logger.info("Loky Cleaned up")
 
         # Eliminate any fibers not selected using the waypoint ROIs:
-        possible_fibers = np.sum(streamlines_in_bundles, -1) > 0
+        possible_fibers = np.nansum(streamlines_in_bundles, -1) > 0
         tg = StatefulTractogram(tg.streamlines[possible_fibers],
                                 self.img,
                                 Space.VOX)
@@ -696,7 +706,10 @@ class Segmentation:
 
         streamlines_in_bundles = streamlines_in_bundles[possible_fibers]
         min_dist_coords = min_dist_coords[possible_fibers]
-        bundle_choice = np.argmax(streamlines_in_bundles, -1)
+        if self.roi_dist_tie_break:
+            bundle_choice = np.nanargmin(np.nanmin(min_dist_coords, -1), -1)
+        else:
+            bundle_choice = np.nanargmax(streamlines_in_bundles, -1)
 
         # We do another round through, so that we can orient all the
         # streamlines within a bundle in the same orientation with respect to
@@ -800,8 +813,8 @@ class Segmentation:
             if self.clip_edges:
                 self.logger.info("Clipping Streamlines by ROI")
                 for idx in range(len(select_sl)):
-                    min0 = min_dist_coords_bundle[idx, bundle_idx, 0]
-                    min1 = min_dist_coords_bundle[idx, bundle_idx, 1]
+                    min0 = int(min_dist_coords_bundle[idx, bundle_idx, 0])
+                    min1 = int(min_dist_coords_bundle[idx, bundle_idx, 1])
 
                     # If the point that is closest to the first ROI
                     # is the same as the point closest to the second ROI,
@@ -1156,7 +1169,7 @@ def _is_streamline_in_ROIs(sl, tol, include_roi,
             else:
                 return np.argmin(dist[0], 0)[0],\
                     np.argmin(dist[0], 0)[0], fiber_prob
-    return 0, 0, 0
+    return np.nan, np.nan, np.nan
 
 
 def _is_streamline_in_ROIs_parallel(indiv_args, tol, include_roi,
