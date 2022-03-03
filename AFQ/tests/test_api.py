@@ -484,7 +484,7 @@ def test_AFQ_reco():
     myafq.export_all()
 
 
-@pytest.mark.nightly_custom
+@pytest.mark.nightly_anisotropic
 def test_AFQ_reco80():
     """
     Test API segmentation with the 80-bundle atlas
