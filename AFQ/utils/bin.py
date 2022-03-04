@@ -235,35 +235,6 @@ def func_dict_to_arg_dict(func_dict=None, logger=None):
     return arg_dict
 
 
-def parse_qsiprep_params_dict(params_dict):
-    arg_dict = func_dict_to_arg_dict()
-    kwargs = {}
-
-    special_args = {
-        "CLEANING": "clean_params",
-        "SEGMENTATION": "segmentation_params",
-        "TRACTOGRAPHY": "tracking_params"}
-
-    for section, args in arg_dict.items():
-        if section == "AFQ_desc":
-            continue
-        for arg, arg_info in args.items():
-            if arg in special_args.keys():
-                kwargs[special_args[arg]] = {}
-                for actual_arg in arg_info.keys():
-                    if actual_arg in params_dict:
-                        kwargs[special_args[arg]][actual_arg] = toml_to_val(
-                            params_dict[actual_arg])
-            else:
-                if arg in params_dict:
-                    kwargs[arg] = toml_to_val(params_dict[arg])
-
-    for ignore_param in qsi_prep_ignore_params:
-        kwargs.pop(ignore_param, None)
-
-    return kwargs
-
-
 def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
                          overwrite=False,
                          logger=None,
