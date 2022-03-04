@@ -12,6 +12,7 @@ from AFQ.definitions.mapping import *  # interprets mappings loaded from toml
 from AFQ.definitions.scalar import *  # interprets scalars loaded from toml
 from AFQ.definitions.utils import Definition
 from AFQ.api.utils import kwargs_descriptors
+import AFQ.api.bundle_dict as abd
 
 import nibabel as nib  # allows users to input nibabel objects
 
@@ -139,8 +140,8 @@ def dict_to_toml(dictionary):
 # not shown to the user (mostly BIDS filters stuff)
 qsi_prep_ignore_params = [
     "bids_path", "bids_filters", "preproc_pipeline",
-    "custom_tractography_bids_filters", "brain_mask",
-    "mapping", "participant_labels", "output_dir"]
+    "import_tract", "brain_mask_definition",
+    "mapping_definition", "participant_labels", "output_dir"]
 
 
 def dict_to_json(dictionary):
@@ -154,6 +155,13 @@ def dict_to_json(dictionary):
                 continue
             local_ignore.append(arg)
             if isinstance(arg_info, dict):
+                # different reasonable defaults for qsiprep
+                if arg == "scalars":
+                    arg_info["default"] = [
+                        'dki_fa', 'dki_md', 'dki_mk', 'dki_awf']
+                if arg == "bundle_info":
+                    arg_info["default"] = \
+                        abd.BUNDLES + abd.CALLOSUM_BUNDLES
                 json = json\
                     + f'"{arg}": {val_to_toml(arg_info["default"])}'
             else:
@@ -236,14 +244,22 @@ def parse_qsiprep_params_dict(params_dict):
         "SEGMENTATION": "segmentation_params",
         "TRACTOGRAPHY": "tracking_params"}
 
-    for section, arg_name in special_args.items():
-        kwargs[arg_name] = {}
-        for key in arg_dict[section].keys():
-            if key in params_dict:
-                kwargs[arg_name][key] = toml_to_val(params_dict[key])
+    for section, args in arg_dict.items():
+        if section == "AFQ_desc":
+            continue
+        for arg, arg_info in args.items():
+            if arg in special_args.keys():
+                kwargs[special_args[arg]] = {}
+                for actual_arg in arg_info.keys():
+                    if actual_arg in params_dict:
+                        kwargs[special_args[arg]][actual_arg] = toml_to_val(
+                            params_dict[actual_arg])
+            else:
+                if arg in params_dict:
+                    kwargs[arg] = toml_to_val(params_dict[arg])
 
-    for arg, val in params_dict.items():
-        kwargs[arg] = toml_to_val(val)
+    for ignore_param in qsi_prep_ignore_params:
+        kwargs.pop(ignore_param, None)
 
     return kwargs
 
