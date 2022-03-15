@@ -367,7 +367,7 @@ def test_AFQ_data():
 @pytest.mark.nightly_anisotropic
 def test_AFQ_anisotropic():
     """
-    Test if API can run using anisotropic registration
+    Test if API can run using anisotropic power map registration
     with a specific selection of b vals
     """
     _, bids_path, _ = get_temp_hardi()
@@ -484,7 +484,7 @@ def test_AFQ_reco():
     myafq.export_all()
 
 
-@pytest.mark.nightly_anisotropic
+@pytest.mark.nightly_reco80
 def test_AFQ_reco80():
     """
     Test API segmentation with the 80-bundle atlas
