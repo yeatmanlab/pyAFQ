@@ -17,7 +17,7 @@ one of the following communication channels:
 
 #. If you would like to start a discussion about future developments or about
    the method, consider starting a discussion on this
-   `page <https://github.com/yeatmanlab/pyAFQ/discussions>`_
+   `page <https://github.com/yeatmanlab/pyAFQ/discussions>`_.
 
 #. Questions regarding the method and its use can also be posted to the
    `Neurostars <https://neurostars.org/>`_ Q&A forum.
