@@ -491,9 +491,16 @@ def test_AFQ_reco80():
     """
     _, bids_path, _ = get_temp_hardi()
 
+    tracking_params = dict(
+        odf_model="csd",
+        n_seeds=10000,
+        random_seeds=True,
+        rng_seed=42)
+
     myafq = GroupAFQ(
         bids_path=bids_path,
         preproc_pipeline='vistasoft',
+        tracking_params=tracking_params,
         segmentation_params={
             'seg_algo': 'reco80',
             'rng': 42})
