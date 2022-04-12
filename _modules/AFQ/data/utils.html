@@ -1,0 +1,263 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AFQ.data.utils &#8212; AFQ 0.11 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="../../../index.html">
+  <img src="../../../_static/logo.png" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../installation_guide.html">
+  Installing
+  <code class="docutils literal notranslate">
+   <span class="pre">
+    pyAFQ
+   </span>
+  </code>
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../usage/index.html">
+  Using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../auto_examples/index.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../getting_help.html">
+  Getting help using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../contributing.html">
+  Contributing to pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../autoapi/index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../developing/index.html">
+  Developing
+  <cite>
+   pyAFQ
+  </cite>
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for AFQ.data.utils</h1><div class="highlight"><pre>
+<div class="viewcode-block" id="BUNDLE_RECO_2_AFQ"><a class="viewcode-back" href="../../../autoapi/AFQ/data/utils/index.html#AFQ.data.utils.BUNDLE_RECO_2_AFQ">[docs]</a><span></span><span class="n">BUNDLE_RECO_2_AFQ</span> <span class="o">=</span> \
+    <span class="p">{</span>
+        <span class="s2">&quot;AF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;ARC_L&quot;</span><span class="p">,</span> <span class="s2">&quot;AF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;ARC_R&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;UF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;UNC_L&quot;</span><span class="p">,</span> <span class="s2">&quot;UF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;UNC_R&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;IFOF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;IFO_L&quot;</span><span class="p">,</span> <span class="s2">&quot;IFOF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;IFO_R&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;CST_L&quot;</span><span class="p">:</span> <span class="s2">&quot;CST_L&quot;</span><span class="p">,</span> <span class="s2">&quot;CST_R&quot;</span><span class="p">:</span> <span class="s2">&quot;CST_R&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ILF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;ILF_L&quot;</span><span class="p">,</span> <span class="s2">&quot;ILF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;ILF_R&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;SLF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;SLF_L&quot;</span><span class="p">,</span> <span class="s2">&quot;SLF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;SLF_R&quot;</span>
+    <span class="p">}</span></div>
+
+<div class="viewcode-block" id="BUNDLE_MAT_2_PYTHON"><a class="viewcode-back" href="../../../autoapi/AFQ/data/utils/index.html#AFQ.data.utils.BUNDLE_MAT_2_PYTHON">[docs]</a><span class="n">BUNDLE_MAT_2_PYTHON</span> <span class="o">=</span> \
+    <span class="p">{</span><span class="s1">&#39;Right Corticospinal&#39;</span><span class="p">:</span> <span class="s1">&#39;CST_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left Corticospinal&#39;</span><span class="p">:</span> <span class="s1">&#39;CST_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;RightCorticospinal&#39;</span><span class="p">:</span> <span class="s1">&#39;CST_R&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftCorticospinal&#39;</span><span class="p">:</span> <span class="s1">&#39;CST_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Right Uncinate&#39;</span><span class="p">:</span> <span class="s1">&#39;UNC_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left Uncinate&#39;</span><span class="p">:</span> <span class="s1">&#39;UNC_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;RightUncinate&#39;</span><span class="p">:</span> <span class="s1">&#39;UNC_R&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftUncinate&#39;</span><span class="p">:</span> <span class="s1">&#39;UNC_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Left IFOF&#39;</span><span class="p">:</span> <span class="s1">&#39;IFO_L&#39;</span><span class="p">,</span> <span class="s1">&#39;Right IFOF&#39;</span><span class="p">:</span> <span class="s1">&#39;IFO_R&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;LeftIFOF&#39;</span><span class="p">:</span> <span class="s1">&#39;IFO_L&#39;</span><span class="p">,</span> <span class="s1">&#39;RightIFOF&#39;</span><span class="p">:</span> <span class="s1">&#39;IFO_R&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Right Arcuate&#39;</span><span class="p">:</span> <span class="s1">&#39;ARC_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left Arcuate&#39;</span><span class="p">:</span> <span class="s1">&#39;ARC_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;RightArcuate&#39;</span><span class="p">:</span> <span class="s1">&#39;ARC_R&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftArcuate&#39;</span><span class="p">:</span> <span class="s1">&#39;ARC_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Right Thalamic Radiation&#39;</span><span class="p">:</span> <span class="s1">&#39;ATR_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left Thalamic Radiation&#39;</span><span class="p">:</span> <span class="s1">&#39;ATR_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;RightThalamicRadiation&#39;</span><span class="p">:</span> <span class="s1">&#39;ATR_R&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftThalamicRadiation&#39;</span><span class="p">:</span> <span class="s1">&#39;ATR_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Right Cingulum Cingulate&#39;</span><span class="p">:</span> <span class="s1">&#39;CGC_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left Cingulum Cingulate&#39;</span><span class="p">:</span> <span class="s1">&#39;CGC_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;RightCingulumCingulate&#39;</span><span class="p">:</span> <span class="s1">&#39;CGC_R&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftCingulumCingulate&#39;</span><span class="p">:</span> <span class="s1">&#39;CGC_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Right Cingulum Hippocampus&#39;</span><span class="p">:</span> <span class="s1">&#39;HCC_R&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Left Cingulum Hippocampus&#39;</span><span class="p">:</span> <span class="s1">&#39;HCC_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;RightCingulumHippocampus&#39;</span><span class="p">:</span> <span class="s1">&#39;HCC_R&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;LeftCingulumHippocampus&#39;</span><span class="p">:</span> <span class="s1">&#39;HCC_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Callosum Forceps Major&#39;</span><span class="p">:</span> <span class="s1">&#39;FP&#39;</span><span class="p">,</span> <span class="s1">&#39;Callosum Forceps Minor&#39;</span><span class="p">:</span> <span class="s1">&#39;FA&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;CallosumForcepsMajor&#39;</span><span class="p">:</span> <span class="s1">&#39;FP&#39;</span><span class="p">,</span> <span class="s1">&#39;CallosumForcepsMinor&#39;</span><span class="p">:</span> <span class="s1">&#39;FA&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Right ILF&#39;</span><span class="p">:</span> <span class="s1">&#39;ILF_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left ILF&#39;</span><span class="p">:</span> <span class="s1">&#39;ILF_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;RightILF&#39;</span><span class="p">:</span> <span class="s1">&#39;ILF_R&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftILF&#39;</span><span class="p">:</span> <span class="s1">&#39;ILF_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Right SLF&#39;</span><span class="p">:</span> <span class="s1">&#39;SLF_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left SLF&#39;</span><span class="p">:</span> <span class="s1">&#39;SLF_L&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;RightSLF&#39;</span><span class="p">:</span> <span class="s1">&#39;SLF_R&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftSLF&#39;</span><span class="p">:</span> <span class="s1">&#39;SLF_L&#39;</span><span class="p">}</span></div>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2018--, The pyAFQ Contributors.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

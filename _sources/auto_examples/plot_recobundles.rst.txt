@@ -30,7 +30,7 @@ See `plot_tract_profile` for explanations of each stage here. The main
 difference here is that segmentation uses the RecoBundles algorithm, instead of
 the AFQ waypoint ROI approach.
 
-.. GENERATED FROM PYTHON SOURCE LINES 15-174
+.. GENERATED FROM PYTHON SOURCE LINES 15-177
 
 .. code-block:: default
 
@@ -50,7 +50,7 @@ the AFQ waypoint ROI approach.
     from dipy.align import affine_registration
 
 
-    import AFQ.data as afd
+    import AFQ.data.fetch as afd
     import AFQ.tractography as aft
     import AFQ.registration as reg
     import AFQ.models.dti as dti
@@ -104,7 +104,10 @@ the AFQ waypoint ROI approach.
                                    img, MNI_T2_img)
 
 
-    bundle_names = ["CST", "UF", "CC_ForcepsMajor", "CC_ForcepsMinor", "OR", "VOF"]
+    bundle_names = [
+        "CST_L", "CST_R", "UF_L", "UF_R",
+        "CC_ForcepsMajor", "CC_ForcepsMinor",
+        "OR_L", "OR_R", "VOF_L", "VOF_R"]
     bundles = abd.BundleDict(bundle_names, seg_algo="reco80")
 
     print("Tracking...")
@@ -143,7 +146,7 @@ the AFQ waypoint ROI approach.
                  op.join(working_dir, 'seed_roi.nii.gz'))
         sft = aft.track(dti_params['params'], seed_mask=seed_roi,
                         directions='det', stop_mask=FA_data,
-                        stop_threshold=0.1)
+                        stop_threshold=0.1, odf_model="dti")
         print(len(sft.streamlines))
         save_tractogram(sft, op.join(working_dir, 'dti_streamlines_reco.trk'),
                         bbox_valid_check=False)
@@ -202,28 +205,28 @@ the AFQ waypoint ROI approach.
     *
 
       .. image-sg:: /auto_examples/images/sphx_glr_plot_recobundles_001.png
-         :alt: CST_R
+         :alt: CST_L
          :srcset: /auto_examples/images/sphx_glr_plot_recobundles_001.png
          :class: sphx-glr-multi-img
 
     *
 
       .. image-sg:: /auto_examples/images/sphx_glr_plot_recobundles_002.png
-         :alt: CST_L
+         :alt: CST_R
          :srcset: /auto_examples/images/sphx_glr_plot_recobundles_002.png
          :class: sphx-glr-multi-img
 
     *
 
       .. image-sg:: /auto_examples/images/sphx_glr_plot_recobundles_003.png
-         :alt: UF_R
+         :alt: UF_L
          :srcset: /auto_examples/images/sphx_glr_plot_recobundles_003.png
          :class: sphx-glr-multi-img
 
     *
 
       .. image-sg:: /auto_examples/images/sphx_glr_plot_recobundles_004.png
-         :alt: UF_L
+         :alt: UF_R
          :srcset: /auto_examples/images/sphx_glr_plot_recobundles_004.png
          :class: sphx-glr-multi-img
 
@@ -244,28 +247,28 @@ the AFQ waypoint ROI approach.
     *
 
       .. image-sg:: /auto_examples/images/sphx_glr_plot_recobundles_007.png
-         :alt: OR_R
+         :alt: OR_L
          :srcset: /auto_examples/images/sphx_glr_plot_recobundles_007.png
          :class: sphx-glr-multi-img
 
     *
 
       .. image-sg:: /auto_examples/images/sphx_glr_plot_recobundles_008.png
-         :alt: OR_L
+         :alt: OR_R
          :srcset: /auto_examples/images/sphx_glr_plot_recobundles_008.png
          :class: sphx-glr-multi-img
 
     *
 
       .. image-sg:: /auto_examples/images/sphx_glr_plot_recobundles_009.png
-         :alt: VOF_R
+         :alt: VOF_L
          :srcset: /auto_examples/images/sphx_glr_plot_recobundles_009.png
          :class: sphx-glr-multi-img
 
     *
 
       .. image-sg:: /auto_examples/images/sphx_glr_plot_recobundles_010.png
-         :alt: VOF_L
+         :alt: VOF_R
          :srcset: /auto_examples/images/sphx_glr_plot_recobundles_010.png
          :class: sphx-glr-multi-img
 
@@ -290,22 +293,22 @@ the AFQ waypoint ROI approach.
     Tracking...
     16669
     Segmenting fiber groups...
-    CST_R 103
     CST_L 54
-    UF_R 41
-    UF_L 54
-    CC_ForcepsMajor 433
-    CC_ForcepsMinor 950
-    OR_R 19
-    OR_L 36
-    VOF_R 98
+    CST_R 128
+    UF_L 56
+    UF_R 40
+    CC_ForcepsMajor 508
+    CC_ForcepsMinor 984
+    OR_L 44
+    OR_R 18
     VOF_L 134
+    VOF_R 80
     Extracting tract profiles...
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 175-183
+.. GENERATED FROM PYTHON SOURCE LINES 178-186
 
 References:
 -------------------------
@@ -319,7 +322,7 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 17 minutes  56.288 seconds)
+   **Total running time of the script:** ( 17 minutes  49.111 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_recobundles.py:

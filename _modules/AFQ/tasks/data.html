@@ -5,10 +5,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.data &#8212; AFQ 0.10 documentation</title>
+    <title>AFQ.tasks.data &#8212; AFQ 0.11 documentation</title>
     
-  <link href="../../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
@@ -31,7 +27,8 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -46,7 +43,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -136,10 +133,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -155,7 +150,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -163,17 +159,9 @@
     
   </div>
 </nav>
-<h3><a href="../../../index.html">Table of Contents</a></h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -205,11 +193,12 @@
 <span class="kn">import</span> <span class="nn">dipy.reconst.dti</span> <span class="k">as</span> <span class="nn">dpy_dti</span>
 <span class="kn">from</span> <span class="nn">dipy.reconst</span> <span class="kn">import</span> <span class="n">shm</span>
 <span class="kn">from</span> <span class="nn">dipy.reconst.dki_micro</span> <span class="kn">import</span> <span class="n">axonal_water_fraction</span>
+<span class="kn">from</span> <span class="nn">AFQ.definitions.scalar</span> <span class="kn">import</span> <span class="n">ScalarFile</span>
 
 <span class="kn">from</span> <span class="nn">AFQ.tasks.decorators</span> <span class="kn">import</span> <span class="n">as_file</span><span class="p">,</span> <span class="n">as_model</span><span class="p">,</span> <span class="n">as_dt_deriv</span>
 <span class="kn">from</span> <span class="nn">AFQ.tasks.utils</span> <span class="kn">import</span> <span class="n">get_fname</span><span class="p">,</span> <span class="n">with_name</span>
 <span class="kn">import</span> <span class="nn">AFQ.api.bundle_dict</span> <span class="k">as</span> <span class="nn">abd</span>
-<span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afd</span>
+<span class="kn">import</span> <span class="nn">AFQ.data.fetch</span> <span class="k">as</span> <span class="nn">afd</span>
 
 <span class="kn">from</span> <span class="nn">AFQ.definitions.utils</span> <span class="kn">import</span> <span class="n">Definition</span>
 <span class="kn">from</span> <span class="nn">AFQ.definitions.mask</span> <span class="kn">import</span> <span class="n">B0Mask</span>
@@ -417,7 +406,8 @@
 <span class="sd">        threshold controlling the amplitude below which the corresponding</span>
 <span class="sd">        fODF is assumed to be zero.  Ideally, tau should be set to</span>
 <span class="sd">        zero. However, to improve the stability of the algorithm, tau is</span>
-<span class="sd">        set to tau*100 % of the mean fODF amplitude (here, 10% by default)</span>
+<span class="sd">        set to tau*100 percent of the mean fODF amplitude (here, 10 percent</span>
+<span class="sd">        by default)</span>
 <span class="sd">        (see [1]_). Default: 0.1</span>
 
 <span class="sd">    References</span>
@@ -427,7 +417,6 @@
 <span class="sd">            Non-negativity constrained super-resolved spherical</span>
 <span class="sd">            deconvolution</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">msmt</span> <span class="o">=</span> <span class="p">(</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;odf_model&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;MSMT&quot;</span><span class="p">)</span>
     <span class="n">mask</span> <span class="o">=</span>\
         <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">brain_mask_file</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
     <span class="k">try</span><span class="p">:</span>
@@ -435,25 +424,20 @@
             <span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span>
             <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span>
             <span class="n">response</span><span class="o">=</span><span class="n">csd_response</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="n">csd_sh_order</span><span class="p">,</span>
-            <span class="n">lambda_</span><span class="o">=</span><span class="n">csd_lambda_</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">csd_tau</span><span class="p">,</span>
-            <span class="n">msmt</span><span class="o">=</span><span class="n">msmt</span><span class="p">)</span>
+            <span class="n">lambda_</span><span class="o">=</span><span class="n">csd_lambda_</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">csd_tau</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">CsdNanResponseError</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">CsdNanResponseError</span><span class="p">(</span>
             <span class="s1">&#39;Could not compute CSD response function for subject: &#39;</span>
             <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">subses_dict</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1"> in session: </span><span class="si">{</span><span class="n">subses_dict</span><span class="p">[</span><span class="s2">&quot;ses&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1"> &#39;</span>
             <span class="sa">f</span><span class="s1">&#39;file: </span><span class="si">{</span><span class="n">subses_dict</span><span class="p">[</span><span class="s2">&quot;dwi_file&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">.&#39;</span>
-            <span class="p">)</span>
+        <span class="p">)</span>
     <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
         <span class="n">SphericalHarmonicDegree</span><span class="o">=</span><span class="n">csd_sh_order</span><span class="p">,</span>
         <span class="n">ResponseFunctionTensor</span><span class="o">=</span><span class="n">csd_response</span><span class="p">,</span>
         <span class="n">lambda_</span><span class="o">=</span><span class="n">csd_lambda_</span><span class="p">,</span>
         <span class="n">tau</span><span class="o">=</span><span class="n">csd_tau</span><span class="p">)</span>
     <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;SphericalHarmonicBasis&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;DESCOTEAUX&quot;</span>
-    <span class="k">if</span> <span class="n">msmt</span><span class="p">:</span>
-        <span class="n">model_file</span> <span class="o">=</span> <span class="s2">&quot;mcsd.py&quot;</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">model_file</span> <span class="o">=</span> <span class="s2">&quot;csdeconv.py&quot;</span>
-    <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;ModelURL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DIPY_GH</span><span class="si">}</span><span class="s2">reconst/</span><span class="si">{</span><span class="n">model_file</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;ModelURL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DIPY_GH</span><span class="si">}</span><span class="s2">reconst/csdeconv.py&quot;</span>
     <span class="k">return</span> <span class="n">csdf</span><span class="o">.</span><span class="n">shm_coeff</span><span class="p">,</span> <span class="n">meta</span></div>
 
 
@@ -704,8 +688,9 @@
 
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;bundle_dict&quot;</span><span class="p">,</span> <span class="s2">&quot;reg_template&quot;</span><span class="p">)</span>
-<div class="viewcode-block" id="get_bundle_dict"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.get_bundle_dict">[docs]</a><span class="k">def</span> <span class="nf">get_bundle_dict</span><span class="p">(</span><span class="n">segmentation_params</span><span class="p">,</span> <span class="n">brain_mask_file</span><span class="p">,</span> <span class="n">bundle_info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                    <span class="n">reg_template_spec</span><span class="o">=</span><span class="s2">&quot;mni_T1&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="get_bundle_dict"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.get_bundle_dict">[docs]</a><span class="k">def</span> <span class="nf">get_bundle_dict</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">segmentation_params</span><span class="p">,</span>
+                    <span class="n">brain_mask_file</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">,</span>
+                    <span class="n">bundle_info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reg_template_spec</span><span class="o">=</span><span class="s2">&quot;mni_T1&quot;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Dictionary defining the different bundles to be segmented,</span>
 <span class="sd">    and a Nifti1Image containing the template for registration</span>
@@ -715,7 +700,8 @@
 <span class="sd">    bundle_info : list of strings, dict, or BundleDict, optional</span>
 <span class="sd">        List of bundle names to include in segmentation,</span>
 <span class="sd">        or a bundle dictionary (see BundleDict for inspiration),</span>
-<span class="sd">        or a BundleDict.</span>
+<span class="sd">        or a BundleDict. See `Defining Custom Bundle Dictionaries`</span>
+<span class="sd">        in the `usage` section of pyAFQ&#39;s documentation for details.</span>
 <span class="sd">        If None, will get all appropriate bundles for the chosen</span>
 <span class="sd">        segmentation algorithm.</span>
 <span class="sd">        Default: None</span>
@@ -780,6 +766,21 @@
             <span class="n">seg_algo</span><span class="o">=</span><span class="n">segmentation_params</span><span class="p">[</span><span class="s2">&quot;seg_algo&quot;</span><span class="p">],</span>
             <span class="n">resample_to</span><span class="o">=</span><span class="n">reg_template</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">roi_scalar_to_info</span><span class="p">(</span><span class="n">roi</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">ScalarFile</span><span class="p">):</span>
+            <span class="n">roi</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
+                <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;bids_layout&quot;</span><span class="p">],</span>
+                <span class="n">subses_dict</span><span class="p">[</span><span class="s2">&quot;dwi_file&quot;</span><span class="p">],</span>
+                <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">],</span>
+                <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;session&quot;</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">roi</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
+                <span class="n">subses_dict</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span>
+                <span class="n">reg_template</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">roi</span>
+    <span class="k">for</span> <span class="n">b_name</span><span class="p">,</span> <span class="n">b_info</span> <span class="ow">in</span> <span class="n">bundle_dict</span><span class="o">.</span><span class="n">_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="s2">&quot;space&quot;</span> <span class="ow">in</span> <span class="n">b_info</span> <span class="ow">and</span> <span class="n">b_info</span><span class="p">[</span><span class="s2">&quot;space&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;subject&quot;</span><span class="p">:</span>
+            <span class="n">bundle_dict</span><span class="o">.</span><span class="n">apply_to_rois</span><span class="p">(</span><span class="n">b_name</span><span class="p">,</span> <span class="n">roi_scalar_to_info</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="n">reg_template</span></div>
 
 
@@ -826,7 +827,8 @@
       </div>
     </div>
   
-  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
@@ -839,7 +841,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

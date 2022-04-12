@@ -5,10 +5,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.mapping &#8212; AFQ 0.10 documentation</title>
+    <title>AFQ.tasks.mapping &#8212; AFQ 0.11 documentation</title>
     
-  <link href="../../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
@@ -31,7 +27,8 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -46,7 +43,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -136,10 +133,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -155,7 +150,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -163,17 +159,9 @@
     
   </div>
 </nav>
-<h3><a href="../../../index.html">Table of Contents</a></h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -202,7 +190,8 @@
 <span class="kn">import</span> <span class="nn">pimms</span>
 <span class="kn">from</span> <span class="nn">AFQ.tasks.decorators</span> <span class="kn">import</span> <span class="n">as_file</span>
 <span class="kn">from</span> <span class="nn">AFQ.tasks.utils</span> <span class="kn">import</span> <span class="n">get_fname</span><span class="p">,</span> <span class="n">with_name</span>
-<span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afd</span>
+<span class="kn">import</span> <span class="nn">AFQ.data.fetch</span> <span class="k">as</span> <span class="nn">afd</span>
+<span class="kn">from</span> <span class="nn">AFQ.data.s3bids</span> <span class="kn">import</span> <span class="n">write_json</span>
 <span class="kn">import</span> <span class="nn">AFQ.utils.volume</span> <span class="k">as</span> <span class="nn">auv</span>
 <span class="kn">from</span> <span class="nn">AFQ.definitions.mapping</span> <span class="kn">import</span> <span class="n">SynMap</span>
 <span class="kn">from</span> <span class="nn">AFQ.definitions.utils</span> <span class="kn">import</span> <span class="n">Definition</span>
@@ -252,34 +241,37 @@
     <span class="n">roi_files</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundle_dict</span><span class="p">:</span>
         <span class="n">roi_files</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">roi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;ROIs&#39;</span><span class="p">]):</span>
-            <span class="k">if</span> <span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;rules&#39;</span><span class="p">][</span><span class="n">ii</span><span class="p">]:</span>
-                <span class="n">inclusion</span> <span class="o">=</span> <span class="s1">&#39;include&#39;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">inclusion</span> <span class="o">=</span> <span class="s1">&#39;exclude&#39;</span>
+        <span class="k">for</span> <span class="n">roi_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;include&#39;</span><span class="p">,</span> <span class="s1">&#39;exclude&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">roi_type</span> <span class="ow">in</span> <span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">roi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="n">roi_type</span><span class="p">]):</span>
+                    <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
+                        <span class="n">get_fname</span><span class="p">(</span>
+                            <span class="n">subses_dict</span><span class="p">,</span>
+                            <span class="sa">f</span><span class="s1">&#39;_desc-ROI-</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">roi_type</span><span class="si">}</span><span class="s1">.nii.gz&#39;</span><span class="p">))</span>
 
-            <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
-                <span class="n">get_fname</span><span class="p">(</span>
-                    <span class="n">subses_dict</span><span class="p">,</span>
-                    <span class="sa">f</span><span class="s1">&#39;_desc-ROI-</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">inclusion</span><span class="si">}</span><span class="s1">.nii.gz&#39;</span><span class="p">))</span>
+                    <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rois_dir</span><span class="p">,</span> <span class="n">fname</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="s2">&quot;space&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span>\
+                            <span class="ow">or</span> <span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span>
+                                <span class="s2">&quot;space&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;template&quot;</span><span class="p">:</span>
+                            <span class="n">warped_roi</span> <span class="o">=</span> <span class="n">auv</span><span class="o">.</span><span class="n">transform_inverse_roi</span><span class="p">(</span>
+                                <span class="n">roi</span><span class="p">,</span>
+                                <span class="n">mapping</span><span class="p">,</span>
+                                <span class="n">bundle_name</span><span class="o">=</span><span class="n">bundle</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">warped_roi</span> <span class="o">=</span> <span class="n">roi</span>
 
-            <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rois_dir</span><span class="p">,</span> <span class="n">fname</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
-                <span class="n">warped_roi</span> <span class="o">=</span> <span class="n">auv</span><span class="o">.</span><span class="n">transform_inverse_roi</span><span class="p">(</span>
-                    <span class="n">roi</span><span class="p">,</span>
-                    <span class="n">mapping</span><span class="p">,</span>
-                    <span class="n">bundle_name</span><span class="o">=</span><span class="n">bundle</span><span class="p">)</span>
-
-                <span class="c1"># Cast to float32, so that it can be read in by MI-Brain:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saving </span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
-                    <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span>
-                        <span class="n">warped_roi</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
-                        <span class="n">dwi_affine</span><span class="p">),</span> <span class="n">fname</span><span class="p">)</span>
-                <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-                <span class="n">meta_fname</span> <span class="o">=</span> <span class="n">fname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.json&#39;</span>
-                <span class="n">afd</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
-            <span class="n">roi_files</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+                        <span class="c1"># Cast to float32,</span>
+                        <span class="c1"># so that it can be read in by MI-Brain:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saving </span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                            <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span>
+                                <span class="n">warped_roi</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+                                <span class="n">dwi_affine</span><span class="p">),</span> <span class="n">fname</span><span class="p">)</span>
+                        <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                        <span class="n">meta_fname</span> <span class="o">=</span> <span class="n">fname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.json&#39;</span>
+                        <span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
+                    <span class="n">roi_files</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;rois_file&#39;</span><span class="p">:</span> <span class="n">roi_files</span><span class="p">}</span></div>
 
 
@@ -444,7 +436,7 @@
                     <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">],</span>
                     <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;session&quot;</span><span class="p">]</span>
                 <span class="p">)</span>
-            <span class="n">mapping_tasks</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">{scalar.name}</span><span class="s2">_file_res&quot;</span><span class="p">]</span> <span class="o">=</span>\
+            <span class="n">mapping_tasks</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">scalar</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_file_res&quot;</span><span class="p">]</span> <span class="o">=</span>\
                 <span class="n">pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">scalar</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_file&quot;</span><span class="p">)(</span><span class="n">scalar</span><span class="o">.</span><span class="n">get_for_subses</span><span class="p">())</span>
 
     <span class="k">if</span> <span class="n">use_sls</span><span class="p">:</span>
@@ -466,7 +458,8 @@
       </div>
     </div>
   
-  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
@@ -479,7 +472,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

@@ -29,7 +29,7 @@ import matplotlib.pyplot as plt
 import nibabel as nib
 
 from AFQ.api.group import GroupAFQ
-import AFQ.data as afd
+import AFQ.data.fetch as afd
 
 
 ##########################################################################
@@ -210,7 +210,9 @@ print(validator.is_bids(tractography_relative_path))
 # For an example that includes custom definition of bundle info, see the
 # `plot_callosal_tract_profile example <http://yeatmanlab.github.io/pyAFQ/auto_examples/plot_callosal_tract_profile.html>`_.
 
-bundle_info = ["SLF", "ARC", "CST", "FP"]
+bundle_info = [
+    "SLF_L", "SLF_R", "ARC_L", "ARC_R",
+    "CST_L", "CST_R", "FP"]
 
 ##########################################################################
 # Now, we can define our AFQ object, pointing to the derivatives of the

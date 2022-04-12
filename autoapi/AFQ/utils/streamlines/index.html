@@ -5,10 +5,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.utils.streamlines &#8212; AFQ 0.10 documentation</title>
+    <title>AFQ.utils.streamlines &#8212; AFQ 0.11 documentation</title>
     
-  <link href="../../../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css" />
@@ -31,7 +27,8 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
@@ -48,7 +45,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -138,10 +135,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -157,7 +152,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -230,6 +226,49 @@
     </ul>
    </li>
    <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../data/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.data
+      </span>
+     </code>
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+    <label for="toctree-checkbox-3">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../data/fetch/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.data.fetch
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../data/s3bids/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.data.s3bids
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../data/utils/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.data.utils
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
     <a class="reference internal" href="../../definitions/index.html">
      <code class="xref py py-mod docutils literal notranslate">
       <span class="pre">
@@ -237,8 +276,8 @@
       </span>
      </code>
     </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
-    <label for="toctree-checkbox-3">
+    <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+    <label for="toctree-checkbox-4">
      <i class="fas fa-chevron-down">
      </i>
     </label>
@@ -289,8 +328,8 @@
       </span>
      </code>
     </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
-    <label for="toctree-checkbox-4">
+    <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+    <label for="toctree-checkbox-5">
      <i class="fas fa-chevron-down">
      </i>
     </label>
@@ -332,8 +371,8 @@
       </span>
      </code>
     </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
-    <label for="toctree-checkbox-5">
+    <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+    <label for="toctree-checkbox-6">
      <i class="fas fa-chevron-down">
      </i>
     </label>
@@ -411,8 +450,8 @@
       </span>
      </code>
     </a>
-    <input checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
-    <label for="toctree-checkbox-6">
+    <input checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+    <label for="toctree-checkbox-7">
      <i class="fas fa-chevron-down">
      </i>
     </label>
@@ -481,8 +520,8 @@
       </span>
      </code>
     </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
-    <label for="toctree-checkbox-7">
+    <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+    <label for="toctree-checkbox-8">
      <i class="fas fa-chevron-down">
      </i>
     </label>
@@ -526,15 +565,6 @@
     </ul>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="../../data/index.html">
-     <code class="xref py py-mod docutils literal notranslate">
-      <span class="pre">
-       AFQ.data
-      </span>
-     </code>
-    </a>
-   </li>
-   <li class="toctree-l2">
     <a class="reference internal" href="../../registration/index.html">
      <code class="xref py py-mod docutils literal notranslate">
       <span class="pre">
@@ -567,20 +597,9 @@
 
   </div>
 </nav>
-<h3><a href="../../../../index.html">Table of Contents</a></h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -591,7 +610,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -603,24 +622,36 @@
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#classes">
+     Classes
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#functions">
      Functions
     </a>
     <ul class="nav section-nav flex-column">
      <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#AFQ.utils.streamlines.add_bundles">
-       add_bundles
+      <a class="reference internal nav-link" href="#AFQ.utils.streamlines.SegmentedSFT">
+       SegmentedSFT
       </a>
-     </li>
-     <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#AFQ.utils.streamlines.bundles_to_tgram">
-       bundles_to_tgram
-      </a>
-     </li>
-     <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#AFQ.utils.streamlines.tgram_to_bundles">
-       tgram_to_bundles
-      </a>
+      <ul class="nav section-nav flex-column">
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.utils.streamlines.SegmentedSFT.get_sft_and_sidecar">
+         get_sft_and_sidecar
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.utils.streamlines.SegmentedSFT.get_bundle">
+         get_bundle
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.utils.streamlines.SegmentedSFT.fromfile">
+         fromfile
+        </a>
+       </li>
+      </ul>
      </li>
      <li class="toc-h4 nav-item toc-entry">
       <a class="reference internal nav-link" href="#AFQ.utils.streamlines.split_streamline">
@@ -660,86 +691,59 @@
               <div>
                 
   <div class="section" id="module-AFQ.utils.streamlines">
-<span id="afq-utils-streamlines"></span><h1><a class="reference internal" href="#module-AFQ.utils.streamlines" title="AFQ.utils.streamlines"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.streamlines</span></code></a><a class="headerlink" href="#module-AFQ.utils.streamlines" title="Permalink to this headline">¶</a></h1>
+<span id="afq-utils-streamlines"></span><h1><a class="reference internal" href="#module-AFQ.utils.streamlines" title="AFQ.utils.streamlines"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.streamlines</span></code></a><a class="headerlink" href="#module-AFQ.utils.streamlines" title="Permalink to this headline">#</a></h1>
 <div class="section" id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="functions">
-<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
-<table class="longtable table autosummary">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">#</a></h2>
+<div class="section" id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">#</a></h3>
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.utils.streamlines.add_bundles" title="AFQ.utils.streamlines.add_bundles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_bundles</span></code></a>(t1, t2)</p></td>
-<td><p>Combine two bundles, using the second bundles' affine and</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.utils.streamlines.SegmentedSFT" title="AFQ.utils.streamlines.SegmentedSFT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SegmentedSFT</span></code></a></p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.utils.streamlines.bundles_to_tgram" title="AFQ.utils.streamlines.bundles_to_tgram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bundles_to_tgram</span></code></a>(bundles, bundle_dict, reference)</p></td>
-<td><p>Create a StatefulTractogram object from bundles and their</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.utils.streamlines.tgram_to_bundles" title="AFQ.utils.streamlines.tgram_to_bundles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tgram_to_bundles</span></code></a>(tgram, bundle_dict, reference)</p></td>
-<td><p>Convert a StatefulTractogram object to a dict with StatefulTractogram</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.utils.streamlines.split_streamline" title="AFQ.utils.streamlines.split_streamline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_streamline</span></code></a>(streamlines, sl_to_split, split_idx)</p></td>
+</tbody>
+</table>
+</div>
+<div class="section" id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">#</a></h3>
+<table class="autosummary longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.utils.streamlines.split_streamline" title="AFQ.utils.streamlines.split_streamline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_streamline</span></code></a>(streamlines, sl_to_split, split_idx)</p></td>
 <td><p>Given a Streamlines object, split one of the underlying streamlines</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="py function">
-<dt class="sig sig-object py" id="AFQ.utils.streamlines.add_bundles">
-<span class="sig-prename descclassname"><span class="pre">AFQ.utils.streamlines.</span></span><span class="sig-name descname"><span class="pre">add_bundles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#add_bundles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.utils.streamlines.add_bundles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Combine two bundles, using the second bundles’ affine and
-data_per_streamline keys.</p>
-<blockquote>
-<div><p>Parameters</p>
-</div></blockquote>
-<p>t1, t2 : nib.streamlines.Tractogram class instances</p>
-</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="AFQ.utils.streamlines.SegmentedSFT">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.utils.streamlines.</span></span><span class="sig-name descname"><span class="pre">SegmentedSFT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bundles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#SegmentedSFT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.utils.streamlines.SegmentedSFT" title="Permalink to this definition">#</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="AFQ.utils.streamlines.SegmentedSFT.get_sft_and_sidecar">
+<span class="sig-name descname"><span class="pre">get_sft_and_sidecar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#SegmentedSFT.get_sft_and_sidecar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.utils.streamlines.SegmentedSFT.get_sft_and_sidecar" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="AFQ.utils.streamlines.bundles_to_tgram">
-<span class="sig-prename descclassname"><span class="pre">AFQ.utils.streamlines.</span></span><span class="sig-name descname"><span class="pre">bundles_to_tgram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bundles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#bundles_to_tgram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.utils.streamlines.bundles_to_tgram" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a StatefulTractogram object from bundles and their
-specification.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>bundles: dict</strong></dt><dd><p>Each key in the dict is a bundle name and each value in the dict
-is the stateful tractogram of a particular bundle.</p>
-</dd>
-<dt><strong>bundle_dict: dict</strong></dt><dd><p>A bundle specification dictionary. Each key is a bundle name, and each
-value is another dictionary specifying bundle properties. In this
-value dictionary, there must be one <cite>uid</cite> key whose value is a
-unique integer for that bundle.</p>
-</dd>
-<dt><strong>reference</strong><span class="classifier">Nifti</span></dt><dd><p>The affine_to_rasmm input to <cite>nib.streamlines.Tractogram</cite></p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="AFQ.utils.streamlines.SegmentedSFT.get_bundle">
+<span class="sig-name descname"><span class="pre">get_bundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#SegmentedSFT.get_bundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.utils.streamlines.SegmentedSFT.get_bundle" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="AFQ.utils.streamlines.tgram_to_bundles">
-<span class="sig-prename descclassname"><span class="pre">AFQ.utils.streamlines.</span></span><span class="sig-name descname"><span class="pre">tgram_to_bundles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tgram</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#tgram_to_bundles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.utils.streamlines.tgram_to_bundles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert a StatefulTractogram object to a dict with StatefulTractogram
-objects for each bundle.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>tgram</strong><span class="classifier">StatefulTractogram class instance.</span></dt><dd><p>Requires a data_per_streamline[‘bundle’][bundle_name][‘uid’] attribute.</p>
-</dd>
-<dt><strong>bundle_dict: dict</strong></dt><dd><p>A bundle specification dictionary. Each item includes in particular a
-<cite>uid</cite> key that is a unique integer for that bundle.</p>
-</dd>
-</dl>
-</dd>
-</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="AFQ.utils.streamlines.SegmentedSFT.fromfile">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fromfile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trk_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'same'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sidecar_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#SegmentedSFT.fromfile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.utils.streamlines.SegmentedSFT.fromfile" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.utils.streamlines.split_streamline">
-<span class="sig-prename descclassname"><span class="pre">AFQ.utils.streamlines.</span></span><span class="sig-name descname"><span class="pre">split_streamline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">streamlines</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sl_to_split</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#split_streamline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.utils.streamlines.split_streamline" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.utils.streamlines.</span></span><span class="sig-name descname"><span class="pre">split_streamline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">streamlines</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sl_to_split</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/utils/streamlines.html#split_streamline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.utils.streamlines.split_streamline" title="Permalink to this definition">#</a></dt>
 <dd><p>Given a Streamlines object, split one of the underlying streamlines</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -764,7 +768,7 @@ objects for each bundle.</p>
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="../stats/index.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -787,7 +791,8 @@ objects for each bundle.</p>
       </div>
     </div>
   
-  <script src="../../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
@@ -800,7 +805,7 @@ objects for each bundle.</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

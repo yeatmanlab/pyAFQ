@@ -39,7 +39,7 @@ using waypoint ROIs.
 
     https://figshare.com/articles/Templates_for_Automated_Fiber_Quantification_of_corpus_callosum_from_Diffusion_MRI_data/3381523
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-62
+.. GENERATED FROM PYTHON SOURCE LINES 24-63
 
 .. code-block:: default
 
@@ -56,11 +56,12 @@ using waypoint ROIs.
     from dipy.io.stateful_tractogram import Space
     from dipy.align import affine_registration
 
-    import AFQ.data as afd
+    import AFQ.data.fetch as afd
     import AFQ.tractography as aft
     import AFQ.registration as reg
     import AFQ.models.dti as dti
     import AFQ.segmentation as seg
+    from AFQ.utils.streamlines import SegmentedSFT
     from AFQ.utils.volume import transform_inverse_roi, density_map
     from AFQ.viz.plot import show_anatomical_slices
     from AFQ.viz.plotly_backend import visualize_bundles, visualize_volume
@@ -88,7 +89,7 @@ using waypoint ROIs.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-72
+.. GENERATED FROM PYTHON SOURCE LINES 64-73
 
 Get example data:
 -----------------
@@ -100,7 +101,7 @@ Get example data:
 
     https://purl.stanford.edu/ng782rw8378
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-101
+.. GENERATED FROM PYTHON SOURCE LINES 73-102
 
 .. code-block:: default
 
@@ -249,7 +250,7 @@ Get example data:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-129
+.. GENERATED FROM PYTHON SOURCE LINES 103-130
 
 Calculate DTI:
 --------------
@@ -279,7 +280,7 @@ In this example we will only use FA.
   The diffusion tensor imaging parameters contain the associated eigenvalues
   and eigenvectors from eigen decomposition on the diffusion tensor.
 
-.. GENERATED FROM PYTHON SOURCE LINES 129-146
+.. GENERATED FROM PYTHON SOURCE LINES 130-147
 
 .. code-block:: default
 
@@ -321,7 +322,7 @@ In this example we will only use FA.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 147-159
+.. GENERATED FROM PYTHON SOURCE LINES 148-160
 
 Register the individual data to a template:
 -------------------------------------------
@@ -336,7 +337,7 @@ fulfill the segmentation criteria.
     Before calculating this non-linear warping, we perform a pre-alignment
     using an affine transformation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 159-200
+.. GENERATED FROM PYTHON SOURCE LINES 160-201
 
 .. code-block:: default
 
@@ -422,7 +423,7 @@ fulfill the segmentation criteria.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 201-249
+.. GENERATED FROM PYTHON SOURCE LINES 202-250
 
 Create novel bundle specification:
 ----------------------------------
@@ -473,7 +474,7 @@ waypoint ROI templates:
 The templates are first resampled into the MNI space, before
 they are brought into the subject's individual native space.
 
-.. GENERATED FROM PYTHON SOURCE LINES 249-276
+.. GENERATED FROM PYTHON SOURCE LINES 250-277
 
 .. code-block:: default
 
@@ -497,10 +498,10 @@ they are brought into the subject's individual native space.
 
     # anterior frontal ROIs
     bundles["AntFrontal"] = {
-        'ROIs': [callosal_templates["L_AntFrontal"],
-                 callosal_templates["R_AntFrontal"],
-                 callosal_templates["Callosum_midsag"]],
-        'rules': [True, True, True],
+        'include': [
+            callosal_templates["L_AntFrontal"],
+            callosal_templates["R_AntFrontal"],
+            callosal_templates["Callosum_midsag"]],
         'cross_midline': True
     }
 
@@ -544,7 +545,7 @@ they are brought into the subject's individual native space.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 277-296
+.. GENERATED FROM PYTHON SOURCE LINES 278-297
 
 Tracking:
 ---------
@@ -566,7 +567,7 @@ algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
   streamlines for the anterior forceps, but not many streamlines anywhere
   else.
 
-.. GENERATED FROM PYTHON SOURCE LINES 296-340
+.. GENERATED FROM PYTHON SOURCE LINES 297-344
 
 .. code-block:: default
 
@@ -577,23 +578,25 @@ algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
     if not op.exists(op.join(working_dir, 'dti_streamlines.trk')):
         seed_roi = np.zeros(img.shape[:-1])
         for bundle in bundles:
-            for idx, roi in enumerate(bundles[bundle]['ROIs']):
-                if bundles[bundle]['rules'][idx]:
-                    warped_roi = transform_inverse_roi(
-                        roi,
-                        mapping,
-                        bundle_name=bundle)
+            for idx, roi in enumerate(bundles[bundle]["include"]):
+                warped_roi = transform_inverse_roi(
+                    roi,
+                    mapping,
+                    bundle_name=bundle)
 
-                    nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),
-                             op.join(working_dir, f"{bundle}_{idx+1}.nii.gz"))
+                nib.save(
+                    nib.Nifti1Image(warped_roi.astype(float), img.affine),
+                    op.join(working_dir, f"{bundle}_{idx+1}.nii.gz"))
 
-                    warped_roi_img = nib.load(op.join(working_dir,
-                                                      f"{bundle}_{idx+1}.nii.gz"))
-                    show_anatomical_slices(warped_roi_img.get_fdata(),
-                                           f'warped {bundle}_{idx+1} ROI')
+                warped_roi_img = nib.load(op.join(
+                    working_dir,
+                    f"{bundle}_{idx+1}.nii.gz"))
+                show_anatomical_slices(
+                    warped_roi_img.get_fdata(),
+                    f'warped {bundle}_{idx+1} ROI')
 
-                    # Add voxels that aren't there yet:
-                    seed_roi = np.logical_or(seed_roi, warped_roi)
+                # Add voxels that aren't there yet:
+                seed_roi = np.logical_or(seed_roi, warped_roi)
 
         seed_roi_img = nib.Nifti1Image(seed_roi.astype(float), img.affine)
         nib.save(seed_roi_img, op.join(working_dir, 'seed_roi.nii.gz'))
@@ -601,7 +604,8 @@ algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
         show_anatomical_slices(seed_roi_img.get_fdata(), 'Seed ROI')
 
         tractogram = aft.track(dti_params['params'], seed_mask=seed_roi,
-                               stop_mask=FA_data, stop_threshold=0.1)
+                               stop_mask=FA_data, stop_threshold=0.1,
+                               directions="det", odf_model="dti")
         save_tractogram(tractogram, op.join(working_dir, 'dti_streamlines.trk'),
                         bbox_valid_check=False)
 
@@ -664,7 +668,7 @@ algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 341-374
+.. GENERATED FROM PYTHON SOURCE LINES 345-378
 
 Segmentation:
 -------------
@@ -700,7 +704,7 @@ contains the following keys:
    segmentation by ignoring endpoint filters. This means that additional
    streamlines may be included that would otherwise be excluded.
 
-.. GENERATED FROM PYTHON SOURCE LINES 374-408
+.. GENERATED FROM PYTHON SOURCE LINES 378-412
 
 .. code-block:: default
 
@@ -771,7 +775,7 @@ contains the following keys:
     Assigning Streamlines to Bundles
     Finding Streamlines for AntFrontal
     1019 streamlines exceed the probability threshold.
-      0%|          | 0/1019 [00:00<?, ?it/s]      0%|          | 4/1019 [00:04<17:26,  1.03s/it]      2%|2         | 22/1019 [00:04<02:23,  6.96it/s]     39%|###9      | 398/1019 [00:04<00:03, 178.04it/s]     77%|#######6  | 782/1019 [00:04<00:00, 401.13it/s]    100%|##########| 1019/1019 [00:04<00:00, 229.97it/s]
+      0%|          | 0/1019 [00:00<?, ?it/s]      0%|          | 2/1019 [00:00<01:09, 14.61it/s]      0%|          | 4/1019 [00:04<20:06,  1.19s/it]      3%|2         | 30/1019 [00:04<01:42,  9.68it/s]     52%|#####1    | 526/1019 [00:04<00:02, 237.35it/s]    100%|##########| 1019/1019 [00:04<00:00, 234.01it/s]
     157 streamlines selected with waypoint ROIs
     Cleaning up Loky...
     Loky Cleaned up
@@ -781,7 +785,7 @@ contains the following keys:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 409-427
+.. GENERATED FROM PYTHON SOURCE LINES 413-431
 
 Cleaning:
 ---------
@@ -802,7 +806,7 @@ of their trajectory and/or length.
      - greather than 4 standard deviations from the mean length
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 427-454
+.. GENERATED FROM PYTHON SOURCE LINES 431-458
 
 .. code-block:: default
 
@@ -856,19 +860,24 @@ of their trajectory and/or length.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 455-457
+.. GENERATED FROM PYTHON SOURCE LINES 459-461
 
-Visualizing bundles and tract profiles:
+Visualizing a bundle and tract profile:
 ---------------------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 457-462
+.. GENERATED FROM PYTHON SOURCE LINES 461-471
 
 .. code-block:: default
 
 
-    plotly.io.show(visualize_bundles(tractogram,
+    bundle_to_viz = SegmentedSFT({"AntFrontal": load_tractogram(
+        op.join(working_dir, f'afq_AntFrontal.trk'),
+        img, to_space=Space.VOX)}, Space.VOX)
+
+    plotly.io.show(visualize_bundles(bundle_to_viz,
                                      figure=visualize_volume(warped_MNI_T2_data),
-                                     shade_by_volume=FA_data))
+                                     shade_by_volume=FA_data,
+                                     bundle_dict=bundles))
 
 
 
@@ -880,7 +889,7 @@ Visualizing bundles and tract profiles:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 463-473
+.. GENERATED FROM PYTHON SOURCE LINES 472-482
 
 Bundle profiles:
 ----------------
@@ -893,7 +902,7 @@ to how representative this streamline is of the bundle overall.
   As a sanity check the anterior forceps the tract profile is relatively
   symmetric?
 
-.. GENERATED FROM PYTHON SOURCE LINES 473-489
+.. GENERATED FROM PYTHON SOURCE LINES 482-498
 
 .. code-block:: default
 
@@ -934,7 +943,7 @@ to how representative this streamline is of the bundle overall.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 490-500
+.. GENERATED FROM PYTHON SOURCE LINES 499-509
 
 References:
 -------------------------
@@ -950,7 +959,7 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 15 minutes  16.987 seconds)
+   **Total running time of the script:** ( 15 minutes  1.104 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_callosal_tract_profile.py:

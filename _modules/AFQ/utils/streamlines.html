@@ -5,10 +5,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.utils.streamlines &#8212; AFQ 0.10 documentation</title>
+    <title>AFQ.utils.streamlines &#8212; AFQ 0.11 documentation</title>
     
-  <link href="../../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
@@ -31,7 +27,8 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -46,7 +43,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -136,10 +133,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -155,7 +150,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -163,17 +159,9 @@
     
   </div>
 </nav>
-<h3><a href="../../../index.html">Table of Contents</a></h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -193,82 +181,88 @@
               <div>
                 
   <h1>Source code for AFQ.utils.streamlines</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
+<span></span><span class="kn">import</span> <span class="nn">gc</span>
+<span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="kn">import</span> <span class="n">load_tractogram</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">StatefulTractogram</span><span class="p">,</span> <span class="n">Space</span>
+<span class="kn">from</span> <span class="nn">AFQ.data.s3bids</span> <span class="kn">import</span> <span class="n">read_json</span>
+<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
 
 
-<div class="viewcode-block" id="add_bundles"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.add_bundles">[docs]</a><span class="k">def</span> <span class="nf">add_bundles</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Combine two bundles, using the second bundles&#39; affine and</span>
-<span class="sd">    data_per_streamline keys.</span>
-<span class="sd">     Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    t1, t2 : nib.streamlines.Tractogram class instances</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">data_per_streamline</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">t1</span><span class="o">.</span><span class="n">data_per_streamline</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
-                               <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">t2</span><span class="o">.</span><span class="n">data_per_streamline</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
-                           <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">t2</span><span class="o">.</span><span class="n">data_per_streamline</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
-    <span class="k">return</span> <span class="n">nib</span><span class="o">.</span><span class="n">streamlines</span><span class="o">.</span><span class="n">Tractogram</span><span class="p">(</span>
-        <span class="nb">list</span><span class="p">(</span><span class="n">t1</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">t2</span><span class="o">.</span><span class="n">streamlines</span><span class="p">),</span>
-        <span class="n">data_per_streamline</span><span class="p">,</span>
-        <span class="n">affine_to_rasmm</span><span class="o">=</span><span class="n">t2</span><span class="o">.</span><span class="n">affine_to_rasmm</span><span class="p">)</span></div>
+<div class="viewcode-block" id="SegmentedSFT"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.SegmentedSFT">[docs]</a><span class="k">class</span> <span class="nc">SegmentedSFT</span><span class="p">():</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundles</span><span class="p">,</span> <span class="n">space</span><span class="p">):</span>
+        <span class="n">reference</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bundle_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">sls</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">idxs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">this_tracking_idxs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">idx_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">b_name</span> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bundles</span><span class="p">[</span><span class="n">b_name</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">this_sls</span> <span class="o">=</span> <span class="n">bundles</span><span class="p">[</span><span class="n">b_name</span><span class="p">][</span><span class="s1">&#39;sl&#39;</span><span class="p">]</span>
+                <span class="n">this_tracking_idxs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">bundles</span><span class="p">[</span><span class="n">b_name</span><span class="p">][</span><span class="s1">&#39;idx&#39;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">this_sls</span> <span class="o">=</span> <span class="n">bundles</span><span class="p">[</span><span class="n">b_name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">reference</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">reference</span> <span class="o">=</span> <span class="n">this_sls</span>
+            <span class="n">this_sls</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">this_sls</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)</span>
+            <span class="n">sls</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">this_sls</span><span class="p">)</span>
+            <span class="n">new_idx_count</span> <span class="o">=</span> <span class="n">idx_count</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">this_sls</span><span class="p">)</span>
+            <span class="n">idxs</span><span class="p">[</span><span class="n">b_name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">idx_count</span><span class="p">,</span> <span class="n">new_idx_count</span><span class="p">))</span>
+            <span class="n">idx_count</span> <span class="o">=</span> <span class="n">new_idx_count</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bundle_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b_name</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">sft</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span><span class="n">sls</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">space</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bundle_idxs</span> <span class="o">=</span> <span class="n">idxs</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">this_tracking_idxs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">this_tracking_idxs</span> <span class="o">=</span> <span class="n">this_tracking_idxs</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">this_tracking_idxs</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="bundles_to_tgram"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.bundles_to_tgram">[docs]</a><span class="k">def</span> <span class="nf">bundles_to_tgram</span><span class="p">(</span><span class="n">bundles</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="n">reference</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Create a StatefulTractogram object from bundles and their</span>
-<span class="sd">    specification.</span>
+<div class="viewcode-block" id="SegmentedSFT.get_sft_and_sidecar"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.SegmentedSFT.get_sft_and_sidecar">[docs]</a>    <span class="k">def</span> <span class="nf">get_sft_and_sidecar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sidecar_info</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">sidecar_info</span><span class="p">[</span><span class="s2">&quot;bundle_ids&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">dps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">bundle_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_names</span><span class="p">):</span>
+            <span class="n">sidecar_info</span><span class="p">[</span><span class="s2">&quot;bundle_ids&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bundle_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">dps</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_idxs</span><span class="p">[</span><span class="n">bundle_name</span><span class="p">]]</span> <span class="o">=</span> <span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">dps</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;bundle&quot;</span><span class="p">:</span> <span class="n">dps</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sft</span><span class="o">.</span><span class="n">data_per_streamline</span> <span class="o">=</span> <span class="n">dps</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">this_tracking_idxs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">this_tracking_idxs</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">this_tracking_idxs</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">this_tracking_idxs</span><span class="p">[</span><span class="n">ii</span><span class="p">])</span>
+            <span class="n">sidecar_info</span><span class="p">[</span><span class="s2">&quot;tracking_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">this_tracking_idxs</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    bundles: dict</span>
-<span class="sd">        Each key in the dict is a bundle name and each value in the dict</span>
-<span class="sd">        is the stateful tractogram of a particular bundle.</span>
-<span class="sd">    bundle_dict: dict</span>
-<span class="sd">        A bundle specification dictionary. Each key is a bundle name, and each</span>
-<span class="sd">        value is another dictionary specifying bundle properties. In this</span>
-<span class="sd">        value dictionary, there must be one `uid` key whose value is a</span>
-<span class="sd">        unique integer for that bundle.</span>
-<span class="sd">    reference : Nifti</span>
-<span class="sd">        The affine_to_rasmm input to `nib.streamlines.Tractogram`</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">tgram</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">streamlines</span><span class="o">.</span><span class="n">Tractogram</span><span class="p">([],</span> <span class="p">{</span><span class="s1">&#39;bundle&#39;</span><span class="p">:</span> <span class="p">[]})</span>
-    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
-        <span class="n">this_sl</span> <span class="o">=</span> <span class="n">bundles</span><span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="o">.</span><span class="n">streamlines</span>
-        <span class="n">this_tgram</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">streamlines</span><span class="o">.</span><span class="n">Tractogram</span><span class="p">(</span>
-            <span class="n">this_sl</span><span class="p">,</span>
-            <span class="n">data_per_streamline</span><span class="o">=</span><span class="p">{</span>
-                <span class="s1">&#39;bundle&#39;</span><span class="p">:</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">this_sl</span><span class="p">)</span>
-                           <span class="o">*</span> <span class="p">[</span><span class="n">bundle_dict</span><span class="p">[</span><span class="n">b</span><span class="p">][</span><span class="s1">&#39;uid&#39;</span><span class="p">]])},</span>
-                <span class="n">affine_to_rasmm</span><span class="o">=</span><span class="n">reference</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
-        <span class="n">tgram</span> <span class="o">=</span> <span class="n">add_bundles</span><span class="p">(</span><span class="n">tgram</span><span class="p">,</span> <span class="n">this_tgram</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">StatefulTractogram</span><span class="p">(</span><span class="n">tgram</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">,</span>
-                              <span class="n">data_per_streamline</span><span class="o">=</span><span class="n">tgram</span><span class="o">.</span><span class="n">data_per_streamline</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sft</span><span class="p">,</span> <span class="n">sidecar_info</span></div>
 
+<div class="viewcode-block" id="SegmentedSFT.get_bundle"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.SegmentedSFT.get_bundle">[docs]</a>    <span class="k">def</span> <span class="nf">get_bundle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b_name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sft</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_idxs</span><span class="p">[</span><span class="n">b_name</span><span class="p">]]</span></div>
 
-<div class="viewcode-block" id="tgram_to_bundles"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.tgram_to_bundles">[docs]</a><span class="k">def</span> <span class="nf">tgram_to_bundles</span><span class="p">(</span><span class="n">tgram</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="n">reference</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Convert a StatefulTractogram object to a dict with StatefulTractogram</span>
-<span class="sd">    objects for each bundle.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    tgram : StatefulTractogram class instance.</span>
-<span class="sd">        Requires a data_per_streamline[&#39;bundle&#39;][bundle_name][&#39;uid&#39;] attribute.</span>
-
-<span class="sd">    bundle_dict: dict</span>
-<span class="sd">        A bundle specification dictionary. Each item includes in particular a</span>
-<span class="sd">        `uid` key that is a unique integer for that bundle.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">bundles</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">bb</span> <span class="ow">in</span> <span class="n">bundle_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">bb</span> <span class="o">==</span> <span class="s1">&#39;whole_brain&#39;</span><span class="p">:</span>
-            <span class="n">uid</span> <span class="o">=</span> <span class="n">bundle_dict</span><span class="p">[</span><span class="n">bb</span><span class="p">][</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span>
-            <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">tgram</span><span class="o">.</span><span class="n">data_per_streamline</span><span class="p">[</span><span class="s1">&#39;bundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">uid</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">bundles</span><span class="p">[</span><span class="n">bb</span><span class="p">]</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span>
-                <span class="n">tgram</span><span class="o">.</span><span class="n">streamlines</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">reference</span><span class="p">,</span> <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">bundles</span></div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="SegmentedSFT.fromfile"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.SegmentedSFT.fromfile">[docs]</a>    <span class="k">def</span> <span class="nf">fromfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">trk_file</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="s2">&quot;same&quot;</span><span class="p">,</span> <span class="n">sidecar_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">sidecar_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># assume json sidecar has the same name as trk_file,</span>
+            <span class="c1"># but with json suffix</span>
+            <span class="n">sidecar_file</span> <span class="o">=</span> <span class="n">trk_file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.json&#39;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">sidecar_file</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+                    <span class="s2">&quot;JSON sidecars are required for trk files. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;JSON sidecar not found for: </span><span class="si">{</span><span class="n">sidecar_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+        <span class="n">sidecar_info</span> <span class="o">=</span> <span class="n">read_json</span><span class="p">(</span><span class="n">sidecar_file</span><span class="p">)</span>
+        <span class="n">sft</span> <span class="o">=</span> <span class="n">load_tractogram</span><span class="p">(</span><span class="n">trk_file</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">Space</span><span class="o">.</span><span class="n">RASMM</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">reference</span> <span class="o">==</span> <span class="s2">&quot;same&quot;</span><span class="p">:</span>
+            <span class="n">reference</span> <span class="o">=</span> <span class="n">sft</span>
+        <span class="n">bundles</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="s2">&quot;bundle_ids&quot;</span> <span class="ow">in</span> <span class="n">sidecar_info</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">b_name</span><span class="p">,</span> <span class="n">b_id</span> <span class="ow">in</span> <span class="n">sidecar_info</span><span class="p">[</span><span class="s2">&quot;bundle_ids&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">b_name</span> <span class="o">==</span> <span class="s2">&quot;whole_brain&quot;</span><span class="p">:</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+                        <span class="n">sft</span><span class="o">.</span><span class="n">data_per_streamline</span><span class="p">[</span><span class="s1">&#39;bundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">b_id</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">bundles</span><span class="p">[</span><span class="n">b_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span>
+                        <span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">reference</span><span class="p">,</span> <span class="n">Space</span><span class="o">.</span><span class="n">RASMM</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">bundles</span><span class="p">[</span><span class="s2">&quot;whole_brain&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sft</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">bundles</span><span class="p">,</span> <span class="n">Space</span><span class="o">.</span><span class="n">RASMM</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="split_streamline"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.split_streamline">[docs]</a><span class="k">def</span> <span class="nf">split_streamline</span><span class="p">(</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">sl_to_split</span><span class="p">,</span> <span class="n">split_idx</span><span class="p">):</span>
@@ -312,7 +306,8 @@
       </div>
     </div>
   
-  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
@@ -325,7 +320,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

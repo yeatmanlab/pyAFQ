@@ -5,10 +5,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.viz.utils &#8212; AFQ 0.10 documentation</title>
+    <title>AFQ.viz.utils &#8212; AFQ 0.11 documentation</title>
     
-  <link href="../../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
@@ -31,7 +27,8 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -46,7 +43,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -136,10 +133,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -155,7 +150,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -163,17 +159,9 @@
     
   </div>
 </nav>
-<h3><a href="../../../index.html">Table of Contents</a></h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -201,14 +189,14 @@
 <span class="kn">import</span> <span class="nn">imageio</span> <span class="k">as</span> <span class="nn">io</span>
 
 <span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
-<span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="kn">import</span> <span class="n">load_tractogram</span>
 <span class="kn">from</span> <span class="nn">dipy.tracking.utils</span> <span class="kn">import</span> <span class="n">transform_tracking_output</span>
 <span class="kn">import</span> <span class="nn">dipy.tracking.streamlinespeed</span> <span class="k">as</span> <span class="nn">dps</span>
-<span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">StatefulTractogram</span><span class="p">,</span> <span class="n">Space</span>
+<span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">StatefulTractogram</span>
 <span class="kn">from</span> <span class="nn">dipy.align</span> <span class="kn">import</span> <span class="n">resample</span>
 
 <span class="kn">import</span> <span class="nn">AFQ.utils.volume</span> <span class="k">as</span> <span class="nn">auv</span>
 <span class="kn">import</span> <span class="nn">AFQ.registration</span> <span class="k">as</span> <span class="nn">reg</span>
+<span class="kn">import</span> <span class="nn">AFQ.utils.streamlines</span> <span class="k">as</span> <span class="nn">aus</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Viz&quot;</span><span class="p">]</span>
 
@@ -346,58 +334,7 @@
     <span class="k">return</span> <span class="n">msg</span>
 
 
-<span class="k">def</span> <span class="nf">bundle_selector</span><span class="p">(</span><span class="n">bundle_dict</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Selects bundle and color</span>
-<span class="sd">    from the given bundle dictionary and color informaiton</span>
-<span class="sd">    Helper function</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    bundle_dict : dict, optional</span>
-<span class="sd">        Keys are names of bundles and values are dicts that should include</span>
-<span class="sd">        a key `&#39;uid&#39;` with values as integers for selection from the trk</span>
-<span class="sd">        metadata. Default: bundles are either not identified, or identified</span>
-<span class="sd">        only as unique integers in the metadata.</span>
-
-<span class="sd">    bundle : str or int, optional</span>
-<span class="sd">        The name of a bundle to select from among the keys in `bundle_dict`</span>
-<span class="sd">        or an integer for selection from the trk metadata.</span>
-
-<span class="sd">    colors : dict or list</span>
-<span class="sd">        If this is a dict, keys are bundle names and values are RGB tuples.</span>
-<span class="sd">        If this is a list, each item is an RGB tuple. Defaults to a list</span>
-<span class="sd">        with Tableau 20 RGB values</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    RGB tuple and str</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">b_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">bundle_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># We&#39;ll choose a color from a rotating list:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">color</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">))]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">color_list</span> <span class="o">=</span> <span class="n">colors</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
-            <span class="n">color</span> <span class="o">=</span> <span class="n">color_list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">))]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># We have a mapping from UIDs to bundle names:</span>
-        <span class="n">b_found</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">for</span> <span class="n">b_name_iter</span><span class="p">,</span> <span class="n">b_iter</span> <span class="ow">in</span> <span class="n">bundle_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">b_iter</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="p">:</span>
-                <span class="n">b_name</span> <span class="o">=</span> <span class="n">b_name_iter</span>
-                <span class="n">b_found</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="k">break</span>
-
-        <span class="c1"># ignore bundle if it is not in the bundle_dict</span>
-        <span class="k">if</span> <span class="n">b_found</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
-        <span class="n">color</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="n">b_name</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">color</span><span class="p">,</span> <span class="n">b_name</span>
-
-
-<span class="k">def</span> <span class="nf">tract_generator</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">n_points</span><span class="p">,</span>
+<span class="k">def</span> <span class="nf">tract_generator</span><span class="p">(</span><span class="n">trk_file</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">n_points</span><span class="p">,</span>
                     <span class="n">n_sls_viz</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span> <span class="n">n_sls_min</span><span class="o">=</span><span class="mi">75</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates bundles of streamlines from the tractogram.</span>
@@ -409,21 +346,15 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    sft : Stateful Tractogram, str</span>
-<span class="sd">        A Stateful Tractogram containing streamline information</span>
-<span class="sd">        or a path to a trk file</span>
+<span class="sd">    trk_file : str or SegmentedSFT</span>
+<span class="sd">        Path to a trk file or SegmentedSFT</span>
 
-<span class="sd">    affine : ndarray</span>
-<span class="sd">       An affine transformation to apply to the streamlines.</span>
-
-<span class="sd">    bundle : str or int</span>
-<span class="sd">        The name of a bundle to select from among the keys in `bundle_dict`</span>
-<span class="sd">        or an integer for selection from the trk metadata.</span>
+<span class="sd">    bundle : str</span>
+<span class="sd">        The name of a bundle to select from the trk metadata.</span>
 
 <span class="sd">    bundle_dict : dict, optional</span>
-<span class="sd">        Keys are names of bundles and values are dicts that should include</span>
-<span class="sd">        a key `&#39;uid&#39;` with values as integers for selection from the sft</span>
-<span class="sd">        metadata. Default: bundles are either not identified, or identified</span>
+<span class="sd">        Keys are names of bundles and values are dicts that specify them.</span>
+<span class="sd">        Default: bundles are either not identified, or identified</span>
 <span class="sd">        only as unique integers in the metadata.</span>
 
 <span class="sd">    colors : dict or list</span>
@@ -454,21 +385,18 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">colors</span> <span class="o">=</span> <span class="n">gen_color_dict</span><span class="p">(</span><span class="n">bundle_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">viz_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading Stateful Tractogram...&quot;</span><span class="p">)</span>
-        <span class="n">sft</span> <span class="o">=</span> <span class="n">load_tractogram</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="s1">&#39;same&#39;</span><span class="p">,</span> <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">,</span> <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">viz_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading Stateful Tractogram...&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trk_file</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">seg_sft</span> <span class="o">=</span> <span class="n">aus</span><span class="o">.</span><span class="n">SegmentedSFT</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">trk_file</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">seg_sft</span> <span class="o">=</span> <span class="n">trk_file</span>
 
-    <span class="k">if</span> <span class="n">affine</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">viz_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Transforming Stateful Tractogram...&quot;</span><span class="p">)</span>
-        <span class="n">sft</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="o">.</span><span class="n">from_sft</span><span class="p">(</span>
-            <span class="n">transform_tracking_output</span><span class="p">(</span><span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">affine</span><span class="p">),</span>
-            <span class="n">sft</span><span class="p">,</span>
-            <span class="n">data_per_streamline</span><span class="o">=</span><span class="n">sft</span><span class="o">.</span><span class="n">data_per_streamline</span><span class="p">)</span>
-
-    <span class="n">streamlines</span> <span class="o">=</span> <span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span>
+    <span class="n">seg_sft</span><span class="o">.</span><span class="n">sft</span><span class="o">.</span><span class="n">to_vox</span><span class="p">()</span>
+    <span class="n">streamlines</span> <span class="o">=</span> <span class="n">seg_sft</span><span class="o">.</span><span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span>
     <span class="n">viz_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Generating colorful lines from tractography...&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="nb">list</span><span class="p">(</span><span class="n">sft</span><span class="o">.</span><span class="n">data_per_streamline</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">==</span> <span class="p">[]:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">seg_sft</span><span class="o">.</span><span class="n">bundle_names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>\
+            <span class="ow">and</span> <span class="n">seg_sft</span><span class="o">.</span><span class="n">bundle_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;whole_brain&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="n">colors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">colors</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="c1"># There are no bundles in here:</span>
@@ -479,47 +407,44 @@
             <span class="n">streamlines</span> <span class="o">=</span> <span class="n">streamlines</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">n_points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">streamlines</span> <span class="o">=</span> <span class="n">dps</span><span class="o">.</span><span class="n">set_number_of_points</span><span class="p">(</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">n_points</span><span class="p">)</span>
-        <span class="k">yield</span> <span class="n">streamlines</span><span class="p">,</span> <span class="n">colors</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;all_bundles&quot;</span><span class="p">,</span> <span class="n">sft</span><span class="o">.</span><span class="n">dimensions</span>
-
+        <span class="k">yield</span> <span class="n">streamlines</span><span class="p">,</span> <span class="n">colors</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;all_bundles&quot;</span><span class="p">,</span> <span class="n">seg_sft</span><span class="o">.</span><span class="n">sft</span><span class="o">.</span><span class="n">dimensions</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># There are bundles:</span>
-        <span class="k">if</span> <span class="n">bundle_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">bundle_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">bundle_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;whole_brain&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
             <span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">bundle_dict</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">bundle_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;whole_brain&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;whole_brain&#39;</span> <span class="ow">in</span> <span class="n">bundle_dict</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">bundle_dict</span><span class="p">[</span><span class="s1">&#39;whole_brain&#39;</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">bundle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># No selection: visualize all of them:</span>
-
-            <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">sft</span><span class="o">.</span><span class="n">data_per_streamline</span><span class="p">[</span><span class="s1">&#39;bundle&#39;</span><span class="p">]):</span>
-                <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sft</span><span class="o">.</span><span class="n">data_per_streamline</span><span class="p">[</span><span class="s1">&#39;bundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">bundle_name</span> <span class="ow">in</span> <span class="n">bundle_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="n">seg_sft</span><span class="o">.</span><span class="n">bundle_idxs</span><span class="p">[</span><span class="n">bundle_name</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
                 <span class="n">n_sl_viz</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_sls_viz</span><span class="p">)</span> <span class="o">//</span>\
-                    <span class="nb">len</span><span class="p">(</span><span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="n">streamlines</span><span class="p">)</span>
                 <span class="n">n_sl_viz</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">n_sls_min</span><span class="p">,</span> <span class="n">n_sl_viz</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">n_sl_viz</span><span class="p">:</span>
                     <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n_sl_viz</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                 <span class="n">these_sls</span> <span class="o">=</span> <span class="n">streamlines</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">n_points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">these_sls</span> <span class="o">=</span> <span class="n">dps</span><span class="o">.</span><span class="n">set_number_of_points</span><span class="p">(</span><span class="n">these_sls</span><span class="p">,</span> <span class="n">n_points</span><span class="p">)</span>
-                <span class="n">color</span><span class="p">,</span> <span class="n">b_name</span> <span class="o">=</span> <span class="n">bundle_selector</span><span class="p">(</span><span class="n">bundle_dict</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">color</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">continue</span>
-                <span class="k">yield</span> <span class="n">these_sls</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">b_name</span><span class="p">,</span> <span class="n">sft</span><span class="o">.</span><span class="n">dimensions</span>
-
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">color</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="n">bundle_name</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">color</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">yield</span> <span class="n">these_sls</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">bundle_name</span><span class="p">,</span> <span class="n">seg_sft</span><span class="o">.</span><span class="n">sft</span><span class="o">.</span><span class="n">dimensions</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Select just one to visualize:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bundle</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="c1"># We need to find the UID:</span>
-                <span class="n">uid</span> <span class="o">=</span> <span class="n">bundle_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># It&#39;s already a UID:</span>
-                <span class="n">uid</span> <span class="o">=</span> <span class="n">bundle</span>
-
-            <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sft</span><span class="o">.</span><span class="n">data_per_streamline</span><span class="p">[</span><span class="s1">&#39;bundle&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">uid</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">these_sls</span> <span class="o">=</span> <span class="n">streamlines</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">these_sls</span> <span class="o">=</span> <span class="n">seg_sft</span><span class="o">.</span><span class="n">get_bundle</span><span class="p">(</span><span class="n">bundle</span><span class="p">)</span><span class="o">.</span><span class="n">streamlines</span>
             <span class="k">if</span> <span class="n">n_points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">these_sls</span> <span class="o">=</span> <span class="n">dps</span><span class="o">.</span><span class="n">set_number_of_points</span><span class="p">(</span><span class="n">these_sls</span><span class="p">,</span> <span class="n">n_points</span><span class="p">)</span>
-            <span class="n">color</span><span class="p">,</span> <span class="n">b_name</span> <span class="o">=</span> <span class="n">bundle_selector</span><span class="p">(</span><span class="n">bundle_dict</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">uid</span><span class="p">)</span>
-            <span class="k">yield</span> <span class="n">these_sls</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">b_name</span><span class="p">,</span> <span class="n">sft</span><span class="o">.</span><span class="n">dimensions</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">color</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">color</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">yield</span> <span class="n">these_sls</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">seg_sft</span><span class="o">.</span><span class="n">sft</span><span class="o">.</span><span class="n">dimensions</span>
 
 
 <span class="k">def</span> <span class="nf">gif_from_pngs</span><span class="p">(</span><span class="n">tdir</span><span class="p">,</span> <span class="n">gif_fname</span><span class="p">,</span> <span class="n">n_frames</span><span class="p">,</span>
@@ -695,7 +620,8 @@
       </div>
     </div>
   
-  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
@@ -708,7 +634,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

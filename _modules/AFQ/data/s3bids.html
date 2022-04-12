@@ -1,0 +1,1511 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AFQ.data.s3bids &#8212; AFQ 0.11 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="../../../index.html">
+  <img src="../../../_static/logo.png" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../installation_guide.html">
+  Installing
+  <code class="docutils literal notranslate">
+   <span class="pre">
+    pyAFQ
+   </span>
+  </code>
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../usage/index.html">
+  Using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../auto_examples/index.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../getting_help.html">
+  Getting help using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../contributing.html">
+  Contributing to pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../autoapi/index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../../developing/index.html">
+  Developing
+  <cite>
+   pyAFQ
+  </cite>
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <h1>Source code for AFQ.data.s3bids</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
+<span class="kn">import</span> <span class="nn">gzip</span>
+
+<span class="kn">import</span> <span class="nn">s3fs</span>
+<span class="kn">import</span> <span class="nn">boto3</span>
+<span class="kn">from</span> <span class="nn">botocore</span> <span class="kn">import</span> <span class="n">UNSIGNED</span>
+<span class="kn">from</span> <span class="nn">botocore.client</span> <span class="kn">import</span> <span class="n">Config</span>
+
+<span class="kn">from</span> <span class="nn">dask</span> <span class="kn">import</span> <span class="n">compute</span><span class="p">,</span> <span class="n">delayed</span>
+<span class="kn">from</span> <span class="nn">dask.diagnostics</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">tqdm.auto</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
+
+<span class="kn">from</span> <span class="nn">bids</span> <span class="kn">import</span> <span class="n">BIDSLayout</span>
+<span class="kn">from</span> <span class="nn">AFQ.data.fetch</span> <span class="kn">import</span> <span class="n">to_bids_description</span>
+
+
+<span class="c1"># +----------------------------------------------------+</span>
+<span class="c1"># | Begin S3BIDSStudy classes and supporting functions |</span>
+<span class="c1"># +----------------------------------------------------+</span>
+<div class="viewcode-block" id="get_s3_client"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.get_s3_client">[docs]</a><span class="k">def</span> <span class="nf">get_s3_client</span><span class="p">(</span><span class="n">anon</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a boto3 s3 client</span>
+
+<span class="sd">    Global boto clients are not thread safe so we use this function</span>
+<span class="sd">    to return independent session clients for different threads.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    anon : bool</span>
+<span class="sd">        Whether to use anonymous connection (public buckets only).</span>
+<span class="sd">        If False, uses the key/secret given, or boto’s credential</span>
+<span class="sd">        resolver (client_kwargs, environment, variables, config files,</span>
+<span class="sd">        EC2 IAM server, in that order). Default: True</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    s3_client : boto3.client(&#39;s3&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">anon</span><span class="p">:</span>
+        <span class="n">s3_client</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">client</span><span class="p">(</span>
+            <span class="s1">&#39;s3&#39;</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">Config</span><span class="p">(</span><span class="n">signature_version</span><span class="o">=</span><span class="n">UNSIGNED</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">s3_client</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">s3_client</span></div>
+
+
+<div class="viewcode-block" id="_ls_s3fs"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids._ls_s3fs">[docs]</a><span class="k">def</span> <span class="nf">_ls_s3fs</span><span class="p">(</span><span class="n">s3_prefix</span><span class="p">,</span> <span class="n">anon</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a dict of list of files using s3fs</span>
+
+<span class="sd">    The files are divided between subject directories/files and</span>
+<span class="sd">    non-subject directories/files.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    s3_prefix : str</span>
+<span class="sd">        AWS S3 key for the study or site &quot;directory&quot; that contains all</span>
+<span class="sd">        of the subjects</span>
+
+<span class="sd">    anon : bool</span>
+<span class="sd">        Whether to use anonymous connection (public buckets only).</span>
+<span class="sd">        If False, uses the key/secret given, or boto’s credential</span>
+<span class="sd">        resolver (client_kwargs, environment, variables, config files,</span>
+<span class="sd">        EC2 IAM server, in that order). Default: True</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    subjects : dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="n">s3fs</span><span class="o">.</span><span class="n">S3FileSystem</span><span class="p">(</span><span class="n">anon</span><span class="o">=</span><span class="n">anon</span><span class="p">)</span>
+    <span class="n">site_files</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">s3_prefix</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># Just need BIDSLayout for the `parse_file_entities` method</span>
+    <span class="c1"># so we can pass dev/null as the argument</span>
+    <span class="n">layout</span> <span class="o">=</span> <span class="n">BIDSLayout</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">entities</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">parse_file_entities</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">site_files</span>
+    <span class="p">]</span>
+
+    <span class="n">files</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;subjects&#39;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">f</span> <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">site_files</span><span class="p">,</span> <span class="n">entities</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subject&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="p">],</span>
+        <span class="s1">&#39;other&#39;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">f</span> <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">site_files</span><span class="p">,</span> <span class="n">entities</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subject&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="p">]</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">files</span></div>
+
+
+<div class="viewcode-block" id="_get_matching_s3_keys"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids._get_matching_s3_keys">[docs]</a><span class="k">def</span> <span class="nf">_get_matching_s3_keys</span><span class="p">(</span><span class="n">bucket</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">anon</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate all the matching keys in an S3 bucket.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    bucket : str</span>
+<span class="sd">        Name of the S3 bucket</span>
+
+<span class="sd">    prefix : str, optional</span>
+<span class="sd">        Only fetch keys that start with this prefix</span>
+
+<span class="sd">    suffix : str, optional</span>
+<span class="sd">        Only fetch keys that end with this suffix</span>
+
+<span class="sd">    anon : bool</span>
+<span class="sd">        Whether to use anonymous connection (public buckets only).</span>
+<span class="sd">        If False, uses the key/secret given, or boto’s credential</span>
+<span class="sd">        resolver (client_kwargs, environment, variables, config files,</span>
+<span class="sd">        EC2 IAM server, in that order). Default: True</span>
+
+<span class="sd">    Yields</span>
+<span class="sd">    ------</span>
+<span class="sd">    key : list</span>
+<span class="sd">        S3 keys that match the prefix and suffix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">s3</span> <span class="o">=</span> <span class="n">get_s3_client</span><span class="p">(</span><span class="n">anon</span><span class="o">=</span><span class="n">anon</span><span class="p">)</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Bucket&#39;</span><span class="p">:</span> <span class="n">bucket</span><span class="p">,</span> <span class="s1">&#39;MaxKeys&#39;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">}</span>
+
+    <span class="c1"># If the prefix is a single string (not a tuple of strings), we can</span>
+    <span class="c1"># do the filtering directly in the S3 API.</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">prefix</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;Prefix&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prefix</span>
+
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="c1"># The S3 API response is a large blob of metadata.</span>
+        <span class="c1"># &#39;Contents&#39; contains information about the listed objects.</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="n">s3</span><span class="o">.</span><span class="n">list_objects_v2</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">contents</span> <span class="o">=</span> <span class="n">resp</span><span class="p">[</span><span class="s1">&#39;Contents&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;Key&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="ow">and</span> <span class="n">key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">suffix</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">key</span>
+
+        <span class="c1"># The S3 API is paginated, returning up to 1000 keys at a time.</span>
+        <span class="c1"># Pass the continuation token into the next response, until we</span>
+        <span class="c1"># reach the final page (when this field is missing).</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ContinuationToken&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">resp</span><span class="p">[</span><span class="s1">&#39;NextContinuationToken&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">break</span></div>
+
+
+<div class="viewcode-block" id="_download_from_s3"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids._download_from_s3">[docs]</a><span class="k">def</span> <span class="nf">_download_from_s3</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">bucket</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">anon</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Download object from S3 to local file</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fname : str</span>
+<span class="sd">        File path to which to download the object</span>
+
+<span class="sd">    bucket : str</span>
+<span class="sd">        S3 bucket name</span>
+
+<span class="sd">    key : str</span>
+<span class="sd">        S3 key for the object to download</span>
+
+<span class="sd">    overwrite : bool</span>
+<span class="sd">        If True, overwrite file if it already exists.</span>
+<span class="sd">        If False, skip download and return. Default: False</span>
+
+<span class="sd">    anon : bool</span>
+<span class="sd">        Whether to use anonymous connection (public buckets only).</span>
+<span class="sd">        If False, uses the key/secret given, or boto’s credential</span>
+<span class="sd">        resolver (client_kwargs, environment, variables, config files,</span>
+<span class="sd">        EC2 IAM server, in that order). Default: True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create the directory and file if necessary</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="n">s3fs</span><span class="o">.</span><span class="n">S3FileSystem</span><span class="p">(</span><span class="n">anon</span><span class="o">=</span><span class="n">anon</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">overwrite</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+        <span class="n">Path</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">fs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">bucket</span><span class="p">,</span> <span class="n">key</span><span class="p">]),</span> <span class="n">fname</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="S3BIDSSubject"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSSubject">[docs]</a><span class="k">class</span> <span class="nc">S3BIDSSubject</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A single study subject hosted on AWS S3&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subject_id</span><span class="p">,</span> <span class="n">study</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a Subject instance</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        subject_id : str</span>
+<span class="sd">            Subject-ID for this subject</span>
+
+<span class="sd">        study : AFQ.data.S3BIDSStudy</span>
+<span class="sd">            The S3BIDSStudy for which this subject was a participant</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;botocore&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subject_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;subject_id must be a string.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">study</span><span class="p">,</span> <span class="n">S3BIDSStudy</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;study must be an instance of S3BIDSStudy.&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subject_id</span> <span class="o">=</span> <span class="n">subject_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_study</span> <span class="o">=</span> <span class="n">study</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_get_s3_keys</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_files</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;raw&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;derivatives&#39;</span><span class="p">:</span> <span class="p">{}}</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="S3BIDSSubject.subject_id"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSSubject.subject_id">[docs]</a>    <span class="k">def</span> <span class="nf">subject_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;An identifier string for the subject&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subject_id</span></div>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="S3BIDSSubject.study"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSSubject.study">[docs]</a>    <span class="k">def</span> <span class="nf">study</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The study in which this subject participated&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_study</span></div>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="S3BIDSSubject.s3_keys"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSSubject.s3_keys">[docs]</a>    <span class="k">def</span> <span class="nf">s3_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A dict of S3 keys for this subject&#39;s data</span>
+
+<span class="sd">        The S3 keys are divided between &quot;raw&quot; data and derivatives</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_s3_keys</span></div>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="S3BIDSSubject.files"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSSubject.files">[docs]</a>    <span class="k">def</span> <span class="nf">files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Local files for this subject&#39;s dMRI data</span>
+
+<span class="sd">        Before the call to subject.download(), this is None.</span>
+<span class="sd">        Afterward, the files are stored in a dict with keys</span>
+<span class="sd">        for each Amazon S3 key and values corresponding to</span>
+<span class="sd">        the local file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files</span></div>
+
+<div class="viewcode-block" id="S3BIDSSubject.__repr__"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSSubject.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">(subject_id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">subject_id</span><span class="si">}</span><span class="s1">, &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;study_id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">study_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="S3BIDSSubject._get_s3_keys"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSSubject._get_s3_keys">[docs]</a>    <span class="k">def</span> <span class="nf">_get_s3_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get all required S3 keys for this subject</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        s3_keys : dict</span>
+<span class="sd">            S3 keys organized into &quot;raw&quot; and &quot;derivatives&quot; lists</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">prefixes</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;raw&#39;</span><span class="p">:</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">,</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">subject_id</span><span class="p">])</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;derivatives&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="n">dt</span><span class="p">:</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                    <span class="o">*</span><span class="n">dt</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:],</span>  <span class="c1"># removes bucket name</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">subject_id</span>
+                <span class="p">])</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">derivative_types</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+
+        <span class="n">s3_keys</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;raw&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">_get_matching_s3_keys</span><span class="p">(</span>
+                <span class="n">bucket</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span>
+                <span class="n">prefix</span><span class="o">=</span><span class="n">prefixes</span><span class="p">[</span><span class="s1">&#39;raw&#39;</span><span class="p">],</span>
+                <span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">anon</span><span class="p">,</span>
+            <span class="p">))),</span>
+            <span class="s1">&#39;derivatives&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="n">dt</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">_get_matching_s3_keys</span><span class="p">(</span>
+                    <span class="n">bucket</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span>
+                    <span class="n">prefix</span><span class="o">=</span><span class="n">prefixes</span><span class="p">[</span><span class="s1">&#39;derivatives&#39;</span><span class="p">][</span><span class="n">dt</span><span class="p">],</span>
+                    <span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">anon</span><span class="p">,</span>
+                <span class="p">)))</span> <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">derivative_types</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_s3_keys</span> <span class="o">=</span> <span class="n">s3_keys</span></div>
+
+<div class="viewcode-block" id="S3BIDSSubject.download"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSSubject.download">[docs]</a>    <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">include_derivs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pbar_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Download files from S3</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        directory : str</span>
+<span class="sd">            Directory to which to download subject files</span>
+
+<span class="sd">        include_derivs : bool or str</span>
+<span class="sd">            If True, download all derivatives files. If False, do not.</span>
+<span class="sd">            If a string or sequence of strings is passed, this will</span>
+<span class="sd">            only download derivatives that match the string(s) (e.g.</span>
+<span class="sd">            [&#39;dmriprep&#39;, &#39;afq&#39;]). Default: False</span>
+
+<span class="sd">        overwrite : bool</span>
+<span class="sd">            If True, overwrite files for each subject. Default: False</span>
+
+<span class="sd">        suffix : str</span>
+<span class="sd">            Suffix, including extension, of file(s) to download.</span>
+<span class="sd">            Default: None</span>
+
+<span class="sd">        pbar : bool</span>
+<span class="sd">            If True, include download progress bar. Default: True</span>
+
+<span class="sd">        pbar_idx : int</span>
+<span class="sd">            Progress bar index for multithreaded progress bars. Default: 0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;directory must be a string.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">include_derivs</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">include_derivs</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">include_derivs</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;include_derivs must be a boolean, a &#39;</span>
+                            <span class="s1">&#39;string, or a sequence of strings.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">overwrite</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;overwrite must be a boolean.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">suffix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">suffix</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;suffix must be a string.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pbar</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;pbar must be a boolean.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pbar_idx</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;pbar_idx must be an integer.&#39;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">split_key</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">key</span>
+
+        <span class="c1"># Filter out keys that do not end with suffix</span>
+        <span class="k">if</span> <span class="n">suffix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">s3_keys_raw</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">s3key</span> <span class="k">for</span> <span class="n">s3key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_keys</span><span class="p">[</span><span class="s1">&#39;raw&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">s3key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">suffix</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="n">s3_keys_deriv</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">dt</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">s3key</span> <span class="k">for</span> <span class="n">s3key</span> <span class="ow">in</span> <span class="n">s3keys</span> <span class="k">if</span> <span class="n">s3key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">suffix</span><span class="p">)</span>
+                <span class="p">]</span> <span class="k">for</span> <span class="n">dt</span><span class="p">,</span> <span class="n">s3keys</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_keys</span><span class="p">[</span><span class="s1">&#39;derivatives&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">s3_keys_raw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_keys</span><span class="p">[</span><span class="s1">&#39;raw&#39;</span><span class="p">]</span>
+            <span class="n">s3_keys_deriv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_keys</span><span class="p">[</span><span class="s1">&#39;derivatives&#39;</span><span class="p">]</span>
+
+        <span class="n">files</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;raw&#39;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">op</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">directory</span><span class="p">,</span>
+                    <span class="n">split_key</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+                <span class="p">))</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">s3_keys_raw</span>
+            <span class="p">],</span>
+            <span class="s1">&#39;derivatives&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="n">dt</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">op</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="n">directory</span><span class="p">,</span>
+                        <span class="n">split_key</span><span class="p">(</span><span class="n">s3key</span><span class="p">)</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+                    <span class="p">))</span> <span class="k">for</span> <span class="n">s3key</span> <span class="ow">in</span> <span class="n">s3keys</span>
+                <span class="p">]</span> <span class="k">for</span> <span class="n">dt</span><span class="p">,</span> <span class="n">s3keys</span> <span class="ow">in</span> <span class="n">s3_keys_deriv</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="n">raw_zip</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">s3_keys_raw</span><span class="p">,</span> <span class="n">files</span><span class="p">[</span><span class="s1">&#39;raw&#39;</span><span class="p">]))</span>
+
+        <span class="c1"># Populate files parameter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_files</span><span class="p">[</span><span class="s2">&quot;raw&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">f</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">raw_zip</span><span class="p">})</span>
+
+        <span class="c1"># Generate list of (key, file) tuples</span>
+        <span class="n">download_pairs</span> <span class="o">=</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">raw_zip</span><span class="p">]</span>
+
+        <span class="n">deriv_zips</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">dt</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span>
+                <span class="n">s3keys</span><span class="p">,</span> <span class="n">files</span><span class="p">[</span><span class="s1">&#39;derivatives&#39;</span><span class="p">][</span><span class="n">dt</span><span class="p">]</span>
+            <span class="p">))</span> <span class="k">for</span> <span class="n">dt</span><span class="p">,</span> <span class="n">s3keys</span> <span class="ow">in</span> <span class="n">s3_keys_deriv</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+
+        <span class="n">deriv_pairs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">files</span><span class="p">[</span><span class="s1">&#39;derivatives&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">include_derivs</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="c1"># In this case, include all derivatives files</span>
+                <span class="n">deriv_pairs</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">deriv_zips</span><span class="p">[</span><span class="n">dt</span><span class="p">]]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_files</span><span class="p">[</span><span class="s1">&#39;derivatives&#39;</span><span class="p">][</span><span class="n">dt</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">k</span><span class="p">:</span> <span class="n">f</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">deriv_zips</span><span class="p">[</span><span class="n">dt</span><span class="p">]</span>
+                <span class="p">}</span>
+            <span class="k">elif</span> <span class="n">include_derivs</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">include_derivs</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+                  <span class="c1"># In this case, filter only derivatives S3 keys that</span>
+                  <span class="c1"># include the `include_derivs` string as a substring</span>
+                  <span class="ow">and</span> <span class="n">include_derivs</span> <span class="ow">in</span> <span class="n">dt</span><span class="p">):</span>
+                <span class="n">deriv_pairs</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">deriv_zips</span><span class="p">[</span><span class="n">dt</span><span class="p">]]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_files</span><span class="p">[</span><span class="s1">&#39;derivatives&#39;</span><span class="p">][</span><span class="n">dt</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">k</span><span class="p">:</span> <span class="n">f</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">deriv_zips</span><span class="p">[</span><span class="n">dt</span><span class="p">]</span>
+                <span class="p">}</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">include_derivs</span><span class="p">)</span>
+                  <span class="ow">and</span> <span class="nb">any</span><span class="p">([</span><span class="n">deriv</span> <span class="ow">in</span> <span class="n">dt</span> <span class="k">for</span> <span class="n">deriv</span> <span class="ow">in</span> <span class="n">include_derivs</span><span class="p">])):</span>
+                <span class="c1"># In this case, filter only derivatives S3 keys that</span>
+                <span class="c1"># include any of the `include_derivs` strings as a</span>
+                <span class="c1"># substring</span>
+                <span class="n">deriv_pairs</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">deriv_zips</span><span class="p">[</span><span class="n">dt</span><span class="p">]]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_files</span><span class="p">[</span><span class="s1">&#39;derivatives&#39;</span><span class="p">][</span><span class="n">dt</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">k</span><span class="p">:</span> <span class="n">f</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">deriv_zips</span><span class="p">[</span><span class="n">dt</span><span class="p">]</span>
+                <span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">include_derivs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">download_pairs</span> <span class="o">+=</span> <span class="n">deriv_pairs</span>
+
+        <span class="c1"># Now iterate through the list and download each item</span>
+        <span class="k">if</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="n">progress</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Download </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">subject_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                            <span class="n">position</span><span class="o">=</span><span class="n">pbar_idx</span><span class="p">,</span>
+                            <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">download_pairs</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span> <span class="ow">in</span> <span class="n">download_pairs</span><span class="p">:</span>
+            <span class="n">_download_from_s3</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="n">fname</span><span class="p">,</span>
+                              <span class="n">bucket</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span>
+                              <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+                              <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span>
+                              <span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">anon</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">pbar</span><span class="p">:</span>
+                <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="HBNSubject"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSubject">[docs]</a><span class="k">class</span> <span class="nc">HBNSubject</span><span class="p">(</span><span class="n">S3BIDSSubject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A subject in the HBN study</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    AFQ.data.S3BIDSSubject</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subject_id</span><span class="p">,</span> <span class="n">study</span><span class="p">,</span> <span class="n">site</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a Subject instance</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        subject_id : str</span>
+<span class="sd">            Subject-ID for this subject</span>
+
+<span class="sd">        study : AFQ.data.S3BIDSStudy</span>
+<span class="sd">            The S3BIDSStudy for which this subject was a participant</span>
+
+<span class="sd">        site : str, optional</span>
+<span class="sd">            Site-ID for the site from which this subject&#39;s data was collected</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">site</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">site</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;site must be a string or None.&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_site</span> <span class="o">=</span> <span class="n">site</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">subject_id</span><span class="o">=</span><span class="n">subject_id</span><span class="p">,</span>
+            <span class="n">study</span><span class="o">=</span><span class="n">study</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="HBNSubject.site"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSubject.site">[docs]</a>    <span class="k">def</span> <span class="nf">site</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The site at which this subject was a participant&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_site</span></div>
+
+<div class="viewcode-block" id="HBNSubject.__repr__"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSubject.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">(subject_id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">subject_id</span><span class="si">}</span><span class="s1">, &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;study_id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">study_id</span><span class="si">}</span><span class="s1">, site=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">site</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HBNSubject._get_s3_keys"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSubject._get_s3_keys">[docs]</a>    <span class="k">def</span> <span class="nf">_get_s3_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get all required S3 keys for this subject</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        s3_keys : dict</span>
+<span class="sd">            S3 keys organized into &quot;raw&quot; and &quot;derivatives&quot; lists</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">prefixes</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;raw&#39;</span><span class="p">:</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">,</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">subject_id</span><span class="p">])</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;derivatives&#39;</span><span class="p">:</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">,</span>
+                <span class="s1">&#39;derivatives&#39;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">subject_id</span>
+            <span class="p">])</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="n">s3_keys</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">datatype</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">_get_matching_s3_keys</span><span class="p">(</span>
+                <span class="n">bucket</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span>
+                <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+                <span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">anon</span><span class="p">,</span>
+            <span class="p">)))</span> <span class="k">for</span> <span class="n">datatype</span><span class="p">,</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="n">prefixes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+
+        <span class="k">def</span> <span class="nf">get_deriv_type</span><span class="p">(</span><span class="n">s3_key</span><span class="p">):</span>
+            <span class="n">after_sub</span> <span class="o">=</span> <span class="n">s3_key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">subject_id</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">deriv_type</span> <span class="o">=</span> <span class="n">after_sub</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">deriv_type</span>
+
+        <span class="n">deriv_keys</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">dt</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">s3key</span> <span class="k">for</span> <span class="n">s3key</span> <span class="ow">in</span> <span class="n">s3_keys</span><span class="p">[</span><span class="s1">&#39;derivatives&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">dt</span> <span class="o">==</span> <span class="n">get_deriv_type</span><span class="p">(</span><span class="n">s3key</span><span class="p">)</span>
+            <span class="p">]</span> <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">derivative_types</span>
+        <span class="p">}</span>
+
+        <span class="n">s3_keys</span><span class="p">[</span><span class="s1">&#39;derivatives&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">deriv_keys</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_s3_keys</span> <span class="o">=</span> <span class="n">s3_keys</span></div></div>
+
+
+<div class="viewcode-block" id="S3BIDSStudy"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy">[docs]</a><span class="k">class</span> <span class="nc">S3BIDSStudy</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A BIDS-compliant study hosted on AWS S3&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">study_id</span><span class="p">,</span> <span class="n">bucket</span><span class="p">,</span> <span class="n">s3_prefix</span><span class="p">,</span> <span class="n">subjects</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">anon</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_participants_tsv</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">_subject_class</span><span class="o">=</span><span class="n">S3BIDSSubject</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize an S3BIDSStudy instance</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        study_id : str</span>
+<span class="sd">            An identifier string for the study</span>
+
+<span class="sd">        bucket : str</span>
+<span class="sd">            The S3 bucket that contains the study data</span>
+
+<span class="sd">        s3_prefix : str</span>
+<span class="sd">            The S3 prefix common to all of the study objects on S3</span>
+
+<span class="sd">        subjects : str, sequence(str), int, or None</span>
+<span class="sd">            If int, retrieve S3 keys for the first `subjects` subjects.</span>
+<span class="sd">            If &quot;all&quot;, retrieve all subjects. If str or sequence of</span>
+<span class="sd">            strings, retrieve S3 keys for the specified subjects. If sequence</span>
+<span class="sd">            of ints, then for each int n retrieve S3 keys for the nth subject.</span>
+<span class="sd">            If None, retrieve S3 keys for the first subject. Default: None</span>
+
+<span class="sd">        anon : bool</span>
+<span class="sd">            Whether to use anonymous connection (public buckets only).</span>
+<span class="sd">            If False, uses the key/secret given, or boto’s credential</span>
+<span class="sd">            resolver (client_kwargs, environment, variables, config</span>
+<span class="sd">            files, EC2 IAM server, in that order). Default: True</span>
+
+<span class="sd">        use_participants_tsv : bool</span>
+<span class="sd">            If True, use the particpants tsv files to retrieve subject</span>
+<span class="sd">            identifiers. This is faster but may not catch all subjects.</span>
+<span class="sd">            Sometimes the tsv files are outdated. Default: False</span>
+
+<span class="sd">        random_seed : int or None</span>
+<span class="sd">            Random seed for selection of subjects if `subjects` is an</span>
+<span class="sd">            integer. Use the same random seed for reproducibility.</span>
+<span class="sd">            Default: None</span>
+
+<span class="sd">        _subject_class : object</span>
+<span class="sd">            The subject class to be used for this study. This parameter</span>
+<span class="sd">            has a leading underscore because you probably don&#39;t want</span>
+<span class="sd">            to change it. If you do change it, you must provide a</span>
+<span class="sd">            class that quacks like AFQ.data.S3BIDSSubject. Default:</span>
+<span class="sd">            S3BIDSSubject</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;botocore&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">study_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`study_id` must be a string.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bucket</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`bucket` must be a string.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s3_prefix</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`s3_prefix` must be a string.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">subjects</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subjects</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subjects</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">subjects</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">subjects</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`subjects` must be an int, string, &#39;</span>
+                            <span class="s1">&#39;sequence of strings, or a sequence of ints.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">anon</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`anon` must be of type bool.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subjects</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">subjects</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;If `subjects` is an int, it must be &#39;</span>
+                             <span class="s1">&#39;greater than 0.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">use_participants_tsv</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`use_participants_tsv` must be boolean.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">random_seed</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">random_seed</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`random_seed` must be an integer.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_study_id</span> <span class="o">=</span> <span class="n">study_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bucket</span> <span class="o">=</span> <span class="n">bucket</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_s3_prefix</span> <span class="o">=</span> <span class="n">s3_prefix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_use_participants_tsv</span> <span class="o">=</span> <span class="n">use_participants_tsv</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_random_seed</span> <span class="o">=</span> <span class="n">random_seed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_anon</span> <span class="o">=</span> <span class="n">anon</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subject_class</span> <span class="o">=</span> <span class="n">_subject_class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_local_directories</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Get a list of all subjects in the study</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_subjects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_list_all_subjects</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_derivative_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_derivative_types</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_non_subject_s3_keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_non_subject_s3_keys</span><span class="p">()</span>
+
+        <span class="c1"># Convert `subjects` into a sequence of subjectID strings</span>
+        <span class="k">if</span> <span class="n">subjects</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subjects</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> \
+                <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">subjects</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subjects</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">)):</span>
+            <span class="c1"># if subjects is an int, get that many random subjects</span>
+            <span class="n">prng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">random_seed</span><span class="p">)</span>
+            <span class="n">randomized_subjects</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_subjects</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+            <span class="n">prng</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">randomized_subjects</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">subjects</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">subjects</span> <span class="o">=</span> <span class="n">randomized_subjects</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subjects</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="n">subjects</span> <span class="o">=</span> <span class="n">randomized_subjects</span><span class="p">[:</span><span class="n">subjects</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">subjects</span> <span class="o">=</span> <span class="p">[</span><span class="n">randomized_subjects</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">subjects</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subjects</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">subjects</span> <span class="o">=</span> <span class="p">[</span><span class="n">subjects</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">subjects</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+            <span class="c1"># if &quot;all,&quot; retrieve all subjects</span>
+            <span class="n">subjects</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_subjects</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subjects</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="c1"># if a string, just get that one subject</span>
+            <span class="n">subjects</span> <span class="o">=</span> <span class="p">[</span><span class="n">subjects</span><span class="p">]</span>
+        <span class="c1"># The last case for subjects is what we want. No transformation needed.</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">subjects</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_subjects</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;The following subjects could not be found in the study: &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">set</span><span class="p">(</span><span class="n">subjects</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_subjects</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="p">)</span>
+
+        <span class="n">subs</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">delayed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_subject</span><span class="p">)(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">subjects</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Retrieving subject S3 keys&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">ProgressBar</span><span class="p">():</span>
+            <span class="n">subjects</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">compute</span><span class="p">(</span><span class="o">*</span><span class="n">subs</span><span class="p">,</span> <span class="n">scheduler</span><span class="o">=</span><span class="s1">&#39;threads&#39;</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subjects</span> <span class="o">=</span> <span class="n">subjects</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="S3BIDSStudy.study_id"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.study_id">[docs]</a>    <span class="k">def</span> <span class="nf">study_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;An identifier string for the study&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_study_id</span></div>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="S3BIDSStudy.bucket"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.bucket">[docs]</a>    <span class="k">def</span> <span class="nf">bucket</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The S3 bucket that contains the study data&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bucket</span></div>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="S3BIDSStudy.s3_prefix"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.s3_prefix">[docs]</a>    <span class="k">def</span> <span class="nf">s3_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The S3 prefix common to all of the study objects on S3&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_s3_prefix</span></div>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="S3BIDSStudy.subjects"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.subjects">[docs]</a>    <span class="k">def</span> <span class="nf">subjects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A list of Subject instances for each requested subject&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subjects</span></div>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="S3BIDSStudy.anon"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.anon">[docs]</a>    <span class="k">def</span> <span class="nf">anon</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Is this study using an anonymous S3 connection?&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_anon</span></div>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="S3BIDSStudy.derivative_types"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.derivative_types">[docs]</a>    <span class="k">def</span> <span class="nf">derivative_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A list of derivative pipelines available in this study&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_derivative_types</span></div>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="S3BIDSStudy.non_sub_s3_keys"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.non_sub_s3_keys">[docs]</a>    <span class="k">def</span> <span class="nf">non_sub_s3_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A dict of S3 keys that are not in subject directories&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_non_subject_s3_keys</span></div>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="S3BIDSStudy.local_directories"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.local_directories">[docs]</a>    <span class="k">def</span> <span class="nf">local_directories</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A list of local directories where this study has been downloaded&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_directories</span></div>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="S3BIDSStudy.use_participants_tsv"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.use_participants_tsv">[docs]</a>    <span class="k">def</span> <span class="nf">use_participants_tsv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Did we use a participants.tsv file to populate the list of</span>
+<span class="sd">        study subjects.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_participants_tsv</span></div>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="S3BIDSStudy.random_seed"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.random_seed">[docs]</a>    <span class="k">def</span> <span class="nf">random_seed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The random seed used to retrieve study subjects&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_random_seed</span></div>
+
+<div class="viewcode-block" id="S3BIDSStudy.__repr__"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">(study_id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">study_id</span><span class="si">}</span><span class="s1">, &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;bucket=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="si">}</span><span class="s1">, s3_prefix=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">s3_prefix</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="S3BIDSStudy._get_subject"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy._get_subject">[docs]</a>    <span class="k">def</span> <span class="nf">_get_subject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subject_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a Subject instance from a subject-ID&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subject_class</span><span class="p">(</span><span class="n">subject_id</span><span class="o">=</span><span class="n">subject_id</span><span class="p">,</span>
+                                   <span class="n">study</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="S3BIDSStudy._get_derivative_types"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy._get_derivative_types">[docs]</a>    <span class="k">def</span> <span class="nf">_get_derivative_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a list of available derivatives pipelines</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            list of available derivatives pipelines</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">s3_prefix</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">])</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+        <span class="n">nonsub_keys</span> <span class="o">=</span> <span class="n">_ls_s3fs</span><span class="p">(</span><span class="n">s3_prefix</span><span class="o">=</span><span class="n">s3_prefix</span><span class="p">,</span>
+                               <span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">anon</span><span class="p">)[</span><span class="s1">&#39;other&#39;</span><span class="p">]</span>
+        <span class="n">derivatives_prefix</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">s3_prefix</span><span class="p">,</span> <span class="s1">&#39;derivatives&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">derivatives_prefix</span> <span class="ow">in</span> <span class="n">nonsub_keys</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_ls_s3fs</span><span class="p">(</span>
+                <span class="n">s3_prefix</span><span class="o">=</span><span class="n">derivatives_prefix</span><span class="p">,</span>
+                <span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">anon</span>
+            <span class="p">)[</span><span class="s1">&#39;other&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="S3BIDSStudy._get_non_subject_s3_keys"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy._get_non_subject_s3_keys">[docs]</a>    <span class="k">def</span> <span class="nf">_get_non_subject_s3_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a list of &#39;non-subject&#39; files</span>
+
+<span class="sd">        In this context, a &#39;non-subject&#39; file is any file</span>
+<span class="sd">        or directory that is not a subject ID folder</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            dict with keys &#39;raw&#39; and &#39;derivatives&#39; and whose values</span>
+<span class="sd">            are lists of S3 keys for non-subject files</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">non_sub_s3_keys</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">s3_prefix</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">])</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+
+        <span class="n">nonsub_keys</span> <span class="o">=</span> <span class="n">_ls_s3fs</span><span class="p">(</span><span class="n">s3_prefix</span><span class="o">=</span><span class="n">s3_prefix</span><span class="p">,</span>
+                               <span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">anon</span><span class="p">)[</span><span class="s1">&#39;other&#39;</span><span class="p">]</span>
+        <span class="n">nonsub_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">nonsub_keys</span>
+                       <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;derivatives&#39;</span><span class="p">)]</span>
+
+        <span class="n">nonsub_deriv_keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">derivative_types</span><span class="p">:</span>
+            <span class="n">nonsub_deriv_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_ls_s3fs</span><span class="p">(</span>
+                <span class="n">s3_prefix</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
+                <span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">anon</span>
+            <span class="p">)[</span><span class="s1">&#39;other&#39;</span><span class="p">])</span>
+
+        <span class="n">non_sub_s3_keys</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;raw&#39;</span><span class="p">:</span> <span class="n">nonsub_keys</span><span class="p">,</span>
+            <span class="s1">&#39;derivatives&#39;</span><span class="p">:</span> <span class="n">nonsub_deriv_keys</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">non_sub_s3_keys</span></div>
+
+<div class="viewcode-block" id="S3BIDSStudy._list_all_subjects"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy._list_all_subjects">[docs]</a>    <span class="k">def</span> <span class="nf">_list_all_subjects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return list of subjects</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            list of participant_ids</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_participants_tsv</span><span class="p">:</span>
+            <span class="n">tsv_key</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">,</span>
+                                <span class="s2">&quot;participants.tsv&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+            <span class="n">s3</span> <span class="o">=</span> <span class="n">get_s3_client</span><span class="p">(</span><span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">anon</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">get_subs_from_tsv_key</span><span class="p">(</span><span class="n">s3_key</span><span class="p">):</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">s3</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span>
+                    <span class="n">Bucket</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span>
+                    <span class="n">Key</span><span class="o">=</span><span class="n">s3_key</span>
+                <span class="p">)</span>
+
+                <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+                    <span class="n">response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Body&#39;</span><span class="p">)</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">participant_id</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+            <span class="n">subject_set</span> <span class="o">=</span> <span class="n">get_subs_from_tsv_key</span><span class="p">(</span><span class="n">tsv_key</span><span class="p">)</span>
+            <span class="n">subjects</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">subject_set</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">s3_prefix</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">])</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+            <span class="n">sub_keys</span> <span class="o">=</span> <span class="n">_ls_s3fs</span><span class="p">(</span><span class="n">s3_prefix</span><span class="o">=</span><span class="n">s3_prefix</span><span class="p">,</span>
+                                <span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">anon</span><span class="p">)[</span><span class="s1">&#39;subjects&#39;</span><span class="p">]</span>
+
+            <span class="c1"># Just need BIDSLayout for the `parse_file_entities`</span>
+            <span class="c1"># method so we can pass dev/null as the argument</span>
+            <span class="n">layout</span> <span class="o">=</span> <span class="n">BIDSLayout</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">subjects</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">sub_keys</span><span class="p">:</span>
+                <span class="n">entities</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="n">parse_file_entities</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                <span class="n">subjects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sub-&#39;</span> <span class="o">+</span> <span class="n">entities</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subject&#39;</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">subjects</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="S3BIDSStudy._download_non_sub_keys"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy._download_non_sub_keys">[docs]</a>    <span class="k">def</span> <span class="nf">_download_non_sub_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span>
+                               <span class="n">select</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;dataset_description.json&quot;</span><span class="p">,),</span>
+                               <span class="n">filenames</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">s3fs</span><span class="o">.</span><span class="n">S3FileSystem</span><span class="p">(</span><span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">anon</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">filenames</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filenames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_sub_s3_keys</span><span class="p">[</span><span class="s1">&#39;raw&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">select</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">([</span><span class="n">s</span> <span class="ow">in</span> <span class="n">fn</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">select</span><span class="p">]):</span>
+                <span class="n">Path</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">fs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fn</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="S3BIDSStudy._download_derivative_descriptions"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy._download_derivative_descriptions">[docs]</a>    <span class="k">def</span> <span class="nf">_download_derivative_descriptions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include_derivs</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">derivative</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">derivative_types</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">include_derivs</span> <span class="ow">is</span> <span class="kc">True</span> \
+                <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">include_derivs</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="n">include_derivs</span> <span class="o">==</span> <span class="n">op</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">derivative</span><span class="p">))</span> \
+                <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">include_derivs</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">include_derivs</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="nb">any</span><span class="p">([</span><span class="n">deriv</span> <span class="ow">in</span> <span class="n">derivative</span> <span class="k">for</span>
+                             <span class="n">deriv</span> <span class="ow">in</span> <span class="n">include_derivs</span><span class="p">])):</span>
+                <span class="n">filenames</span> <span class="o">=</span> \
+                    <span class="n">_ls_s3fs</span><span class="p">(</span><span class="n">s3_prefix</span><span class="o">=</span><span class="n">derivative</span><span class="p">,</span> <span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">anon</span><span class="p">)[</span><span class="s1">&#39;other&#39;</span><span class="p">]</span>
+                <span class="n">deriv_directory</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">directory</span><span class="p">,</span> <span class="o">*</span><span class="n">derivative</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_download_non_sub_keys</span><span class="p">(</span>
+                    <span class="n">deriv_directory</span><span class="p">,</span>
+                    <span class="n">select</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;dataset_description.json&quot;</span><span class="p">,),</span>
+                    <span class="n">filenames</span><span class="o">=</span><span class="n">filenames</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="S3BIDSStudy.download"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.download">[docs]</a>    <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span>
+                 <span class="n">include_modality_agnostic</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;dataset_description.json&quot;</span><span class="p">,),</span>
+                 <span class="n">include_derivs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">include_derivs_dataset_description</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pbar</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Download files for each subject in the study</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        directory : str</span>
+<span class="sd">            Directory to which to download subject files</span>
+
+<span class="sd">        include_modality_agnostic : bool, &quot;all&quot; or any subset of [</span>
+<span class="sd">                &quot;dataset_description.json&quot;, &quot;CHANGES&quot;, &quot;README&quot;, &quot;LICENSE&quot;]</span>
+<span class="sd">            If True or &quot;all&quot;, download all keys in self.non_sub_s3_keys</span>
+<span class="sd">            also. If a subset of [&quot;dataset_description.json&quot;, &quot;CHANGES&quot;,</span>
+<span class="sd">            &quot;README&quot;, &quot;LICENSE&quot;], download only those files. This is</span>
+<span class="sd">            useful if the non_sub_s3_keys contain files common to all</span>
+<span class="sd">            subjects that should be inherited.</span>
+<span class="sd">            Default: (&quot;dataset_description.json&quot;,)</span>
+
+<span class="sd">        include_derivs : bool or str</span>
+<span class="sd">            If True, download all derivatives files. If False, do not.</span>
+<span class="sd">            If a string or sequence of strings is passed, this will</span>
+<span class="sd">            only download derivatives that match the string(s) (e.g.</span>
+<span class="sd">            [&quot;dmriprep&quot;, &quot;afq&quot;]). Default: False</span>
+
+<span class="sd">        include_derivs_dataset_description : bool</span>
+<span class="sd">            Used only if include_derivs is not False. If True,</span>
+<span class="sd">            dataset_description.json downloaded for each derivative.</span>
+
+<span class="sd">        suffix : str</span>
+<span class="sd">            Suffix, including extension, of file(s) to download.</span>
+<span class="sd">            Default: None</span>
+
+<span class="sd">        overwrite : bool</span>
+<span class="sd">            If True, overwrite files for each subject. Default: False</span>
+
+<span class="sd">        pbar : bool</span>
+<span class="sd">            If True, include progress bar. Default: True</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        AFQ.data.S3BIDSSubject.download</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_local_directories</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_local_directories</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_local_directories</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">include_modality_agnostic</span> <span class="ow">is</span> <span class="kc">True</span>\
+                <span class="ow">or</span> <span class="n">include_modality_agnostic</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_download_non_sub_keys</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">include_modality_agnostic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="c1"># Subset selection</span>
+            <span class="n">valid_set</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;dataset_description.json&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;CHANGES&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;README&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;LICENSE&quot;</span><span class="p">}</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">include_modality_agnostic</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">valid_set</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;include_modality_agnostic must be either&quot;</span>
+                    <span class="s2">&quot; a boolean, &#39;all&#39;, &quot;</span>
+                    <span class="s2">&quot;or a subset of </span><span class="si">{valid_set}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">valid_set</span><span class="o">=</span><span class="n">valid_set</span><span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_download_non_sub_keys</span><span class="p">(</span>
+                <span class="n">directory</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="n">include_modality_agnostic</span><span class="p">)</span>
+
+        <span class="c1"># download dataset_description.json for derivatives</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">include_derivs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">)</span> \
+                <span class="ow">and</span> <span class="n">include_derivs_dataset_description</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_download_derivative_descriptions</span><span class="p">(</span>
+                <span class="n">include_derivs</span><span class="p">,</span> <span class="n">directory</span><span class="p">)</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[</span><span class="n">delayed</span><span class="p">(</span><span class="n">sub</span><span class="o">.</span><span class="n">download</span><span class="p">)(</span>
+            <span class="n">directory</span><span class="o">=</span><span class="n">directory</span><span class="p">,</span>
+            <span class="n">include_derivs</span><span class="o">=</span><span class="n">include_derivs</span><span class="p">,</span>
+            <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">,</span>
+            <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span>
+            <span class="n">pbar</span><span class="o">=</span><span class="n">pbar</span><span class="p">,</span>
+            <span class="n">pbar_idx</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span>
+        <span class="p">)</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">sub</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">)]</span>
+
+        <span class="n">compute</span><span class="p">(</span><span class="o">*</span><span class="n">results</span><span class="p">,</span> <span class="n">scheduler</span><span class="o">=</span><span class="s1">&#39;threads&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="HBNSite"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSite">[docs]</a><span class="k">class</span> <span class="nc">HBNSite</span><span class="p">(</span><span class="n">S3BIDSStudy</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An HBN study site</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    AFQ.data.S3BIDSStudy</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site</span><span class="p">,</span> <span class="n">study_id</span><span class="o">=</span><span class="s1">&#39;HBN&#39;</span><span class="p">,</span> <span class="n">bucket</span><span class="o">=</span><span class="s1">&#39;fcp-indi&#39;</span><span class="p">,</span>
+                 <span class="n">s3_prefix</span><span class="o">=</span><span class="s1">&#39;data/Projects/HBN/MRI&#39;</span><span class="p">,</span>
+                 <span class="n">subjects</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_participants_tsv</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">random_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the HBN site</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        site : [&quot;Site-SI&quot;, &quot;Site-RU&quot;, &quot;Site-CBIC&quot;, &quot;Site-CUNY&quot;]</span>
+<span class="sd">            The HBN site</span>
+
+<span class="sd">        study_id : str</span>
+<span class="sd">            An identifier string for the site</span>
+
+<span class="sd">        bucket : str</span>
+<span class="sd">            The S3 bucket that contains the study data</span>
+
+<span class="sd">        s3_prefix : str</span>
+<span class="sd">            The S3 prefix common to all of the study objects on S3</span>
+
+<span class="sd">        subjects : str, sequence(str), int, or None</span>
+<span class="sd">            If int, retrieve S3 keys for the first `subjects` subjects.</span>
+<span class="sd">            If &quot;all&quot;, retrieve all subjects. If str or sequence of</span>
+<span class="sd">            strings, retrieve S3 keys for the specified subjects. If</span>
+<span class="sd">            None, retrieve S3 keys for the first subject. Default: None</span>
+
+<span class="sd">        use_participants_tsv : bool</span>
+<span class="sd">            If True, use the particpants tsv files to retrieve subject</span>
+<span class="sd">            identifiers. This is faster but may not catch all subjects.</span>
+<span class="sd">            Sometimes the tsv files are outdated. Default: False</span>
+
+<span class="sd">        random_seed : int or None</span>
+<span class="sd">            Random seed for selection of subjects if `subjects` is an</span>
+<span class="sd">            integer. Use the same random seed for reproducibility.</span>
+<span class="sd">            Default: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">valid_sites</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Site-SI&quot;</span><span class="p">,</span> <span class="s2">&quot;Site-RU&quot;</span><span class="p">,</span> <span class="s2">&quot;Site-CBIC&quot;</span><span class="p">,</span> <span class="s2">&quot;Site-CUNY&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">site</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_sites</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;site must be one of </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">valid_sites</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_site</span> <span class="o">=</span> <span class="n">site</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">study_id</span><span class="o">=</span><span class="n">study_id</span><span class="p">,</span>
+            <span class="n">bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span>
+            <span class="n">s3_prefix</span><span class="o">=</span><span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">s3_prefix</span><span class="p">,</span> <span class="n">site</span><span class="p">]),</span>
+            <span class="n">subjects</span><span class="o">=</span><span class="n">subjects</span><span class="p">,</span>
+            <span class="n">use_participants_tsv</span><span class="o">=</span><span class="n">use_participants_tsv</span><span class="p">,</span>
+            <span class="n">random_seed</span><span class="o">=</span><span class="n">random_seed</span><span class="p">,</span>
+            <span class="n">_subject_class</span><span class="o">=</span><span class="n">HBNSubject</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="HBNSite.site"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSite.site">[docs]</a>    <span class="k">def</span> <span class="nf">site</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The HBN site&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_site</span></div>
+
+<div class="viewcode-block" id="HBNSite._get_subject"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSite._get_subject">[docs]</a>    <span class="k">def</span> <span class="nf">_get_subject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subject_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a Subject instance from a subject-ID&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subject_class</span><span class="p">(</span><span class="n">subject_id</span><span class="o">=</span><span class="n">subject_id</span><span class="p">,</span>
+                                   <span class="n">study</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+                                   <span class="n">site</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">site</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HBNSite._get_derivative_types"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSite._get_derivative_types">[docs]</a>    <span class="k">def</span> <span class="nf">_get_derivative_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a list of available derivatives pipelines</span>
+
+<span class="sd">        The HBN dataset is not BIDS compliant so to go a list</span>
+<span class="sd">        of available derivatives, we must peak inside every</span>
+<span class="sd">        directory in `derivatives/sub-XXXX/`</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            list of available derivatives pipelines</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">s3_prefix</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">])</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+        <span class="n">nonsub_keys</span> <span class="o">=</span> <span class="n">_ls_s3fs</span><span class="p">(</span><span class="n">s3_prefix</span><span class="o">=</span><span class="n">s3_prefix</span><span class="p">,</span>
+                               <span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">anon</span><span class="p">)[</span><span class="s1">&#39;other&#39;</span><span class="p">]</span>
+        <span class="n">derivatives_prefix</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">s3_prefix</span><span class="p">,</span> <span class="s1">&#39;derivatives&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">derivatives_prefix</span> <span class="ow">in</span> <span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">nonsub_keys</span><span class="p">]):</span>
+            <span class="n">deriv_subs</span> <span class="o">=</span> <span class="n">_ls_s3fs</span><span class="p">(</span>
+                <span class="n">s3_prefix</span><span class="o">=</span><span class="n">derivatives_prefix</span><span class="p">,</span>
+                <span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">anon</span>
+            <span class="p">)[</span><span class="s1">&#39;subjects&#39;</span><span class="p">]</span>
+
+            <span class="n">deriv_types</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">sub_key</span> <span class="ow">in</span> <span class="n">deriv_subs</span><span class="p">:</span>
+                <span class="n">deriv_types</span> <span class="o">+=</span> <span class="p">[</span>
+                    <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sub_key</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">_ls_s3fs</span><span class="p">(</span>
+                        <span class="n">s3_prefix</span><span class="o">=</span><span class="n">sub_key</span><span class="p">,</span>
+                        <span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">anon</span>
+                    <span class="p">)[</span><span class="s1">&#39;subjects&#39;</span><span class="p">]</span>
+                <span class="p">]</span>
+
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">deriv_types</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="HBNSite._get_non_subject_s3_keys"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSite._get_non_subject_s3_keys">[docs]</a>    <span class="k">def</span> <span class="nf">_get_non_subject_s3_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a list of &#39;non-subject&#39; files</span>
+
+<span class="sd">        In this context, a &#39;non-subject&#39; file is any file</span>
+<span class="sd">        or directory that is not a subject ID folder. This method</span>
+<span class="sd">        is different from AFQ.data.S3BIDSStudy because the HBN</span>
+<span class="sd">        dataset is not BIDS compliant</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            dict with keys &#39;raw&#39; and &#39;derivatives&#39; and whose values</span>
+<span class="sd">            are lists of S3 keys for non-subject files</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        AFQ.data.S3BIDSStudy._get_non_subject_s3_keys</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">non_sub_s3_keys</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">s3_prefix</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">])</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+
+        <span class="n">nonsub_keys</span> <span class="o">=</span> <span class="n">_ls_s3fs</span><span class="p">(</span><span class="n">s3_prefix</span><span class="o">=</span><span class="n">s3_prefix</span><span class="p">,</span>
+                               <span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">anon</span><span class="p">)[</span><span class="s1">&#39;other&#39;</span><span class="p">]</span>
+        <span class="n">nonsub_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">nonsub_keys</span>
+                       <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;derivatives&#39;</span><span class="p">)]</span>
+
+        <span class="n">nonsub_deriv_keys</span> <span class="o">=</span> <span class="n">_ls_s3fs</span><span class="p">(</span>
+            <span class="n">s3_prefix</span><span class="o">=</span><span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">s3_prefix</span><span class="p">,</span>
+                <span class="s1">&#39;derivatives&#39;</span>
+            <span class="p">]),</span>
+            <span class="n">anon</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">anon</span>
+        <span class="p">)[</span><span class="s1">&#39;other&#39;</span><span class="p">]</span>
+
+        <span class="n">non_sub_s3_keys</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;raw&#39;</span><span class="p">:</span> <span class="n">nonsub_keys</span><span class="p">,</span>
+            <span class="s1">&#39;derivatives&#39;</span><span class="p">:</span> <span class="n">nonsub_deriv_keys</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">non_sub_s3_keys</span></div>
+
+<div class="viewcode-block" id="HBNSite.download"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSite.download">[docs]</a>    <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">include_modality_agnostic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">include_derivs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pbar</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Download files for each subject in the study</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        directory : str</span>
+<span class="sd">            Directory to which to download subject files</span>
+
+<span class="sd">        include_modality_agnostic : bool, &quot;all&quot; or any subset of [</span>
+<span class="sd">                &quot;dataset_description.json&quot;, &quot;CHANGES&quot;, &quot;README&quot;, &quot;LICENSE&quot;]</span>
+<span class="sd">            If True or &quot;all&quot;, download all keys in self.non_sub_s3_keys</span>
+<span class="sd">            also. If a subset of [&quot;dataset_description.json&quot;, &quot;CHANGES&quot;,</span>
+<span class="sd">            &quot;README&quot;, &quot;LICENSE&quot;], download only those files. This is</span>
+<span class="sd">            useful if the non_sub_s3_keys contain files common to all</span>
+<span class="sd">            subjects that should be inherited. Default: False</span>
+
+<span class="sd">        include_derivs : bool or str</span>
+<span class="sd">            If True, download all derivatives files. If False, do not.</span>
+<span class="sd">            If a string or sequence of strings is passed, this will</span>
+<span class="sd">            only download derivatives that match the string(s) (e.g.</span>
+<span class="sd">            [&quot;dmriprep&quot;, &quot;afq&quot;]). Default: False</span>
+
+<span class="sd">        overwrite : bool</span>
+<span class="sd">            If True, overwrite files for each subject. Default: False</span>
+
+<span class="sd">        pbar : bool</span>
+<span class="sd">            If True, include progress bar. Default: True</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        AFQ.data.S3BIDSSubject.download</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>
+            <span class="n">directory</span><span class="o">=</span><span class="n">directory</span><span class="p">,</span>
+            <span class="n">include_modality_agnostic</span><span class="o">=</span><span class="n">include_modality_agnostic</span><span class="p">,</span>
+            <span class="n">include_derivs</span><span class="o">=</span><span class="n">include_derivs</span><span class="p">,</span>
+            <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span>
+            <span class="n">pbar</span><span class="o">=</span><span class="n">pbar</span>
+        <span class="p">)</span>
+
+        <span class="n">to_bids_description</span><span class="p">(</span>
+            <span class="n">directory</span><span class="p">,</span>
+            <span class="o">**</span><span class="p">{</span><span class="s2">&quot;BIDSVersion&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;HBN Study, &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">site</span><span class="p">,</span>
+               <span class="s2">&quot;DatasetType&quot;</span><span class="p">:</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;Subjects&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">subject_id</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">]})</span></div></div>
+
+
+<span class="c1"># +--------------------------------------------------+</span>
+<span class="c1"># | End S3BIDSStudy classes and supporting functions |</span>
+<span class="c1"># +--------------------------------------------------+</span>
+
+<div class="viewcode-block" id="s3fs_nifti_write"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.s3fs_nifti_write">[docs]</a><span class="k">def</span> <span class="nf">s3fs_nifti_write</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Write a nifti file straight to S3</span>
+
+<span class="sd">    Paramters</span>
+<span class="sd">    ---------</span>
+<span class="sd">    img : nib.Nifti1Image class instance</span>
+<span class="sd">        The image containing data to be written into S3</span>
+<span class="sd">    fname : string</span>
+<span class="sd">        Full path (including bucket name and extension) to the S3 location</span>
+<span class="sd">        where the file is to be saved.</span>
+<span class="sd">    fs : an s3fs.S3FileSystem class instance, optional</span>
+<span class="sd">        A file-system to refer to. Default to create a new file-system</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">s3fs</span><span class="o">.</span><span class="n">S3FileSystem</span><span class="p">()</span>
+
+    <span class="n">bio</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
+    <span class="n">file_map</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">make_file_map</span><span class="p">({</span><span class="s1">&#39;image&#39;</span><span class="p">:</span> <span class="n">bio</span><span class="p">,</span> <span class="s1">&#39;header&#39;</span><span class="p">:</span> <span class="n">bio</span><span class="p">})</span>
+    <span class="n">img</span><span class="o">.</span><span class="n">to_file_map</span><span class="p">(</span><span class="n">file_map</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">bio</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span>
+    <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ff</span><span class="p">:</span>
+        <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="s3fs_nifti_read"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.s3fs_nifti_read">[docs]</a><span class="k">def</span> <span class="nf">s3fs_nifti_read</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">anon</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Lazily reads a nifti image from S3.</span>
+
+<span class="sd">    Paramters</span>
+<span class="sd">    ---------</span>
+<span class="sd">    fname : string</span>
+<span class="sd">        Full path (including bucket name and extension) to the S3 location</span>
+<span class="sd">        of the file to be read.</span>
+<span class="sd">    fs : an s3fs.S3FileSystem class instance, optional</span>
+<span class="sd">        A file-system to refer to. Default to create a new file-system.</span>
+<span class="sd">    anon : bool</span>
+<span class="sd">        Whether to use anonymous connection (public buckets only).</span>
+<span class="sd">        If False, uses the key/secret given, or boto’s credential</span>
+<span class="sd">        resolver (client_kwargs, environment, variables, config files,</span>
+<span class="sd">        EC2 IAM server, in that order). Default: True</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    nib.Nifti1Image class instance</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Because the image is lazily loaded, data stored in the file</span>
+<span class="sd">    is not transferred until `get_fdata` is called.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">s3fs</span><span class="o">.</span><span class="n">S3FileSystem</span><span class="p">(</span><span class="n">anon</span><span class="o">=</span><span class="n">anon</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="k">as</span> <span class="n">ff</span><span class="p">:</span>
+        <span class="n">zz</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">ff</span><span class="p">)</span>
+        <span class="n">rr</span> <span class="o">=</span> <span class="n">zz</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">bb</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">(</span><span class="n">rr</span><span class="p">)</span>
+        <span class="n">fh</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">FileHolder</span><span class="p">(</span><span class="n">fileobj</span><span class="o">=</span><span class="n">bb</span><span class="p">)</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="o">.</span><span class="n">from_file_map</span><span class="p">({</span><span class="s1">&#39;header&#39;</span><span class="p">:</span> <span class="n">fh</span><span class="p">,</span> <span class="s1">&#39;image&#39;</span><span class="p">:</span> <span class="n">fh</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">img</span></div>
+
+
+<div class="viewcode-block" id="write_json"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.write_json">[docs]</a><span class="k">def</span> <span class="nf">write_json</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Write data to JSON file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fname : str</span>
+<span class="sd">        Full path to the file to write.</span>
+
+<span class="sd">    data : dict</span>
+<span class="sd">        A dict containing the data to write.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ff</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ff</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="k">lambda</span> <span class="n">obj</span><span class="p">:</span> <span class="s2">&quot;Not Serializable&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_json"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.read_json">[docs]</a><span class="k">def</span> <span class="nf">read_json</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read data from a JSON file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fname : str</span>
+<span class="sd">        Full path to the data-containing file</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ff</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ff</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="s3fs_json_read"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.s3fs_json_read">[docs]</a><span class="k">def</span> <span class="nf">s3fs_json_read</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">anon</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads json directly from S3</span>
+
+<span class="sd">    Paramters</span>
+<span class="sd">    ---------</span>
+<span class="sd">    fname : str</span>
+<span class="sd">        Full path (including bucket name and extension) to the file on S3.</span>
+<span class="sd">    fs : an s3fs.S3FileSystem class instance, optional</span>
+<span class="sd">        A file-system to refer to. Default to create a new file-system.</span>
+<span class="sd">    anon : bool</span>
+<span class="sd">        Whether to use anonymous connection (public buckets only).</span>
+<span class="sd">        If False, uses the key/secret given, or boto’s credential</span>
+<span class="sd">        resolver (client_kwargs, environment, variables, config files,</span>
+<span class="sd">        EC2 IAM server, in that order). Default: True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">s3fs</span><span class="o">.</span><span class="n">S3FileSystem</span><span class="p">(</span><span class="n">anon</span><span class="o">=</span><span class="n">anon</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="k">as</span> <span class="n">ff</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ff</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="s3fs_json_write"><a class="viewcode-back" href="../../../autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.s3fs_json_write">[docs]</a><span class="k">def</span> <span class="nf">s3fs_json_write</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Writes json from a dict directly into S3</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : dict</span>
+<span class="sd">        The json to be written out</span>
+<span class="sd">    fname : str</span>
+<span class="sd">        Full path (including bucket name and extension) to the file to</span>
+<span class="sd">        be written out on S3</span>
+<span class="sd">    fs : an s3fs.S3FileSystem class instance, optional</span>
+<span class="sd">        A file-system to refer to. Default to create a new file-system.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">s3fs</span><span class="o">.</span><span class="n">S3FileSystem</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ff</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ff</span><span class="p">)</span></div>
+</pre></div>
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2018--, The pyAFQ Contributors.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

@@ -5,10 +5,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Using pyAFQ &#8212; AFQ 0.10 documentation</title>
+    <title>Using pyAFQ &#8212; AFQ 0.11 documentation</title>
     
-  <link href="../_static/css/theme.css" rel="stylesheet">
-  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
@@ -31,7 +27,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -48,7 +45,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -138,10 +135,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -157,7 +152,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -171,6 +167,16 @@
  <li class="toctree-l1">
   <a class="reference internal" href="kwargs.html">
    The pyAFQ API optional arguments
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="methods.html">
+   The pyAFQ API methods
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="bundledict.html">
+   Defining Custom Bundle Dictionaries
   </a>
  </li>
  <li class="toctree-l1">
@@ -195,7 +201,7 @@
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="scalars.html">
-   The pyAFQ Custom Scalars API
+   The pyAFQ Custom Tissue Properties API
   </a>
  </li>
  <li class="toctree-l1">
@@ -217,32 +223,9 @@
 
   </div>
 </nav>
-<h3><a href="../index.html">Table of Contents</a></h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Using pyAFQ</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="data.html">Organizing your data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="kwargs.html">The pyAFQ API optional arguments</a></li>
-<li class="toctree-l2"><a class="reference internal" href="kwargs.html#the-pyafq-api-methods">The pyAFQ API methods</a></li>
-<li class="toctree-l2"><a class="reference internal" href="config.html">The pyAFQ configuration file</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viz_backend.html">Visualization Backends</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viz_backend.html#fury-dockerfile-for-cloudknot">Fury Dockerfile for Cloudknot</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mask.html">The pyAFQ Mask API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mapping.html">The pyAFQ Mapping API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="scalars.html">The pyAFQ Custom Scalars API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="converter.html">Tractography from other pipelines</a></li>
-<li class="toctree-l2"><a class="reference internal" href="converter.html#matlab-afq-to-python-afq-conversion">Matlab AFQ to Python AFQ conversion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tracking.html">Usage tracking with Google Analytics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="docker.html">The pyAFQ docker image</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -283,12 +266,12 @@
               <div>
                 
   <div class="section" id="using-pyafq">
-<h1>Using pyAFQ<a class="headerlink" href="#using-pyafq" title="Permalink to this headline">¶</a></h1>
+<h1>Using pyAFQ<a class="headerlink" href="#using-pyafq" title="Permalink to this headline">#</a></h1>
 <p><cite>pyAFQ</cite> provides a programmatic application programming interface (API) that
 can be used to integrate pyAFQ functionality into Python programs or into
 interactive analysis sessions (e.g., using
 <a class="reference external" href="https://jupyter.org">Jupyter</a> notebooks). Examples of using the API are
-provided in the <span class="xref std std-ref">examples</span> documentation section.</p>
+provided in the <a class="reference external" href="https://dipy.org/documentation/latest/examples_index/#examples" title="(in dipy v1.4.1)"><span>Examples</span></a> documentation section.</p>
 <p>In addition, pyAFQ provides a command-line interface (CLI). After installing
 the software, and organizing the data, run:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pyAFQ</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">config</span><span class="o">.</span><span class="n">toml</span>
@@ -310,7 +293,7 @@ The csv file has the same format as
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="../installation_guide.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -333,7 +316,8 @@ The csv file has the same format as
       </div>
     </div>
   
-  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
@@ -346,7 +330,7 @@ The csv file has the same format as
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

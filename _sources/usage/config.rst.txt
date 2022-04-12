@@ -55,7 +55,7 @@ See an example configuration file below::
     # Set "n_jobs" to -1 to automatically parallelize as
     # the number of cpus. Here is an example for how to do
     # multiprocessing with 4 cpus:
-    # {"n_jobs": -4, "engine": "joblib", "backend": "loky"}
+    # {"n_jobs": 4, "engine": "joblib", "backend": "loky"}
     # Default: {"engine": "serial"}
     parallel_params = "{'engine': 'serial'}"
     
@@ -69,7 +69,7 @@ See an example configuration file below::
     
     # How tracking directions are determined.
     # One of: {"det" | "prob"}
-    directions = "det"
+    directions = "prob"
     
     # The maximum turning angle in each step. Default: 30
     max_angle = 30.0
@@ -130,8 +130,8 @@ See an example configuration file below::
     # The miminal length (mm) in a streamline. Default: 1000
     max_length = 1000
     
-    # One of {"DTI", "CSD", "DKI", "MSMT"}. Defaults to use "DTI"
-    odf_model = "DTI"
+    # One of {"DTI", "CSD", "DKI"}. Defaults to use "DTI"
+    odf_model = "CSD"
     
     # Which strategy to use in tracking. This can be the standard local
     # tracking ("local") or Particle Filtering Tracking ([Girard2014]_).
@@ -227,16 +227,22 @@ See an example configuration file below::
     # Default: 0.
     prob_threshold = 0
     
+    # Whether to use distance from nearest ROI as a tie breaker when a
+    # streamline qualifies as a part of multiple bundles. If False,
+    # probability maps are used.
+    # Default : False.
+    roi_dist_tie_break = false
+    
     # The distance that a streamline node has to be from the waypoint
     # ROI in order to be included or excluded.
     # If set to None (default), will be calculated as the
     # center-to-corner distance of the voxel in the diffusion data.
-    # If a bundle has additional_tolerance in its bundle_dict, that
+    # If a bundle has inc_addtol or exc_addtol in its bundle_dict, that
     # tolerance will be added to this distance.
     # For example, if you wanted to increase tolerance for the right
     # arcuate waypoint ROIs by 3 each, you could make the following
     # modification to your bundle_dict:
-    # bundle_dict["ARC_R"]["additional_tolerances"] = [3, 3]
+    # bundle_dict["ARC_R"]["inc_addtol"] = [3, 3]
     # Additional tolerances can also be negative.
     dist_to_waypoint = ""
     
@@ -253,10 +259,12 @@ See an example configuration file below::
     # If not None, presegment by ROIs before performing
     # RecoBundles. Only used if seg_algo starts with 'Reco'.
     # Meta-data for the segmentation. The format is something like::
-    # {'name': {'ROIs':[img1, img2],
-    # 'rules':[True, True]},
+    # {'bundle_name': {
+    # 'include':[img1, img2],
     # 'prob_map': img3,
-    # 'cross_midline': False}
+    # 'cross_midline': False,
+    # 'start': img4,
+    # 'end': img5}}
     # Default: None
     presegment_bundle_dict = ""
     
@@ -265,20 +273,10 @@ See an example configuration file below::
     # Default: {}
     presegment_kwargs = "{}"
     
-    # Whether to filter the bundles based on their endpoints relative
-    # to regions defined in the AAL atlas. Applies only to the waypoint
-    # approach (XXX for now). Default: True.
+    # Whether to filter the bundles based on their endpoints.
+    # Applies only when `seg_algo == 'AFQ'`.
+    # Default: True.
     filter_by_endpoints = true
-    
-    # AAL atlas, which is the default behavior.
-    # The format for this should be:
-    # {"bundle1": {"startpoint":img1_1,
-    # "endpoint":img1_2},
-    # "bundle2": {"startpoint":img2_1,
-    # "endpoint":img2_2}}
-    # where the images used are binary masks of the desired
-    # endpoints.
-    endpoint_info = ""
     
     # If filter_by_endpoints is True, this is the required distance
     # from the endpoints to the atlas ROIs.
@@ -364,7 +362,8 @@ See an example configuration file below::
     # threshold controlling the amplitude below which the corresponding
     # fODF is assumed to be zero.  Ideally, tau should be set to
     # zero. However, to improve the stability of the algorithm, tau is
-    # set to tau*100 % of the mean fODF amplitude (here, 10% by default)
+    # set to tau*100 percent of the mean fODF amplitude (here, 10 percent
+    # by default)
     # (see [1]_). Default: 0.1
     csd_tau = 0.1
     
@@ -392,7 +391,8 @@ See an example configuration file below::
     
     # List of bundle names to include in segmentation,
     # or a bundle dictionary (see BundleDict for inspiration),
-    # or a BundleDict.
+    # or a BundleDict. See `Defining Custom Bundle Dictionaries`
+    # in the `usage` section of pyAFQ's documentation for details.
     # If None, will get all appropriate bundles for the chosen
     # segmentation algorithm.
     # Default: None

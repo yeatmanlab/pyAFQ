@@ -5,10 +5,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The pyAFQ configuration file &#8212; AFQ 0.10 documentation</title>
+    <title>The pyAFQ configuration file &#8212; AFQ 0.11 documentation</title>
     
-  <link href="../_static/css/theme.css" rel="stylesheet">
-  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
@@ -31,7 +27,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -40,7 +37,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Visualization Backends" href="viz_backend.html" />
-    <link rel="prev" title="The pyAFQ API optional arguments" href="kwargs.html" />
+    <link rel="prev" title="Defining Custom Bundle Dictionaries" href="bundledict.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -48,7 +45,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -138,10 +135,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -157,7 +152,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -171,6 +167,16 @@
  <li class="toctree-l1">
   <a class="reference internal" href="kwargs.html">
    The pyAFQ API optional arguments
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="methods.html">
+   The pyAFQ API methods
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="bundledict.html">
+   Defining Custom Bundle Dictionaries
   </a>
  </li>
  <li class="toctree-l1 current active">
@@ -195,7 +201,7 @@
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="scalars.html">
-   The pyAFQ Custom Scalars API
+   The pyAFQ Custom Tissue Properties API
   </a>
  </li>
  <li class="toctree-l1">
@@ -217,32 +223,9 @@
 
   </div>
 </nav>
-<h3><a href="../index.html">Table of Contents</a></h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Using pyAFQ</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="data.html">Organizing your data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="kwargs.html">The pyAFQ API optional arguments</a></li>
-<li class="toctree-l2"><a class="reference internal" href="kwargs.html#the-pyafq-api-methods">The pyAFQ API methods</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">The pyAFQ configuration file</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viz_backend.html">Visualization Backends</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viz_backend.html#fury-dockerfile-for-cloudknot">Fury Dockerfile for Cloudknot</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mask.html">The pyAFQ Mask API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mapping.html">The pyAFQ Mapping API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="scalars.html">The pyAFQ Custom Scalars API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="converter.html">Tractography from other pipelines</a></li>
-<li class="toctree-l2"><a class="reference internal" href="converter.html#matlab-afq-to-python-afq-conversion">Matlab AFQ to Python AFQ conversion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tracking.html">Usage tracking with Google Analytics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="docker.html">The pyAFQ docker image</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -283,7 +266,7 @@
               <div>
                 
   <div class="section" id="the-pyafq-configuration-file">
-<h1>The pyAFQ configuration file<a class="headerlink" href="#the-pyafq-configuration-file" title="Permalink to this headline">¶</a></h1>
+<h1>The pyAFQ configuration file<a class="headerlink" href="#the-pyafq-configuration-file" title="Permalink to this headline">#</a></h1>
 <p>This file should be a <a class="reference external" href="https://github.com/toml-lang/toml">toml</a> file. At
 minimum, the file should contain information about the location of the
 <cite>dmriprep</cite> folder:</p>
@@ -335,7 +318,7 @@ See an example configuration file below:</p>
 <span class="c1"># Set &quot;n_jobs&quot; to -1 to automatically parallelize as</span>
 <span class="c1"># the number of cpus. Here is an example for how to do</span>
 <span class="c1"># multiprocessing with 4 cpus:</span>
-<span class="c1"># {&quot;n_jobs&quot;: -4, &quot;engine&quot;: &quot;joblib&quot;, &quot;backend&quot;: &quot;loky&quot;}</span>
+<span class="c1"># {&quot;n_jobs&quot;: 4, &quot;engine&quot;: &quot;joblib&quot;, &quot;backend&quot;: &quot;loky&quot;}</span>
 <span class="c1"># Default: {&quot;engine&quot;: &quot;serial&quot;}</span>
 <span class="n">parallel_params</span> <span class="o">=</span> <span class="s2">&quot;{&#39;engine&#39;: &#39;serial&#39;}&quot;</span>
 
@@ -349,7 +332,7 @@ See an example configuration file below:</p>
 
 <span class="c1"># How tracking directions are determined.</span>
 <span class="c1"># One of: {&quot;det&quot; | &quot;prob&quot;}</span>
-<span class="n">directions</span> <span class="o">=</span> <span class="s2">&quot;det&quot;</span>
+<span class="n">directions</span> <span class="o">=</span> <span class="s2">&quot;prob&quot;</span>
 
 <span class="c1"># The maximum turning angle in each step. Default: 30</span>
 <span class="n">max_angle</span> <span class="o">=</span> <span class="mf">30.0</span>
@@ -410,8 +393,8 @@ See an example configuration file below:</p>
 <span class="c1"># The miminal length (mm) in a streamline. Default: 1000</span>
 <span class="n">max_length</span> <span class="o">=</span> <span class="mi">1000</span>
 
-<span class="c1"># One of {&quot;DTI&quot;, &quot;CSD&quot;, &quot;DKI&quot;, &quot;MSMT&quot;}. Defaults to use &quot;DTI&quot;</span>
-<span class="n">odf_model</span> <span class="o">=</span> <span class="s2">&quot;DTI&quot;</span>
+<span class="c1"># One of {&quot;DTI&quot;, &quot;CSD&quot;, &quot;DKI&quot;}. Defaults to use &quot;DTI&quot;</span>
+<span class="n">odf_model</span> <span class="o">=</span> <span class="s2">&quot;CSD&quot;</span>
 
 <span class="c1"># Which strategy to use in tracking. This can be the standard local</span>
 <span class="c1"># tracking (&quot;local&quot;) or Particle Filtering Tracking ([Girard2014]_).</span>
@@ -507,16 +490,22 @@ See an example configuration file below:</p>
 <span class="c1"># Default: 0.</span>
 <span class="n">prob_threshold</span> <span class="o">=</span> <span class="mi">0</span>
 
+<span class="c1"># Whether to use distance from nearest ROI as a tie breaker when a</span>
+<span class="c1"># streamline qualifies as a part of multiple bundles. If False,</span>
+<span class="c1"># probability maps are used.</span>
+<span class="c1"># Default : False.</span>
+<span class="n">roi_dist_tie_break</span> <span class="o">=</span> <span class="n">false</span>
+
 <span class="c1"># The distance that a streamline node has to be from the waypoint</span>
 <span class="c1"># ROI in order to be included or excluded.</span>
 <span class="c1"># If set to None (default), will be calculated as the</span>
 <span class="c1"># center-to-corner distance of the voxel in the diffusion data.</span>
-<span class="c1"># If a bundle has additional_tolerance in its bundle_dict, that</span>
+<span class="c1"># If a bundle has inc_addtol or exc_addtol in its bundle_dict, that</span>
 <span class="c1"># tolerance will be added to this distance.</span>
 <span class="c1"># For example, if you wanted to increase tolerance for the right</span>
 <span class="c1"># arcuate waypoint ROIs by 3 each, you could make the following</span>
 <span class="c1"># modification to your bundle_dict:</span>
-<span class="c1"># bundle_dict[&quot;ARC_R&quot;][&quot;additional_tolerances&quot;] = [3, 3]</span>
+<span class="c1"># bundle_dict[&quot;ARC_R&quot;][&quot;inc_addtol&quot;] = [3, 3]</span>
 <span class="c1"># Additional tolerances can also be negative.</span>
 <span class="n">dist_to_waypoint</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
@@ -533,10 +522,12 @@ See an example configuration file below:</p>
 <span class="c1"># If not None, presegment by ROIs before performing</span>
 <span class="c1"># RecoBundles. Only used if seg_algo starts with &#39;Reco&#39;.</span>
 <span class="c1"># Meta-data for the segmentation. The format is something like::</span>
-<span class="c1"># {&#39;name&#39;: {&#39;ROIs&#39;:[img1, img2],</span>
-<span class="c1"># &#39;rules&#39;:[True, True]},</span>
+<span class="c1"># {&#39;bundle_name&#39;: {</span>
+<span class="c1"># &#39;include&#39;:[img1, img2],</span>
 <span class="c1"># &#39;prob_map&#39;: img3,</span>
-<span class="c1"># &#39;cross_midline&#39;: False}</span>
+<span class="c1"># &#39;cross_midline&#39;: False,</span>
+<span class="c1"># &#39;start&#39;: img4,</span>
+<span class="c1"># &#39;end&#39;: img5}}</span>
 <span class="c1"># Default: None</span>
 <span class="n">presegment_bundle_dict</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
@@ -545,20 +536,10 @@ See an example configuration file below:</p>
 <span class="c1"># Default: {}</span>
 <span class="n">presegment_kwargs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span>
 
-<span class="c1"># Whether to filter the bundles based on their endpoints relative</span>
-<span class="c1"># to regions defined in the AAL atlas. Applies only to the waypoint</span>
-<span class="c1"># approach (XXX for now). Default: True.</span>
+<span class="c1"># Whether to filter the bundles based on their endpoints.</span>
+<span class="c1"># Applies only when `seg_algo == &#39;AFQ&#39;`.</span>
+<span class="c1"># Default: True.</span>
 <span class="n">filter_by_endpoints</span> <span class="o">=</span> <span class="n">true</span>
-
-<span class="c1"># AAL atlas, which is the default behavior.</span>
-<span class="c1"># The format for this should be:</span>
-<span class="c1"># {&quot;bundle1&quot;: {&quot;startpoint&quot;:img1_1,</span>
-<span class="c1"># &quot;endpoint&quot;:img1_2},</span>
-<span class="c1"># &quot;bundle2&quot;: {&quot;startpoint&quot;:img2_1,</span>
-<span class="c1"># &quot;endpoint&quot;:img2_2}}</span>
-<span class="c1"># where the images used are binary masks of the desired</span>
-<span class="c1"># endpoints.</span>
-<span class="n">endpoint_info</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <span class="c1"># If filter_by_endpoints is True, this is the required distance</span>
 <span class="c1"># from the endpoints to the atlas ROIs.</span>
@@ -644,7 +625,8 @@ See an example configuration file below:</p>
 <span class="c1"># threshold controlling the amplitude below which the corresponding</span>
 <span class="c1"># fODF is assumed to be zero.  Ideally, tau should be set to</span>
 <span class="c1"># zero. However, to improve the stability of the algorithm, tau is</span>
-<span class="c1"># set to tau*100 % of the mean fODF amplitude (here, 10% by default)</span>
+<span class="c1"># set to tau*100 percent of the mean fODF amplitude (here, 10 percent</span>
+<span class="c1"># by default)</span>
 <span class="c1"># (see [1]_). Default: 0.1</span>
 <span class="n">csd_tau</span> <span class="o">=</span> <span class="mf">0.1</span>
 
@@ -672,7 +654,8 @@ See an example configuration file below:</p>
 
 <span class="c1"># List of bundle names to include in segmentation,</span>
 <span class="c1"># or a bundle dictionary (see BundleDict for inspiration),</span>
-<span class="c1"># or a BundleDict.</span>
+<span class="c1"># or a BundleDict. See `Defining Custom Bundle Dictionaries`</span>
+<span class="c1"># in the `usage` section of pyAFQ&#39;s documentation for details.</span>
 <span class="c1"># If None, will get all appropriate bundles for the chosen</span>
 <span class="c1"># segmentation algorithm.</span>
 <span class="c1"># Default: None</span>
@@ -789,12 +772,12 @@ ignore them.</p>
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
-    <a class='left-prev' id="prev-link" href="kwargs.html" title="previous page">
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="bundledict.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">The pyAFQ API optional arguments</p>
+            <p class="prev-next-title">Defining Custom Bundle Dictionaries</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="viz_backend.html" title="next page">
@@ -812,7 +795,8 @@ ignore them.</p>
       </div>
     </div>
   
-  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
@@ -825,7 +809,7 @@ ignore them.</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

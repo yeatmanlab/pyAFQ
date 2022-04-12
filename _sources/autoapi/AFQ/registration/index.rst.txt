@@ -120,7 +120,7 @@ Functions
 
    :Returns:
 
-       A :class:`DiffeomorphicMap` object
+       **A** : class:`DiffeomorphicMap` object
            ..
 
 

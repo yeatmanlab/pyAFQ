@@ -14,7 +14,7 @@ import nibabel as nib
 import plotly
 
 from AFQ.api.group import GroupAFQ
-import AFQ.data as afd
+import AFQ.data.fetch as afd
 
 ##########################################################################
 # Get some example data

@@ -5,10 +5,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.models.csd &#8212; AFQ 0.10 documentation</title>
+    <title>AFQ.models.csd &#8212; AFQ 0.11 documentation</title>
     
-  <link href="../../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
@@ -31,7 +27,8 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -46,7 +43,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -136,10 +133,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -155,7 +150,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -163,17 +159,9 @@
     
   </div>
 </nav>
-<h3><a href="../../../index.html">Table of Contents</a></h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -204,11 +192,10 @@
 <span class="kn">from</span> <span class="nn">dipy.reconst</span> <span class="kn">import</span> <span class="n">shm</span>
 <span class="kn">import</span> <span class="nn">AFQ.utils.models</span> <span class="k">as</span> <span class="nn">ut</span>
 
-<span class="c1"># Monkey patch fixed spherical harmonics for conda and fixed solve_qp from</span>
+<span class="c1"># Monkey patch fixed spherical harmonics for conda from</span>
 <span class="c1"># DIPY dev:</span>
-<span class="kn">from</span> <span class="nn">AFQ._fixes</span> <span class="kn">import</span> <span class="n">spherical_harmonics</span><span class="p">,</span> <span class="n">solve_qp</span>
+<span class="kn">from</span> <span class="nn">AFQ._fixes</span> <span class="kn">import</span> <span class="n">spherical_harmonics</span>
 <span class="n">shm</span><span class="o">.</span><span class="n">spherical_harmonics</span> <span class="o">=</span> <span class="n">spherical_harmonics</span>
-<span class="n">mcsd</span><span class="o">.</span><span class="n">solve_qp</span> <span class="o">=</span> <span class="n">solve_qp</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fit_csd&quot;</span><span class="p">]</span>
 
@@ -217,7 +204,7 @@
     <span class="k">pass</span>
 
 
-<span class="k">def</span> <span class="nf">_model</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msmt</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_model</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function that defines a CSD model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -231,39 +218,27 @@
         <span class="k">if</span> <span class="n">sh_order</span> <span class="o">&gt;</span> <span class="mi">8</span><span class="p">:</span>
             <span class="n">sh_order</span> <span class="o">=</span> <span class="mi">8</span>
 
-    <span class="k">if</span> <span class="n">msmt</span><span class="p">:</span>
-        <span class="n">my_model</span> <span class="o">=</span> <span class="n">mcsd</span><span class="o">.</span><span class="n">MultiShellDeconvModel</span>
-        <span class="k">if</span> <span class="n">response</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">mask_wm</span><span class="p">,</span> <span class="n">mask_gm</span><span class="p">,</span> <span class="n">mask_csf</span> <span class="o">=</span>\
-                <span class="n">mcsd</span><span class="o">.</span><span class="n">mask_for_response_msmt</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-            <span class="n">response_wm</span><span class="p">,</span> <span class="n">response_gm</span><span class="p">,</span> <span class="n">response_csf</span> <span class="o">=</span>\
-                <span class="n">mcsd</span><span class="o">.</span><span class="n">response_from_mask_msmt</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span>
-                                             <span class="n">mask_wm</span><span class="p">,</span> <span class="n">mask_gm</span><span class="p">,</span> <span class="n">mask_csf</span><span class="p">)</span>
-            <span class="n">response</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">response_wm</span><span class="p">,</span> <span class="n">response_gm</span><span class="p">,</span> <span class="n">response_csf</span><span class="p">])</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">my_model</span> <span class="o">=</span> <span class="n">csd</span><span class="o">.</span><span class="n">ConstrainedSphericalDeconvModel</span>
-        <span class="k">if</span> <span class="n">response</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">response</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">csd</span><span class="o">.</span><span class="n">auto_response_ssst</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">roi_radii</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-                                                 <span class="n">fa_thr</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
-        <span class="c1"># Catch conditions where an auto-response could not be calculated:</span>
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
-            <span class="k">raise</span> <span class="n">CsdNanResponseError</span>
+    <span class="n">my_model</span> <span class="o">=</span> <span class="n">csd</span><span class="o">.</span><span class="n">ConstrainedSphericalDeconvModel</span>
+    <span class="k">if</span> <span class="n">response</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">response</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">csd</span><span class="o">.</span><span class="n">auto_response_ssst</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">roi_radii</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                                             <span class="n">fa_thr</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+    <span class="c1"># Catch conditions where an auto-response could not be calculated:</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+        <span class="k">raise</span> <span class="n">CsdNanResponseError</span>
 
     <span class="n">csdmodel</span> <span class="o">=</span> <span class="n">my_model</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="n">sh_order</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">csdmodel</span>
 
 
-<span class="k">def</span> <span class="nf">_fit</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lambda_</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-         <span class="n">msmt</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_fit</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lambda_</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function that does the core of fitting a model to data.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_model</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">sh_order</span><span class="p">,</span> <span class="n">msmt</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_model</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">sh_order</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="fit_csd"><a class="viewcode-back" href="../../../autoapi/AFQ/models/csd/index.html#AFQ.models.csd.fit_csd">[docs]</a><span class="k">def</span> <span class="nf">fit_csd</span><span class="p">(</span><span class="n">data_files</span><span class="p">,</span> <span class="n">bval_files</span><span class="p">,</span> <span class="n">bvec_files</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lambda_</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">msmt</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lambda_</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fit the CSD model and save file with SH coefficients.</span>
 
@@ -304,8 +279,6 @@
 <span class="sd">        A full path to a directory to store the maps that get computed.</span>
 <span class="sd">        Default: file with coefficients gets stored in the same directory as</span>
 <span class="sd">        the first DWI file in `data_files`.</span>
-<span class="sd">    msmt : bool, optional</span>
-<span class="sd">        If False, standard single-shell CSD will be used. Otherwise,</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -323,7 +296,7 @@
                                             <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
 
     <span class="n">csdfit</span> <span class="o">=</span> <span class="n">_fit</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="n">sh_order</span><span class="p">,</span>
-                  <span class="n">lambda_</span><span class="o">=</span><span class="n">lambda_</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">tau</span><span class="p">,</span> <span class="n">msmt</span><span class="o">=</span><span class="n">msmt</span><span class="p">)</span>
+                  <span class="n">lambda_</span><span class="o">=</span><span class="n">lambda_</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">tau</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">out_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">out_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">data_files</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;dki&#39;</span><span class="p">)</span>
@@ -350,7 +323,8 @@
       </div>
     </div>
   
-  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
@@ -363,7 +337,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

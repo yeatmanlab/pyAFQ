@@ -23,7 +23,7 @@ Functions
 
 
 
-.. py:function:: fit_csd(data_files, bval_files, bvec_files, mask=None, response=None, b0_threshold=50, sh_order=None, lambda_=1, tau=0.1, out_dir=None, msmt=False)
+.. py:function:: fit_csd(data_files, bval_files, bvec_files, mask=None, response=None, b0_threshold=50, sh_order=None, lambda_=1, tau=0.1, out_dir=None)
 
    
    Fit the CSD model and save file with SH coefficients.
@@ -75,9 +75,6 @@ Functions
            A full path to a directory to store the maps that get computed.
            Default: file with coefficients gets stored in the same directory as
            the first DWI file in `data_files`.
-
-       **msmt** : bool, optional
-           If False, standard single-shell CSD will be used. Otherwise,
 
    :Returns:
 

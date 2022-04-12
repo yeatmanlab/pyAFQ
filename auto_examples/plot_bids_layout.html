@@ -5,10 +5,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>How pyAFQ uses BIDS &#8212; AFQ 0.10 documentation</title>
+    <title>How pyAFQ uses BIDS &#8212; AFQ 0.11 documentation</title>
     
-  <link href="../_static/css/theme.css" rel="stylesheet">
-  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
@@ -31,7 +27,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -48,7 +45,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -138,10 +135,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -157,7 +152,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -235,29 +231,9 @@
 
   </div>
 </nav>
-<h3><a href="../index.html">Table of Contents</a></h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="plot_afq_reco80.html">RecoBundles80 using AFQ API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_afq_api.html">AFQ API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_afq_callosal.html">Callosal bundles using AFQ API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_optic_radiations.html">Plotting the Optic Radiations</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">How pyAFQ uses BIDS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cloudknot_example.html">Using cloudknot to run pyAFQ on AWS batch:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cloudknot_hcp_example.html">AFQ with HCP data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_tract_profile.html">Plotting tract profiles</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_recobundles.html">Plotting tract profiles using RecoBundles</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_callosal_tract_profile.html">Plotting Novel Tract Profiles:</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -303,7 +279,7 @@
 to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="how-pyafq-uses-bids">
-<span id="sphx-glr-auto-examples-plot-bids-layout-py"></span><h1>How pyAFQ uses BIDS<a class="headerlink" href="#how-pyafq-uses-bids" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-auto-examples-plot-bids-layout-py"></span><h1>How pyAFQ uses BIDS<a class="headerlink" href="#how-pyafq-uses-bids" title="Permalink to this headline">#</a></h1>
 <p>The pyAFQ API relies heavily on the
 <a class="reference external" href="https://bids-specification.readthedocs.io/en/stable/">Brain Imaging Data Standard (BIDS)</a>. This means that the software assumes that its inputs are organized
 according to the BIDS spec and its outputs conform where possible with the
@@ -326,7 +302,7 @@ of the software.</p>
 <span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
 
 <span class="kn">from</span> <span class="nn">AFQ.api.group</span> <span class="kn">import</span> <span class="n">GroupAFQ</span>
-<span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afd</span>
+<span class="kn">import</span> <span class="nn">AFQ.data.fetch</span> <span class="k">as</span> <span class="nn">afd</span>
 </pre></div>
 </div>
 <dl class="simple">
@@ -393,77 +369,76 @@ these reconstructions in the pyAFQ segmentation and tractometry pipeline
 We fetch this data and add it as a separate pipeline</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">afd</span><span class="o">.</span><span class="n">fetch_stanford_hardi_tractography</span><span class="p">()</span>
 
-<span class="n">bids_path</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;AFQ_data&#39;</span><span class="p">,</span> <span class="s1">&#39;stanford_hardi&#39;</span><span class="p">)</span>
-<span class="n">tractography_path</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bids_path</span><span class="p">,</span> <span class="s1">&#39;derivatives&#39;</span><span class="p">,</span> <span class="s1">&#39;my_tractography&#39;</span><span class="p">)</span>
-<span class="n">sub_path</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tractography_path</span><span class="p">,</span> <span class="s1">&#39;sub-01&#39;</span><span class="p">,</span> <span class="s1">&#39;ses-01&#39;</span><span class="p">,</span> <span class="s1">&#39;dwi&#39;</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bids_path</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.expanduser" title="os.path.expanduser" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">expanduser</span></a><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;AFQ_data&#39;</span><span class="p">,</span> <span class="s1">&#39;stanford_hardi&#39;</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tractography_path</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bids_path</span></a><span class="p">,</span> <span class="s1">&#39;derivatives&#39;</span><span class="p">,</span> <span class="s1">&#39;my_tractography&#39;</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sub_path</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tractography_path</span></a><span class="p">,</span> <span class="s1">&#39;sub-01&#39;</span><span class="p">,</span> <span class="s1">&#39;ses-01&#39;</span><span class="p">,</span> <span class="s1">&#39;dwi&#39;</span><span class="p">)</span>
 
-<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">sub_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
-    <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-        <span class="n">op</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span>
+<a href="https://docs.python.org/3/library/os.html#os.makedirs" title="os.makedirs" class="sphx-glr-backref-module-os sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">makedirs</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sub_path</span></a><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/os.html#os.rename" title="os.rename" class="sphx-glr-backref-module-os sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">rename</span></a><span class="p">(</span>
+    <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span>
+        <a href="https://docs.python.org/3/library/os.path.html#os.path.expanduser" title="os.path.expanduser" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">expanduser</span></a><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span>
         <span class="s1">&#39;AFQ_data&#39;</span><span class="p">,</span>
         <span class="s1">&#39;stanford_hardi_tractography&#39;</span><span class="p">,</span>
         <span class="s1">&#39;full_segmented_cleaned_tractography.trk&#39;</span><span class="p">),</span>
-    <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-        <span class="n">sub_path</span><span class="p">,</span>
+    <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span>
+        <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sub_path</span></a><span class="p">,</span>
         <span class="s1">&#39;sub-01_ses-01-dwi_tractography.trk&#39;</span><span class="p">))</span>
 
 <span class="n">afd</span><span class="o">.</span><span class="n">to_bids_description</span><span class="p">(</span>
-    <span class="n">tractography_path</span><span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tractography_path</span></a><span class="p">,</span>
     <span class="o">**</span><span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;my_tractography&quot;</span><span class="p">,</span>
         <span class="s2">&quot;PipelineDescription&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;my_tractography&quot;</span><span class="p">}})</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/11337 [00:00&lt;?, ? MB/s]
-  0%|          | 4/11337 [00:00&lt;06:47, 27.83 MB/s]
-  0%|          | 10/11337 [00:00&lt;05:16, 35.82 MB/s]
-  0%|          | 40/11337 [00:00&lt;01:38, 115.00 MB/s]
-  1%|1         | 156/11337 [00:00&lt;00:28, 389.03 MB/s]
-  4%|4         | 496/11337 [00:00&lt;00:09, 1106.67 MB/s]
-  8%|7         | 865/11337 [00:00&lt;00:06, 1608.80 MB/s]
- 11%|#         | 1237/11337 [00:01&lt;00:05, 1935.29 MB/s]
- 14%|#4        | 1613/11337 [00:01&lt;00:04, 2157.40 MB/s]
- 18%|#7        | 1991/11337 [00:01&lt;00:04, 2309.55 MB/s]
- 21%|##        | 2371/11337 [00:01&lt;00:03, 2416.92 MB/s]
- 24%|##4       | 2748/11337 [00:01&lt;00:03, 2484.45 MB/s]
- 28%|##7       | 3125/11337 [00:01&lt;00:03, 2531.25 MB/s]
- 31%|###       | 3499/11337 [00:01&lt;00:03, 2558.92 MB/s]
- 34%|###4      | 3876/11337 [00:02&lt;00:02, 2583.43 MB/s]
- 38%|###7      | 4255/11337 [00:02&lt;00:02, 2605.59 MB/s]
- 41%|####      | 4630/11337 [00:02&lt;00:02, 2610.63 MB/s]
- 44%|####4     | 5007/11337 [00:02&lt;00:02, 2622.17 MB/s]
- 48%|####7     | 5386/11337 [00:02&lt;00:02, 2634.86 MB/s]
- 51%|#####     | 5763/11337 [00:02&lt;00:02, 2636.73 MB/s]
- 54%|#####4    | 6142/11337 [00:02&lt;00:01, 2645.89 MB/s]
- 58%|#####7    | 6524/11337 [00:03&lt;00:01, 2645.22 MB/s]
- 61%|######    | 6894/11337 [00:03&lt;00:01, 2639.72 MB/s]
- 64%|######4   | 7273/11337 [00:03&lt;00:01, 2627.33 MB/s]
- 68%|######7   | 7656/11337 [00:03&lt;00:01, 2646.01 MB/s]
- 71%|#######   | 8034/11337 [00:03&lt;00:01, 2666.95 MB/s]
- 74%|#######4  | 8410/11337 [00:03&lt;00:01, 2658.02 MB/s]
- 77%|#######7  | 8779/11337 [00:03&lt;00:00, 2634.90 MB/s]
- 81%|########  | 9151/11337 [00:03&lt;00:00, 2626.78 MB/s]
- 84%|########4 | 9529/11337 [00:04&lt;00:00, 2635.10 MB/s]
- 87%|########7 | 9901/11337 [00:04&lt;00:00, 2626.04 MB/s]
- 90%|######### | 10241/11337 [00:04&lt;00:00, 2802.56 MB/s]
- 93%|#########2| 10527/11337 [00:04&lt;00:00, 2593.28 MB/s]
- 96%|#########5| 10833/11337 [00:04&lt;00:00, 2570.56 MB/s]
- 99%|#########8| 11172/11337 [00:04&lt;00:00, 2761.20 MB/s]
-100%|##########| 11337/11337 [00:04&lt;00:00, 2356.46 MB/s]
+  0%|          | 4/11337 [00:00&lt;06:42, 28.19 MB/s]
+  0%|          | 15/11337 [00:00&lt;03:19, 56.86 MB/s]
+  1%|          | 66/11337 [00:00&lt;00:58, 194.18 MB/s]
+  2%|2         | 267/11337 [00:00&lt;00:16, 672.71 MB/s]
+  6%|5         | 637/11337 [00:00&lt;00:07, 1360.29 MB/s]
+  9%|8         | 995/11337 [00:00&lt;00:05, 1747.09 MB/s]
+ 12%|#2        | 1372/11337 [00:01&lt;00:04, 2038.20 MB/s]
+ 15%|#5        | 1746/11337 [00:01&lt;00:04, 2222.48 MB/s]
+ 19%|#8        | 2112/11337 [00:01&lt;00:03, 2325.72 MB/s]
+ 22%|##1       | 2486/11337 [00:01&lt;00:03, 2415.91 MB/s]
+ 25%|##5       | 2864/11337 [00:01&lt;00:03, 2487.08 MB/s]
+ 29%|##8       | 3243/11337 [00:01&lt;00:03, 2537.47 MB/s]
+ 32%|###1      | 3614/11337 [00:01&lt;00:03, 2552.02 MB/s]
+ 35%|###5      | 3985/11337 [00:02&lt;00:02, 2564.03 MB/s]
+ 38%|###8      | 4361/11337 [00:02&lt;00:02, 2584.88 MB/s]
+ 42%|####1     | 4738/11337 [00:02&lt;00:02, 2600.70 MB/s]
+ 45%|####5     | 5116/11337 [00:02&lt;00:02, 2612.88 MB/s]
+ 48%|####8     | 5497/11337 [00:02&lt;00:02, 2632.04 MB/s]
+ 52%|#####1    | 5873/11337 [00:02&lt;00:02, 2630.92 MB/s]
+ 55%|#####5    | 6241/11337 [00:02&lt;00:01, 2615.37 MB/s]
+ 58%|#####8    | 6618/11337 [00:03&lt;00:01, 2619.57 MB/s]
+ 62%|######1   | 6991/11337 [00:03&lt;00:01, 2616.01 MB/s]
+ 65%|######4   | 7362/11337 [00:03&lt;00:01, 2610.56 MB/s]
+ 68%|######8   | 7737/11337 [00:03&lt;00:01, 2615.67 MB/s]
+ 72%|#######1  | 8114/11337 [00:03&lt;00:01, 2623.43 MB/s]
+ 75%|#######4  | 8495/11337 [00:03&lt;00:01, 2637.59 MB/s]
+ 78%|#######8  | 8874/11337 [00:03&lt;00:00, 2642.49 MB/s]
+ 82%|########1 | 9250/11337 [00:04&lt;00:00, 2636.93 MB/s]
+ 85%|########4 | 9627/11337 [00:04&lt;00:00, 2636.77 MB/s]
+ 88%|########8 | 10006/11337 [00:04&lt;00:00, 2642.48 MB/s]
+ 92%|#########1| 10375/11337 [00:04&lt;00:00, 2620.14 MB/s]
+ 95%|#########4| 10746/11337 [00:04&lt;00:00, 2610.65 MB/s]
+ 98%|#########8| 11124/11337 [00:04&lt;00:00, 2620.07 MB/s]
+100%|##########| 11337/11337 [00:04&lt;00:00, 2363.06 MB/s]
 
   0%|          | 0/14 [00:00&lt;?, ? MB/s]
- 29%|##8       | 4/14 [00:00&lt;00:00, 28.36 MB/s]
-100%|##########| 14/14 [00:00&lt;00:00, 65.81 MB/s]
+ 29%|##8       | 4/14 [00:00&lt;00:00, 28.15 MB/s]
+100%|##########| 14/14 [00:00&lt;00:00, 65.31 MB/s]
 
   0%|          | 0/1037 [00:00&lt;?, ? MB/s]
   0%|          | 4/1037 [00:00&lt;00:36, 28.42 MB/s]
-  1%|1         | 15/1037 [00:00&lt;00:17, 57.45 MB/s]
-  6%|6         | 63/1037 [00:00&lt;00:05, 185.89 MB/s]
- 25%|##4       | 256/1037 [00:00&lt;00:01, 649.27 MB/s]
- 60%|######    | 626/1037 [00:00&lt;00:00, 1355.99 MB/s]
- 96%|#########6| 996/1037 [00:00&lt;00:00, 1781.97 MB/s]
-100%|##########| 1037/1037 [00:00&lt;00:00, 1209.81 MB/s]
+  1%|1         | 11/1037 [00:00&lt;00:25, 40.77 MB/s]
+  4%|4         | 46/1037 [00:00&lt;00:07, 135.00 MB/s]
+ 18%|#7        | 184/1037 [00:00&lt;00:01, 466.36 MB/s]
+ 53%|#####3    | 554/1037 [00:00&lt;00:00, 1240.86 MB/s]
+ 89%|########9 | 928/1037 [00:00&lt;00:00, 1709.99 MB/s]
+100%|##########| 1037/1037 [00:00&lt;00:00, 1206.75 MB/s]
 </pre></div>
 </div>
 <p>After we do that, our dataset folder should look like this:</p>
@@ -505,7 +480,7 @@ We fetch this data and add it as a separate pipeline</p>
 </div>
 <p>To explore the layout of these derivatives, we will initialize a
 <code class="xref py py-class docutils literal notranslate"><span class="pre">BIDSLayout</span></code> class instance to help us see what is in this dataset</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">layout</span> <span class="o">=</span> <span class="n">bids</span><span class="o">.</span><span class="n">BIDSLayout</span><span class="p">(</span><span class="n">bids_path</span><span class="p">,</span> <span class="n">derivatives</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">layout</span> <span class="o">=</span> <span class="n">bids</span><span class="o">.</span><span class="n">BIDSLayout</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bids_path</span></a><span class="p">,</span> <span class="n">derivatives</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Because there is no raw data in this BIDS layout (only derivatives),
@@ -519,32 +494,32 @@ pybids will report that there are no subjects and sessions:</p>
 </div>
 <p>But a query on the derivatives will reveal the different derivatives that
 are stored here:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">layout</span><span class="o">.</span><span class="n">derivatives</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">layout</span><span class="o">.</span><span class="n">derivatives</span></a><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;vistasoft&#39;: BIDS Layout: ...rd_hardi/derivatives/vistasoft | Subjects: 1 | Sessions: 1 | Runs: 0, &#39;freesurfer&#39;: BIDS Layout: ...d_hardi/derivatives/freesurfer | Subjects: 1 | Sessions: 1 | Runs: 0, &#39;my_tractography&#39;: BIDS Layout: ...di/derivatives/my_tractography | Subjects: 1 | Sessions: 1 | Runs: 0}
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;vistasoft&#39;: BIDS Layout: ...rd_hardi/derivatives/vistasoft | Subjects: 1 | Sessions: 1 | Runs: 0, &#39;my_tractography&#39;: BIDS Layout: ...di/derivatives/my_tractography | Subjects: 1 | Sessions: 1 | Runs: 0, &#39;freesurfer&#39;: BIDS Layout: ...d_hardi/derivatives/freesurfer | Subjects: 1 | Sessions: 1 | Runs: 0}
 </pre></div>
 </div>
 <p>We can use a <code class="xref py py-class docutils literal notranslate"><span class="pre">bids.BIDSValidator</span></code> object to make sure that the
 files within our data set are BIDS-compliant. For example, we can
 extract the tractography derivatives part of our layout using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">my_tractography</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="n">derivatives</span><span class="p">[</span><span class="s2">&quot;my_tractography&quot;</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">my_tractography</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">layout</span><span class="o">.</span><span class="n">derivatives</span></a><span class="p">[</span><span class="s2">&quot;my_tractography&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>This variable is also a BIDS layout object. This object has a <code class="docutils literal notranslate"><span class="pre">get</span></code>
 method, which allows us to query and find specific items within the
 layout. For example, we can ask for files that have a suffix consistent
 with tractography results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tractography_files</span> <span class="o">=</span> <span class="n">my_tractography</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;tractography&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tractography_files</span></a> <span class="o">=</span> <span class="n">my_tractography</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;tractography&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Or ask for files that have a <code class="docutils literal notranslate"><span class="pre">.trk</span></code> extension:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tractography_files</span> <span class="o">=</span> <span class="n">my_tractography</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">extension</span><span class="o">=</span><span class="s1">&#39;.trk&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tractography_files</span></a> <span class="o">=</span> <span class="n">my_tractography</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">extension</span><span class="o">=</span><span class="s1">&#39;.trk&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>In this case, both of these would produce the same result.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tractography_file</span> <span class="o">=</span> <span class="n">tractography_files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tractography_file</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tractography_files</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">tractography_file</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -566,11 +541,11 @@ requires that the filename be provided relative to the root of the BIDS
 dataset, so we have to split the string that contains the full path
 of the tractography to extract only the part that is relative to the
 root of the entire BIDS <code class="docutils literal notranslate"><span class="pre">layout</span></code> object:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tractography_full_path</span> <span class="o">=</span> <span class="n">tractography_file</span><span class="o">.</span><span class="n">path</span>
-<span class="n">tractography_relative_path</span> <span class="o">=</span> <span class="n">tractography_full_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">layout</span><span class="o">.</span><span class="n">root</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tractography_full_path</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tractography_file</span><span class="o">.</span><span class="n">path</span></a>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tractography_relative_path</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tractography_full_path</span></a><span class="o">.</span><span class="n">split</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">layout</span><span class="o">.</span><span class="n">root</span></a><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
 <span class="n">validator</span> <span class="o">=</span> <span class="n">bids</span><span class="o">.</span><span class="n">BIDSValidator</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">validator</span><span class="o">.</span><span class="n">is_bids</span><span class="p">(</span><span class="n">tractography_relative_path</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">validator</span><span class="o">.</span><span class="n">is_bids</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tractography_relative_path</span></a><span class="p">))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -584,7 +559,9 @@ which we already have clear definitions of the information
 needed to segment them (e.g., waypoint ROIs and probability maps).
 For an example that includes custom definition of bundle info, see the
 <a class="reference external" href="http://yeatmanlab.github.io/pyAFQ/auto_examples/plot_callosal_tract_profile.html">plot_callosal_tract_profile example</a>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bundle_info</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SLF&quot;</span><span class="p">,</span> <span class="s2">&quot;ARC&quot;</span><span class="p">,</span> <span class="s2">&quot;CST&quot;</span><span class="p">,</span> <span class="s2">&quot;FP&quot;</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle_info</span></a> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;SLF_L&quot;</span><span class="p">,</span> <span class="s2">&quot;SLF_R&quot;</span><span class="p">,</span> <span class="s2">&quot;ARC_L&quot;</span><span class="p">,</span> <span class="s2">&quot;ARC_R&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CST_L&quot;</span><span class="p">,</span> <span class="s2">&quot;CST_R&quot;</span><span class="p">,</span> <span class="s2">&quot;FP&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>Now, we can define our AFQ object, pointing to the derivatives of the
@@ -604,9 +581,9 @@ done by defining the segmentation_params dictionary input.
 To sub-sample to 10,000 streamlines, we define
 <cite>‘nb_streamlines’ = 10000</cite>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">my_afq</span> <span class="o">=</span> <span class="n">GroupAFQ</span><span class="p">(</span>
-    <span class="n">bids_path</span><span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bids_path</span></a><span class="p">,</span>
     <span class="n">preproc_pipeline</span><span class="o">=</span><span class="s1">&#39;vistasoft&#39;</span><span class="p">,</span>
-    <span class="n">bundle_info</span><span class="o">=</span><span class="n">bundle_info</span><span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle_info</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle_info</span></a><span class="p">,</span>
     <span class="n">custom_tractography_bids_filters</span><span class="o">=</span><span class="p">{</span>
         <span class="s2">&quot;suffix&quot;</span><span class="p">:</span> <span class="s2">&quot;tractography&quot;</span><span class="p">,</span>
         <span class="s2">&quot;scope&quot;</span><span class="p">:</span> <span class="s2">&quot;my_tractography&quot;</span>
@@ -631,61 +608,50 @@ Optimizing level 2 [max iter: 10000]
 Optimizing level 1 [max iter: 1000]
 Optimizing level 0 [max iter: 100]
 
-  0%|          | 0/2686 [00:00&lt;?, ?it/s]
-  0%|          | 2/2686 [00:00&lt;04:54,  9.12it/s]
-  0%|          | 4/2686 [00:04&lt;53:07,  1.19s/it]
-  1%|          | 16/2686 [00:04&lt;09:04,  4.91it/s]
- 15%|#4        | 398/2686 [00:04&lt;00:12, 179.87it/s]
- 39%|###8      | 1038/2686 [00:04&lt;00:03, 547.85it/s]
- 77%|#######6  | 2062/2686 [00:04&lt;00:00, 1146.67it/s]
- 96%|#########5| 2574/2686 [00:04&lt;00:00, 1404.78it/s]
-100%|##########| 2686/2686 [00:04&lt;00:00, 543.57it/s]
+  0%|          | 0/2603 [00:00&lt;?, ?it/s]
+  0%|          | 4/2603 [00:02&lt;30:45,  1.41it/s]
+  2%|1         | 44/2603 [00:02&lt;02:05, 20.47it/s]
+ 30%|##9       | 780/2603 [00:03&lt;00:03, 486.62it/s]
+ 79%|#######9  | 2060/2603 [00:03&lt;00:00, 1401.89it/s]
+100%|##########| 2603/2603 [00:03&lt;00:00, 801.45it/s]
 
-  0%|          | 0/2691 [00:00&lt;?, ?it/s]
-  2%|1         | 44/2691 [00:00&lt;00:06, 435.75it/s]
- 19%|#8        | 508/2691 [00:00&lt;00:00, 2757.71it/s]
- 38%|###7      | 1020/2691 [00:00&lt;00:00, 3753.40it/s]
- 76%|#######5  | 2044/2691 [00:00&lt;00:00, 4584.25it/s]
-100%|##########| 2691/2691 [00:00&lt;00:00, 5299.94it/s]
+  0%|          | 0/2394 [00:00&lt;?, ?it/s]
+  3%|2         | 60/2394 [00:00&lt;00:03, 594.57it/s]
+ 43%|####2     | 1020/2394 [00:00&lt;00:00, 4651.84it/s]
+ 85%|########5 | 2044/2394 [00:00&lt;00:00, 5639.62it/s]
+100%|##########| 2394/2394 [00:00&lt;00:00, 5965.52it/s]
 
-  0%|          | 0/2065 [00:00&lt;?, ?it/s]
-  1%|          | 12/2065 [00:00&lt;00:17, 118.79it/s]
- 37%|###6      | 764/2065 [00:00&lt;00:00, 3544.75it/s]
- 74%|#######4  | 1532/2065 [00:00&lt;00:00, 4854.74it/s]
- 99%|#########8| 2044/2065 [00:00&lt;00:00, 4716.43it/s]
-100%|##########| 2065/2065 [00:00&lt;00:00, 4329.97it/s]
+  0%|          | 0/2255 [00:00&lt;?, ?it/s]
+  3%|2         | 60/2255 [00:00&lt;00:03, 594.27it/s]
+ 45%|####5     | 1020/2255 [00:00&lt;00:00, 4934.09it/s]
+ 91%|######### | 2044/2255 [00:00&lt;00:00, 6643.83it/s]
+100%|##########| 2255/2255 [00:00&lt;00:00, 6418.65it/s]
 
-  0%|          | 0/2283 [00:00&lt;?, ?it/s]
-  3%|2         | 60/2283 [00:00&lt;00:03, 576.89it/s]
- 33%|###3      | 764/2283 [00:00&lt;00:00, 3775.55it/s]
- 67%|######7   | 1532/2283 [00:00&lt;00:00, 5101.50it/s]
- 90%|########9 | 2044/2283 [00:00&lt;00:00, 4941.71it/s]
-100%|##########| 2283/2283 [00:00&lt;00:00, 5038.15it/s]
+  0%|          | 0/1850 [00:00&lt;?, ?it/s]
+  1%|1         | 20/1850 [00:00&lt;00:09, 197.01it/s]
+ 55%|#####5    | 1020/1850 [00:00&lt;00:00, 5031.54it/s]
+100%|##########| 1850/1850 [00:00&lt;00:00, 6868.59it/s]
 
-  0%|          | 0/1178 [00:00&lt;?, ?it/s]
-  4%|3         | 44/1178 [00:00&lt;00:02, 431.12it/s]
- 65%|######4   | 764/1178 [00:00&lt;00:00, 4360.49it/s]
-100%|##########| 1178/1178 [00:00&lt;00:00, 4808.95it/s]
+  0%|          | 0/1364 [00:00&lt;?, ?it/s]
+  9%|9         | 124/1364 [00:00&lt;00:01, 1206.01it/s]
+100%|##########| 1364/1364 [00:00&lt;00:00, 8707.07it/s]
 
-  0%|          | 0/1185 [00:00&lt;?, ?it/s]
-  1%|          | 8/1185 [00:00&lt;00:19, 59.37it/s]
- 64%|######4   | 764/1185 [00:00&lt;00:00, 3423.77it/s]
-100%|##########| 1185/1185 [00:00&lt;00:00, 3806.36it/s]
+  0%|          | 0/1250 [00:00&lt;?, ?it/s]
+ 15%|#5        | 188/1250 [00:00&lt;00:00, 1836.06it/s]
+100%|##########| 1250/1250 [00:00&lt;00:00, 8091.64it/s]
 
-  0%|          | 0/2043 [00:00&lt;?, ?it/s]
-  0%|          | 8/2043 [00:00&lt;00:25, 79.49it/s]
- 25%|##4       | 508/2043 [00:00&lt;00:00, 2540.18it/s]
- 50%|####9     | 1020/2043 [00:00&lt;00:00, 3367.69it/s]
-100%|##########| 2043/2043 [00:00&lt;00:00, 4792.40it/s]
+  0%|          | 0/1770 [00:00&lt;?, ?it/s]
+  3%|3         | 60/1770 [00:00&lt;00:02, 595.72it/s]
+ 58%|#####7    | 1020/1770 [00:00&lt;00:00, 4754.79it/s]
+100%|##########| 1770/1770 [00:00&lt;00:00, 6101.97it/s]
 
-  0%|          | 0/7 [00:00&lt;?, ?it/s]
- 29%|##8       | 2/7 [00:00&lt;00:00, 16.59it/s]
- 71%|#######1  | 5/7 [00:00&lt;00:00, 23.84it/s]
-100%|##########| 7/7 [00:00&lt;00:00, 24.48it/s]
+  0%|          | 0/5 [00:00&lt;?, ?it/s]
+ 80%|########  | 4/5 [00:00&lt;00:00, 38.65it/s]
+100%|##########| 5/5 [00:00&lt;00:00, 38.84it/s]
 
-  0%|          | 0/7 [00:00&lt;?, ?it/s]
- 57%|#####7    | 4/7 [00:00&lt;00:00, 31.21it/s]
-100%|##########| 7/7 [00:00&lt;00:00, 31.58it/s]
+  0%|          | 0/5 [00:00&lt;?, ?it/s]
+ 80%|########  | 4/5 [00:00&lt;00:00, 39.38it/s]
+100%|##########| 5/5 [00:00&lt;00:00, 39.52it/s]
 </pre></div>
 </div>
 <p>A few common issues that can hinder BIDS from working properly are:</p>
@@ -695,7 +661,7 @@ file contains the right names for the pipeline. See above for an example
 of that.</p></li>
 <li><p>File naming convention doesn’t uniquely identify file with bids filters.</p></li>
 </ol>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 19 minutes  33.895 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 19 minutes  31.879 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-bids-layout-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9bdf3bad98b30ef023e365f728dd0600/plot_bids_layout.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_bids_layout.py</span></code></a></p>
@@ -712,7 +678,7 @@ of that.</p></li>
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="plot_optic_radiations.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -735,7 +701,8 @@ of that.</p></li>
       </div>
     </div>
   
-  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
@@ -748,7 +715,7 @@ of that.</p></li>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

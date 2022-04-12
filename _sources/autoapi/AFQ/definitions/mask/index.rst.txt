@@ -284,14 +284,23 @@ Classes
           !! processed by numpydoc !!
 
 
-.. py:class:: RoiMask(use_presegment=False)
+.. py:class:: RoiMask(use_presegment=False, use_endpoints=False)
 
    Bases: :py:obj:`AFQ.definitions.utils.Definition`
 
    
-   Define a mask which is all ROIs or'd together.
+   Define a mask which is all include ROIs or'd together.
 
 
+   :Parameters:
+
+       **use_presegment** : bool
+           Whether to use presegment bundle dict from segmentation params
+           to get ROIs.
+
+       **use_endpoints** : bool
+           Whether to use the endpoints ("start" and "end") instead of the
+           include ROIs to generate the mask.
 
 
 

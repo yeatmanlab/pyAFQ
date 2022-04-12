@@ -37,23 +37,25 @@ pyAFQ with different tractography seeding strategies.
 Import cloudknot and set the correct region. The HCP data is stored in `us-east-1`, so it's best
 to analyze it there.
 
-.. GENERATED FROM PYTHON SOURCE LINES 20-25
+.. GENERATED FROM PYTHON SOURCE LINES 20-27
 
 .. code-block:: default
 
     import configparser
     import itertools
     import cloudknot as ck
+    import os.path as op
+
     ck.set_region('us-east-1')
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 26-29
+.. GENERATED FROM PYTHON SOURCE LINES 28-31
 
 Define a function to run. This function allows us to pass in the subject ID for the subjects we would
 like to analyze , as well as strategies for seeding tractography (different masks and/or different
 numbers of seeds per voxel).
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-102
+.. GENERATED FROM PYTHON SOURCE LINES 31-101
 
 .. code-block:: default
 
@@ -67,12 +69,9 @@ numbers of seeds per voxel).
         import s3fs
         # all imports must be at the top of the function
         # cloudknot installs the appropriate packages from pip
-        from AFQ.data import fetch_hcp
+        from AFQ.data.fetch import fetch_hcp
         from AFQ.api.group import GroupAFQ
         import AFQ.definitions.mask as afm
-
-        import numpy as np
-        import os.path as op
 
         # set logging level to your choice
         logging.basicConfig(level=logging.INFO)
@@ -82,7 +81,7 @@ numbers of seeds per voxel).
         _, hcp_bids = fetch_hcp(
             [subject],
             profile_name=False,
-            study=f"HCP_1200",
+            study="HCP_1200",
             aws_access_key_id=aws_access_key,
             aws_secret_access_key=aws_secret_key)
 
@@ -131,23 +130,23 @@ numbers of seeds per voxel).
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-104
+.. GENERATED FROM PYTHON SOURCE LINES 102-103
 
 In this example, we will process the data from the following subjects
 
-.. GENERATED FROM PYTHON SOURCE LINES 104-106
+.. GENERATED FROM PYTHON SOURCE LINES 103-105
 
 .. code-block:: default
 
     subjects = ["103818", "105923", "111312"]
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 107-109
+.. GENERATED FROM PYTHON SOURCE LINES 106-108
 
 We will test combinations of different conditions:
 subjects, seed masks, and number of seeds
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-112
+.. GENERATED FROM PYTHON SOURCE LINES 108-111
 
 .. code-block:: default
 
@@ -155,26 +154,26 @@ subjects, seed masks, and number of seeds
     n_seeds = [1, 2, 1000000, 2000000]
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-115
+.. GENERATED FROM PYTHON SOURCE LINES 112-114
 
 The following function creates all the combinations of the above lists, such that every subject is
 run with every mask and every number of seeds.
 
-.. GENERATED FROM PYTHON SOURCE LINES 115-117
+.. GENERATED FROM PYTHON SOURCE LINES 114-116
 
 .. code-block:: default
 
     args = list(itertools.product(subjects, seed_mask, n_seeds))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 118-122
+.. GENERATED FROM PYTHON SOURCE LINES 117-121
 
 We assume that the credentials for HCP usage are stored in the home directory in a
 `~/.aws/credentials` file. This is where these credentials are stored if the AWS CLI is used to
 configure the profile. We use the standard lib ``configparser`` library
 to get the relevant hcp keys from there.
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-128
+.. GENERATED FROM PYTHON SOURCE LINES 121-127
 
 .. code-block:: default
 
@@ -185,7 +184,7 @@ to get the relevant hcp keys from there.
     aws_secret_key = CP.get('hcp', 'AWS_SECRET_ACCESS_KEY')
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 129-134
+.. GENERATED FROM PYTHON SOURCE LINES 128-133
 
 The following function will attach your AWS keys to each list in a list of lists
 We use this with each list being a list of arguments,
@@ -193,7 +192,7 @@ and we append the AWS keys to each list of arguments, so that we can pass
 them into the function to be used on AWS Batch to download the data into the
 AWS Batch machines.
 
-.. GENERATED FROM PYTHON SOURCE LINES 134-145
+.. GENERATED FROM PYTHON SOURCE LINES 133-144
 
 .. code-block:: default
 
@@ -209,24 +208,24 @@ AWS Batch machines.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 146-147
+.. GENERATED FROM PYTHON SOURCE LINES 145-146
 
 This calls the function to attach the access keys to the argument list
 
-.. GENERATED FROM PYTHON SOURCE LINES 147-149
+.. GENERATED FROM PYTHON SOURCE LINES 146-148
 
 .. code-block:: default
 
     args = attach_keys(args)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 150-153
+.. GENERATED FROM PYTHON SOURCE LINES 149-152
 
 Define the :meth:`Knot` object to run your jobs on. See
 `this example <http://yeatmanlab.github.io/pyAFQ/auto_examples/cloudknot_example.html>`_ for more
 details about the arguments to the object.
 
-.. GENERATED FROM PYTHON SOURCE LINES 153-161
+.. GENERATED FROM PYTHON SOURCE LINES 152-160
 
 .. code-block:: default
 
@@ -239,20 +238,20 @@ details about the arguments to the object.
         bid_percentage=100)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 162-165
+.. GENERATED FROM PYTHON SOURCE LINES 161-164
 
 This launches a process for each combination.
 Because `starmap` is `True`, each list in `args` will be unfolded
 and passed into `afq_process_subject` as arguments.
 
-.. GENERATED FROM PYTHON SOURCE LINES 165-167
+.. GENERATED FROM PYTHON SOURCE LINES 164-166
 
 .. code-block:: default
 
     result_futures = knot.map(args, starmap=True)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 168-176
+.. GENERATED FROM PYTHON SOURCE LINES 167-175
 
 The following function can be called repeatedly in a jupyter notebook
 to view the progress of jobs::
@@ -263,12 +262,12 @@ You can also view the status of a specific job::
 
     knot.jobs[0].status
 
-.. GENERATED FROM PYTHON SOURCE LINES 178-180
+.. GENERATED FROM PYTHON SOURCE LINES 177-179
 
 When all jobs are finished, remember to clobber the knot to destroy all the resources that were
 created in AWS.
 
-.. GENERATED FROM PYTHON SOURCE LINES 180-183
+.. GENERATED FROM PYTHON SOURCE LINES 179-182
 
 .. code-block:: default
 
@@ -276,12 +275,12 @@ created in AWS.
     knot.clobber(clobber_pars=True, clobber_repo=True, clobber_image=True)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 184-186
+.. GENERATED FROM PYTHON SOURCE LINES 183-185
 
 We continue processing to create another knot which takes the resulting profiles of each
 combination and combines them all into one csv file
 
-.. GENERATED FROM PYTHON SOURCE LINES 186-202
+.. GENERATED FROM PYTHON SOURCE LINES 185-201
 
 .. code-block:: default
 
@@ -302,11 +301,11 @@ combination and combines them all into one csv file
         bid_percentage=100)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 203-204
+.. GENERATED FROM PYTHON SOURCE LINES 202-203
 
 the arguments to this call to :meth:`map` are all the different configurations of pyAFQ that we ran
 
-.. GENERATED FROM PYTHON SOURCE LINES 204-211
+.. GENERATED FROM PYTHON SOURCE LINES 203-210
 
 .. code-block:: default
 

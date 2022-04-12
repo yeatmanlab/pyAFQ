@@ -44,7 +44,7 @@ in [Yeatman2014]_.
     from dipy.align import affine_registration
 
     import AFQ.api.bundle_dict as abd
-    import AFQ.data as afd
+    import AFQ.data.fetch as afd
     import AFQ.tractography as aft
     import AFQ.registration as reg
     import AFQ.models.dti as dti
@@ -203,12 +203,14 @@ data structure. The templates are first resampled into the MNI space, before
 they are brought into the subject's individual native space.
 For speed, we only segment two bundles here.
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-115
+.. GENERATED FROM PYTHON SOURCE LINES 111-117
 
 .. code-block:: default
 
 
-    bundles = abd.BundleDict(["CST", "ARC"], resample_to=MNI_T2_img)
+    bundles = abd.BundleDict(
+        ["CST_L", "CST_R", "ARC_L", "ARC_R"],
+        resample_to=MNI_T2_img)
 
 
 
@@ -218,14 +220,14 @@ For speed, we only segment two bundles here.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-120
+.. GENERATED FROM PYTHON SOURCE LINES 118-122
 
 Tracking
 --------
 Streamlines are generate using DTI and a deterministic tractography
 algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-148
+.. GENERATED FROM PYTHON SOURCE LINES 122-151
 
 .. code-block:: default
 
@@ -234,22 +236,23 @@ algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
     if not op.exists(op.join(working_dir, 'dti_streamlines.trk')):
         seed_roi = np.zeros(img.shape[:-1])
         for bundle in bundles:
-            for idx, roi in enumerate(bundles[bundle]['ROIs']):
-                if bundles[bundle]['rules'][idx]:
-                    warped_roi = transform_inverse_roi(
-                        roi,
-                        mapping,
-                        bundle_name=bundle)
+            for idx, roi in enumerate(bundles[bundle]['include']):
+                warped_roi = transform_inverse_roi(
+                    roi,
+                    mapping,
+                    bundle_name=bundle)
 
-                    nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),
-                             op.join(working_dir, f"{bundle}_{idx+1}.nii.gz"))
-                    # Add voxels that aren't there yet:
-                    seed_roi = np.logical_or(seed_roi, warped_roi)
+                nib.save(
+                    nib.Nifti1Image(warped_roi.astype(float), img.affine),
+                    op.join(working_dir, f"{bundle}_{idx+1}.nii.gz"))
+                # Add voxels that aren't there yet:
+                seed_roi = np.logical_or(seed_roi, warped_roi)
         nib.save(nib.Nifti1Image(
             seed_roi.astype(float), img.affine),
             op.join(working_dir, 'seed_roi.nii.gz'))
         sft = aft.track(dti_params['params'], seed_mask=seed_roi,
-                        stop_mask=FA_data, stop_threshold=0.1)
+                        stop_mask=FA_data, stop_threshold=0.1,
+                        directions="det", odf_model="dti")
         save_tractogram(sft, op.join(working_dir, 'dti_streamlines.trk'),
                         bbox_valid_check=False)
     else:
@@ -272,7 +275,7 @@ algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 149-155
+.. GENERATED FROM PYTHON SOURCE LINES 152-158
 
 Segmentation
 --------
@@ -281,7 +284,7 @@ probability that they belong to a bundle is larger than a threshold (set to
 0,per default), whether they pass through inclusion ROIs and whether they do
 not pass through exclusion ROIs.
 
-.. GENERATED FROM PYTHON SOURCE LINES 155-169
+.. GENERATED FROM PYTHON SOURCE LINES 158-172
 
 .. code-block:: default
 
@@ -310,22 +313,22 @@ not pass through exclusion ROIs.
  .. code-block:: none
 
     Segmenting fiber groups...
-      0%|          | 0/341 [00:00<?, ?it/s]      1%|          | 2/341 [00:00<00:21, 16.02it/s]      1%|1         | 4/341 [00:03<05:53,  1.05s/it]      9%|8         | 30/341 [00:03<00:28, 10.92it/s]    100%|##########| 341/341 [00:03<00:00, 90.77it/s]
-      0%|          | 0/243 [00:00<?, ?it/s]    100%|##########| 243/243 [00:00<00:00, 3781.57it/s]
-      0%|          | 0/429 [00:00<?, ?it/s]      2%|1         | 8/429 [00:00<00:05, 72.50it/s]     89%|########8 | 380/429 [00:00<00:00, 2057.70it/s]    100%|##########| 429/429 [00:00<00:00, 1977.31it/s]
-      0%|          | 0/471 [00:00<?, ?it/s]     54%|#####3    | 252/471 [00:00<00:00, 2496.74it/s]    100%|##########| 471/471 [00:00<00:00, 3991.42it/s]
+      0%|          | 0/249 [00:00<?, ?it/s]      1%|          | 2/249 [00:00<00:15, 16.41it/s]      2%|1         | 4/249 [00:03<04:41,  1.15s/it]     12%|#2        | 30/249 [00:04<00:21,  9.99it/s]    100%|##########| 249/249 [00:04<00:00, 61.01it/s]
+      0%|          | 0/379 [00:00<?, ?it/s]      2%|2         | 8/379 [00:00<00:05, 64.18it/s]    100%|##########| 379/379 [00:00<00:00, 2380.97it/s]
+      0%|          | 0/400 [00:00<?, ?it/s]      2%|2         | 8/400 [00:00<00:06, 59.79it/s]    100%|##########| 400/400 [00:00<00:00, 2039.58it/s]
+      0%|          | 0/395 [00:00<?, ?it/s]      5%|5         | 20/395 [00:00<00:01, 191.98it/s]    100%|##########| 395/395 [00:00<00:00, 2155.28it/s]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 170-174
+.. GENERATED FROM PYTHON SOURCE LINES 173-177
 
 Cleaning
 --------
 Each fiber group is cleaned to exclude streamlines that are outliers in terms
 of their trajector and/or length.
 
-.. GENERATED FROM PYTHON SOURCE LINES 174-194
+.. GENERATED FROM PYTHON SOURCE LINES 177-197
 
 .. code-block:: default
 
@@ -360,23 +363,23 @@ of their trajector and/or length.
  .. code-block:: none
 
     Cleaning fiber groups...
-    Cleaning CST_R
-    Before cleaning: 19 streamlines
-    Afer cleaning: 19 streamlines
     Cleaning CST_L
-    Before cleaning: 30 streamlines
-    Afer cleaning: 30 streamlines
-    Cleaning ARC_R
-    Before cleaning: 14 streamlines
-    Afer cleaning: 14 streamlines
-    Cleaning ARC_L
     Before cleaning: 23 streamlines
     Afer cleaning: 23 streamlines
+    Cleaning CST_R
+    Before cleaning: 17 streamlines
+    Afer cleaning: 17 streamlines
+    Cleaning ARC_L
+    Before cleaning: 7 streamlines
+    Afer cleaning: 7 streamlines
+    Cleaning ARC_R
+    Before cleaning: 15 streamlines
+    Afer cleaning: 15 streamlines
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 195-201
+.. GENERATED FROM PYTHON SOURCE LINES 198-204
 
 Bundle profiles
 ---------------
@@ -385,7 +388,7 @@ scalar properties along the length of each bundle are queried from this
 scalar data. Here, the contribution of each streamline is weighted according
 to how representative this streamline is of the bundle overall.
 
-.. GENERATED FROM PYTHON SOURCE LINES 201-215
+.. GENERATED FROM PYTHON SOURCE LINES 204-218
 
 .. code-block:: default
 
@@ -412,28 +415,28 @@ to how representative this streamline is of the bundle overall.
     *
 
       .. image-sg:: /auto_examples/images/sphx_glr_plot_tract_profile_001.png
-         :alt: CST_R
+         :alt: CST_L
          :srcset: /auto_examples/images/sphx_glr_plot_tract_profile_001.png
          :class: sphx-glr-multi-img
 
     *
 
       .. image-sg:: /auto_examples/images/sphx_glr_plot_tract_profile_002.png
-         :alt: CST_L
+         :alt: CST_R
          :srcset: /auto_examples/images/sphx_glr_plot_tract_profile_002.png
          :class: sphx-glr-multi-img
 
     *
 
       .. image-sg:: /auto_examples/images/sphx_glr_plot_tract_profile_003.png
-         :alt: ARC_R
+         :alt: ARC_L
          :srcset: /auto_examples/images/sphx_glr_plot_tract_profile_003.png
          :class: sphx-glr-multi-img
 
     *
 
       .. image-sg:: /auto_examples/images/sphx_glr_plot_tract_profile_004.png
-         :alt: ARC_L
+         :alt: ARC_R
          :srcset: /auto_examples/images/sphx_glr_plot_tract_profile_004.png
          :class: sphx-glr-multi-img
 
@@ -449,7 +452,7 @@ to how representative this streamline is of the bundle overall.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 216-226
+.. GENERATED FROM PYTHON SOURCE LINES 219-229
 
 References:
 -------------------------
@@ -465,7 +468,7 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 15 minutes  59.975 seconds)
+   **Total running time of the script:** ( 14 minutes  45.995 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_tract_profile.py:

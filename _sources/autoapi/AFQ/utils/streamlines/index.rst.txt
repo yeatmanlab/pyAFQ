@@ -13,27 +13,27 @@
 Module Contents
 ---------------
 
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.utils.streamlines.SegmentedSFT
+
+
 
 Functions
 ~~~~~~~~~
 
 .. autoapisummary::
 
-   AFQ.utils.streamlines.add_bundles
-   AFQ.utils.streamlines.bundles_to_tgram
-   AFQ.utils.streamlines.tgram_to_bundles
    AFQ.utils.streamlines.split_streamline
 
 
 
-.. py:function:: add_bundles(t1, t2)
+.. py:class:: SegmentedSFT(bundles, space)
 
    
-   Combine two bundles, using the second bundles' affine and
-   data_per_streamline keys.
-    Parameters
-   ----------
-   t1, t2 : nib.streamlines.Tractogram class instances
 
 
 
@@ -52,28 +52,9 @@ Functions
 
    ..
        !! processed by numpydoc !!
+   .. py:method:: get_sft_and_sidecar(self)
 
-.. py:function:: bundles_to_tgram(bundles, bundle_dict, reference)
-
-   
-   Create a StatefulTractogram object from bundles and their
-   specification.
-
-
-   :Parameters:
-
-       **bundles: dict**
-           Each key in the dict is a bundle name and each value in the dict
-           is the stateful tractogram of a particular bundle.
-
-       **bundle_dict: dict**
-           A bundle specification dictionary. Each key is a bundle name, and each
-           value is another dictionary specifying bundle properties. In this
-           value dictionary, there must be one `uid` key whose value is a
-           unique integer for that bundle.
-
-       **reference** : Nifti
-           The affine_to_rasmm input to `nib.streamlines.Tractogram`
+      
 
 
 
@@ -88,24 +69,14 @@ Functions
 
 
 
-   ..
-       !! processed by numpydoc !!
-
-.. py:function:: tgram_to_bundles(tgram, bundle_dict, reference)
-
-   
-   Convert a StatefulTractogram object to a dict with StatefulTractogram
-   objects for each bundle.
 
 
-   :Parameters:
+      ..
+          !! processed by numpydoc !!
 
-       **tgram** : StatefulTractogram class instance.
-           Requires a data_per_streamline['bundle'][bundle_name]['uid'] attribute.
+   .. py:method:: get_bundle(self, b_name)
 
-       **bundle_dict: dict**
-           A bundle specification dictionary. Each item includes in particular a
-           `uid` key that is a unique integer for that bundle.
+      
 
 
 
@@ -120,8 +91,34 @@ Functions
 
 
 
-   ..
-       !! processed by numpydoc !!
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: fromfile(cls, trk_file, reference='same', sidecar_file=None)
+      :classmethod:
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
 
 .. py:function:: split_streamline(streamlines, sl_to_split, split_idx)
 

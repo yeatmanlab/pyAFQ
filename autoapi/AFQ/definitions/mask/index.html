@@ -5,10 +5,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.definitions.mask &#8212; AFQ 0.10 documentation</title>
+    <title>AFQ.definitions.mask &#8212; AFQ 0.11 documentation</title>
     
-  <link href="../../../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css" />
@@ -31,7 +27,8 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
@@ -48,7 +45,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -138,10 +135,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -157,7 +152,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -229,6 +225,49 @@
      </li>
     </ul>
    </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../data/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.data
+      </span>
+     </code>
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+    <label for="toctree-checkbox-3">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../data/fetch/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.data.fetch
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../data/s3bids/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.data.s3bids
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../data/utils/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.data.utils
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
    <li class="toctree-l2 current active has-children">
     <a class="reference internal" href="../index.html">
      <code class="xref py py-mod docutils literal notranslate">
@@ -237,8 +276,8 @@
       </span>
      </code>
     </a>
-    <input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
-    <label for="toctree-checkbox-3">
+    <input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+    <label for="toctree-checkbox-4">
      <i class="fas fa-chevron-down">
      </i>
     </label>
@@ -289,8 +328,8 @@
       </span>
      </code>
     </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
-    <label for="toctree-checkbox-4">
+    <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+    <label for="toctree-checkbox-5">
      <i class="fas fa-chevron-down">
      </i>
     </label>
@@ -332,8 +371,8 @@
       </span>
      </code>
     </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
-    <label for="toctree-checkbox-5">
+    <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+    <label for="toctree-checkbox-6">
      <i class="fas fa-chevron-down">
      </i>
     </label>
@@ -411,8 +450,8 @@
       </span>
      </code>
     </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
-    <label for="toctree-checkbox-6">
+    <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+    <label for="toctree-checkbox-7">
      <i class="fas fa-chevron-down">
      </i>
     </label>
@@ -481,8 +520,8 @@
       </span>
      </code>
     </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
-    <label for="toctree-checkbox-7">
+    <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+    <label for="toctree-checkbox-8">
      <i class="fas fa-chevron-down">
      </i>
     </label>
@@ -526,15 +565,6 @@
     </ul>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="../../data/index.html">
-     <code class="xref py py-mod docutils literal notranslate">
-      <span class="pre">
-       AFQ.data
-      </span>
-     </code>
-    </a>
-   </li>
-   <li class="toctree-l2">
     <a class="reference internal" href="../../registration/index.html">
      <code class="xref py py-mod docutils literal notranslate">
       <span class="pre">
@@ -567,20 +597,9 @@
 
   </div>
 </nav>
-<h3><a href="../../../../index.html">Table of Contents</a></h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -591,7 +610,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -789,12 +808,12 @@
               <div>
                 
   <div class="section" id="module-AFQ.definitions.mask">
-<span id="afq-definitions-mask"></span><h1><a class="reference internal" href="#module-AFQ.definitions.mask" title="AFQ.definitions.mask"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.mask</span></code></a><a class="headerlink" href="#module-AFQ.definitions.mask" title="Permalink to this headline">¶</a></h1>
+<span id="afq-definitions-mask"></span><h1><a class="reference internal" href="#module-AFQ.definitions.mask" title="AFQ.definitions.mask"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.mask</span></code></a><a class="headerlink" href="#module-AFQ.definitions.mask" title="Permalink to this headline">#</a></h1>
 <div class="section" id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">#</a></h2>
 <div class="section" id="classes">
-<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h3>
-<table class="longtable table autosummary">
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">#</a></h3>
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -807,7 +826,7 @@
 <td><p>Define a mask which covers a full volume.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.definitions.mask.RoiMask" title="AFQ.definitions.mask.RoiMask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RoiMask</span></code></a></p></td>
-<td><p>Define a mask which is all ROIs or'd together.</p></td>
+<td><p>Define a mask which is all include ROIs or'd together.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.definitions.mask.B0Mask" title="AFQ.definitions.mask.B0Mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">B0Mask</span></code></a></p></td>
 <td><p>Define a mask using b0 and dipy's median_otsu.</p></td>
@@ -828,7 +847,7 @@
 </table>
 <dl class="py class">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.MaskFile">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.definitions.mask.</span></span><span class="sig-name descname"><span class="pre">MaskFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#MaskFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.MaskFile" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.definitions.mask.</span></span><span class="sig-name descname"><span class="pre">MaskFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#MaskFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.MaskFile" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../utils/index.html#AFQ.definitions.utils.Definition" title="AFQ.definitions.utils.Definition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AFQ.definitions.utils.Definition</span></code></a></p>
 <p>Define a mask based on a file.
 Does not apply any labels or thresholds;
@@ -861,83 +880,95 @@ filters={“scope”:”dmriprep”})</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.MaskFile.find_path">
-<span class="sig-name descname"><span class="pre">find_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_layout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#MaskFile.find_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.MaskFile.find_path" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">find_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_layout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#MaskFile.find_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.MaskFile.find_path" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.MaskFile.get_path_data_affine">
-<span class="sig-name descname"><span class="pre">get_path_data_affine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#MaskFile.get_path_data_affine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.MaskFile.get_path_data_affine" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_path_data_affine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#MaskFile.get_path_data_affine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.MaskFile.get_path_data_affine" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.MaskFile.apply_conditions">
-<span class="sig-name descname"><span class="pre">apply_conditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_data_orig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#MaskFile.apply_conditions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.MaskFile.apply_conditions" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">apply_conditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_data_orig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#MaskFile.apply_conditions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.MaskFile.apply_conditions" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.MaskFile.get_mask_getter">
-<span class="sig-name descname"><span class="pre">get_mask_getter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#MaskFile.get_mask_getter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.MaskFile.get_mask_getter" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_mask_getter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#MaskFile.get_mask_getter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.MaskFile.get_mask_getter" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.MaskFile.get_brain_mask">
-<span class="sig-name descname"><span class="pre">get_brain_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#MaskFile.get_brain_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.MaskFile.get_brain_mask" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_brain_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#MaskFile.get_brain_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.MaskFile.get_brain_mask" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.FullMask">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.definitions.mask.</span></span><span class="sig-name descname"><span class="pre">FullMask</span></span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#FullMask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.FullMask" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.definitions.mask.</span></span><span class="sig-name descname"><span class="pre">FullMask</span></span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#FullMask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.FullMask" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../utils/index.html#AFQ.definitions.utils.Definition" title="AFQ.definitions.utils.Definition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AFQ.definitions.utils.Definition</span></code></a></p>
 <p>Define a mask which covers a full volume.</p>
 <p class="rubric">Examples</p>
 <p>brain_mask_definition = FullMask()</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.FullMask.find_path">
-<span class="sig-name descname"><span class="pre">find_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_layout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#FullMask.find_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.FullMask.find_path" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">find_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_layout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#FullMask.find_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.FullMask.find_path" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.FullMask.get_mask_getter">
-<span class="sig-name descname"><span class="pre">get_mask_getter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#FullMask.get_mask_getter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.FullMask.get_mask_getter" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_mask_getter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#FullMask.get_mask_getter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.FullMask.get_mask_getter" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.FullMask.get_brain_mask">
-<span class="sig-name descname"><span class="pre">get_brain_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#FullMask.get_brain_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.FullMask.get_brain_mask" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_brain_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#FullMask.get_brain_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.FullMask.get_brain_mask" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.RoiMask">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.definitions.mask.</span></span><span class="sig-name descname"><span class="pre">RoiMask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_presegment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#RoiMask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.RoiMask" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.definitions.mask.</span></span><span class="sig-name descname"><span class="pre">RoiMask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_presegment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_endpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#RoiMask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.RoiMask" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../utils/index.html#AFQ.definitions.utils.Definition" title="AFQ.definitions.utils.Definition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AFQ.definitions.utils.Definition</span></code></a></p>
-<p>Define a mask which is all ROIs or’d together.</p>
+<p>Define a mask which is all include ROIs or’d together.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>use_presegment</strong><span class="classifier">bool</span></dt><dd><p>Whether to use presegment bundle dict from segmentation params
+to get ROIs.</p>
+</dd>
+<dt><strong>use_endpoints</strong><span class="classifier">bool</span></dt><dd><p>Whether to use the endpoints (“start” and “end”) instead of the
+include ROIs to generate the mask.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
 <p>seed_mask = RoiMask()
 api.GroupAFQ(tracking_params={“seed_mask”: seed_mask})</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.RoiMask.find_path">
-<span class="sig-name descname"><span class="pre">find_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_layout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#RoiMask.find_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.RoiMask.find_path" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">find_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_layout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#RoiMask.find_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.RoiMask.find_path" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.RoiMask.get_mask_getter">
-<span class="sig-name descname"><span class="pre">get_mask_getter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#RoiMask.get_mask_getter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.RoiMask.get_mask_getter" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_mask_getter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#RoiMask.get_mask_getter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.RoiMask.get_mask_getter" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.RoiMask.get_brain_mask">
-<span class="sig-name descname"><span class="pre">get_brain_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#RoiMask.get_brain_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.RoiMask.get_brain_mask" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_brain_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#RoiMask.get_brain_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.RoiMask.get_brain_mask" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.B0Mask">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.definitions.mask.</span></span><span class="sig-name descname"><span class="pre">B0Mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">median_otsu_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#B0Mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.B0Mask" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.definitions.mask.</span></span><span class="sig-name descname"><span class="pre">B0Mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">median_otsu_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#B0Mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.B0Mask" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../utils/index.html#AFQ.definitions.utils.Definition" title="AFQ.definitions.utils.Definition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AFQ.definitions.utils.Definition</span></code></a></p>
 <p>Define a mask using b0 and dipy’s median_otsu.</p>
 <dl class="field-list simple">
@@ -954,24 +985,24 @@ Default: {}</p>
 api.GroupAFQ(brain_mask_definition=brain_mask_definition)</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.B0Mask.find_path">
-<span class="sig-name descname"><span class="pre">find_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_layout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#B0Mask.find_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.B0Mask.find_path" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">find_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_layout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#B0Mask.find_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.B0Mask.find_path" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.B0Mask.get_mask_getter">
-<span class="sig-name descname"><span class="pre">get_mask_getter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#B0Mask.get_mask_getter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.B0Mask.get_mask_getter" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_mask_getter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#B0Mask.get_mask_getter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.B0Mask.get_mask_getter" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.B0Mask.get_brain_mask">
-<span class="sig-name descname"><span class="pre">get_brain_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#B0Mask.get_brain_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.B0Mask.get_brain_mask" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_brain_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#B0Mask.get_brain_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.B0Mask.get_brain_mask" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.LabelledMaskFile">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.definitions.mask.</span></span><span class="sig-name descname"><span class="pre">LabelledMaskFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inclusive_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclusive_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'or'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#LabelledMaskFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.LabelledMaskFile" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.definitions.mask.</span></span><span class="sig-name descname"><span class="pre">LabelledMaskFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inclusive_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclusive_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'or'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#LabelledMaskFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.LabelledMaskFile" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#AFQ.definitions.mask.MaskFile" title="AFQ.definitions.mask.MaskFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MaskFile</span></code></a>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">CombineMaskMixin</span></code></p>
 <p>Define a mask based on labels in a file.</p>
 <dl class="field-list simple">
@@ -1015,14 +1046,14 @@ exclusive_labels=[0])</p>
 <p>api.GroupAFQ(brain_mask_definition=brain_mask_definition)</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.LabelledMaskFile.apply_conditions">
-<span class="sig-name descname"><span class="pre">apply_conditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_data_orig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#LabelledMaskFile.apply_conditions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.LabelledMaskFile.apply_conditions" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">apply_conditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_data_orig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#LabelledMaskFile.apply_conditions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.LabelledMaskFile.apply_conditions" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.ThresholdedMaskFile">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.definitions.mask.</span></span><span class="sig-name descname"><span class="pre">ThresholdedMaskFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_bound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_bound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'and'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#ThresholdedMaskFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.ThresholdedMaskFile" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.definitions.mask.</span></span><span class="sig-name descname"><span class="pre">ThresholdedMaskFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_bound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_bound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'and'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#ThresholdedMaskFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.ThresholdedMaskFile" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#AFQ.definitions.mask.MaskFile" title="AFQ.definitions.mask.MaskFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MaskFile</span></code></a>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">CombineMaskMixin</span></code></p>
 <p>Define a mask based on thresholding a file.
 Note that this should not be used to directly make a seed mask
@@ -1067,14 +1098,14 @@ lower_bound=0.1)</p>
 <p>api.GroupAFQ(brain_mask_definition=brain_mask_definition)</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.ThresholdedMaskFile.apply_conditions">
-<span class="sig-name descname"><span class="pre">apply_conditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_data_orig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#ThresholdedMaskFile.apply_conditions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.ThresholdedMaskFile.apply_conditions" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">apply_conditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_data_orig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#ThresholdedMaskFile.apply_conditions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.ThresholdedMaskFile.apply_conditions" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.ScalarMask">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.definitions.mask.</span></span><span class="sig-name descname"><span class="pre">ScalarMask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#ScalarMask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.ScalarMask" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.definitions.mask.</span></span><span class="sig-name descname"><span class="pre">ScalarMask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#ScalarMask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.ScalarMask" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../utils/index.html#AFQ.definitions.utils.Definition" title="AFQ.definitions.utils.Definition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AFQ.definitions.utils.Definition</span></code></a></p>
 <p>Define a mask based on a scalar.
 Does not apply any labels or thresholds;
@@ -1101,24 +1132,24 @@ scope=”dmriprep”)</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.ScalarMask.find_path">
-<span class="sig-name descname"><span class="pre">find_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_layout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#ScalarMask.find_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.ScalarMask.find_path" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">find_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_layout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#ScalarMask.find_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.ScalarMask.find_path" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.ScalarMask.get_mask_getter">
-<span class="sig-name descname"><span class="pre">get_mask_getter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#ScalarMask.get_mask_getter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.ScalarMask.get_mask_getter" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_mask_getter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#ScalarMask.get_mask_getter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.ScalarMask.get_mask_getter" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.ScalarMask.get_brain_mask">
-<span class="sig-name descname"><span class="pre">get_brain_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#ScalarMask.get_brain_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.ScalarMask.get_brain_mask" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_brain_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#ScalarMask.get_brain_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.ScalarMask.get_brain_mask" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="AFQ.definitions.mask.ThresholdedScalarMask">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.definitions.mask.</span></span><span class="sig-name descname"><span class="pre">ThresholdedScalarMask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_bound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_bound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'and'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#ThresholdedScalarMask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.ThresholdedScalarMask" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.definitions.mask.</span></span><span class="sig-name descname"><span class="pre">ThresholdedScalarMask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scalar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_bound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_bound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'and'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mask.html#ThresholdedScalarMask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mask.ThresholdedScalarMask" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#AFQ.definitions.mask.ThresholdedMaskFile" title="AFQ.definitions.mask.ThresholdedMaskFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ThresholdedMaskFile</span></code></a>, <a class="reference internal" href="#AFQ.definitions.mask.ScalarMask" title="AFQ.definitions.mask.ScalarMask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ScalarMask</span></code></a></p>
 <p>Define a mask based on thresholding a scalar mask.
 Note that this should not be used to directly make a seed mask
@@ -1164,7 +1195,7 @@ lower_bound=0.2)</p>
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="../mapping/index.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -1187,7 +1218,8 @@ lower_bound=0.2)</p>
       </div>
     </div>
   
-  <script src="../../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
@@ -1200,7 +1232,7 @@ lower_bound=0.2)</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

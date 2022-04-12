@@ -24,7 +24,7 @@ Classes
 
 
 
-.. py:class:: BundleDict(bundle_info=BUNDLES, seg_algo='afq', resample_to=None)
+.. py:class:: BundleDict(bundle_info=BUNDLES, seg_algo='afq', resample_to=None, resample_subject_to=None, keep_in_memory=False)
 
    Bases: :py:obj:`collections.abc.MutableMapping`
 
@@ -47,7 +47,79 @@ Classes
 
    ..
        !! processed by numpydoc !!
+   .. py:method:: load_templates(self)
+
+      
+      Loads templates for generating bundle dictionaries
+      from bundle names.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: _gen(self, bundle_name)
+
+      
+      Given a bundle name, load its
+      bundle's dictionary describing the bundle.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
    .. py:method:: gen_all(self)
+
+      
+      If bundle_info is a list of names, this will load
+      each bundle's dictionary describing the bundle.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: __getitem__(self, key)
 
       
 
@@ -70,28 +142,6 @@ Classes
           !! processed by numpydoc !!
 
    .. py:method:: __setitem__(self, key, item)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: __getitem__(self, key)
 
       
 
@@ -182,8 +232,87 @@ Classes
    .. py:method:: copy(self)
 
       
+      Generates a copy of this BundleDict where the internal dictionary
+      is a copy of this BundleDict's internal dictionary.
+      Useful if you want to add or remove bundles from a copy
+      of a BundleDict.
 
 
+
+      :Returns:
+
+          **bundle_dict** : BundleDict
+              Euclidean norms of vectors.
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: apply_to_rois(self, b_name, func, *args, **kwargs)
+
+      
+      Applies some transformation to all ROIs (include, exclude, end, start)
+      and the prob_map in a given bundle.
+
+
+      :Parameters:
+
+          **b_name** : name
+              bundle name of bundle whose ROIs will be transformed.
+
+          **func** : function
+              function whose first argument must be a Nifti1Image and which
+              returns a Nifti1Image
+
+          **\*args**
+              Additional arguments for func
+
+          **\*\*kwargs**
+              Optional arguments for func
+
+      :Returns:
+
+          Dictionary containing the old values of all ROIs and prob_map
+              ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: _resample_roi(self, b_name)
+
+      
+      Given a bundle name, resample all ROIs and prob maps
+      into either template or subject space for that bundle,
+      depending on its "space" attribute.
+
+
+      :Parameters:
+
+          **b_name** : str
+              Name of the bundle to be resampled.
 
 
 
@@ -201,7 +330,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: resample_all_roi(self)
+   .. py:method:: __add__(self, other)
 
       
 
@@ -224,7 +353,7 @@ Classes
           !! processed by numpydoc !!
 
 
-.. py:class:: PediatricBundleDict(bundle_info=PEDIATRIC_BUNDLES, seg_algo='afq', resample_to=False)
+.. py:class:: PediatricBundleDict(bundle_info=PEDIATRIC_BUNDLES, seg_algo='afq', resample_to=None, resample_subject_to=None, keep_in_memory=False)
 
    Bases: :py:obj:`BundleDict`
 
@@ -247,9 +376,11 @@ Classes
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: gen_all(self)
+   .. py:method:: load_templates(self)
 
       
+      Loads templates for generating bundle dictionaries
+      from bundle names.
 
 
 

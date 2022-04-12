@@ -69,4 +69,47 @@ Classes
       ..
           !! processed by numpydoc !!
 
+   .. py:method:: export_all(self, viz=True, xforms=True, indiv=True)
+
+      
+      Exports all the possible outputs
+
+
+      :Parameters:
+
+          **viz** : bool
+              Whether to output visualizations. This includes tract profile
+              plots, a figure containing all bundles, and, if using the AFQ
+              segmentation algorithm, individual bundle figures.
+              Default: True
+
+          **xforms** : bool
+              Whether to output the reg_template image in subject space and,
+              depending on if it is possible based on the mapping used, to
+              output the b0 in template space.
+              Default: True
+
+          **indiv** : bool
+              Whether to output individual bundles in their own files, in
+              addition to the one file containing all bundles. If using
+              the AFQ segmentation algorithm, individual ROIs are also
+              output.
+              Default: True
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
 

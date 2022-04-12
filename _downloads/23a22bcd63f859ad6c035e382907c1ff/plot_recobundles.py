@@ -28,7 +28,7 @@ from dipy.io.stateful_tractogram import Space
 from dipy.align import affine_registration
 
 
-import AFQ.data as afd
+import AFQ.data.fetch as afd
 import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.models.dti as dti
@@ -82,7 +82,10 @@ else:
                                img, MNI_T2_img)
 
 
-bundle_names = ["CST", "UF", "CC_ForcepsMajor", "CC_ForcepsMinor", "OR", "VOF"]
+bundle_names = [
+    "CST_L", "CST_R", "UF_L", "UF_R",
+    "CC_ForcepsMajor", "CC_ForcepsMinor",
+    "OR_L", "OR_R", "VOF_L", "VOF_R"]
 bundles = abd.BundleDict(bundle_names, seg_algo="reco80")
 
 print("Tracking...")
@@ -121,7 +124,7 @@ if not op.exists(op.join(working_dir, 'dti_streamlines_reco.trk')):
              op.join(working_dir, 'seed_roi.nii.gz'))
     sft = aft.track(dti_params['params'], seed_mask=seed_roi,
                     directions='det', stop_mask=FA_data,
-                    stop_threshold=0.1)
+                    stop_threshold=0.1, odf_model="dti")
     print(len(sft.streamlines))
     save_tractogram(sft, op.join(working_dir, 'dti_streamlines_reco.trk'),
                     bbox_valid_check=False)

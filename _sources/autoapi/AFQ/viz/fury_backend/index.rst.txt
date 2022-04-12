@@ -82,7 +82,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: visualize_bundles(sft, affine=None, n_points=None, bundle_dict=None, bundle=None, colors=None, shade_by_volume=None, color_by_streamline=None, sbv_lims=[None, None], include_profiles=(None, None), flip_axes=[False, False, False], opacity=1.0, figure=None, background=(1, 1, 1), interact=False, inline=False)
+.. py:function:: visualize_bundles(sft, n_points=None, bundle_dict=None, bundle=None, colors=None, shade_by_volume=None, color_by_streamline=None, sbv_lims=[None, None], include_profiles=(None, None), flip_axes=[False, False, False], opacity=1.0, figure=None, background=(1, 1, 1), interact=False, inline=False)
 
    
    Visualize bundles in 3D using VTK.
@@ -98,18 +98,13 @@ Attributes
            must contain a bundle key in it's data_per_streamline which is a list
            of bundle `'uid'`.
 
-       **affine** : ndarray, optional
-           An affine transformation to apply to the streamlines before
-           visualization. Default: no transform.
-
        **n_points** : int or None
            n_points to resample streamlines to before plotting. If None, no
            resampling is done.
 
        **bundle_dict** : dict, optional
-           Keys are names of bundles and values are dicts that should include
-           a key `'uid'` with values as integers for selection from the sft
-           metadata. Default: bundles are either not identified, or identified
+           Keys are names of bundles and values are dicts that specify them.
+           Default: bundles are either not identified, or identified
            only as unique integers in the metadata.
 
        **bundle** : str or int, optional

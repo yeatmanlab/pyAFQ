@@ -5,10 +5,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Automated Fiber Quantification &#8212; AFQ 0.10 documentation</title>
+    <title>Automated Fiber Quantification &#8212; AFQ 0.11 documentation</title>
     
-  <link href="_static/css/theme.css" rel="stylesheet">
-  <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css" />
@@ -31,7 +27,8 @@
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
@@ -47,7 +44,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -137,10 +134,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -156,7 +151,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -164,17 +160,9 @@
     
   </div>
 </nav>
-<h3><a href="#">Table of Contents</a></h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -185,7 +173,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -240,7 +228,7 @@
               <div>
                 
   <span class="target" id="home"></span><div class="section" id="automated-fiber-quantification">
-<h1>Automated Fiber Quantification<a class="headerlink" href="#automated-fiber-quantification" title="Permalink to this headline">¶</a></h1>
+<h1>Automated Fiber Quantification<a class="headerlink" href="#automated-fiber-quantification" title="Permalink to this headline">#</a></h1>
 <p>Tractography based on diffusion weighted MRI (dMRI) is used to find the major
 white matter fascicles (tracts) in the living human brain. The health of these
 tracts is an important factor underlying many cognitive and neurological
@@ -256,9 +244,9 @@ fiber tracts in individual human brains, and quantification of the tissue
 properties within the tracts. To learn more about the software please refer to the Table of Contents.</p>
 </div>
 <div class="section" id="tractometry">
-<h1>Tractometry<a class="headerlink" href="#tractometry" title="Permalink to this headline">¶</a></h1>
+<h1>Tractometry<a class="headerlink" href="#tractometry" title="Permalink to this headline">#</a></h1>
 <table class="colwidths-auto table" id="id11">
-<caption><span class="caption-text">AFQ Tractometry Pipeline</span><a class="headerlink" href="#id11" title="Permalink to this table">¶</a></caption>
+<caption><span class="caption-text">AFQ Tractometry Pipeline</span><a class="headerlink" href="#id11" title="Permalink to this table">#</a></caption>
 <tbody>
 <tr class="row-odd"><td><p>Tractography</p></td>
 <td><p>→ <a class="reference external" href="http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/registration/index.html">Registration</a></p></td>
@@ -271,7 +259,7 @@ properties within the tracts. To learn more about the software please refer to t
 </table>
 </div>
 <div class="section" id="citing-our-work">
-<h1>Citing our work<a class="headerlink" href="#citing-our-work" title="Permalink to this headline">¶</a></h1>
+<h1>Citing our work<a class="headerlink" href="#citing-our-work" title="Permalink to this headline">#</a></h1>
 <p>If you use this software in your work, please consider citing the papers that
 describe the method <a class="reference internal" href="#yeatman2012" id="id7"><span>[Yeatman2012]</span></a>, the specific implementation <a class="reference internal" href="#kruper2021" id="id8"><span>[Kruper2021]</span></a>,
 as well as the underlying modeling and tractography implementations in <a class="reference external" href="https://dipy.org">DIPY</a> <a class="reference internal" href="#garyfallidis2014" id="id9"><span>[Garyfallidis2014]</span></a>. If you use the RecoBundles method,
@@ -294,7 +282,7 @@ please also cite the original paper describing that method <a class="reference i
 </dl>
 </div>
 <div class="section" id="acknowledgements">
-<h1>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">¶</a></h1>
+<h1>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">#</a></h1>
 <p>Work on this software is supported through grant <a class="reference external" href="https://projectreporter.nih.gov/project_info_details.cfm?aid=9886761&amp;icde=46874320&amp;ddparam=&amp;ddvalue=&amp;ddsub=&amp;cr=2&amp;csb=default&amp;cs=ASC&amp;pball=">1RF1MH121868-01</a> from the <a class="reference external" href="https://www.nimh.nih.gov/index.shtml">National Institutes for Mental Health</a> / <a class="reference external" href="https://braininitiative.nih.gov">The BRAIN Initiative</a>
 and by a grant from the
 <a class="reference external" href="https://www.moore.org/">Gordon &amp; Betty Moore Foundation</a>,  and from the
@@ -351,7 +339,8 @@ R01EB027585) to Eleftherios Garyfallidis and to Ariel Rokem , and by <a class="r
       </div>
     </div>
   
-  <script src="_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
@@ -364,7 +353,7 @@ R01EB027585) to Eleftherios Garyfallidis and to Ariel Rokem , and by <a class="r
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

@@ -5,10 +5,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Using cloudknot to run pyAFQ on AWS batch: &#8212; AFQ 0.10 documentation</title>
+    <title>Using cloudknot to run pyAFQ on AWS batch: &#8212; AFQ 0.11 documentation</title>
     
-  <link href="../_static/css/theme.css" rel="stylesheet">
-  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
@@ -31,7 +27,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -48,7 +45,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -138,10 +135,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -157,7 +152,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -235,29 +231,9 @@
 
   </div>
 </nav>
-<h3><a href="../index.html">Table of Contents</a></h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="plot_afq_reco80.html">RecoBundles80 using AFQ API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_afq_api.html">AFQ API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_afq_callosal.html">Callosal bundles using AFQ API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_optic_radiations.html">Plotting the Optic Radiations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_bids_layout.html">How pyAFQ uses BIDS</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Using cloudknot to run pyAFQ on AWS batch:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cloudknot_hcp_example.html">AFQ with HCP data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_tract_profile.html">Plotting tract profiles</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_recobundles.html">Plotting tract profiles using RecoBundles</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_callosal_tract_profile.html">Plotting Novel Tract Profiles:</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -268,7 +244,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -329,7 +305,7 @@
 to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="using-cloudknot-to-run-pyafq-on-aws-batch">
-<span id="sphx-glr-auto-examples-cloudknot-example-py"></span><h1>Using cloudknot to run pyAFQ on AWS batch:<a class="headerlink" href="#using-cloudknot-to-run-pyafq-on-aws-batch" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-auto-examples-cloudknot-example-py"></span><h1>Using cloudknot to run pyAFQ on AWS batch:<a class="headerlink" href="#using-cloudknot-to-run-pyafq-on-aws-batch" title="Permalink to this headline">#</a></h1>
 <p>One of the purposes of <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code> is to analyze large-scale openly-available
 datasets, such as those in the
 <a class="reference external" href="https://www.humanconnectome.org/">Human Connectome Project</a>.</p>
@@ -350,7 +326,7 @@ That is because AWS charges for inter-region transfer of data.</p>
 </pre></div>
 </div>
 <div class="section" id="define-the-function-to-use">
-<h2>Define the function to use<a class="headerlink" href="#define-the-function-to-use" title="Permalink to this headline">¶</a></h2>
+<h2>Define the function to use<a class="headerlink" href="#define-the-function-to-use" title="Permalink to this headline">#</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">Cloudknot</span></code> uses the single program multiple data paradigm of computing.
 This means that the same function will be run on multiple different inputs.
 For example, a <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code> processing function run
@@ -365,14 +341,14 @@ what dependencies to install into AWS Batch to run this function.</p>
     <span class="kn">import</span> <span class="nn">s3fs</span>
     <span class="c1"># all imports must be at the top of the function</span>
     <span class="c1"># cloudknot installs the appropriate packages from pip</span>
-    <span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afqd</span>
+    <span class="kn">import</span> <span class="nn">AFQ.data.s3bids</span> <span class="k">as</span> <span class="nn">afs</span>
     <span class="kn">from</span> <span class="nn">AFQ.api.group</span> <span class="kn">import</span> <span class="n">GroupAFQ</span>
     <span class="kn">import</span> <span class="nn">AFQ.definitions.mask</span> <span class="k">as</span> <span class="nn">afm</span>
 
     <span class="c1"># Download the given subject to your local machine from s3</span>
     <span class="c1"># Can find subjects more easily if they are specified in a</span>
     <span class="c1"># BIDS participants.tsv file, even if it is sparse</span>
-    <span class="n">study_ixi</span> <span class="o">=</span> <span class="n">afqd</span><span class="o">.</span><span class="n">S3BIDSStudy</span><span class="p">(</span>
+    <span class="n">study_ixi</span> <span class="o">=</span> <span class="n">afs</span><span class="o">.</span><span class="n">S3BIDSStudy</span><span class="p">(</span>
         <span class="s2">&quot;my_study&quot;</span><span class="p">,</span>
         <span class="s2">&quot;my_study_bucket&quot;</span><span class="p">,</span>
         <span class="s2">&quot;my_study_prefix&quot;</span><span class="p">,</span>
@@ -417,7 +393,7 @@ see the docstring for S3BIDSStudy.__init__ for more information</p>
 </div>
 </div>
 <div class="section" id="defining-a-knot-instance">
-<h2>Defining a <code class="docutils literal notranslate"><span class="pre">Knot</span></code> instance<a class="headerlink" href="#defining-a-knot-instance" title="Permalink to this headline">¶</a></h2>
+<h2>Defining a <code class="docutils literal notranslate"><span class="pre">Knot</span></code> instance<a class="headerlink" href="#defining-a-knot-instance" title="Permalink to this headline">#</a></h2>
 <p>We instantiate a class instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">ck.Knot</span></code> class.
 This object will be used to run your jobs.
 The object is instantiated with the <cite>‘AmazonS3FullAccess’</cite> policy,
@@ -443,11 +419,11 @@ You can also specify other forks and branches to install from.</p>
 </div>
 </div>
 <div class="section" id="launching-the-computation">
-<h2>Launching the computation<a class="headerlink" href="#launching-the-computation" title="Permalink to this headline">¶</a></h2>
+<h2>Launching the computation<a class="headerlink" href="#launching-the-computation" title="Permalink to this headline">#</a></h2>
 <p>The <code class="xref py py-meth docutils literal notranslate"><span class="pre">map()</span></code> method of the :class:<a href="#id1"><span class="problematic" id="id2">`</span></a>Knot object maps each of the inputs
 provided as a sequence onto the function and executes the function on each
 one of them in parallel.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result_futures</span> <span class="o">=</span> <span class="n">knot</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">subjects</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result_futures</span> <span class="o">=</span> <span class="n">knot</span><span class="o">.</span><a href="https://docs.python.org/3/library/functions.html#map" title="builtins.map" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-function"><span class="n">map</span></a><span class="p">(</span><span class="n">subjects</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Once computations have started, you can call the following
@@ -486,7 +462,7 @@ resulting profiles of each subject and combines them into one csv file.</p>
 function itself. The <cite>job_type</cite> key-word argument is used to signal to
 <code class="docutils literal notranslate"><span class="pre">Cloudknot</span></code> that only one job is submitted rather than the default
 array of jobs.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result_futures2</span> <span class="o">=</span> <span class="n">knot2</span><span class="o">.</span><span class="n">map</span><span class="p">([</span><span class="s2">&quot;dummy_argument&quot;</span><span class="p">],</span> <span class="n">job_type</span><span class="o">=</span><span class="s2">&quot;independent&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result_futures2</span> <span class="o">=</span> <span class="n">knot2</span><span class="o">.</span><a href="https://docs.python.org/3/library/functions.html#map" title="builtins.map" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-function"><span class="n">map</span></a><span class="p">([</span><span class="s2">&quot;dummy_argument&quot;</span><span class="p">],</span> <span class="n">job_type</span><span class="o">=</span><span class="s2">&quot;independent&quot;</span><span class="p">)</span>
 <span class="n">result_futures2</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
 <span class="n">knot2</span><span class="o">.</span><span class="n">clobber</span><span class="p">(</span><span class="n">clobber_pars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clobber_repo</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clobber_image</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
@@ -509,7 +485,7 @@ array of jobs.</p>
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="plot_bids_layout.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -532,7 +508,8 @@ array of jobs.</p>
       </div>
     </div>
   
-  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
@@ -545,7 +522,7 @@ array of jobs.</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

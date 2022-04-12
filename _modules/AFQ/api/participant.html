@@ -5,10 +5,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.api.participant &#8212; AFQ 0.10 documentation</title>
+    <title>AFQ.api.participant &#8212; AFQ 0.11 documentation</title>
     
-  <link href="../../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
@@ -31,7 +27,8 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -46,7 +43,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -136,10 +133,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -155,7 +150,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -163,17 +159,9 @@
     
   </div>
 </nav>
-<h3><a href="../../../index.html">Table of Contents</a></h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -195,9 +183,12 @@
   <h1>Source code for AFQ.api.participant</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
 <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">from</span> <span class="nn">AFQ.definitions.mapping</span> <span class="kn">import</span> <span class="n">SlrMap</span>
 <span class="kn">from</span> <span class="nn">AFQ.api.utils</span> <span class="kn">import</span> <span class="n">wf_sections</span><span class="p">,</span> <span class="n">add_method_descriptions</span>
+<span class="kn">from</span> <span class="nn">AFQ.viz.utils</span> <span class="kn">import</span> <span class="n">viz_import_msg_error</span>
 
 <span class="kn">from</span> <span class="nn">AFQ.tasks.data</span> <span class="kn">import</span> <span class="n">get_data_plan</span>
 <span class="kn">from</span> <span class="nn">AFQ.tasks.mapping</span> <span class="kn">import</span> <span class="n">get_mapping_plan</span>
@@ -209,8 +200,8 @@
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ParticipantAFQ&quot;</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="ParticipantAFQ"><a class="viewcode-back" href="../../../autoapi/AFQ/api/participant/index.html#AFQ.api.participant.ParticipantAFQ">[docs]</a><span class="nd">@add_method_descriptions</span>
-<span class="k">class</span> <span class="nc">ParticipantAFQ</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="nd">@add_method_descriptions</span>
+<div class="viewcode-block" id="ParticipantAFQ"><a class="viewcode-back" href="../../../autoapi/AFQ/api/participant/index.html#AFQ.api.participant.ParticipantAFQ">[docs]</a><span class="k">class</span> <span class="nc">ParticipantAFQ</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">dwi_data_file</span><span class="p">,</span>
                  <span class="n">bval_file</span><span class="p">,</span> <span class="n">bvec_file</span><span class="p">,</span>
@@ -235,7 +226,7 @@
 <span class="sd">            the BIDS layout to each participant.</span>
 <span class="sd">        kwargs : additional optional parameters</span>
 <span class="sd">            You can set additional parameters for any step</span>
-<span class="sd">            of the process. See :ref:`kwargs_docs` for more details.</span>
+<span class="sd">            of the process. See :ref:`usage/kwargs` for more details.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -270,6 +261,8 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">output_dir</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;output_dir does not exist: </span><span class="si">{</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ.api&#39;</span><span class="p">)</span>
 
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bids_info&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bids_info</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;subses_dict&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
@@ -334,7 +327,64 @@
                     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">[</span><span class="n">sub_attr</span><span class="p">][</span><span class="n">attr_file</span><span class="p">]</span>
 
         <span class="c1"># attr not found, allow typical AttributeError</span>
-        <span class="k">return</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ParticipantAFQ.export_all"><a class="viewcode-back" href="../../../autoapi/AFQ/api/participant/index.html#AFQ.api.participant.ParticipantAFQ.export_all">[docs]</a>    <span class="k">def</span> <span class="nf">export_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viz</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">xforms</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                   <span class="n">indiv</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Exports all the possible outputs</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        viz : bool</span>
+<span class="sd">            Whether to output visualizations. This includes tract profile</span>
+<span class="sd">            plots, a figure containing all bundles, and, if using the AFQ</span>
+<span class="sd">            segmentation algorithm, individual bundle figures.</span>
+<span class="sd">            Default: True</span>
+<span class="sd">        xforms : bool</span>
+<span class="sd">            Whether to output the reg_template image in subject space and,</span>
+<span class="sd">            depending on if it is possible based on the mapping used, to</span>
+<span class="sd">            output the b0 in template space.</span>
+<span class="sd">            Default: True</span>
+<span class="sd">        indiv : bool</span>
+<span class="sd">            Whether to output individual bundles in their own files, in</span>
+<span class="sd">            addition to the one file containing all bundles. If using</span>
+<span class="sd">            the AFQ segmentation algorithm, individual ROIs are also</span>
+<span class="sd">            output.</span>
+<span class="sd">            Default: True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+        <span class="n">seg_algo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">segmentation_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;seg_algo&quot;</span><span class="p">,</span> <span class="s2">&quot;AFQ&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">xforms</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">b0_warped</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span>
+                    <span class="s2">&quot;Failed to export warped b0. This could be because your &quot;</span>
+                    <span class="s2">&quot;mapping type is only compatible with transformation &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;from template to subject space. The error is: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">template_xform</span>
+        <span class="k">if</span> <span class="n">indiv</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">indiv_bundles</span>
+            <span class="k">if</span> <span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;AFQ&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rois</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sl_counts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">profiles</span>
+
+        <span class="k">if</span> <span class="n">viz</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tract_profile_plots</span>
+            <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">plotly_err_message</span> <span class="o">=</span> <span class="n">viz_import_msg_error</span><span class="p">(</span><span class="s2">&quot;plot&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">!=</span> <span class="n">plotly_err_message</span><span class="p">:</span>
+                    <span class="k">raise</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">plotly_err_message</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">all_bundles_figure</span>
+            <span class="k">if</span> <span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;AFQ&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">indiv_bundles_figures</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Time taken for export all: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">))</span></div></div>
 </pre></div>
 
               </div>
@@ -350,7 +400,8 @@
       </div>
     </div>
   
-  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
@@ -363,7 +414,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

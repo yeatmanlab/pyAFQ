@@ -1,0 +1,1402 @@
+:py:mod:`AFQ.data.s3bids`
+=========================
+
+.. py:module:: AFQ.data.s3bids
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.data.s3bids.S3BIDSSubject
+   AFQ.data.s3bids.HBNSubject
+   AFQ.data.s3bids.S3BIDSStudy
+   AFQ.data.s3bids.HBNSite
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.data.s3bids.get_s3_client
+   AFQ.data.s3bids._ls_s3fs
+   AFQ.data.s3bids._get_matching_s3_keys
+   AFQ.data.s3bids._download_from_s3
+   AFQ.data.s3bids.s3fs_nifti_write
+   AFQ.data.s3bids.s3fs_nifti_read
+   AFQ.data.s3bids.write_json
+   AFQ.data.s3bids.read_json
+   AFQ.data.s3bids.s3fs_json_read
+   AFQ.data.s3bids.s3fs_json_write
+
+
+
+.. py:function:: get_s3_client(anon=True)
+
+   
+   Return a boto3 s3 client
+
+   Global boto clients are not thread safe so we use this function
+   to return independent session clients for different threads.
+
+   :Parameters:
+
+       **anon** : bool
+           Whether to use anonymous connection (public buckets only).
+           If False, uses the key/secret given, or boto’s credential
+           resolver (client_kwargs, environment, variables, config files,
+           EC2 IAM server, in that order). Default: True
+
+   :Returns:
+
+       **s3_client** : boto3.client('s3')
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: _ls_s3fs(s3_prefix, anon=True)
+
+   
+   Returns a dict of list of files using s3fs
+
+   The files are divided between subject directories/files and
+   non-subject directories/files.
+
+   :Parameters:
+
+       **s3_prefix** : str
+           AWS S3 key for the study or site "directory" that contains all
+           of the subjects
+
+       **anon** : bool
+           Whether to use anonymous connection (public buckets only).
+           If False, uses the key/secret given, or boto’s credential
+           resolver (client_kwargs, environment, variables, config files,
+           EC2 IAM server, in that order). Default: True
+
+   :Returns:
+
+       **subjects** : dict
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: _get_matching_s3_keys(bucket, prefix='', suffix='', anon=True)
+
+   
+   Generate all the matching keys in an S3 bucket.
+
+
+   :Parameters:
+
+       **bucket** : str
+           Name of the S3 bucket
+
+       **prefix** : str, optional
+           Only fetch keys that start with this prefix
+
+       **suffix** : str, optional
+           Only fetch keys that end with this suffix
+
+       **anon** : bool
+           Whether to use anonymous connection (public buckets only).
+           If False, uses the key/secret given, or boto’s credential
+           resolver (client_kwargs, environment, variables, config files,
+           EC2 IAM server, in that order). Default: True
+
+
+   :Yields:
+
+       **key** : list
+           S3 keys that match the prefix and suffix
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: _download_from_s3(fname, bucket, key, overwrite=False, anon=True)
+
+   
+   Download object from S3 to local file
+
+
+   :Parameters:
+
+       **fname** : str
+           File path to which to download the object
+
+       **bucket** : str
+           S3 bucket name
+
+       **key** : str
+           S3 key for the object to download
+
+       **overwrite** : bool
+           If True, overwrite file if it already exists.
+           If False, skip download and return. Default: False
+
+       **anon** : bool
+           Whether to use anonymous connection (public buckets only).
+           If False, uses the key/secret given, or boto’s credential
+           resolver (client_kwargs, environment, variables, config files,
+           EC2 IAM server, in that order). Default: True
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: S3BIDSSubject(subject_id, study)
+
+   
+   A single study subject hosted on AWS S3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: subject_id(self)
+      :property:
+
+      
+      An identifier string for the subject
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: study(self)
+      :property:
+
+      
+      The study in which this subject participated
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: s3_keys(self)
+      :property:
+
+      
+      A dict of S3 keys for this subject's data
+
+      The S3 keys are divided between "raw" data and derivatives
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: files(self)
+      :property:
+
+      
+      Local files for this subject's dMRI data
+
+      Before the call to subject.download(), this is None.
+      Afterward, the files are stored in a dict with keys
+      for each Amazon S3 key and values corresponding to
+      the local file.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: __repr__(self)
+
+      
+      Return repr(self).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: _get_s3_keys(self)
+
+      
+      Get all required S3 keys for this subject
+
+
+
+      :Returns:
+
+          **s3_keys** : dict
+              S3 keys organized into "raw" and "derivatives" lists
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: download(self, directory, include_derivs=False, overwrite=False, suffix=None, pbar=True, pbar_idx=0)
+
+      
+      Download files from S3
+
+
+      :Parameters:
+
+          **directory** : str
+              Directory to which to download subject files
+
+          **include_derivs** : bool or str
+              If True, download all derivatives files. If False, do not.
+              If a string or sequence of strings is passed, this will
+              only download derivatives that match the string(s) (e.g.
+              ['dmriprep', 'afq']). Default: False
+
+          **overwrite** : bool
+              If True, overwrite files for each subject. Default: False
+
+          **suffix** : str
+              Suffix, including extension, of file(s) to download.
+              Default: None
+
+          **pbar** : bool
+              If True, include download progress bar. Default: True
+
+          **pbar_idx** : int
+              Progress bar index for multithreaded progress bars. Default: 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: HBNSubject(subject_id, study, site=None)
+
+   Bases: :py:obj:`S3BIDSSubject`
+
+   
+   A subject in the HBN study
+
+
+
+
+
+
+
+
+
+
+   .. seealso::
+
+       
+       :obj:`AFQ.data.S3BIDSSubject`
+           ..
+       
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: site(self)
+      :property:
+
+      
+      The site at which this subject was a participant
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: __repr__(self)
+
+      
+      Return repr(self).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: _get_s3_keys(self)
+
+      
+      Get all required S3 keys for this subject
+
+
+
+      :Returns:
+
+          **s3_keys** : dict
+              S3 keys organized into "raw" and "derivatives" lists
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: S3BIDSStudy(study_id, bucket, s3_prefix, subjects=None, anon=True, use_participants_tsv=False, random_seed=None, _subject_class=S3BIDSSubject)
+
+   
+   A BIDS-compliant study hosted on AWS S3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: study_id(self)
+      :property:
+
+      
+      An identifier string for the study
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: bucket(self)
+      :property:
+
+      
+      The S3 bucket that contains the study data
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: s3_prefix(self)
+      :property:
+
+      
+      The S3 prefix common to all of the study objects on S3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: subjects(self)
+      :property:
+
+      
+      A list of Subject instances for each requested subject
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: anon(self)
+      :property:
+
+      
+      Is this study using an anonymous S3 connection?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: derivative_types(self)
+      :property:
+
+      
+      A list of derivative pipelines available in this study
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: non_sub_s3_keys(self)
+      :property:
+
+      
+      A dict of S3 keys that are not in subject directories
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: local_directories(self)
+      :property:
+
+      
+      A list of local directories where this study has been downloaded
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: use_participants_tsv(self)
+      :property:
+
+      
+      Did we use a participants.tsv file to populate the list of
+      study subjects.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: random_seed(self)
+      :property:
+
+      
+      The random seed used to retrieve study subjects
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: __repr__(self)
+
+      
+      Return repr(self).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: _get_subject(self, subject_id)
+
+      
+      Return a Subject instance from a subject-ID
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: _get_derivative_types(self)
+
+      
+      Return a list of available derivatives pipelines
+
+
+
+      :Returns:
+
+          list
+              list of available derivatives pipelines
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: _get_non_subject_s3_keys(self)
+
+      
+      Return a list of 'non-subject' files
+
+      In this context, a 'non-subject' file is any file
+      or directory that is not a subject ID folder
+
+
+      :Returns:
+
+          dict
+              dict with keys 'raw' and 'derivatives' and whose values
+              are lists of S3 keys for non-subject files
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: _list_all_subjects(self)
+
+      
+      Return list of subjects
+
+
+
+      :Returns:
+
+          list
+              list of participant_ids
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: _download_non_sub_keys(self, directory, select=('dataset_description.json', ), filenames=None)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: _download_derivative_descriptions(self, include_derivs, directory)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: download(self, directory, include_modality_agnostic=('dataset_description.json', ), include_derivs=False, include_derivs_dataset_description=True, suffix=None, overwrite=False, pbar=True)
+
+      
+      Download files for each subject in the study
+
+
+      :Parameters:
+
+          **directory** : str
+              Directory to which to download subject files
+
+          **include_modality_agnostic** : bool, "all" or any subset of [
+                  "dataset_description.json", "CHANGES", "README", "LICENSE"]
+              If True or "all", download all keys in self.non_sub_s3_keys
+              also. If a subset of ["dataset_description.json", "CHANGES",
+              "README", "LICENSE"], download only those files. This is
+              useful if the non_sub_s3_keys contain files common to all
+              subjects that should be inherited.
+              Default: ("dataset_description.json",)
+
+          **include_derivs** : bool or str
+              If True, download all derivatives files. If False, do not.
+              If a string or sequence of strings is passed, this will
+              only download derivatives that match the string(s) (e.g.
+              ["dmriprep", "afq"]). Default: False
+
+          **include_derivs_dataset_description** : bool
+              Used only if include_derivs is not False. If True,
+              dataset_description.json downloaded for each derivative.
+
+          **suffix** : str
+              Suffix, including extension, of file(s) to download.
+              Default: None
+
+          **overwrite** : bool
+              If True, overwrite files for each subject. Default: False
+
+          **pbar** : bool
+              If True, include progress bar. Default: True
+
+
+
+
+
+
+
+
+      .. seealso::
+
+          
+          :obj:`AFQ.data.S3BIDSSubject.download`
+              ..
+          
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: HBNSite(site, study_id='HBN', bucket='fcp-indi', s3_prefix='data/Projects/HBN/MRI', subjects=None, use_participants_tsv=False, random_seed=None)
+
+   Bases: :py:obj:`S3BIDSStudy`
+
+   
+   An HBN study site
+
+
+
+
+
+
+
+
+
+
+   .. seealso::
+
+       
+       :obj:`AFQ.data.S3BIDSStudy`
+           ..
+       
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: site(self)
+      :property:
+
+      
+      The HBN site
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: _get_subject(self, subject_id)
+
+      
+      Return a Subject instance from a subject-ID
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: _get_derivative_types(self)
+
+      
+      Return a list of available derivatives pipelines
+
+      The HBN dataset is not BIDS compliant so to go a list
+      of available derivatives, we must peak inside every
+      directory in `derivatives/sub-XXXX/`
+
+
+      :Returns:
+
+          list
+              list of available derivatives pipelines
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: _get_non_subject_s3_keys(self)
+
+      
+      Return a list of 'non-subject' files
+
+      In this context, a 'non-subject' file is any file
+      or directory that is not a subject ID folder. This method
+      is different from AFQ.data.S3BIDSStudy because the HBN
+      dataset is not BIDS compliant
+
+
+      :Returns:
+
+          dict
+              dict with keys 'raw' and 'derivatives' and whose values
+              are lists of S3 keys for non-subject files
+
+
+
+
+
+
+
+      .. seealso::
+
+          
+          :obj:`AFQ.data.S3BIDSStudy._get_non_subject_s3_keys`
+              ..
+          
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: download(self, directory, include_modality_agnostic=False, include_derivs=False, overwrite=False, pbar=True)
+
+      
+      Download files for each subject in the study
+
+
+      :Parameters:
+
+          **directory** : str
+              Directory to which to download subject files
+
+          **include_modality_agnostic** : bool, "all" or any subset of [
+                  "dataset_description.json", "CHANGES", "README", "LICENSE"]
+              If True or "all", download all keys in self.non_sub_s3_keys
+              also. If a subset of ["dataset_description.json", "CHANGES",
+              "README", "LICENSE"], download only those files. This is
+              useful if the non_sub_s3_keys contain files common to all
+              subjects that should be inherited. Default: False
+
+          **include_derivs** : bool or str
+              If True, download all derivatives files. If False, do not.
+              If a string or sequence of strings is passed, this will
+              only download derivatives that match the string(s) (e.g.
+              ["dmriprep", "afq"]). Default: False
+
+          **overwrite** : bool
+              If True, overwrite files for each subject. Default: False
+
+          **pbar** : bool
+              If True, include progress bar. Default: True
+
+
+
+
+
+
+
+
+      .. seealso::
+
+          
+          :obj:`AFQ.data.S3BIDSSubject.download`
+              ..
+          
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:function:: s3fs_nifti_write(img, fname, fs=None)
+
+   
+   Write a nifti file straight to S3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: s3fs_nifti_read(fname, fs=None, anon=False)
+
+   
+   Lazily reads a nifti image from S3.
+
+
+
+   :Returns:
+
+       nib.Nifti1Image class instance
+           ..
+
+
+
+
+
+
+
+
+   .. rubric:: Notes
+
+   Because the image is lazily loaded, data stored in the file
+   is not transferred until `get_fdata` is called.
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: write_json(fname, data)
+
+   
+   Write data to JSON file.
+
+
+   :Parameters:
+
+       **fname** : str
+           Full path to the file to write.
+
+       **data** : dict
+           A dict containing the data to write.
+
+   :Returns:
+
+       None
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: read_json(fname)
+
+   
+   Read data from a JSON file.
+
+
+   :Parameters:
+
+       **fname** : str
+           Full path to the data-containing file
+
+   :Returns:
+
+       dict
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: s3fs_json_read(fname, fs=None, anon=False)
+
+   
+   Reads json directly from S3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: s3fs_json_write(data, fname, fs=None)
+
+   
+   Writes json from a dict directly into S3
+
+
+   :Parameters:
+
+       **data** : dict
+           The json to be written out
+
+       **fname** : str
+           Full path (including bucket name and extension) to the file to
+           be written out on S3
+
+       **fs** : an s3fs.S3FileSystem class instance, optional
+           A file-system to refer to. Default to create a new file-system.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

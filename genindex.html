@@ -5,10 +5,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; AFQ 0.10 documentation</title>
+    <title>Index &#8212; AFQ 0.11 documentation</title>
     
-  <link href="_static/css/theme.css" rel="stylesheet">
-  <link href="_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css" />
@@ -31,7 +27,8 @@
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
@@ -46,7 +43,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -136,10 +133,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -155,7 +150,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -163,17 +159,9 @@
     
   </div>
 </nav>
-<h3><a href="index.html">Table of Contents</a></h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -204,10 +192,12 @@
  | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#Q"><strong>Q</strong></a>
@@ -225,6 +215,8 @@
 <h2 id="_">_</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="autoapi/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.BundleDict.__add__">__add__() (AFQ.api.bundle_dict.BundleDict method)</a>
+</li>
       <li><a href="autoapi/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.BundleDict.__delitem__">__delitem__() (AFQ.api.bundle_dict.BundleDict method)</a>
 </li>
       <li><a href="autoapi/AFQ/api/group/index.html#AFQ.api.group.GroupAFQ.__getattribute__">__getattribute__() (AFQ.api.group.GroupAFQ method)</a>
@@ -239,9 +231,23 @@
 </li>
       <li><a href="autoapi/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.BundleDict.__len__">__len__() (AFQ.api.bundle_dict.BundleDict method)</a>
 </li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSubject.__repr__">__repr__() (AFQ.data.s3bids.HBNSubject method)</a>
+
+      <ul>
+        <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.__repr__">(AFQ.data.s3bids.S3BIDSStudy method)</a>
+</li>
+        <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSSubject.__repr__">(AFQ.data.s3bids.S3BIDSSubject method)</a>
+</li>
+      </ul></li>
       <li><a href="autoapi/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.BundleDict.__setitem__">__setitem__() (AFQ.api.bundle_dict.BundleDict method)</a>
 </li>
       <li><a href="autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._color_arr2str">_color_arr2str() (in module AFQ.viz.plotly_backend)</a>
+</li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy._download_derivative_descriptions">_download_derivative_descriptions() (AFQ.data.s3bids.S3BIDSStudy method)</a>
+</li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids._download_from_s3">_download_from_s3() (in module AFQ.data.s3bids)</a>
+</li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy._download_non_sub_keys">_download_non_sub_keys() (AFQ.data.s3bids.S3BIDSStudy method)</a>
 </li>
       <li><a href="autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._draw_core">_draw_core() (in module AFQ.viz.plotly_backend)</a>
 </li>
@@ -249,25 +255,59 @@
 </li>
       <li><a href="autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._draw_slice">_draw_slice() (in module AFQ.viz.plotly_backend)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._draw_streamlines">_draw_streamlines() (in module AFQ.viz.plotly_backend)</a>
 </li>
       <li><a href="autoapi/AFQ/index.html#AFQ._ga_id">_ga_id (in module AFQ)</a>
 </li>
+      <li><a href="autoapi/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.BundleDict._gen">_gen() (AFQ.api.bundle_dict.BundleDict method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation._get_bundle_info">_get_bundle_info() (AFQ.segmentation.Segmentation method)</a>
 </li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSite._get_derivative_types">_get_derivative_types() (AFQ.data.s3bids.HBNSite method)</a>
+
+      <ul>
+        <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy._get_derivative_types">(AFQ.data.s3bids.S3BIDSStudy method)</a>
+</li>
+      </ul></li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids._get_matching_s3_keys">_get_matching_s3_keys() (in module AFQ.data.s3bids)</a>
+</li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSite._get_non_subject_s3_keys">_get_non_subject_s3_keys() (AFQ.data.s3bids.HBNSite method)</a>
+
+      <ul>
+        <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy._get_non_subject_s3_keys">(AFQ.data.s3bids.S3BIDSStudy method)</a>
+</li>
+      </ul></li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSubject._get_s3_keys">_get_s3_keys() (AFQ.data.s3bids.HBNSubject method)</a>
+
+      <ul>
+        <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSSubject._get_s3_keys">(AFQ.data.s3bids.S3BIDSSubject method)</a>
+</li>
+      </ul></li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSite._get_subject">_get_subject() (AFQ.data.s3bids.HBNSite method)</a>
+
+      <ul>
+        <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy._get_subject">(AFQ.data.s3bids.S3BIDSStudy method)</a>
+</li>
+      </ul></li>
       <li><a href="autoapi/AFQ/viz/fury_backend/index.html#AFQ.viz.fury_backend._inline_interact">_inline_interact() (in module AFQ.viz.fury_backend)</a>
 
       <ul>
         <li><a href="autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._inline_interact">(in module AFQ.viz.plotly_backend)</a>
 </li>
       </ul></li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy._list_all_subjects">_list_all_subjects() (AFQ.data.s3bids.S3BIDSStudy method)</a>
+</li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids._ls_s3fs">_ls_s3fs() (in module AFQ.data.s3bids)</a>
+</li>
       <li><a href="autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._name_from_enum">_name_from_enum() (in module AFQ.viz.plotly_backend)</a>
 </li>
       <li><a href="autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._plot_profiles">_plot_profiles() (in module AFQ.viz.plotly_backend)</a>
 </li>
       <li><a href="autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation._read_tg">_read_tg() (AFQ.segmentation.Segmentation method)</a>
+</li>
+      <li><a href="autoapi/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.BundleDict._resample_roi">_resample_roi() (AFQ.api.bundle_dict.BundleDict method)</a>
 </li>
       <li><a href="autoapi/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation._return_empty">_return_empty() (AFQ.segmentation.Segmentation method)</a>
 </li>
@@ -283,8 +323,6 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="autoapi/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.add_bundles">add_bundles() (in module AFQ.utils.streamlines)</a>
-</li>
       <li><a href="autoapi/AFQ/api/utils/index.html#AFQ.api.utils.add_method_descriptions">add_method_descriptions() (in module AFQ.api.utils)</a>
 </li>
       <li><a href="autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.AffMap">AffMap (class in AFQ.definitions.mapping)</a>
@@ -336,6 +374,27 @@
 
       <ul>
         <li><a href="autoapi/AFQ/data/index.html#module-AFQ.data">module</a>
+</li>
+      </ul></li>
+      <li>
+    AFQ.data.fetch
+
+      <ul>
+        <li><a href="autoapi/AFQ/data/fetch/index.html#module-AFQ.data.fetch">module</a>
+</li>
+      </ul></li>
+      <li>
+    AFQ.data.s3bids
+
+      <ul>
+        <li><a href="autoapi/AFQ/data/s3bids/index.html#module-AFQ.data.s3bids">module</a>
+</li>
+      </ul></li>
+      <li>
+    AFQ.data.utils
+
+      <ul>
+        <li><a href="autoapi/AFQ/data/utils/index.html#module-AFQ.data.utils">module</a>
 </li>
       </ul></li>
       <li>
@@ -436,6 +495,8 @@
         <li><a href="autoapi/AFQ/tasks/decorators/index.html#module-AFQ.tasks.decorators">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     AFQ.tasks.mapping
 
@@ -443,8 +504,6 @@
         <li><a href="autoapi/AFQ/tasks/mapping/index.html#module-AFQ.tasks.mapping">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     AFQ.tasks.segmentation
 
@@ -568,6 +627,8 @@
 </li>
       <li><a href="autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.anisotropic_power_map">anisotropic_power_map() (in module AFQ.tasks.data)</a>
 </li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.anon">anon (AFQ.data.s3bids.S3BIDSStudy property)</a>
+</li>
       <li><a href="autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.LabelledMaskFile.apply_conditions">apply_conditions() (AFQ.definitions.mask.LabelledMaskFile method)</a>
 
       <ul>
@@ -576,6 +637,8 @@
         <li><a href="autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.ThresholdedMaskFile.apply_conditions">(AFQ.definitions.mask.ThresholdedMaskFile method)</a>
 </li>
       </ul></li>
+      <li><a href="autoapi/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.BundleDict.apply_to_rois">apply_to_rois() (AFQ.api.bundle_dict.BundleDict method)</a>
+</li>
       <li><a href="autoapi/AFQ/tasks/decorators/index.html#AFQ.tasks.decorators.as_dt_deriv">as_dt_deriv() (in module AFQ.tasks.decorators)</a>
 </li>
       <li><a href="autoapi/AFQ/tasks/decorators/index.html#AFQ.tasks.decorators.as_file">as_file() (in module AFQ.tasks.decorators)</a>
@@ -600,13 +663,17 @@
 </li>
       <li><a href="autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.B0Mask">B0Mask (class in AFQ.definitions.mask)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.brain_mask">brain_mask() (in module AFQ.tasks.data)</a>
 </li>
-      <li><a href="autoapi/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.BundleDict">BundleDict (class in AFQ.api.bundle_dict)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.bucket">bucket (AFQ.data.s3bids.S3BIDSStudy property)</a>
 </li>
-      <li><a href="autoapi/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.bundles_to_tgram">bundles_to_tgram() (in module AFQ.utils.streamlines)</a>
+      <li><a href="autoapi/AFQ/data/utils/index.html#AFQ.data.utils.BUNDLE_MAT_2_PYTHON">BUNDLE_MAT_2_PYTHON (in module AFQ.data.utils)</a>
+</li>
+      <li><a href="autoapi/AFQ/data/utils/index.html#AFQ.data.utils.BUNDLE_RECO_2_AFQ">BUNDLE_RECO_2_AFQ (in module AFQ.data.utils)</a>
+</li>
+      <li><a href="autoapi/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.BundleDict">BundleDict (class in AFQ.api.bundle_dict)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -652,6 +719,8 @@
 </li>
       <li><a href="autoapi/AFQ/utils/volume/index.html#AFQ.utils.volume.density_map">density_map() (in module AFQ.utils.volume)</a>
 </li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.derivative_types">derivative_types (AFQ.data.s3bids.S3BIDSStudy property)</a>
+</li>
       <li><a href="autoapi/AFQ/utils/volume/index.html#AFQ.utils.volume.dice_coeff">dice_coeff() (in module AFQ.utils.volume)</a>
 </li>
       <li><a href="autoapi/AFQ/utils/bin/index.html#AFQ.utils.bin.dict_to_json">dict_to_json() (in module AFQ.utils.bin)</a>
@@ -676,16 +745,24 @@
 </li>
       <li><a href="autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dki_md">dki_md() (in module AFQ.tasks.data)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dki_mk">dki_mk() (in module AFQ.tasks.data)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dki_params">dki_params (in module AFQ.tasks.data)</a>
 </li>
       <li><a href="autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dki_rd">dki_rd() (in module AFQ.tasks.data)</a>
 </li>
       <li><a href="autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dki_rk">dki_rk() (in module AFQ.tasks.data)</a>
 </li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSite.download">download() (AFQ.data.s3bids.HBNSite method)</a>
+
+      <ul>
+        <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.download">(AFQ.data.s3bids.S3BIDSStudy method)</a>
+</li>
+        <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSSubject.download">(AFQ.data.s3bids.S3BIDSSubject method)</a>
+</li>
+      </ul></li>
       <li><a href="autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dti">dti() (in module AFQ.tasks.data)</a>
 </li>
       <li><a href="autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.dti_ad">dti_ad() (in module AFQ.tasks.data)</a>
@@ -713,15 +790,19 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/AFQ/api/group/index.html#AFQ.api.group.GroupAFQ.export_all">export_all() (AFQ.api.group.GroupAFQ method)</a>
+
+      <ul>
+        <li><a href="autoapi/AFQ/api/participant/index.html#AFQ.api.participant.ParticipantAFQ.export_all">(AFQ.api.participant.ParticipantAFQ method)</a>
 </li>
+      </ul></li>
       <li><a href="autoapi/AFQ/tasks/segmentation/index.html#AFQ.tasks.segmentation.export_bundles">export_bundles() (in module AFQ.tasks.segmentation)</a>
 </li>
       <li><a href="autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.export_registered_b0">export_registered_b0() (in module AFQ.tasks.mapping)</a>
 </li>
-      <li><a href="autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.export_rois">export_rois() (in module AFQ.tasks.mapping)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.export_rois">export_rois() (in module AFQ.tasks.mapping)</a>
+</li>
       <li><a href="autoapi/AFQ/tasks/tractography/index.html#AFQ.tasks.tractography.export_seed_mask">export_seed_mask() (in module AFQ.tasks.tractography)</a>
 </li>
       <li><a href="autoapi/AFQ/tasks/segmentation/index.html#AFQ.tasks.segmentation.export_sl_counts">export_sl_counts() (in module AFQ.tasks.segmentation)</a>
@@ -736,36 +817,16 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="autoapi/AFQ/index.html#AFQ.fetch_callosum_templates">fetch_callosum_templates (in module AFQ)</a>
-
-      <ul>
-        <li><a href="autoapi/AFQ/data/index.html#AFQ.data.fetch_callosum_templates">(in module AFQ.data)</a>
+      <li><a href="autoapi/AFQ/data/fetch/index.html#AFQ.data.fetch.fetch_callosum_templates">fetch_callosum_templates (in module AFQ.data.fetch)</a>
 </li>
-      </ul></li>
-      <li><a href="autoapi/AFQ/index.html#AFQ.fetch_hcp">fetch_hcp() (in module AFQ)</a>
-
-      <ul>
-        <li><a href="autoapi/AFQ/data/index.html#AFQ.data.fetch_hcp">(in module AFQ.data)</a>
+      <li><a href="autoapi/AFQ/data/fetch/index.html#AFQ.data.fetch.fetch_or_templates">fetch_or_templates (in module AFQ.data.fetch)</a>
 </li>
-      </ul></li>
-      <li><a href="autoapi/AFQ/index.html#AFQ.fetch_or_templates">fetch_or_templates (in module AFQ)</a>
-
-      <ul>
-        <li><a href="autoapi/AFQ/data/index.html#AFQ.data.fetch_or_templates">(in module AFQ.data)</a>
+      <li><a href="autoapi/AFQ/data/fetch/index.html#AFQ.data.fetch.fetch_stanford_hardi_tractography">fetch_stanford_hardi_tractography (in module AFQ.data.fetch)</a>
 </li>
-      </ul></li>
-      <li><a href="autoapi/AFQ/index.html#AFQ.fetch_stanford_hardi_tractography">fetch_stanford_hardi_tractography (in module AFQ)</a>
-
-      <ul>
-        <li><a href="autoapi/AFQ/data/index.html#AFQ.data.fetch_stanford_hardi_tractography">(in module AFQ.data)</a>
+      <li><a href="autoapi/AFQ/data/fetch/index.html#AFQ.data.fetch.fetch_templates">fetch_templates (in module AFQ.data.fetch)</a>
 </li>
-      </ul></li>
-      <li><a href="autoapi/AFQ/index.html#AFQ.fetch_templates">fetch_templates (in module AFQ)</a>
-
-      <ul>
-        <li><a href="autoapi/AFQ/data/index.html#AFQ.data.fetch_templates">(in module AFQ.data)</a>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSSubject.files">files (AFQ.data.s3bids.S3BIDSSubject property)</a>
 </li>
-      </ul></li>
       <li><a href="autoapi/AFQ/definitions/utils/index.html#AFQ.definitions.utils.find_file">find_file() (in module AFQ.definitions.utils)</a>
 </li>
       <li><a href="autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.AffMap.find_path">find_path() (AFQ.definitions.mapping.AffMap method)</a>
@@ -802,6 +863,8 @@
 </li>
       <li><a href="autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.FnirtMap">FnirtMap (class in AFQ.definitions.mapping)</a>
 </li>
+      <li><a href="autoapi/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.SegmentedSFT.fromfile">fromfile() (AFQ.utils.streamlines.SegmentedSFT class method)</a>
+</li>
       <li><a href="autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.FullMask">FullMask (class in AFQ.definitions.mask)</a>
 </li>
       <li><a href="autoapi/AFQ/utils/bin/index.html#AFQ.utils.bin.func_dict_to_arg_dict">func_dict_to_arg_dict() (in module AFQ.utils.bin)</a>
@@ -813,11 +876,7 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.BundleDict.gen_all">gen_all() (AFQ.api.bundle_dict.BundleDict method)</a>
-
-      <ul>
-        <li><a href="autoapi/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.PediatricBundleDict.gen_all">(AFQ.api.bundle_dict.PediatricBundleDict method)</a>
 </li>
-      </ul></li>
       <li><a href="autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.AffMap.gen_mapping">gen_mapping() (AFQ.definitions.mapping.AffMap method)</a>
 
       <ul>
@@ -842,6 +901,8 @@
         <li><a href="autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.ScalarMask.get_brain_mask">(AFQ.definitions.mask.ScalarMask method)</a>
 </li>
       </ul></li>
+      <li><a href="autoapi/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.SegmentedSFT.get_bundle">get_bundle() (AFQ.utils.streamlines.SegmentedSFT method)</a>
+</li>
       <li><a href="autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.get_bundle_dict">get_bundle_dict() (in module AFQ.tasks.data)</a>
 </li>
       <li><a href="autoapi/AFQ/definitions/scalar/index.html#AFQ.definitions.scalar.ScalarFile.get_data">get_data() (AFQ.definitions.scalar.ScalarFile method)</a>
@@ -852,10 +913,10 @@
       </ul></li>
       <li><a href="autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.get_data_gtab">get_data_gtab() (in module AFQ.tasks.data)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/AFQ/tasks/data/index.html#AFQ.tasks.data.get_data_plan">get_data_plan() (in module AFQ.tasks.data)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/AFQ/tasks/utils/index.html#AFQ.tasks.utils.get_fname">get_fname() (in module AFQ.tasks.utils)</a>
 </li>
       <li><a href="autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.FnirtMap.get_for_subses">get_for_subses() (AFQ.definitions.mapping.FnirtMap method)</a>
@@ -878,9 +939,13 @@
 </li>
       <li><a href="autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.get_reg_subject">get_reg_subject() (in module AFQ.tasks.mapping)</a>
 </li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.get_s3_client">get_s3_client() (in module AFQ.data.s3bids)</a>
+</li>
       <li><a href="autoapi/AFQ/tasks/segmentation/index.html#AFQ.tasks.segmentation.get_scalar_dict">get_scalar_dict() (in module AFQ.tasks.segmentation)</a>
 </li>
       <li><a href="autoapi/AFQ/tasks/segmentation/index.html#AFQ.tasks.segmentation.get_segmentation_plan">get_segmentation_plan() (in module AFQ.tasks.segmentation)</a>
+</li>
+      <li><a href="autoapi/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.SegmentedSFT.get_sft_and_sidecar">get_sft_and_sidecar() (AFQ.utils.streamlines.SegmentedSFT method)</a>
 </li>
       <li><a href="autoapi/AFQ/api/group/index.html#AFQ.api.group.GroupAFQ.get_streamlines_json">get_streamlines_json() (AFQ.api.group.GroupAFQ method)</a>
 </li>
@@ -889,6 +954,18 @@
       <li><a href="autoapi/AFQ/tasks/viz/index.html#AFQ.tasks.viz.get_viz_plan">get_viz_plan() (in module AFQ.tasks.viz)</a>
 </li>
       <li><a href="autoapi/AFQ/api/group/index.html#AFQ.api.group.GroupAFQ">GroupAFQ (class in AFQ.api.group)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSite">HBNSite (class in AFQ.data.s3bids)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSubject">HBNSubject (class in AFQ.data.s3bids)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -914,6 +991,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.LabelledMaskFile">LabelledMaskFile (class in AFQ.definitions.mask)</a>
 </li>
+      <li><a href="autoapi/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.BundleDict.load_templates">load_templates() (AFQ.api.bundle_dict.BundleDict method)</a>
+
+      <ul>
+        <li><a href="autoapi/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.PediatricBundleDict.load_templates">(AFQ.api.bundle_dict.PediatricBundleDict method)</a>
+</li>
+      </ul></li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.local_directories">local_directories (AFQ.data.s3bids.S3BIDSStudy property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.logger">logger (in module AFQ.tasks.mapping)</a>
 
       <ul>
@@ -959,6 +1046,12 @@
         <li><a href="autoapi/AFQ/api/utils/index.html#module-AFQ.api.utils">AFQ.api.utils</a>
 </li>
         <li><a href="autoapi/AFQ/data/index.html#module-AFQ.data">AFQ.data</a>
+</li>
+        <li><a href="autoapi/AFQ/data/fetch/index.html#module-AFQ.data.fetch">AFQ.data.fetch</a>
+</li>
+        <li><a href="autoapi/AFQ/data/s3bids/index.html#module-AFQ.data.s3bids">AFQ.data.s3bids</a>
+</li>
+        <li><a href="autoapi/AFQ/data/utils/index.html#module-AFQ.data.utils">AFQ.data.utils</a>
 </li>
         <li><a href="autoapi/AFQ/definitions/index.html#module-AFQ.definitions">AFQ.definitions</a>
 </li>
@@ -1032,15 +1125,19 @@
   </ul></td>
 </tr></table>
 
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.non_sub_s3_keys">non_sub_s3_keys (AFQ.data.s3bids.S3BIDSStudy property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="autoapi/AFQ/index.html#AFQ.organize_stanford_data">organize_stanford_data() (in module AFQ)</a>
-
-      <ul>
-        <li><a href="autoapi/AFQ/data/index.html#AFQ.data.organize_stanford_data">(in module AFQ.data)</a>
+      <li><a href="autoapi/AFQ/data/fetch/index.html#AFQ.data.fetch.organize_stanford_data">organize_stanford_data() (in module AFQ.data.fetch)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -1087,37 +1184,23 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="autoapi/AFQ/index.html#AFQ.read_callosum_templates">read_callosum_templates() (in module AFQ)</a>
-
-      <ul>
-        <li><a href="autoapi/AFQ/data/index.html#AFQ.data.read_callosum_templates">(in module AFQ.data)</a>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.random_seed">random_seed (AFQ.data.s3bids.S3BIDSStudy property)</a>
 </li>
-      </ul></li>
+      <li><a href="autoapi/AFQ/data/fetch/index.html#AFQ.data.fetch.read_callosum_templates">read_callosum_templates() (in module AFQ.data.fetch)</a>
+</li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.read_json">read_json() (in module AFQ.data.s3bids)</a>
+</li>
       <li><a href="autoapi/AFQ/registration/index.html#AFQ.registration.read_mapping">read_mapping() (in module AFQ.registration)</a>
 </li>
-      <li><a href="autoapi/AFQ/index.html#AFQ.read_or_templates">read_or_templates() (in module AFQ)</a>
-
-      <ul>
-        <li><a href="autoapi/AFQ/data/index.html#AFQ.data.read_or_templates">(in module AFQ.data)</a>
-</li>
-      </ul></li>
-      <li><a href="autoapi/AFQ/index.html#AFQ.read_stanford_hardi_tractography">read_stanford_hardi_tractography() (in module AFQ)</a>
-
-      <ul>
-        <li><a href="autoapi/AFQ/data/index.html#AFQ.data.read_stanford_hardi_tractography">(in module AFQ.data)</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="autoapi/AFQ/index.html#AFQ.read_templates">read_templates() (in module AFQ)</a>
-
-      <ul>
-        <li><a href="autoapi/AFQ/data/index.html#AFQ.data.read_templates">(in module AFQ.data)</a>
+      <li><a href="autoapi/AFQ/data/fetch/index.html#AFQ.data.fetch.read_or_templates">read_or_templates() (in module AFQ.data.fetch)</a>
 </li>
-      </ul></li>
+      <li><a href="autoapi/AFQ/data/fetch/index.html#AFQ.data.fetch.read_stanford_hardi_tractography">read_stanford_hardi_tractography() (in module AFQ.data.fetch)</a>
+</li>
+      <li><a href="autoapi/AFQ/data/fetch/index.html#AFQ.data.fetch.read_templates">read_templates() (in module AFQ.data.fetch)</a>
+</li>
       <li><a href="autoapi/AFQ/registration/index.html#AFQ.registration.register_dwi">register_dwi() (in module AFQ.registration)</a>
-</li>
-      <li><a href="autoapi/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.BundleDict.resample_all_roi">resample_all_roi() (AFQ.api.bundle_dict.BundleDict method)</a>
 </li>
       <li><a href="autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.RoiMask">RoiMask (class in AFQ.definitions.mask)</a>
 </li>
@@ -1127,6 +1210,22 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSSubject.s3_keys">s3_keys (AFQ.data.s3bids.S3BIDSSubject property)</a>
+</li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.s3_prefix">s3_prefix (AFQ.data.s3bids.S3BIDSStudy property)</a>
+</li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy">S3BIDSStudy (class in AFQ.data.s3bids)</a>
+</li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSSubject">S3BIDSSubject (class in AFQ.data.s3bids)</a>
+</li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.s3fs_json_read">s3fs_json_read() (in module AFQ.data.s3bids)</a>
+</li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.s3fs_json_write">s3fs_json_write() (in module AFQ.data.s3bids)</a>
+</li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.s3fs_nifti_read">s3fs_nifti_read() (in module AFQ.data.s3bids)</a>
+</li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.s3fs_nifti_write">s3fs_nifti_write() (in module AFQ.data.s3bids)</a>
+</li>
       <li><a href="autoapi/AFQ/definitions/scalar/index.html#AFQ.definitions.scalar.ScalarFile">ScalarFile (class in AFQ.definitions.scalar)</a>
 </li>
       <li><a href="autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.ScalarMask">ScalarMask (class in AFQ.definitions.mask)</a>
@@ -1149,10 +1248,18 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="autoapi/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.SegmentedSFT">SegmentedSFT (class in AFQ.utils.streamlines)</a>
+</li>
       <li><a href="autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.set_layout">set_layout() (in module AFQ.viz.plotly_backend)</a>
 </li>
       <li><a href="autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.single_bundle_viz">single_bundle_viz() (in module AFQ.viz.plotly_backend)</a>
 </li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSite.site">site (AFQ.data.s3bids.HBNSite property)</a>
+
+      <ul>
+        <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSubject.site">(AFQ.data.s3bids.HBNSubject property)</a>
+</li>
+      </ul></li>
       <li><a href="autoapi/AFQ/registration/index.html#AFQ.registration.slr_registration">slr_registration() (in module AFQ.registration)</a>
 </li>
       <li><a href="autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.SlrMap">SlrMap (class in AFQ.definitions.mapping)</a>
@@ -1164,6 +1271,14 @@
       <li><a href="autoapi/AFQ/definitions/utils/index.html#AFQ.definitions.utils.Definition.str_for_toml">str_for_toml() (AFQ.definitions.utils.Definition method)</a>
 </li>
       <li><a href="autoapi/AFQ/tasks/tractography/index.html#AFQ.tasks.tractography.streamlines">streamlines() (in module AFQ.tasks.tractography)</a>
+</li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSSubject.study">study (AFQ.data.s3bids.S3BIDSSubject property)</a>
+</li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.study_id">study_id (AFQ.data.s3bids.S3BIDSStudy property)</a>
+</li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSSubject.subject_id">subject_id (AFQ.data.s3bids.S3BIDSSubject property)</a>
+</li>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.subjects">subjects (AFQ.data.s3bids.S3BIDSStudy property)</a>
 </li>
       <li><a href="autoapi/AFQ/registration/index.html#AFQ.registration.syn_register_dwi">syn_register_dwi() (in module AFQ.registration)</a>
 </li>
@@ -1179,14 +1294,12 @@
 </li>
       <li><a href="autoapi/AFQ/definitions/scalar/index.html#AFQ.definitions.scalar.TemplateScalar">TemplateScalar (class in AFQ.definitions.scalar)</a>
 </li>
-      <li><a href="autoapi/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.tgram_to_bundles">tgram_to_bundles() (in module AFQ.utils.streamlines)</a>
-</li>
       <li><a href="autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.ThresholdedMaskFile">ThresholdedMaskFile (class in AFQ.definitions.mask)</a>
+</li>
+      <li><a href="autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.ThresholdedScalarMask">ThresholdedScalarMask (class in AFQ.definitions.mask)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="autoapi/AFQ/definitions/mask/index.html#AFQ.definitions.mask.ThresholdedScalarMask">ThresholdedScalarMask (class in AFQ.definitions.mask)</a>
-</li>
       <li><a href="autoapi/AFQ/utils/bin/index.html#AFQ.utils.bin.toml_to_val">toml_to_val() (in module AFQ.utils.bin)</a>
 </li>
       <li><a href="autoapi/AFQ/tractography/index.html#AFQ.tractography.track">track() (in module AFQ.tractography)</a>
@@ -1202,6 +1315,10 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/AFQ/api/group/index.html#AFQ.api.group.GroupAFQ.upload_to_s3">upload_to_s3() (AFQ.api.group.GroupAFQ method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.use_participants_tsv">use_participants_tsv (AFQ.data.s3bids.S3BIDSStudy property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1255,9 +1372,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/AFQ/api/utils/index.html#AFQ.api.utils.wf_sections">wf_sections (in module AFQ.api.utils)</a>
 </li>
+      <li><a href="autoapi/AFQ/tasks/utils/index.html#AFQ.tasks.utils.with_name">with_name() (in module AFQ.tasks.utils)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="autoapi/AFQ/tasks/utils/index.html#AFQ.tasks.utils.with_name">with_name() (in module AFQ.tasks.utils)</a>
+      <li><a href="autoapi/AFQ/data/s3bids/index.html#AFQ.data.s3bids.write_json">write_json() (in module AFQ.data.s3bids)</a>
 </li>
       <li><a href="autoapi/AFQ/registration/index.html#AFQ.registration.write_mapping">write_mapping() (in module AFQ.registration)</a>
 </li>
@@ -1303,7 +1422,8 @@
       </div>
     </div>
   
-  <script src="_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
@@ -1316,7 +1436,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

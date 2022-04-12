@@ -22,7 +22,7 @@ from dipy.io.stateful_tractogram import Space
 from dipy.align import affine_registration
 
 import AFQ.api.bundle_dict as abd
-import AFQ.data as afd
+import AFQ.data.fetch as afd
 import AFQ.tractography as aft
 import AFQ.registration as reg
 import AFQ.models.dti as dti
@@ -109,7 +109,9 @@ else:
 # they are brought into the subject's individual native space.
 # For speed, we only segment two bundles here.
 
-bundles = abd.BundleDict(["CST", "ARC"], resample_to=MNI_T2_img)
+bundles = abd.BundleDict(
+    ["CST_L", "CST_R", "ARC_L", "ARC_R"],
+    resample_to=MNI_T2_img)
 
 
 ##########################################################################
@@ -122,22 +124,23 @@ print("Tracking...")
 if not op.exists(op.join(working_dir, 'dti_streamlines.trk')):
     seed_roi = np.zeros(img.shape[:-1])
     for bundle in bundles:
-        for idx, roi in enumerate(bundles[bundle]['ROIs']):
-            if bundles[bundle]['rules'][idx]:
-                warped_roi = transform_inverse_roi(
-                    roi,
-                    mapping,
-                    bundle_name=bundle)
+        for idx, roi in enumerate(bundles[bundle]['include']):
+            warped_roi = transform_inverse_roi(
+                roi,
+                mapping,
+                bundle_name=bundle)
 
-                nib.save(nib.Nifti1Image(warped_roi.astype(float), img.affine),
-                         op.join(working_dir, f"{bundle}_{idx+1}.nii.gz"))
-                # Add voxels that aren't there yet:
-                seed_roi = np.logical_or(seed_roi, warped_roi)
+            nib.save(
+                nib.Nifti1Image(warped_roi.astype(float), img.affine),
+                op.join(working_dir, f"{bundle}_{idx+1}.nii.gz"))
+            # Add voxels that aren't there yet:
+            seed_roi = np.logical_or(seed_roi, warped_roi)
     nib.save(nib.Nifti1Image(
         seed_roi.astype(float), img.affine),
         op.join(working_dir, 'seed_roi.nii.gz'))
     sft = aft.track(dti_params['params'], seed_mask=seed_roi,
-                    stop_mask=FA_data, stop_threshold=0.1)
+                    stop_mask=FA_data, stop_threshold=0.1,
+                    directions="det", odf_model="dti")
     save_tractogram(sft, op.join(working_dir, 'dti_streamlines.trk'),
                     bbox_valid_check=False)
 else:

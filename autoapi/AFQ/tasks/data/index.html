@@ -5,10 +5,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.data &#8212; AFQ 0.10 documentation</title>
+    <title>AFQ.tasks.data &#8212; AFQ 0.11 documentation</title>
     
-  <link href="../../../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css" />
@@ -31,7 +27,8 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
@@ -48,7 +45,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -138,10 +135,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -157,7 +152,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -230,6 +226,49 @@
     </ul>
    </li>
    <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../data/index.html">
+     <code class="xref py py-mod docutils literal notranslate">
+      <span class="pre">
+       AFQ.data
+      </span>
+     </code>
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+    <label for="toctree-checkbox-3">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../data/fetch/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.data.fetch
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../data/s3bids/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.data.s3bids
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../../data/utils/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.data.utils
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
     <a class="reference internal" href="../../definitions/index.html">
      <code class="xref py py-mod docutils literal notranslate">
       <span class="pre">
@@ -237,8 +276,8 @@
       </span>
      </code>
     </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
-    <label for="toctree-checkbox-3">
+    <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+    <label for="toctree-checkbox-4">
      <i class="fas fa-chevron-down">
      </i>
     </label>
@@ -289,8 +328,8 @@
       </span>
      </code>
     </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
-    <label for="toctree-checkbox-4">
+    <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+    <label for="toctree-checkbox-5">
      <i class="fas fa-chevron-down">
      </i>
     </label>
@@ -332,8 +371,8 @@
       </span>
      </code>
     </a>
-    <input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
-    <label for="toctree-checkbox-5">
+    <input checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+    <label for="toctree-checkbox-6">
      <i class="fas fa-chevron-down">
      </i>
     </label>
@@ -411,8 +450,8 @@
       </span>
      </code>
     </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
-    <label for="toctree-checkbox-6">
+    <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+    <label for="toctree-checkbox-7">
      <i class="fas fa-chevron-down">
      </i>
     </label>
@@ -481,8 +520,8 @@
       </span>
      </code>
     </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
-    <label for="toctree-checkbox-7">
+    <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+    <label for="toctree-checkbox-8">
      <i class="fas fa-chevron-down">
      </i>
     </label>
@@ -526,15 +565,6 @@
     </ul>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="../../data/index.html">
-     <code class="xref py py-mod docutils literal notranslate">
-      <span class="pre">
-       AFQ.data
-      </span>
-     </code>
-    </a>
-   </li>
-   <li class="toctree-l2">
     <a class="reference internal" href="../../registration/index.html">
      <code class="xref py py-mod docutils literal notranslate">
       <span class="pre">
@@ -567,20 +597,9 @@
 
   </div>
 </nav>
-<h3><a href="../../../../index.html">Table of Contents</a></h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -591,7 +610,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -805,12 +824,12 @@
               <div>
                 
   <div class="section" id="module-AFQ.tasks.data">
-<span id="afq-tasks-data"></span><h1><a class="reference internal" href="#module-AFQ.tasks.data" title="AFQ.tasks.data"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.data</span></code></a><a class="headerlink" href="#module-AFQ.tasks.data" title="Permalink to this headline">¶</a></h1>
+<span id="afq-tasks-data"></span><h1><a class="reference internal" href="#module-AFQ.tasks.data" title="AFQ.tasks.data"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.data</span></code></a><a class="headerlink" href="#module-AFQ.tasks.data" title="Permalink to this headline">#</a></h1>
 <div class="section" id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">#</a></h2>
 <div class="section" id="functions">
-<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
-<table class="longtable table autosummary">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">#</a></h3>
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -894,7 +913,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.data.brain_mask" title="AFQ.tasks.data.brain_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">brain_mask</span></code></a>(subses_dict, dwi_affine, b0_file, bids_info, brain_mask_definition=None)</p></td>
 <td><p>full path to a nifti file containing</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.data.get_bundle_dict" title="AFQ.tasks.data.get_bundle_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_bundle_dict</span></code></a>(segmentation_params, brain_mask_file, bundle_info=None, reg_template_spec='mni_T1')</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.data.get_bundle_dict" title="AFQ.tasks.data.get_bundle_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_bundle_dict</span></code></a>(subses_dict, dwi_affine, segmentation_params, brain_mask_file, bids_info, bundle_info=None, reg_template_spec='mni_T1')</p></td>
 <td><p>Dictionary defining the different bundles to be segmented,</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.data.get_data_plan" title="AFQ.tasks.data.get_data_plan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_data_plan</span></code></a>(kwargs)</p></td>
@@ -904,8 +923,8 @@
 </table>
 </div>
 <div class="section" id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
-<table class="longtable table autosummary">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">#</a></h3>
+<table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -927,12 +946,12 @@
 </table>
 <dl class="py data">
 <dt class="sig sig-object py" id="AFQ.tasks.data.DIPY_GH">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">DIPY_GH</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">https://github.com/dipy/dipy/blob/master/dipy/</span></em><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#DIPY_GH"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.DIPY_GH" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">DIPY_GH</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">https://github.com/dipy/dipy/blob/master/dipy/</span></em><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#DIPY_GH"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.DIPY_GH" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.get_data_gtab">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">get_data_gtab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bval_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bvec_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_bval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_bval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#get_data_gtab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.get_data_gtab" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">get_data_gtab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bval_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bvec_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_bval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_bval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#get_data_gtab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.get_data_gtab" title="Permalink to this definition">#</a></dt>
 <dd><p>DWI data as an ndarray for selected b values,
 A DIPY GradientTable with all the gradient information,
 and unaltered DWI data in a Nifti1Image.</p>
@@ -960,26 +979,26 @@ it is considered to be b0. Default: 50.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.b0">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">b0</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#b0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.b0" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">b0</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#b0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.b0" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing the mean b0</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.b0_mask">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">b0_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brain_mask_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#b0_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.b0_mask" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">b0_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brain_mask_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#b0_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.b0_mask" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing the
 mean b0 after applying the brain mask</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dti_fit">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dti_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dti_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti_fit" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dti_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dti_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti_fit" title="Permalink to this definition">#</a></dt>
 <dd><p>DTI TensorFit object</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dti">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brain_mask_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bval_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bvec_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robust_tensor_fitting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dti"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brain_mask_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bval_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bvec_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robust_tensor_fitting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dti"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing parameters
 for the DTI fit</p>
 <dl class="field-list simple">
@@ -999,30 +1018,30 @@ it is considered to be b0. Default: 50.</p>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dti_params">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti_params</span></span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dti_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti_params" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti_params</span></span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dti_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti_params" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dki_fit">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dki_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_fit" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dki_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_fit" title="Permalink to this definition">#</a></dt>
 <dd><p>DKI DiffusionKurtosisFit object</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dki">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brain_mask_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brain_mask_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 parameters for the DKI fit</p>
 </dd></dl>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dki_params">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_params</span></span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_params" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_params</span></span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_params" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.csd">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">csd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brain_mask_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracking_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csd_response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csd_sh_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csd_lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csd_tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#csd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.csd" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">csd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brain_mask_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracking_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csd_response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csd_sh_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csd_lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csd_tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#csd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.csd" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 parameters for the CSD fit</p>
 <dl class="field-list simple">
@@ -1045,7 +1064,8 @@ the deconvolution equation. Default: 1</p>
 <dt><strong>csd_tau</strong><span class="classifier">float, optional.</span></dt><dd><p>threshold controlling the amplitude below which the corresponding
 fODF is assumed to be zero.  Ideally, tau should be set to
 zero. However, to improve the stability of the algorithm, tau is
-set to tau*100 % of the mean fODF amplitude (here, 10% by default)
+set to tau*100 percent of the mean fODF amplitude (here, 10 percent
+by default)
 (see <a class="reference internal" href="#rff3b1074f624-1" id="id1">[1]</a>). Default: 0.1</p>
 </dd>
 </dl>
@@ -1064,82 +1084,82 @@ deconvolution</p>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="AFQ.tasks.data.csd_params">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">csd_params</span></span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#csd_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.csd_params" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">csd_params</span></span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#csd_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.csd_params" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.anisotropic_power_map">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">anisotropic_power_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csd_params_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#anisotropic_power_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.anisotropic_power_map" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">anisotropic_power_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csd_params_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#anisotropic_power_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.anisotropic_power_map" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 the anisotropic power map</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dti_fa">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti_fa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dti_fa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti_fa" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti_fa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dti_fa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti_fa" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 the DTI fractional anisotropy</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dti_cfa">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti_cfa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dti_cfa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti_cfa" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti_cfa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dti_cfa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti_cfa" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 the DTI color fractional anisotropy</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dti_pdd">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti_pdd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dti_pdd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti_pdd" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti_pdd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dti_pdd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti_pdd" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 the DTI principal diffusion direction</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dti_md">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti_md</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dti_md"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti_md" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti_md</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dti_md"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti_md" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 the DTI mean diffusivity</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dti_ga">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti_ga</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dti_ga"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti_ga" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti_ga</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dti_ga"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti_ga" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 the DTI geodesic anisotropy</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dti_rd">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti_rd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dti_rd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti_rd" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti_rd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dti_rd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti_rd" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 the DTI radial diffusivity</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dti_ad">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti_ad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dti_ad"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti_ad" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti_ad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dti_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dti_ad"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti_ad" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 the DTI axial diffusivity</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dki_fa">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_fa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_fa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_fa" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_fa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_fa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_fa" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 the DKI fractional anisotropy</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dki_md">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_md</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_md"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_md" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_md</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_md"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_md" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 the DKI mean diffusivity</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dki_awf">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_awf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_tf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sphere</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'repulsion100'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_awf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_awf" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_awf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_tf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sphere</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'repulsion100'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_awf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_awf" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 the DKI axonal water fraction</p>
 <dl class="field-list simple">
@@ -1164,49 +1184,49 @@ Default: 1e-2</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dki_mk">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_mk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_mk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_mk" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_mk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_mk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_mk" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 the DKI mean kurtosis file</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dki_ga">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_ga</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_ga"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_ga" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_ga</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_ga"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_ga" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 the DKI geodesic anisotropy</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dki_rd">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_rd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_rd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_rd" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_rd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_rd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_rd" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 the DKI radial diffusivity</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dki_ad">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_ad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_ad"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_ad" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_ad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_ad"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_ad" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 the DKI axial diffusivity</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dki_rk">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_rk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_rk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_rk" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_rk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_rk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_rk" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 the DKI radial kurtosis</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dki_ak">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_ak</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_ak"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_ak" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dki_ak</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_params_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dki_tf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#dki_ak"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dki_ak" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 the DKI axial kurtosis file</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.brain_mask">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">brain_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brain_mask_definition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#brain_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.brain_mask" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">brain_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brain_mask_definition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#brain_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.brain_mask" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 the brain mask</p>
 <dl class="field-list">
@@ -1226,7 +1246,7 @@ Default: None</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.get_bundle_dict">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">get_bundle_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segmentation_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brain_mask_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_template_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mni_T1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#get_bundle_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.get_bundle_dict" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">get_bundle_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentation_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brain_mask_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_template_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mni_T1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#get_bundle_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.get_bundle_dict" title="Permalink to this definition">#</a></dt>
 <dd><p>Dictionary defining the different bundles to be segmented,
 and a Nifti1Image containing the template for registration</p>
 <dl class="field-list simple">
@@ -1234,7 +1254,8 @@ and a Nifti1Image containing the template for registration</p>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>bundle_info</strong><span class="classifier">list of strings, dict, or BundleDict, optional</span></dt><dd><p>List of bundle names to include in segmentation,
 or a bundle dictionary (see BundleDict for inspiration),
-or a BundleDict.
+or a BundleDict. See <cite>Defining Custom Bundle Dictionaries</cite>
+in the <cite>usage</cite> section of pyAFQ’s documentation for details.
 If None, will get all appropriate bundles for the chosen
 segmentation algorithm.
 Default: None</p>
@@ -1254,7 +1275,7 @@ Default: “mni_T1”</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.get_data_plan">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">get_data_plan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#get_data_plan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.get_data_plan" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">get_data_plan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/data.html#get_data_plan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.get_data_plan" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -1266,7 +1287,7 @@ Default: “mni_T1”</p>
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="../index.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -1289,7 +1310,8 @@ Default: “mni_T1”</p>
       </div>
     </div>
   
-  <script src="../../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
@@ -1302,7 +1324,7 @@ Default: “mni_T1”</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

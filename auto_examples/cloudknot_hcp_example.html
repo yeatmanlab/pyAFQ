@@ -5,10 +5,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ with HCP data &#8212; AFQ 0.10 documentation</title>
+    <title>AFQ with HCP data &#8212; AFQ 0.11 documentation</title>
     
-  <link href="../_static/css/theme.css" rel="stylesheet">
-  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
@@ -31,7 +27,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -48,7 +45,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -138,10 +135,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -157,7 +152,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -235,29 +231,9 @@
 
   </div>
 </nav>
-<h3><a href="../index.html">Table of Contents</a></h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="plot_afq_reco80.html">RecoBundles80 using AFQ API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_afq_api.html">AFQ API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_afq_callosal.html">Callosal bundles using AFQ API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_optic_radiations.html">Plotting the Optic Radiations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_bids_layout.html">How pyAFQ uses BIDS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cloudknot_example.html">Using cloudknot to run pyAFQ on AWS batch:</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">AFQ with HCP data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_tract_profile.html">Plotting tract profiles</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_recobundles.html">Plotting tract profiles using RecoBundles</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_callosal_tract_profile.html">Plotting Novel Tract Profiles:</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -303,7 +279,7 @@
 to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="afq-with-hcp-data">
-<span id="sphx-glr-auto-examples-cloudknot-hcp-example-py"></span><h1>AFQ with HCP data<a class="headerlink" href="#afq-with-hcp-data" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-auto-examples-cloudknot-hcp-example-py"></span><h1>AFQ with HCP data<a class="headerlink" href="#afq-with-hcp-data" title="Permalink to this headline">#</a></h1>
 <p>This example demonstrates how to use the AFQ API to analyze HCP data.
 For this example to run properly, you will need to gain access to the HCP data.
 This can be done by following this instructions on the webpage
@@ -319,6 +295,8 @@ to analyze it there.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">configparser</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
 <span class="kn">import</span> <span class="nn">cloudknot</span> <span class="k">as</span> <span class="nn">ck</span>
+<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+
 <span class="n">ck</span><span class="o">.</span><span class="n">set_region</span><span class="p">(</span><span class="s1">&#39;us-east-1&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -333,22 +311,19 @@ numbers of seeds per voxel).</p>
     <span class="kn">import</span> <span class="nn">s3fs</span>
     <span class="c1"># all imports must be at the top of the function</span>
     <span class="c1"># cloudknot installs the appropriate packages from pip</span>
-    <span class="kn">from</span> <span class="nn">AFQ.data</span> <span class="kn">import</span> <span class="n">fetch_hcp</span>
+    <span class="kn">from</span> <span class="nn">AFQ.data.fetch</span> <span class="kn">import</span> <span class="n">fetch_hcp</span>
     <span class="kn">from</span> <span class="nn">AFQ.api.group</span> <span class="kn">import</span> <span class="n">GroupAFQ</span>
     <span class="kn">import</span> <span class="nn">AFQ.definitions.mask</span> <span class="k">as</span> <span class="nn">afm</span>
 
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-    <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
-
     <span class="c1"># set logging level to your choice</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-    <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+    <a href="https://docs.python.org/3/library/logging.html#logging.basicConfig" title="logging.basicConfig" class="sphx-glr-backref-module-logging sphx-glr-backref-type-py-function"><span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span></a><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+    <span class="n">log</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/logging.html#logging.getLogger" title="logging.getLogger" class="sphx-glr-backref-module-logging sphx-glr-backref-type-py-function"><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span></a><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
     <span class="c1"># Download the given subject to the AWS Batch machine from s3</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">hcp_bids</span> <span class="o">=</span> <span class="n">fetch_hcp</span><span class="p">(</span>
         <span class="p">[</span><span class="n">subject</span><span class="p">],</span>
         <span class="n">profile_name</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">study</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;HCP_1200&quot;</span><span class="p">,</span>
+        <span class="n">study</span><span class="o">=</span><span class="s2">&quot;HCP_1200&quot;</span><span class="p">,</span>
         <span class="n">aws_access_key_id</span><span class="o">=</span><span class="n">aws_access_key</span><span class="p">,</span>
         <span class="n">aws_secret_access_key</span><span class="o">=</span><span class="n">aws_secret_key</span><span class="p">)</span>
 
@@ -408,15 +383,15 @@ subjects, seed masks, and number of seeds</p>
 </div>
 <p>The following function creates all the combinations of the above lists, such that every subject is
 run with every mask and every number of seeds.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">subjects</span><span class="p">,</span> <span class="n">seed_mask</span><span class="p">,</span> <span class="n">n_seeds</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><a href="https://docs.python.org/3/library/itertools.html#itertools.product" title="itertools.product" class="sphx-glr-backref-module-itertools sphx-glr-backref-type-py-function"><span class="n">itertools</span><span class="o">.</span><span class="n">product</span></a><span class="p">(</span><span class="n">subjects</span><span class="p">,</span> <span class="n">seed_mask</span><span class="p">,</span> <span class="n">n_seeds</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>We assume that the credentials for HCP usage are stored in the home directory in a
 <cite>~/.aws/credentials</cite> file. This is where these credentials are stored if the AWS CLI is used to
 configure the profile. We use the standard lib <code class="docutils literal notranslate"><span class="pre">configparser</span></code> library
 to get the relevant hcp keys from there.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CP</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
-<span class="n">CP</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;.aws&#39;</span><span class="p">,</span> <span class="s1">&#39;credentials&#39;</span><span class="p">)))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CP</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/configparser.html#configparser.ConfigParser" title="configparser.ConfigParser" class="sphx-glr-backref-module-configparser sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span></a><span class="p">()</span>
+<span class="n">CP</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.expanduser" title="os.path.expanduser" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">expanduser</span></a><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;.aws&#39;</span><span class="p">,</span> <span class="s1">&#39;credentials&#39;</span><span class="p">)))</span>
 <span class="n">CP</span><span class="o">.</span><span class="n">sections</span><span class="p">()</span>
 <span class="n">aws_access_key</span> <span class="o">=</span> <span class="n">CP</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;hcp&#39;</span><span class="p">,</span> <span class="s1">&#39;AWS_ACCESS_KEY_ID&#39;</span><span class="p">)</span>
 <span class="n">aws_secret_key</span> <span class="o">=</span> <span class="n">CP</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;hcp&#39;</span><span class="p">,</span> <span class="s1">&#39;AWS_SECRET_ACCESS_KEY&#39;</span><span class="p">)</span>
@@ -455,7 +430,7 @@ details about the arguments to the object.</p>
 <p>This launches a process for each combination.
 Because <cite>starmap</cite> is <cite>True</cite>, each list in <cite>args</cite> will be unfolded
 and passed into <cite>afq_process_subject</cite> as arguments.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result_futures</span> <span class="o">=</span> <span class="n">knot</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">starmap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result_futures</span> <span class="o">=</span> <span class="n">knot</span><span class="o">.</span><a href="https://docs.python.org/3/library/functions.html#map" title="builtins.map" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-function"><span class="n">map</span></a><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">starmap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The following function can be called repeatedly in a jupyter notebook
@@ -493,9 +468,9 @@ combination and combines them all into one csv file</p>
 <p>the arguments to this call to <code class="xref py py-meth docutils literal notranslate"><span class="pre">map()</span></code> are all the different configurations of pyAFQ that we ran</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">seed_mask</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fa&quot;</span><span class="p">,</span> <span class="s2">&quot;roi&quot;</span><span class="p">]</span>
 <span class="n">n_seeds</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1000000</span><span class="p">,</span> <span class="mi">2000000</span><span class="p">]</span>
-<span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">seed_mask</span><span class="p">,</span> <span class="n">n_seeds</span><span class="p">))</span>
+<span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><a href="https://docs.python.org/3/library/itertools.html#itertools.product" title="itertools.product" class="sphx-glr-backref-module-itertools sphx-glr-backref-type-py-function"><span class="n">itertools</span><span class="o">.</span><span class="n">product</span></a><span class="p">(</span><span class="n">seed_mask</span><span class="p">,</span> <span class="n">n_seeds</span><span class="p">))</span>
 
-<span class="n">result_futures2</span> <span class="o">=</span> <span class="n">knot2</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">starmap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">result_futures2</span> <span class="o">=</span> <span class="n">knot2</span><span class="o">.</span><a href="https://docs.python.org/3/library/functions.html#map" title="builtins.map" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-function"><span class="n">map</span></a><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">starmap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">result_futures2</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
 <span class="n">knot2</span><span class="o">.</span><span class="n">clobber</span><span class="p">(</span><span class="n">clobber_pars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clobber_repo</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clobber_image</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
@@ -517,7 +492,7 @@ combination and combines them all into one csv file</p>
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="cloudknot_example.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -540,7 +515,8 @@ combination and combines them all into one csv file</p>
       </div>
     </div>
   
-  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
@@ -553,7 +529,7 @@ combination and combines them all into one csv file</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

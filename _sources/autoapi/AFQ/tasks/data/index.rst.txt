@@ -355,7 +355,8 @@ Attributes
            threshold controlling the amplitude below which the corresponding
            fODF is assumed to be zero.  Ideally, tau should be set to
            zero. However, to improve the stability of the algorithm, tau is
-           set to tau*100 % of the mean fODF amplitude (here, 10% by default)
+           set to tau*100 percent of the mean fODF amplitude (here, 10 percent
+           by default)
            (see [Rff3b1074f624-1]_). Default: 0.1
 
 
@@ -863,7 +864,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: get_bundle_dict(segmentation_params, brain_mask_file, bundle_info=None, reg_template_spec='mni_T1')
+.. py:function:: get_bundle_dict(subses_dict, dwi_affine, segmentation_params, brain_mask_file, bids_info, bundle_info=None, reg_template_spec='mni_T1')
 
    
    Dictionary defining the different bundles to be segmented,
@@ -875,7 +876,8 @@ Attributes
        **bundle_info** : list of strings, dict, or BundleDict, optional
            List of bundle names to include in segmentation,
            or a bundle dictionary (see BundleDict for inspiration),
-           or a BundleDict.
+           or a BundleDict. See `Defining Custom Bundle Dictionaries`
+           in the `usage` section of pyAFQ's documentation for details.
            If None, will get all appropriate bundles for the chosen
            segmentation algorithm.
            Default: None

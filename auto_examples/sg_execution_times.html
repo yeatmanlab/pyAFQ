@@ -5,10 +5,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Computation times &#8212; AFQ 0.10 documentation</title>
+    <title>Computation times &#8212; AFQ 0.11 documentation</title>
     
-  <link href="../_static/css/theme.css" rel="stylesheet">
-  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
@@ -31,7 +27,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -46,7 +43,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -136,10 +133,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -155,7 +150,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -163,17 +159,9 @@
     
   </div>
 </nav>
-<h3><a href="../index.html">Table of Contents</a></h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -214,8 +202,8 @@
               <div>
                 
   <div class="section" id="computation-times">
-<span id="sphx-glr-auto-examples-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Permalink to this headline">¶</a></h1>
-<p><strong>166:23.046</strong> total execution time for <strong>auto_examples</strong> files:</p>
+<span id="sphx-glr-auto-examples-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Permalink to this headline">#</a></h1>
+<p><strong>205:03.074</strong> total execution time for <strong>auto_examples</strong> files:</p>
 <table class="table">
 <colgroup>
 <col style="width: 84%" />
@@ -223,36 +211,36 @@
 <col style="width: 7%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_afq_reco80.html#sphx-glr-auto-examples-plot-afq-reco80-py"><span class="std std-ref">RecoBundles80 using AFQ API</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_afq_reco80.py</span></code>)</p></td>
-<td><p>39:14.682</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_optic_radiations.html#sphx-glr-auto-examples-plot-optic-radiations-py"><span class="std std-ref">Plotting the Optic Radiations</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_optic_radiations.py</span></code>)</p></td>
+<td><p>55:43.069</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_afq_api.html#sphx-glr-auto-examples-plot-afq-api-py"><span class="std std-ref">AFQ API</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_afq_api.py</span></code>)</p></td>
-<td><p>25:06.698</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_afq_reco80.html#sphx-glr-auto-examples-plot-afq-reco80-py"><span class="std std-ref">RecoBundles80 using AFQ API</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_afq_reco80.py</span></code>)</p></td>
+<td><p>45:01.741</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_bids_layout.html#sphx-glr-auto-examples-plot-bids-layout-py"><span class="std std-ref">How pyAFQ uses BIDS</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_bids_layout.py</span></code>)</p></td>
-<td><p>19:33.895</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_afq_api.html#sphx-glr-auto-examples-plot-afq-api-py"><span class="std std-ref">AFQ API</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_afq_api.py</span></code>)</p></td>
+<td><p>25:21.815</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_recobundles.html#sphx-glr-auto-examples-plot-recobundles-py"><span class="std std-ref">Plotting tract profiles using RecoBundles</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_recobundles.py</span></code>)</p></td>
-<td><p>17:56.288</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_bids_layout.html#sphx-glr-auto-examples-plot-bids-layout-py"><span class="std std-ref">How pyAFQ uses BIDS</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_bids_layout.py</span></code>)</p></td>
+<td><p>19:31.879</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_afq_callosal.html#sphx-glr-auto-examples-plot-afq-callosal-py"><span class="std std-ref">Callosal bundles using AFQ API</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_afq_callosal.py</span></code>)</p></td>
-<td><p>16:45.312</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_optic_radiations.html#sphx-glr-auto-examples-plot-optic-radiations-py"><span class="std std-ref">Plotting the Optic Radiations</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_optic_radiations.py</span></code>)</p></td>
-<td><p>16:29.208</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_tract_profile.html#sphx-glr-auto-examples-plot-tract-profile-py"><span class="std std-ref">Plotting tract profiles</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_tract_profile.py</span></code>)</p></td>
-<td><p>15:59.975</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_recobundles.html#sphx-glr-auto-examples-plot-recobundles-py"><span class="std std-ref">Plotting tract profiles using RecoBundles</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_recobundles.py</span></code>)</p></td>
+<td><p>17:49.111</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="plot_callosal_tract_profile.html#sphx-glr-auto-examples-plot-callosal-tract-profile-py"><span class="std std-ref">Plotting Novel Tract Profiles:</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_callosal_tract_profile.py</span></code>)</p></td>
-<td><p>15:16.987</p></td>
+<td><p>15:01.104</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_tract_profile.html#sphx-glr-auto-examples-plot-tract-profile-py"><span class="std std-ref">Plotting tract profiles</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_tract_profile.py</span></code>)</p></td>
+<td><p>14:45.995</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_afq_callosal.html#sphx-glr-auto-examples-plot-afq-callosal-py"><span class="std std-ref">Callosal bundles using AFQ API</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_afq_callosal.py</span></code>)</p></td>
+<td><p>11:48.359</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="cloudknot_example.html#sphx-glr-auto-examples-cloudknot-example-py"><span class="std std-ref">Using cloudknot to run pyAFQ on AWS batch:</span></a> (<code class="docutils literal notranslate"><span class="pre">cloudknot_example.py</span></code>)</p></td>
@@ -281,7 +269,8 @@
       </div>
     </div>
   
-  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
@@ -294,7 +283,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

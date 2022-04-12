@@ -32,7 +32,7 @@ Functions
 
 
 
-.. py:class:: Segmentation(nb_points=False, nb_streamlines=False, seg_algo='AFQ', reg_algo=None, clip_edges=False, parallel_segmentation={'n_jobs': -1, 'engine': 'joblib', 'backend': 'loky'}, progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=1.25, reduction_thr=25, refine=False, pruning_thr=12, b0_threshold=50, prob_threshold=0, dist_to_waypoint=None, rng=None, return_idx=False, presegment_bundle_dict=None, presegment_kwargs={}, filter_by_endpoints=True, endpoint_info=None, dist_to_atlas=4, save_intermediates=None)
+.. py:class:: Segmentation(nb_points=False, nb_streamlines=False, seg_algo='AFQ', reg_algo=None, clip_edges=False, parallel_segmentation={'n_jobs': -1, 'engine': 'joblib', 'backend': 'loky'}, progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=1.25, reduction_thr=25, refine=False, pruning_thr=12, b0_threshold=50, prob_threshold=0, roi_dist_tie_break=False, dist_to_waypoint=None, rng=None, return_idx=False, presegment_bundle_dict=None, presegment_kwargs={}, filter_by_endpoints=True, dist_to_atlas=4, save_intermediates=None)
 
    
 
@@ -84,10 +84,12 @@ Functions
       ----------
       bundle_dict: dict or AFQ.api.BundleDict
           Meta-data for the segmentation. The format is something like::
-              {'name': {'ROIs':[img1, img2],
-              'rules':[True, True]},
-              'prob_map': img3,
-              'cross_midline': False}
+              {'bundle_name': {
+                  'include':[img1, img2],
+                  'prob_map': img3,
+                  'cross_midline': False,
+                  'start': img4,
+                  'end': img5}}
       tg : StatefulTractogram
           Bundles to segment
       fdata, fbval, fbvec : str
@@ -237,7 +239,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: _get_bundle_info(self, bundle_idx, bundle, vox_dim, tol)
+   .. py:method:: _get_bundle_info(self, bundle, vox_dim, tol)
 
       
       Get fiber probabilites and ROIs for a given bundle.

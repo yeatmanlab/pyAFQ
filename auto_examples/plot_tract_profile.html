@@ -5,10 +5,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Plotting tract profiles &#8212; AFQ 0.10 documentation</title>
+    <title>Plotting tract profiles &#8212; AFQ 0.11 documentation</title>
     
-  <link href="../_static/css/theme.css" rel="stylesheet">
-  <link href="../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
@@ -31,7 +27,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -48,7 +45,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -138,10 +135,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -157,7 +152,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -235,29 +231,9 @@
 
   </div>
 </nav>
-<h3><a href="../index.html">Table of Contents</a></h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="plot_afq_reco80.html">RecoBundles80 using AFQ API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_afq_api.html">AFQ API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_afq_callosal.html">Callosal bundles using AFQ API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_optic_radiations.html">Plotting the Optic Radiations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_bids_layout.html">How pyAFQ uses BIDS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cloudknot_example.html">Using cloudknot to run pyAFQ on AWS batch:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cloudknot_hcp_example.html">AFQ with HCP data</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Plotting tract profiles</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_recobundles.html">Plotting tract profiles using RecoBundles</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_callosal_tract_profile.html">Plotting Novel Tract Profiles:</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -268,7 +244,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -353,7 +329,7 @@
 to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="plotting-tract-profiles">
-<span id="sphx-glr-auto-examples-plot-tract-profile-py"></span><h1>Plotting tract profiles<a class="headerlink" href="#plotting-tract-profiles" title="Permalink to this headline">¶</a></h1>
+<span id="sphx-glr-auto-examples-plot-tract-profile-py"></span><h1>Plotting tract profiles<a class="headerlink" href="#plotting-tract-profiles" title="Permalink to this headline">#</a></h1>
 <p>An example of tracking and segmenting two tracts, and plotting their tract
 profiles for FA (calculated with DTI). This example uses the Yeatman et al.
 waypoint ROI approach, first described in <a class="reference internal" href="../index.html#yeatman2012" id="id1"><span>[Yeatman2012]</span></a> and further elaborated
@@ -364,14 +340,14 @@ in <a class="reference internal" href="#yeatman2014" id="id2"><span>[Yeatman2014
 <span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
 <span class="kn">import</span> <span class="nn">dipy.data</span> <span class="k">as</span> <span class="nn">dpd</span>
 <span class="kn">from</span> <span class="nn">dipy.data</span> <span class="kn">import</span> <span class="n">fetcher</span>
-<span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="kn">import</span> <span class="n">save_tractogram</span><span class="p">,</span> <span class="n">load_tractogram</span>
-<span class="kn">from</span> <span class="nn">dipy.stats.analysis</span> <span class="kn">import</span> <span class="n">afq_profile</span><span class="p">,</span> <span class="n">gaussian_weights</span>
-<span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">StatefulTractogram</span>
+<span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="kn">import</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.streamline.save_tractogram" title="dipy.io.streamline.save_tractogram" class="sphx-glr-backref-module-dipy-io-streamline sphx-glr-backref-type-py-function"><span class="n">save_tractogram</span></a><span class="p">,</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.streamline.load_tractogram" title="dipy.io.streamline.load_tractogram" class="sphx-glr-backref-module-dipy-io-streamline sphx-glr-backref-type-py-function"><span class="n">load_tractogram</span></a>
+<span class="kn">from</span> <span class="nn">dipy.stats.analysis</span> <span class="kn">import</span> <a href="https://dipy.org/documentation/latest/reference/dipy.stats/#dipy.stats.analysis.afq_profile" title="dipy.stats.analysis.afq_profile" class="sphx-glr-backref-module-dipy-stats-analysis sphx-glr-backref-type-py-function"><span class="n">afq_profile</span></a><span class="p">,</span> <a href="https://dipy.org/documentation/latest/reference/dipy.stats/#dipy.stats.analysis.gaussian_weights" title="dipy.stats.analysis.gaussian_weights" class="sphx-glr-backref-module-dipy-stats-analysis sphx-glr-backref-type-py-function"><span class="n">gaussian_weights</span></a>
+<span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class"><span class="n">StatefulTractogram</span></a>
 <span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">Space</span>
-<span class="kn">from</span> <span class="nn">dipy.align</span> <span class="kn">import</span> <span class="n">affine_registration</span>
+<span class="kn">from</span> <span class="nn">dipy.align</span> <span class="kn">import</span> <a href="https://dipy.org/documentation/latest/reference/dipy.align/#dipy.align.affine_registration" title="dipy.align.affine_registration" class="sphx-glr-backref-module-dipy-align sphx-glr-backref-type-py-function"><span class="n">affine_registration</span></a>
 
 <span class="kn">import</span> <span class="nn">AFQ.api.bundle_dict</span> <span class="k">as</span> <span class="nn">abd</span>
-<span class="kn">import</span> <span class="nn">AFQ.data</span> <span class="k">as</span> <span class="nn">afd</span>
+<span class="kn">import</span> <span class="nn">AFQ.data.fetch</span> <span class="k">as</span> <span class="nn">afd</span>
 <span class="kn">import</span> <span class="nn">AFQ.tractography</span> <span class="k">as</span> <span class="nn">aft</span>
 <span class="kn">import</span> <span class="nn">AFQ.registration</span> <span class="k">as</span> <span class="nn">reg</span>
 <span class="kn">import</span> <span class="nn">AFQ.models.dti</span> <span class="k">as</span> <span class="nn">dti</span>
@@ -379,35 +355,35 @@ in <a class="reference internal" href="#yeatman2014" id="id2"><span>[Yeatman2014
 <span class="kn">from</span> <span class="nn">AFQ.utils.volume</span> <span class="kn">import</span> <span class="n">transform_inverse_roi</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/logging.html#logging.basicConfig" title="logging.basicConfig" class="sphx-glr-backref-module-logging sphx-glr-backref-type-py-function"><span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span></a><span class="p">(</span><span class="n">level</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span></a><span class="p">)</span>
 
 <span class="c1"># Target directory for this example&#39;s output files</span>
-<span class="n">working_dir</span> <span class="o">=</span> <span class="s2">&quot;./tract_profile&quot;</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a> <span class="o">=</span> <span class="s2">&quot;./tract_profile&quot;</span>
 </pre></div>
 </div>
 <div class="section" id="get-example-data">
-<h2>Get example data:<a class="headerlink" href="#get-example-data" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dpd</span><span class="o">.</span><span class="n">fetch_stanford_hardi</span><span class="p">()</span>
-<span class="n">hardi_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fetcher</span><span class="o">.</span><span class="n">dipy_home</span><span class="p">,</span> <span class="s2">&quot;stanford_hardi&quot;</span><span class="p">)</span>
-<span class="n">hardi_fdata</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hardi_dir</span><span class="p">,</span> <span class="s2">&quot;HARDI150.nii.gz&quot;</span><span class="p">)</span>
-<span class="n">hardi_fbval</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hardi_dir</span><span class="p">,</span> <span class="s2">&quot;HARDI150.bval&quot;</span><span class="p">)</span>
-<span class="n">hardi_fbvec</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hardi_dir</span><span class="p">,</span> <span class="s2">&quot;HARDI150.bvec&quot;</span><span class="p">)</span>
-<span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">hardi_fdata</span><span class="p">)</span>
+<h2>Get example data:<a class="headerlink" href="#get-example-data" title="Permalink to this headline">#</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://dipy.org/documentation/latest/reference/dipy.data/#dipy.data.fetch_stanford_hardi" title="dipy.data.fetch_stanford_hardi" class="sphx-glr-backref-module-dipy-data sphx-glr-backref-type-py-function"><span class="n">dpd</span><span class="o">.</span><span class="n">fetch_stanford_hardi</span></a><span class="p">()</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_dir</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fetcher</span><span class="o">.</span><span class="n">dipy_home</span></a><span class="p">,</span> <span class="s2">&quot;stanford_hardi&quot;</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fdata</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_dir</span></a><span class="p">,</span> <span class="s2">&quot;HARDI150.nii.gz&quot;</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fbval</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_dir</span></a><span class="p">,</span> <span class="s2">&quot;HARDI150.bval&quot;</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fbvec</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_dir</span></a><span class="p">,</span> <span class="s2">&quot;HARDI150.bvec&quot;</span><span class="p">)</span>
+<span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fdata</span></a><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="calculate-dti">
-<h2>Calculate DTI:<a class="headerlink" href="#calculate-dti" title="Permalink to this headline">¶</a></h2>
+<h2>Calculate DTI:<a class="headerlink" href="#calculate-dti" title="Permalink to this headline">#</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating DTI...&quot;</span><span class="p">)</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;dti_FA.nii.gz&#39;</span><span class="p">)):</span>
-    <span class="n">dti_params</span> <span class="o">=</span> <span class="n">dti</span><span class="o">.</span><span class="n">fit_dti</span><span class="p">(</span><span class="n">hardi_fdata</span><span class="p">,</span> <span class="n">hardi_fbval</span><span class="p">,</span> <span class="n">hardi_fbvec</span><span class="p">,</span>
-                             <span class="n">out_dir</span><span class="o">=</span><span class="n">working_dir</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.exists" title="os.path.exists" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">exists</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="s1">&#39;dti_FA.nii.gz&#39;</span><span class="p">)):</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dti_params</span></a> <span class="o">=</span> <span class="n">dti</span><span class="o">.</span><span class="n">fit_dti</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fdata</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fbval</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fbvec</span></a><span class="p">,</span>
+                             <span class="n">out_dir</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="n">dti_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;FA&#39;</span><span class="p">:</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;dti_FA.nii.gz&#39;</span><span class="p">),</span>
-                  <span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;dti_params.nii.gz&#39;</span><span class="p">)}</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dti_params</span></a> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;FA&#39;</span><span class="p">:</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="s1">&#39;dti_FA.nii.gz&#39;</span><span class="p">),</span>
+                  <span class="s1">&#39;params&#39;</span><span class="p">:</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="s1">&#39;dti_params.nii.gz&#39;</span><span class="p">)}</span>
 
-<span class="n">FA_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dti_params</span><span class="p">[</span><span class="s1">&#39;FA&#39;</span><span class="p">])</span>
-<span class="n">FA_data</span> <span class="o">=</span> <span class="n">FA_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+<span class="n">FA_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dti_params</span></a><span class="p">[</span><span class="s1">&#39;FA&#39;</span><span class="p">])</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">FA_data</span></a> <span class="o">=</span> <span class="n">FA_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -416,7 +392,7 @@ in <a class="reference internal" href="#yeatman2014" id="id2"><span>[Yeatman2014
 </div>
 </div>
 <div class="section" id="register-the-individual-data-to-a-template">
-<h2>Register the individual data to a template:<a class="headerlink" href="#register-the-individual-data-to-a-template" title="Permalink to this headline">¶</a></h2>
+<h2>Register the individual data to a template:<a class="headerlink" href="#register-the-individual-data-to-a-template" title="Permalink to this headline">#</a></h2>
 <p>For the purpose of bundle segmentation, the individual brain is registered to
 the MNI T2 template. The waypoint ROIs used in segmentation are then each
 brought into each subject’s native space to test streamlines for whether they
@@ -432,24 +408,24 @@ using an affine transformation.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Registering to template...&quot;</span><span class="p">)</span>
 <span class="n">MNI_T2_img</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_mni_template</span><span class="p">()</span>
 
-<span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">)):</span>
+<span class="k">if</span> <span class="ow">not</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.exists" title="os.path.exists" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">exists</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">)):</span>
     <span class="kn">import</span> <span class="nn">dipy.core.gradients</span> <span class="k">as</span> <span class="nn">dpg</span>
-    <span class="n">gtab</span> <span class="o">=</span> <span class="n">dpg</span><span class="o">.</span><span class="n">gradient_table</span><span class="p">(</span><span class="n">hardi_fbval</span><span class="p">,</span> <span class="n">hardi_fbvec</span><span class="p">)</span>
-    <span class="n">b0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()[</span><span class="o">...</span><span class="p">,</span> <span class="n">gtab</span><span class="o">.</span><span class="n">b0s_mask</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <a href="https://dipy.org/documentation/latest/reference/dipy.core/#dipy.core.gradients.GradientTable" title="dipy.core.gradients.GradientTable" class="sphx-glr-backref-module-dipy-core-gradients sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">gtab</span></a> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.core/#dipy.core.gradients.gradient_table" title="dipy.core.gradients.gradient_table" class="sphx-glr-backref-module-dipy-core-gradients sphx-glr-backref-type-py-function"><span class="n">dpg</span><span class="o">.</span><span class="n">gradient_table</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fbval</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fbvec</span></a><span class="p">)</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">b0</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.mean.html#numpy.mean" title="numpy.mean" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">mean</span></a><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()[</span><span class="o">...</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">gtab</span><span class="o">.</span><span class="n">b0s_mask</span></a><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="c1"># Prealign using affine registration</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">prealign</span> <span class="o">=</span> <span class="n">affine_registration</span><span class="p">(</span>
-        <span class="n">b0</span><span class="p">,</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">_</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">prealign</span></a> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.align/#dipy.align.affine_registration" title="dipy.align.affine_registration" class="sphx-glr-backref-module-dipy-align sphx-glr-backref-type-py-function"><span class="n">affine_registration</span></a><span class="p">(</span>
+        <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">b0</span></a><span class="p">,</span>
         <span class="n">MNI_T2_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
         <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
         <span class="n">MNI_T2_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
 
     <span class="c1"># Then register using a non-linear registration using the affine for</span>
     <span class="c1"># prealignment</span>
-    <span class="n">warped_hardi</span><span class="p">,</span> <span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">syn_register_dwi</span><span class="p">(</span><span class="n">hardi_fdata</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span>
-                                                 <span class="n">prealign</span><span class="o">=</span><span class="n">prealign</span><span class="p">)</span>
-    <span class="n">reg</span><span class="o">.</span><span class="n">write_mapping</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">))</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">warped_hardi</span></a><span class="p">,</span> <a href="https://dipy.org/documentation/latest/reference/dipy.align/#dipy.align.imwarp.DiffeomorphicMap" title="dipy.align.imwarp.DiffeomorphicMap" class="sphx-glr-backref-module-dipy-align-imwarp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">syn_register_dwi</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fdata</span></a><span class="p">,</span> <a href="https://dipy.org/documentation/latest/reference/dipy.core/#dipy.core.gradients.GradientTable" title="dipy.core.gradients.GradientTable" class="sphx-glr-backref-module-dipy-core-gradients sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">gtab</span></a><span class="p">,</span>
+                                                 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">prealign</span></a><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">prealign</span></a><span class="p">)</span>
+    <span class="n">reg</span><span class="o">.</span><span class="n">write_mapping</span><span class="p">(</span><a href="https://dipy.org/documentation/latest/reference/dipy.align/#dipy.align.imwarp.DiffeomorphicMap" title="dipy.align.imwarp.DiffeomorphicMap" class="sphx-glr-backref-module-dipy-align-imwarp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">))</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="n">mapping</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">read_mapping</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">),</span>
+    <a href="https://dipy.org/documentation/latest/reference/dipy.align/#dipy.align.imwarp.DiffeomorphicMap" title="dipy.align.imwarp.DiffeomorphicMap" class="sphx-glr-backref-module-dipy-align-imwarp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">read_mapping</span><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">),</span>
                                <span class="n">img</span><span class="p">,</span> <span class="n">MNI_T2_img</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -468,45 +444,48 @@ Optimizing level 0 [max iter: 100]
 </div>
 </div>
 <div class="section" id="read-in-bundle-specification">
-<h2>Read in bundle specification<a class="headerlink" href="#read-in-bundle-specification" title="Permalink to this headline">¶</a></h2>
+<h2>Read in bundle specification<a class="headerlink" href="#read-in-bundle-specification" title="Permalink to this headline">#</a></h2>
 <p>The waypoint ROIs, in addition to bundle probability maps are stored in this
 data structure. The templates are first resampled into the MNI space, before
 they are brought into the subject’s individual native space.
 For speed, we only segment two bundles here.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bundles</span> <span class="o">=</span> <span class="n">abd</span><span class="o">.</span><span class="n">BundleDict</span><span class="p">([</span><span class="s2">&quot;CST&quot;</span><span class="p">,</span> <span class="s2">&quot;ARC&quot;</span><span class="p">],</span> <span class="n">resample_to</span><span class="o">=</span><span class="n">MNI_T2_img</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bundles</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.MutableMapping" title="collections.abc.MutableMapping" class="sphx-glr-backref-module-collections-abc sphx-glr-backref-type-py-class"><span class="n">abd</span><span class="o">.</span><span class="n">BundleDict</span></a><span class="p">(</span>
+    <span class="p">[</span><span class="s2">&quot;CST_L&quot;</span><span class="p">,</span> <span class="s2">&quot;CST_R&quot;</span><span class="p">,</span> <span class="s2">&quot;ARC_L&quot;</span><span class="p">,</span> <span class="s2">&quot;ARC_R&quot;</span><span class="p">],</span>
+    <span class="n">resample_to</span><span class="o">=</span><span class="n">MNI_T2_img</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="tracking">
-<h2>Tracking<a class="headerlink" href="#tracking" title="Permalink to this headline">¶</a></h2>
+<h2>Tracking<a class="headerlink" href="#tracking" title="Permalink to this headline">#</a></h2>
 <p>Streamlines are generate using DTI and a deterministic tractography
 algorithm. For speed, we seed only within the waypoint ROIs for each bundle.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tracking...&quot;</span><span class="p">)</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;dti_streamlines.trk&#39;</span><span class="p">)):</span>
-    <span class="n">seed_roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">roi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bundles</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;ROIs&#39;</span><span class="p">]):</span>
-            <span class="k">if</span> <span class="n">bundles</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;rules&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]:</span>
-                <span class="n">warped_roi</span> <span class="o">=</span> <span class="n">transform_inverse_roi</span><span class="p">(</span>
-                    <span class="n">roi</span><span class="p">,</span>
-                    <span class="n">mapping</span><span class="p">,</span>
-                    <span class="n">bundle_name</span><span class="o">=</span><span class="n">bundle</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.exists" title="os.path.exists" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">exists</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="s1">&#39;dti_streamlines.trk&#39;</span><span class="p">)):</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seed_roi</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
+        <span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">idx</span></a><span class="p">,</span> <span class="n">roi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bundles</span><span class="p">[</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a><span class="p">][</span><span class="s1">&#39;include&#39;</span><span class="p">]):</span>
+            <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">warped_roi</span></a> <span class="o">=</span> <span class="n">transform_inverse_roi</span><span class="p">(</span>
+                <span class="n">roi</span><span class="p">,</span>
+                <a href="https://dipy.org/documentation/latest/reference/dipy.align/#dipy.align.imwarp.DiffeomorphicMap" title="dipy.align.imwarp.DiffeomorphicMap" class="sphx-glr-backref-module-dipy-align-imwarp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="p">,</span>
+                <span class="n">bundle_name</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a><span class="p">)</span>
 
-                <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">warped_roi</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span>
-                         <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.nii.gz&quot;</span><span class="p">))</span>
-                <span class="c1"># Add voxels that aren&#39;t there yet:</span>
-                <span class="n">seed_roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">seed_roi</span><span class="p">,</span> <span class="n">warped_roi</span><span class="p">)</span>
+            <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">warped_roi</span></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span>
+                <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a><span class="si">}</span><span class="s2">_</span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">idx</span></a><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.nii.gz&quot;</span><span class="p">))</span>
+            <span class="c1"># Add voxels that aren&#39;t there yet:</span>
+            <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seed_roi</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">np</span><span class="o">.</span><span class="n">logical_or</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seed_roi</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">warped_roi</span></a><span class="p">)</span>
     <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span>
-        <span class="n">seed_roi</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span>
-        <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;seed_roi.nii.gz&#39;</span><span class="p">))</span>
-    <span class="n">sft</span> <span class="o">=</span> <span class="n">aft</span><span class="o">.</span><span class="n">track</span><span class="p">(</span><span class="n">dti_params</span><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">],</span> <span class="n">seed_mask</span><span class="o">=</span><span class="n">seed_roi</span><span class="p">,</span>
-                    <span class="n">stop_mask</span><span class="o">=</span><span class="n">FA_data</span><span class="p">,</span> <span class="n">stop_threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
-    <span class="n">save_tractogram</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;dti_streamlines.trk&#39;</span><span class="p">),</span>
+        <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seed_roi</span></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span>
+        <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="s1">&#39;seed_roi.nii.gz&#39;</span><span class="p">))</span>
+    <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sft</span></a> <span class="o">=</span> <span class="n">aft</span><span class="o">.</span><span class="n">track</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dti_params</span></a><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">],</span> <span class="n">seed_mask</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seed_roi</span></a><span class="p">,</span>
+                    <span class="n">stop_mask</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">FA_data</span></a><span class="p">,</span> <span class="n">stop_threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                    <span class="n">directions</span><span class="o">=</span><span class="s2">&quot;det&quot;</span><span class="p">,</span> <span class="n">odf_model</span><span class="o">=</span><span class="s2">&quot;dti&quot;</span><span class="p">)</span>
+    <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.streamline.save_tractogram" title="dipy.io.streamline.save_tractogram" class="sphx-glr-backref-module-dipy-io-streamline sphx-glr-backref-type-py-function"><span class="n">save_tractogram</span></a><span class="p">(</span><a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sft</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="s1">&#39;dti_streamlines.trk&#39;</span><span class="p">),</span>
                     <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="n">sft</span> <span class="o">=</span> <span class="n">load_tractogram</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="s1">&#39;dti_streamlines.trk&#39;</span><span class="p">),</span> <span class="n">img</span><span class="p">)</span>
+    <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sft</span></a> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.streamline.load_tractogram" title="dipy.io.streamline.load_tractogram" class="sphx-glr-backref-module-dipy-io-streamline sphx-glr-backref-type-py-function"><span class="n">load_tractogram</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="s1">&#39;dti_streamlines.trk&#39;</span><span class="p">),</span> <span class="n">img</span><span class="p">)</span>
 
-<span class="n">sft</span><span class="o">.</span><span class="n">to_vox</span><span class="p">()</span>
+<a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram.to_vox" title="dipy.io.stateful_tractogram.StatefulTractogram.to_vox" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-method"><span class="n">sft</span><span class="o">.</span><span class="n">to_vox</span></a><span class="p">()</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -515,7 +494,7 @@ algorithm. For speed, we seed only within the waypoint ROIs for each bundle.</p>
 </div>
 </div>
 <div class="section" id="segmentation">
-<h2>Segmentation<a class="headerlink" href="#segmentation" title="Permalink to this headline">¶</a></h2>
+<h2>Segmentation<a class="headerlink" href="#segmentation" title="Permalink to this headline">#</a></h2>
 <p>In this stage, streamlines are tested for several criteria: whether the
 probability that they belong to a bundle is larger than a threshold (set to
 0,per default), whether they pass through inclusion ROIs and whether they do
@@ -523,104 +502,104 @@ not pass through exclusion ROIs.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Segmenting fiber groups...&quot;</span><span class="p">)</span>
 <span class="n">segmentation</span> <span class="o">=</span> <span class="n">seg</span><span class="o">.</span><span class="n">Segmentation</span><span class="p">(</span><span class="n">return_idx</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">segmentation</span><span class="o">.</span><span class="n">segment</span><span class="p">(</span><span class="n">bundles</span><span class="p">,</span>
-                     <span class="n">sft</span><span class="p">,</span>
-                     <span class="n">fdata</span><span class="o">=</span><span class="n">hardi_fdata</span><span class="p">,</span>
-                     <span class="n">fbval</span><span class="o">=</span><span class="n">hardi_fbval</span><span class="p">,</span>
-                     <span class="n">fbvec</span><span class="o">=</span><span class="n">hardi_fbvec</span><span class="p">,</span>
-                     <span class="n">mapping</span><span class="o">=</span><span class="n">mapping</span><span class="p">,</span>
+                     <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sft</span></a><span class="p">,</span>
+                     <span class="n">fdata</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fdata</span></a><span class="p">,</span>
+                     <span class="n">fbval</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fbval</span></a><span class="p">,</span>
+                     <span class="n">fbvec</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fbvec</span></a><span class="p">,</span>
+                     <a href="https://dipy.org/documentation/latest/reference/dipy.align/#dipy.align.imwarp.DiffeomorphicMap" title="dipy.align.imwarp.DiffeomorphicMap" class="sphx-glr-backref-module-dipy-align-imwarp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">=</span><a href="https://dipy.org/documentation/latest/reference/dipy.align/#dipy.align.imwarp.DiffeomorphicMap" title="dipy.align.imwarp.DiffeomorphicMap" class="sphx-glr-backref-module-dipy-align-imwarp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="p">,</span>
                      <span class="n">reg_template</span><span class="o">=</span><span class="n">MNI_T2_img</span><span class="p">)</span>
 
-<span class="n">fiber_groups</span> <span class="o">=</span> <span class="n">segmentation</span><span class="o">.</span><span class="n">fiber_groups</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fiber_groups</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segmentation</span><span class="o">.</span><span class="n">fiber_groups</span></a>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Segmenting fiber groups...
 
-  0%|          | 0/341 [00:00&lt;?, ?it/s]
-  1%|          | 2/341 [00:00&lt;00:21, 16.02it/s]
-  1%|1         | 4/341 [00:03&lt;05:53,  1.05s/it]
-  9%|8         | 30/341 [00:03&lt;00:28, 10.92it/s]
-100%|##########| 341/341 [00:03&lt;00:00, 90.77it/s]
+  0%|          | 0/249 [00:00&lt;?, ?it/s]
+  1%|          | 2/249 [00:00&lt;00:15, 16.41it/s]
+  2%|1         | 4/249 [00:03&lt;04:41,  1.15s/it]
+ 12%|#2        | 30/249 [00:04&lt;00:21,  9.99it/s]
+100%|##########| 249/249 [00:04&lt;00:00, 61.01it/s]
 
-  0%|          | 0/243 [00:00&lt;?, ?it/s]
-100%|##########| 243/243 [00:00&lt;00:00, 3781.57it/s]
+  0%|          | 0/379 [00:00&lt;?, ?it/s]
+  2%|2         | 8/379 [00:00&lt;00:05, 64.18it/s]
+100%|##########| 379/379 [00:00&lt;00:00, 2380.97it/s]
 
-  0%|          | 0/429 [00:00&lt;?, ?it/s]
-  2%|1         | 8/429 [00:00&lt;00:05, 72.50it/s]
- 89%|########8 | 380/429 [00:00&lt;00:00, 2057.70it/s]
-100%|##########| 429/429 [00:00&lt;00:00, 1977.31it/s]
+  0%|          | 0/400 [00:00&lt;?, ?it/s]
+  2%|2         | 8/400 [00:00&lt;00:06, 59.79it/s]
+100%|##########| 400/400 [00:00&lt;00:00, 2039.58it/s]
 
-  0%|          | 0/471 [00:00&lt;?, ?it/s]
- 54%|#####3    | 252/471 [00:00&lt;00:00, 2496.74it/s]
-100%|##########| 471/471 [00:00&lt;00:00, 3991.42it/s]
+  0%|          | 0/395 [00:00&lt;?, ?it/s]
+  5%|5         | 20/395 [00:00&lt;00:01, 191.98it/s]
+100%|##########| 395/395 [00:00&lt;00:00, 2155.28it/s]
 </pre></div>
 </div>
 </div>
 <div class="section" id="cleaning">
-<h2>Cleaning<a class="headerlink" href="#cleaning" title="Permalink to this headline">¶</a></h2>
+<h2>Cleaning<a class="headerlink" href="#cleaning" title="Permalink to this headline">#</a></h2>
 <p>Each fiber group is cleaned to exclude streamlines that are outliers in terms
 of their trajector and/or length.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cleaning fiber groups...&quot;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cleaning </span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Before cleaning: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;sl&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> streamlines&quot;</span><span class="p">)</span>
-    <span class="n">new_fibers</span><span class="p">,</span> <span class="n">idx_in_bundle</span> <span class="o">=</span> <span class="n">seg</span><span class="o">.</span><span class="n">clean_bundle</span><span class="p">(</span>
-        <span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;sl&#39;</span><span class="p">],</span>
+<span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cleaning </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Before cleaning: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fiber_groups</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a><span class="p">][</span><span class="s1">&#39;sl&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> streamlines&quot;</span><span class="p">)</span>
+    <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">new_fibers</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">idx_in_bundle</span></a> <span class="o">=</span> <span class="n">seg</span><span class="o">.</span><span class="n">clean_bundle</span><span class="p">(</span>
+        <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fiber_groups</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a><span class="p">][</span><span class="s1">&#39;sl&#39;</span><span class="p">],</span>
         <span class="n">return_idx</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Afer cleaning: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">new_fibers</span><span class="p">)</span><span class="si">}</span><span class="s2"> streamlines&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Afer cleaning: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">new_fibers</span></a><span class="p">)</span><span class="si">}</span><span class="s2"> streamlines&quot;</span><span class="p">)</span>
 
-    <span class="n">idx_in_global</span> <span class="o">=</span> <span class="n">fiber_groups</span><span class="p">[</span><span class="n">bundle</span><span class="p">][</span><span class="s1">&#39;idx&#39;</span><span class="p">][</span><span class="n">idx_in_bundle</span><span class="p">]</span>
-    <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s1">_idx.npy&#39;</span><span class="p">),</span> <span class="n">idx_in_global</span><span class="p">)</span>
-    <span class="n">sft</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span><span class="n">new_fibers</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">idx_in_global</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fiber_groups</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a><span class="p">][</span><span class="s1">&#39;idx&#39;</span><span class="p">][</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">idx_in_bundle</span></a><span class="p">]</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.save.html#numpy.save" title="numpy.save" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">save</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a><span class="si">}</span><span class="s1">_idx.npy&#39;</span><span class="p">),</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">idx_in_global</span></a><span class="p">)</span>
+    <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sft</span></a> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class"><span class="n">StatefulTractogram</span></a><span class="p">(</span><a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram.streamlines" title="dipy.io.stateful_tractogram.StatefulTractogram.streamlines" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-method"><span class="n">new_fibers</span><span class="o">.</span><span class="n">streamlines</span></a><span class="p">,</span>
                              <span class="n">img</span><span class="p">,</span>
-                             <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
-    <span class="n">sft</span><span class="o">.</span><span class="n">to_rasmm</span><span class="p">()</span>
-    <span class="n">save_tractogram</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s1">_afq.trk&#39;</span><span class="p">),</span>
+                             <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.Space" title="dipy.io.stateful_tractogram.Space" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Space</span><span class="o">.</span><span class="n">VOX</span></a><span class="p">)</span>
+    <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram.to_rasmm" title="dipy.io.stateful_tractogram.StatefulTractogram.to_rasmm" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-method"><span class="n">sft</span><span class="o">.</span><span class="n">to_rasmm</span></a><span class="p">()</span>
+    <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.streamline.save_tractogram" title="dipy.io.streamline.save_tractogram" class="sphx-glr-backref-module-dipy-io-streamline sphx-glr-backref-type-py-function"><span class="n">save_tractogram</span></a><span class="p">(</span><a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sft</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a><span class="si">}</span><span class="s1">_afq.trk&#39;</span><span class="p">),</span>
                     <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Cleaning fiber groups...
-Cleaning CST_R
-Before cleaning: 19 streamlines
-Afer cleaning: 19 streamlines
 Cleaning CST_L
-Before cleaning: 30 streamlines
-Afer cleaning: 30 streamlines
-Cleaning ARC_R
-Before cleaning: 14 streamlines
-Afer cleaning: 14 streamlines
-Cleaning ARC_L
 Before cleaning: 23 streamlines
 Afer cleaning: 23 streamlines
+Cleaning CST_R
+Before cleaning: 17 streamlines
+Afer cleaning: 17 streamlines
+Cleaning ARC_L
+Before cleaning: 7 streamlines
+Afer cleaning: 7 streamlines
+Cleaning ARC_R
+Before cleaning: 15 streamlines
+Afer cleaning: 15 streamlines
 </pre></div>
 </div>
 </div>
 <div class="section" id="bundle-profiles">
-<h2>Bundle profiles<a class="headerlink" href="#bundle-profiles" title="Permalink to this headline">¶</a></h2>
+<h2>Bundle profiles<a class="headerlink" href="#bundle-profiles" title="Permalink to this headline">#</a></h2>
 <p>Streamlines are represented in the original diffusion space (<cite>Space.VOX</cite>) and
 scalar properties along the length of each bundle are queried from this
 scalar data. Here, the contribution of each streamline is weighted according
 to how representative this streamline is of the bundle overall.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Extracting tract profiles...&quot;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
-    <span class="n">sft</span> <span class="o">=</span> <span class="n">load_tractogram</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s1">_afq.trk&#39;</span><span class="p">),</span>
-                          <span class="n">img</span><span class="p">,</span> <span class="n">to_space</span><span class="o">=</span><span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
+<span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
+    <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sft</span></a> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.streamline.load_tractogram" title="dipy.io.streamline.load_tractogram" class="sphx-glr-backref-module-dipy-io-streamline sphx-glr-backref-type-py-function"><span class="n">load_tractogram</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a><span class="si">}</span><span class="s1">_afq.trk&#39;</span><span class="p">),</span>
+                          <span class="n">img</span><span class="p">,</span> <span class="n">to_space</span><span class="o">=</span><a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.Space" title="dipy.io.stateful_tractogram.Space" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Space</span><span class="o">.</span><span class="n">VOX</span></a><span class="p">)</span>
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">weights</span> <span class="o">=</span> <span class="n">gaussian_weights</span><span class="p">(</span><span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)</span>
-    <span class="n">profile</span> <span class="o">=</span> <span class="n">afq_profile</span><span class="p">(</span><span class="n">FA_data</span><span class="p">,</span> <span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span>
-                          <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">bundle</span><span class="p">)</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights</span></a> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.stats/#dipy.stats.analysis.gaussian_weights" title="dipy.stats.analysis.gaussian_weights" class="sphx-glr-backref-module-dipy-stats-analysis sphx-glr-backref-type-py-function"><span class="n">gaussian_weights</span></a><span class="p">(</span><a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram.streamlines" title="dipy.io.stateful_tractogram.StatefulTractogram.streamlines" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-method"><span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span></a><span class="p">)</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">profile</span></a> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.stats/#dipy.stats.analysis.afq_profile" title="dipy.stats.analysis.afq_profile" class="sphx-glr-backref-module-dipy-stats-analysis sphx-glr-backref-type-py-function"><span class="n">afq_profile</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">FA_data</span></a><span class="p">,</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram.streamlines" title="dipy.io.stateful_tractogram.StatefulTractogram.streamlines" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-method"><span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span></a><span class="p">,</span>
+                          <a href="https://numpy.org/doc/stable/reference/generated/numpy.eye.html#numpy.eye" title="numpy.eye" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">eye</span></a><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights</span></a><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights</span></a><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">profile</span></a><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
-<li><img src="../_images/sphx_glr_plot_tract_profile_001.png" srcset="../_images/sphx_glr_plot_tract_profile_001.png" alt="CST_R" class = "sphx-glr-multi-img"/></li>
-<li><img src="../_images/sphx_glr_plot_tract_profile_002.png" srcset="../_images/sphx_glr_plot_tract_profile_002.png" alt="CST_L" class = "sphx-glr-multi-img"/></li>
-<li><img src="../_images/sphx_glr_plot_tract_profile_003.png" srcset="../_images/sphx_glr_plot_tract_profile_003.png" alt="ARC_R" class = "sphx-glr-multi-img"/></li>
-<li><img src="../_images/sphx_glr_plot_tract_profile_004.png" srcset="../_images/sphx_glr_plot_tract_profile_004.png" alt="ARC_L" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_plot_tract_profile_001.png" srcset="../_images/sphx_glr_plot_tract_profile_001.png" alt="CST_L" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_plot_tract_profile_002.png" srcset="../_images/sphx_glr_plot_tract_profile_002.png" alt="CST_R" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_plot_tract_profile_003.png" srcset="../_images/sphx_glr_plot_tract_profile_003.png" alt="ARC_L" class = "sphx-glr-multi-img"/></li>
+<li><img src="../_images/sphx_glr_plot_tract_profile_004.png" srcset="../_images/sphx_glr_plot_tract_profile_004.png" alt="ARC_R" class = "sphx-glr-multi-img"/></li>
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Extracting tract profiles...
@@ -628,7 +607,7 @@ to how representative this streamline is of the bundle overall.</p>
 </div>
 </div>
 <div class="section" id="references">
-<h2>References:<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<h2>References:<a class="headerlink" href="#references" title="Permalink to this headline">#</a></h2>
 <dl class="citation">
 <dt class="label" id="yeatman2012"><span class="brackets"><a class="fn-backref" href="#id1">Yeatman2012</a></span></dt>
 <dd><p>Jason D Yeatman, Robert F Dougherty, Nathaniel J Myall,
@@ -642,7 +621,7 @@ quantification”, PloS One, 7: e49790</p>
 matter”, Nature Communications 5: 4932</p>
 </dd>
 </dl>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 15 minutes  59.975 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 14 minutes  45.995 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-tract-profile-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9626e1edfeda6c40614751305064a723/plot_tract_profile.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_tract_profile.py</span></code></a></p>
@@ -660,7 +639,7 @@ matter”, Nature Communications 5: 4932</p>
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="cloudknot_hcp_example.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -683,7 +662,8 @@ matter”, Nature Communications 5: 4932</p>
       </div>
     </div>
   
-  <script src="../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
@@ -696,7 +676,7 @@ matter”, Nature Communications 5: 4932</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

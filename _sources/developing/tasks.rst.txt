@@ -39,7 +39,9 @@ task which the user should input, make them a kwarg with a reasonable default,
 and add a description to the docstring in a properly formatted parameters
 section. Note that when an output is attached to the AFQ class either as
 an attribute or method, if that output name ends in '_file',
-the '_file' is removed from the name automatically. 
+the '_file' is removed from the name automatically. Also, do not use
+the % character in task docstrings, as this will lead to an error in
+parsing the docstring.
 
 Task Decorators
 ~~~~~~~~~~~~~~~

@@ -5,10 +5,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.viz.plotly_backend &#8212; AFQ 0.10 documentation</title>
+    <title>AFQ.viz.plotly_backend &#8212; AFQ 0.11 documentation</title>
     
-  <link href="../../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -18,12 +19,7 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    
-      
-
-    
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
@@ -31,7 +27,8 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     
-  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -46,7 +43,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -136,10 +133,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -155,7 +150,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -163,17 +159,9 @@
     
   </div>
 </nav>
-<h3><a href="../../../index.html">Table of Contents</a></h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../installation_guide.html">Installing <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../usage/index.html">Using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../getting_help.html">Getting help using pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to pyAFQ</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developing/index.html">Developing <cite>pyAFQ</cite></a></li>
-</ul>
-
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -204,14 +192,13 @@
 
 <span class="kn">from</span> <span class="nn">dipy.tracking.streamline</span> <span class="kn">import</span> <span class="n">set_number_of_points</span>
 
-<span class="kn">import</span> <span class="nn">matplotlib.cm</span> <span class="k">as</span> <span class="nn">cm</span>
-<span class="kn">import</span> <span class="nn">matplotlib.colors</span> <span class="k">as</span> <span class="nn">mcolors</span>
-
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">plotly</span>
     <span class="kn">import</span> <span class="nn">plotly.graph_objs</span> <span class="k">as</span> <span class="nn">go</span>
     <span class="kn">import</span> <span class="nn">plotly.io</span> <span class="k">as</span> <span class="nn">pio</span>
     <span class="kn">from</span> <span class="nn">plotly.subplots</span> <span class="kn">import</span> <span class="n">make_subplots</span>
+    <span class="kn">import</span> <span class="nn">plotly.express</span> <span class="k">as</span> <span class="nn">px</span>
+    <span class="kn">from</span> <span class="nn">plotly.colors</span> <span class="kn">import</span> <span class="n">hex_to_rgb</span>
 <span class="k">except</span> <span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">ModuleNotFoundError</span><span class="p">):</span>
     <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="n">vut</span><span class="o">.</span><span class="n">viz_import_msg_error</span><span class="p">(</span><span class="s2">&quot;plotly&quot;</span><span class="p">))</span>
 
@@ -241,16 +228,18 @@
         <span class="n">num</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="n">num</span> <span class="o">&gt;=</span> <span class="mf">0.999</span><span class="p">:</span>
         <span class="n">num</span> <span class="o">=</span> <span class="mf">0.999</span>
+    <span class="k">if</span> <span class="n">num</span> <span class="o">&lt;=</span> <span class="mf">0.001</span><span class="p">:</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="mf">0.001</span>
     <span class="k">return</span> <span class="n">num</span></div>
 
 
 <div class="viewcode-block" id="_color_arr2str"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._color_arr2str">[docs]</a><span class="k">def</span> <span class="nf">_color_arr2str</span><span class="p">(</span><span class="n">color_arr</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;rgba(</span><span class="si">{</span><span class="n">_to_color_range</span><span class="p">(</span><span class="n">color_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2">, &quot;</span></div>
+        <span class="sa">f</span><span class="s2">&quot;rgba(</span><span class="si">{</span><span class="n">_to_color_range</span><span class="p">(</span><span class="n">color_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2">, &quot;</span>
         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_to_color_range</span><span class="p">(</span><span class="n">color_arr</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="si">}</span><span class="s2">, &quot;</span>
         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_to_color_range</span><span class="p">(</span><span class="n">color_arr</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="si">}</span><span class="s2">, &quot;</span>
         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_to_color_range</span><span class="p">(</span><span class="n">opacity</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
-    <span class="p">)</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="set_layout"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.set_layout">[docs]</a><span class="k">def</span> <span class="nf">set_layout</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -266,9 +255,9 @@
                 <span class="n">showbackground</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">showticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">),</span>
             <span class="n">zaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
                 <span class="n">showbackground</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">showticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">),</span>
-            <span class="n">aspectmode</span><span class="o">=</span><span class="s1">&#39;data&#39;</span></div>
+            <span class="n">aspectmode</span><span class="o">=</span><span class="s1">&#39;data&#39;</span>
         <span class="p">)</span>
-    <span class="p">)</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="_draw_streamlines"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._draw_streamlines">[docs]</a><span class="k">def</span> <span class="nf">_draw_streamlines</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">sls</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">cbv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cbs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -417,7 +406,7 @@
             <span class="n">yaxis_title</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">vut</span><span class="o">.</span><span class="n">display_string</span><span class="p">(</span><span class="n">scalar</span><span class="p">),</span> <span class="n">font</span><span class="o">=</span><span class="n">font</span><span class="p">)))</span></div>
 
 
-<div class="viewcode-block" id="visualize_bundles"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.visualize_bundles">[docs]</a><span class="k">def</span> <span class="nf">visualize_bundles</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="n">affine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="visualize_bundles"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.visualize_bundles">[docs]</a><span class="k">def</span> <span class="nf">visualize_bundles</span><span class="p">(</span><span class="n">sft</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                       <span class="n">bundle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">shade_by_volume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                       <span class="n">color_by_streamline</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                       <span class="n">sbv_lims</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">include_profiles</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
@@ -436,21 +425,16 @@
 <span class="sd">        must contain a bundle key in it&#39;s data_per_streamline which is a list</span>
 <span class="sd">        of bundle `&#39;uid&#39;`.</span>
 
-<span class="sd">    affine : ndarray, optional</span>
-<span class="sd">       An affine transformation to apply to the streamlines before</span>
-<span class="sd">       visualization. Default: no transform.</span>
-
 <span class="sd">    n_points : int or None</span>
 <span class="sd">        n_points to resample streamlines to before plotting. If None, no</span>
 <span class="sd">        resampling is done.</span>
 
 <span class="sd">    bundle_dict : dict, optional</span>
-<span class="sd">        Keys are names of bundles and values are dicts that should include</span>
-<span class="sd">        a key `&#39;uid&#39;` with values as integers for selection from the sft</span>
-<span class="sd">        metadata. Default: bundles are either not identified, or identified</span>
+<span class="sd">        Keys are names of bundles and values are dicts that specify them.</span>
+<span class="sd">        Default: bundles are either not identified, or identified</span>
 <span class="sd">        only as unique integers in the metadata.</span>
 
-<span class="sd">    bundle : str or int, optional</span>
+<span class="sd">    bundle : str, optional</span>
 <span class="sd">        The name of a bundle to select from among the keys in `bundle_dict`</span>
 <span class="sd">        or an integer for selection from the sft metadata.</span>
 
@@ -540,7 +524,7 @@
     <span class="n">set_layout</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">_color_arr2str</span><span class="p">(</span><span class="n">background</span><span class="p">))</span>
 
     <span class="k">for</span> <span class="p">(</span><span class="n">sls</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">)</span> <span class="ow">in</span> <span class="n">vut</span><span class="o">.</span><span class="n">tract_generator</span><span class="p">(</span>
-            <span class="n">sft</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">n_points</span><span class="p">):</span>
+            <span class="n">sft</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">n_points</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color_by_streamline</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">color_by_streamline</span><span class="p">:</span>
                 <span class="n">cbs</span> <span class="o">=</span> <span class="n">color_by_streamline</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
@@ -630,8 +614,8 @@
             <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">_color_arr2str</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">)),</span>
             <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;rgba(0,0,0,0)&quot;</span><span class="p">)</span>
         <span class="p">),</span>
-        <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span></div>
-    <span class="p">)</span>
+        <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="visualize_roi"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.visualize_roi">[docs]</a><span class="k">def</span> <span class="nf">visualize_roi</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">affine_or_mapping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">static_img</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -758,8 +742,8 @@
             <span class="n">hoverinfo</span><span class="o">=</span><span class="s1">&#39;skip&#39;</span><span class="p">,</span>
             <span class="n">showlegend</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">),</span>
-        <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span></div>
-    <span class="p">)</span>
+        <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="_name_from_enum"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._name_from_enum">[docs]</a><span class="k">def</span> <span class="nf">_name_from_enum</span><span class="p">(</span><span class="n">axis</span><span class="p">):</span>
@@ -864,12 +848,19 @@
                <span class="n">dimensions</span><span class="p">,</span> <span class="n">flip_axes</span><span class="p">):</span>
     <span class="n">fgarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">set_number_of_points</span><span class="p">(</span><span class="n">sls</span><span class="p">,</span> <span class="n">n_points</span><span class="p">))</span>
     <span class="n">fgarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">fgarray</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">colormap</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">nipy_spectral</span>
-    <span class="n">normalize</span> <span class="o">=</span> <span class="n">mcolors</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span>
-        <span class="n">vmin</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">indiv_profile</span><span class="p">),</span>
-        <span class="n">vmax</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">indiv_profile</span><span class="p">))</span>
-    <span class="n">s_map</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">ScalarMappable</span><span class="p">(</span><span class="n">norm</span><span class="o">=</span><span class="n">normalize</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">colormap</span><span class="p">)</span>
-    <span class="n">line_color</span> <span class="o">=</span> <span class="n">s_map</span><span class="o">.</span><span class="n">to_rgba</span><span class="p">(</span><span class="n">indiv_profile</span><span class="p">)</span>
+    <span class="c1"># colormap = px.colors.diverging.Portland</span>
+    <span class="c1"># colormap = np.asarray(</span>
+    <span class="c1">#     [[int(i) for i in c[4:-1].split(&#39;,&#39;)] for c in colormap]) / 256</span>
+    <span class="n">colormap</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">sequential</span><span class="o">.</span><span class="n">Viridis</span>
+    <span class="n">colormap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">hex_to_rgb</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">colormap</span><span class="p">])</span> <span class="o">/</span> <span class="mi">256</span>
+    <span class="n">xp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">indiv_profile</span><span class="p">),</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">indiv_profile</span><span class="p">),</span>
+        <span class="n">num</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">colormap</span><span class="p">))</span>
+    <span class="n">line_color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n_points</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+        <span class="n">line_color</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">indiv_profile</span><span class="p">,</span> <span class="n">xp</span><span class="p">,</span> <span class="n">colormap</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span>
     <span class="n">line_color_untouched</span> <span class="o">=</span> <span class="n">line_color</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_points</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n_points</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
@@ -916,7 +907,6 @@
 
 <div class="viewcode-block" id="single_bundle_viz"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.single_bundle_viz">[docs]</a><span class="k">def</span> <span class="nf">single_bundle_viz</span><span class="p">(</span><span class="n">indiv_profile</span><span class="p">,</span> <span class="n">sft</span><span class="p">,</span>
                       <span class="n">bundle</span><span class="p">,</span> <span class="n">scalar_name</span><span class="p">,</span>
-                      <span class="n">affine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                       <span class="n">bundle_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                       <span class="n">flip_axes</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
                       <span class="n">figure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -939,20 +929,15 @@
 
 <span class="sd">    bundle : str or int</span>
 <span class="sd">        The name of the bundle to be used as the label for the plot,</span>
-<span class="sd">        or an integer for selection from the sft metadata.</span>
+<span class="sd">        and for selection from the sft metadata.</span>
 
 <span class="sd">    scalar_name : str</span>
 <span class="sd">        The name of the scalar being used.</span>
 
-<span class="sd">    affine : ndarray, optional</span>
-<span class="sd">       An affine transformation to apply to the streamlines before</span>
-<span class="sd">       visualization. Default: no transform.</span>
-
 <span class="sd">    bundle_dict : dict, optional</span>
 <span class="sd">        This parameter is used if bundle is an int.</span>
-<span class="sd">        Keys are names of bundles and values are dicts that should include</span>
-<span class="sd">        a key `&#39;uid&#39;` with values as integers for selection from the sft</span>
-<span class="sd">        metadata. Default: Either the entire sft is treated as a bundle,</span>
+<span class="sd">        Keys are names of bundles and values are dicts that specify them.</span>
+<span class="sd">        Default: Either the entire sft is treated as a bundle,</span>
 <span class="sd">        or identified only as unique integers in the metadata.</span>
 
 <span class="sd">    flip_axes : ndarray</span>
@@ -986,7 +971,7 @@
 
     <span class="n">n_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">indiv_profile</span><span class="p">)</span>
     <span class="n">sls</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">bundle_name</span><span class="p">,</span> <span class="n">dimensions</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">vut</span><span class="o">.</span><span class="n">tract_generator</span><span class="p">(</span>
-        <span class="n">sft</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">n_points</span><span class="p">))</span>
+        <span class="n">sft</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">n_points</span><span class="p">))</span>
 
     <span class="n">line_color</span> <span class="o">=</span> <span class="n">_draw_core</span><span class="p">(</span>
         <span class="n">sls</span><span class="p">,</span> <span class="n">n_points</span><span class="p">,</span> <span class="n">figure</span><span class="p">,</span> <span class="n">bundle_name</span><span class="p">,</span> <span class="n">indiv_profile</span><span class="p">,</span>
@@ -1013,7 +998,8 @@
       </div>
     </div>
   
-  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
 
 <footer class="footer mt-5 mt-md-0">
   <div class="container">
@@ -1026,7 +1012,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     
