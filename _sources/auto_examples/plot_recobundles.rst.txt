@@ -294,15 +294,15 @@ the AFQ waypoint ROI approach.
     16669
     Segmenting fiber groups...
     CST_L 54
-    CST_R 128
-    UF_L 56
-    UF_R 40
-    CC_ForcepsMajor 508
-    CC_ForcepsMinor 984
-    OR_L 44
+    CST_R 138
+    UF_L 49
+    UF_R 52
+    CC_ForcepsMajor 313
+    CC_ForcepsMinor 1030
+    OR_L 36
     OR_R 18
-    VOF_L 134
-    VOF_R 80
+    VOF_L 142
+    VOF_R 95
     Extracting tract profiles...
 
 
@@ -322,7 +322,7 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 17 minutes  49.111 seconds)
+   **Total running time of the script:** ( 17 minutes  5.247 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_recobundles.py:
