@@ -1,3 +1,29 @@
+0.11 (April 12, 2022)
+=====================
+This release introduces a new API for specifying Bundle Dictionaries,
+which should make it more straightforward to create custom bundle
+dictionaries. In addition, there are a few minor enhancements and updates
+to the documentation.
+  * Reduce number of streamlines in nightly reco80 test (#813)
+  * Reduce memory consumption of Reco80 test (#812)
+  * Upgrade moto (#811)
+  * DOC: Add pointer to discussions page in getting_help.rst (#809)
+  * Split this nightly test into two separate nightly tests. (#807)
+  * [test] Move reco80 from custom to anisotropic nightly test (#805)
+  * [ENH] Allow segmentation tie breakers to be settled by distance from ROI (#804)
+  * Remove MSMT from pyAFQ (#803)
+  *  (#801)
+  * [DOC] update scalars documentation & split API methods description to its own page (#796)
+  * [FIX] Some fixes for nightly tests (#794)
+  * [FIX] update cvxpy (#793)
+  * DOC: Adds intersphinx mapping to numpy python dipy (#230)
+  * [ENH] Better BundleDict System (#788)
+  * [ENH] Updated model defaults (#792)
+  * [DOC] fix minor erros in documenation (#786)
+  * Adds CITATION file. (#787)
+  * [FIX,ENH] fix typo in docs, bug in GroupAFQ init, add export_all to ParticipantAFQ (#784)
+  * [FIX] use plotly cmap instead of matplotlib cmap in plotly_backend (#785)
+
 0.10 (December 07, 2021)
 ========================
 This release introduces a new API for BIDS-organized group studies
