@@ -9,9 +9,10 @@ from AFQ.definitions.utils import Definition, find_file, name_from_path
 from AFQ.tasks.decorators import as_img
 
 
-__all__ = ["ImageFile", "FullImage", "RoiImage", "B0Image", "LabelledImageFile",
-           "ThresholdedImageFile", "ScalarImage", "ThresholdedScalarImage",
-           "TemplateImage"]
+__all__ = [
+    "ImageFile", "FullImage", "RoiImage", "B0Image", "LabelledImageFile",
+    "ThresholdedImageFile", "ScalarImage", "ThresholdedScalarImage",
+    "TemplateImage"]
 
 
 def _resample_image(image_data, dwi_data, image_affine, dwi_affine):
@@ -41,10 +42,13 @@ class ImageDefinition(Definition):
         raise NotImplementedError("Please implement a get_name method")
 
     def get_image_getter(self, task_name):
-        raise NotImplementedError("Please implement a get_image_getter method")
+        raise NotImplementedError(
+            "Please implement a get_image_getter method")
 
-    def get_image_direct(self, subses_dict, bids_info, dwi_affine, b0_file, data_imap=None):
-        raise NotImplementedError("Please implement a get_image_direct method")
+    def get_image_direct(self, subses_dict, bids_info,
+                         dwi_affine, b0_file, data_imap=None):
+        raise NotImplementedError(
+            "Please implement a get_image_direct method")
 
 
 class CombineImageMixin(object):
@@ -174,8 +178,10 @@ class ImageFile(ImageDefinition):
             return image_data, meta
         return image_getter
 
-    def get_image_direct(self, subses_dict, bids_info, dwi_affine, b0_file, data_imap=None):
-        return self.get_image_getter("direct")(subses_dict, dwi_affine, bids_info)
+    def get_image_direct(self, subses_dict, bids_info,
+                         dwi_affine, b0_file, data_imap=None):
+        return self.get_image_getter("direct")(
+            subses_dict, dwi_affine, bids_info)
 
 
 class FullImage(ImageDefinition):
@@ -204,7 +210,8 @@ class FullImage(ImageDefinition):
                 dict(source="Entire Volume")
         return image_getter
 
-    def get_image_direct(self, subses_dict, bids_info, dwi_affine, b0_file, data_imap=None):
+    def get_image_direct(self, subses_dict, bids_info,
+                         dwi_affine, b0_file, data_imap=None):
         return self.get_image_getter("direct")(subses_dict, dwi_affine)
 
 
@@ -292,7 +299,8 @@ class RoiImage(ImageDefinition):
                     mapping_imap["mapping"], data_imap, segmentation_params)
         return image_getter
 
-    def get_image_direct(self, subses_dict, bids_info, dwi_affine, b0_file, data_imap=None):
+    def get_image_direct(self, subses_dict, bids_info,
+                         dwi_affine, b0_file, data_imap=None):
         raise ValueError((
             "RoiImage cannot be used in this context, as they"
             "require later derivatives to be calculated"))
@@ -335,7 +343,8 @@ class B0Image(ImageDefinition):
                 median_otsu_kwargs=self.median_otsu_kwargs)
         return image_getter
 
-    def get_image_direct(self, subses_dict, bids_info, dwi_affine, b0_file, data_imap=None):
+    def get_image_direct(self, subses_dict, bids_info,
+                         dwi_affine, b0_file, data_imap=None):
         mean_b0_img = nib.load(b0_file)
         mean_b0 = mean_b0_img.get_fdata()
         _, image_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
@@ -517,9 +526,11 @@ class ScalarImage(ImageDefinition):
             return nib.load(scalar_file), dict(FromScalar=self.scalar)
         return image_getter
 
-    def get_image_direct(self, subses_dict, bids_info, dwi_affine, b0_file, data_imap=None):
+    def get_image_direct(self, subses_dict, bids_info,
+                         dwi_affine, b0_file, data_imap=None):
         if data_imap is not None:
-            return self.get_image_getter("direct")(subses_dict, dwi_affine, data_imap)
+            return self.get_image_getter("direct")(
+                subses_dict, dwi_affine, data_imap)
         else:
             raise ValueError((
                 "ScalarImage cannot be used in this context, as they"
@@ -610,7 +621,8 @@ class PFTImage(ImageDefinition):
             probseg_funcs.append(probseg.get_image_getter(task_name))
         return probseg_funcs
 
-    def get_image_direct(self, subses_dict, bids_info, dwi_affine, b0_file, data_imap=None):
+    def get_image_direct(self, subses_dict, bids_info,
+                         dwi_affine, b0_file, data_imap=None):
         raise ValueError("PFTImage cannot be used in this context")
 
 
@@ -668,7 +680,8 @@ class TemplateImage(ImageDefinition):
                     mapping_imap["mapping"], data_imap["reg_template"])
         return image_getter
 
-    def get_image_direct(self, subses_dict, bids_info, dwi_affine, b0_file, data_imap=None):
+    def get_image_direct(self, subses_dict, bids_info,
+                         dwi_affine, b0_file, data_imap=None):
         raise ValueError((
             "ScalarImage cannot be used in this context, as they"
             "require later derivatives to be calculated"))
