@@ -662,7 +662,7 @@ def visualize_volume(volume, figure=None, x_pos=0.5, y_pos=0.5,
 
 
 def _draw_core(sls, n_points, figure, bundle_name, indiv_profile,
-               dimensions, flip_axes):
+               labelled_points, dimensions, flip_axes):
     fgarray = np.asarray(set_number_of_points(sls, n_points))
     fgarray = np.median(fgarray, axis=0)
     # colormap = px.colors.diverging.Portland
@@ -688,9 +688,11 @@ def _draw_core(sls, n_points, figure, bundle_name, indiv_profile,
             direc_adjust = (direc_adjust + 3) / 4
         line_color[i, 0:3] = line_color[i, 0:3] * direc_adjust
     text = [None] * n_points
-    text[0] = 0
-    # text[n_points // 2] = n_points // 2 # too much clutter
-    text[-1] = n_points
+    for label in labelled_points:
+        if label == -1:
+            text[label] = str(n_points)
+        else:
+            text[label] = str(label)
 
     if flip_axes[0]:
         fgarray[:, 0] = dimensions[0] - fgarray[:, 0]
@@ -726,6 +728,7 @@ def single_bundle_viz(indiv_profile, sft,
                       bundle, scalar_name,
                       bundle_dict=None,
                       flip_axes=[False, False, False],
+                      labelled_nodes=[0, -1],
                       figure=None,
                       include_profile=False):
     """
@@ -763,6 +766,10 @@ def single_bundle_viz(indiv_profile, sft,
         For example, if the input image is LAS, use [True, False, False].
         Default: [False, False, False]
 
+    labelled_nodes : list or ndarray
+        Which nodes to label. -1 indicates the last node.
+        Default: [0, -1]
+
     figure : Plotly Figure object, optional
         If provided, the visualization will be added to this Figure. Default:
         Initialize a new Figure.
@@ -792,7 +799,7 @@ def single_bundle_viz(indiv_profile, sft,
 
     line_color = _draw_core(
         sls, n_points, figure, bundle_name, indiv_profile,
-        dimensions, flip_axes)
+        labelled_nodes, dimensions, flip_axes)
 
     if include_profile:
         _plot_profiles(
