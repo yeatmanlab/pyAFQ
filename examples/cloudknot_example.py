@@ -46,7 +46,7 @@ def afq_process_subject(subject):
     # cloudknot installs the appropriate packages from pip
     import AFQ.data.s3bids as afs
     from AFQ.api.group import GroupAFQ
-    import AFQ.definitions.mask as afm
+    import AFQ.definitions.image as afm
 
     # Download the given subject to your local machine from s3
     # Can find subjects more easily if they are specified in a
@@ -66,7 +66,7 @@ def afq_process_subject(subject):
     # in this case, we look for a file with suffix 'seg'
     # in the 'pipeline_name' pipeline,
     # and we consider all non-zero labels to be a part of the brain
-    brain_mask_definition = afm.LabelledMaskFile(
+    brain_mask_definition = afm.LabelledImageFile(
         suffix='seg', filters={'scope': 'pipeline_name'},
         exclusive_labels=[0])
 

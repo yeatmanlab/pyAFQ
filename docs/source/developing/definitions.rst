@@ -14,15 +14,15 @@ The requirements of each of these methods are described below:
   of same name as the `__init__` args. This is important for reading/writing
   `Definition`-inherited classes as arguments to config files.
   For scalar definitions, each class should have a `name` parameter (see
-  :class:`AFQ.definitions.scalar.ScalarFile` source for an example). 
+  :class:`AFQ.definitions.image.ImageFile` source for an example). 
 
 - The api calls `find_path` during the :class:`AFQ.api.group.GroupAFQ` object initialization to
   let the definition find relevant files for the given subject and session. All `find_path`
   methods have the same input: `bids_layout`, `from_path`, `subject`, `session`. See
-  :func:`AFQ.definitions.mask.MaskFile.find_path` for a basic example.
+  :func:`AFQ.definitions.mask.ImageFile.find_path` for a basic example.
   If your definition does not need to run anything during :class:`AFQ.api.group.GroupAFQ`
   object initialization, simply override this method with a method that only
-  passes (see :func:`AFQ.definitions.mask.FullMask.find_path` source for an example.)
+  passes (see :func:`AFQ.definitions.mask.FullImage.find_path` source for an example.)
 
 - The :class:`AFQ.api.group.GroupAFQ` object calls `get_for_subses` to get the mask, map,
   etc. during workflow construction or execution. The form of this method varies significantly

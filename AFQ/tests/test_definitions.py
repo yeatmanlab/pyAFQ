@@ -5,14 +5,14 @@ import pytest
 
 from bids.layout import BIDSLayout
 
-import AFQ.definitions.mask as afm
-from AFQ.definitions.mask import *  # interprets masks from eval
+import AFQ.definitions.image as afm
+from AFQ.definitions.image import *  # interprets masks from eval
 from AFQ.definitions.mapping import *  # interprets mappings from eval
 from AFQ.tests.test_api import create_dummy_bids_path
 
 
 def test_str_instantiates_mixin():
-    thresh_mask = afm.ThresholdedScalarMask("dti_fa", lower_bound=0.2)
+    thresh_mask = afm.ThresholdedScalarImage("dti_fa", lower_bound=0.2)
     thresh_mask_str = thresh_mask.str_for_toml()
     thresh_mask_from_str = eval(thresh_mask_str)
 
@@ -59,7 +59,7 @@ def test_find_path(subject, session):
         suffix="dwi", extension="nii.gz"
     )[0]
 
-    mask_file = MaskFile(suffix="seg", filters={'scope': 'synthetic'})
+    mask_file = ImageFile(suffix="seg", filters={'scope': 'synthetic'})
     mask_file.find_path(bids_layout, test_dwi_path, subject, session)
 
     assert mask_file.fnames[session][subject] == op.join(

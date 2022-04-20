@@ -12,6 +12,7 @@ from AFQ.data.s3bids import write_json
 import AFQ.utils.volume as auv
 from AFQ.definitions.mapping import SynMap
 from AFQ.definitions.utils import Definition
+from AFQ.definitions.image import ImageDefinition
 
 from dipy.io.streamline import load_tractogram
 from dipy.io.stateful_tractogram import Space
@@ -186,21 +187,20 @@ def get_reg_subject(data_imap, bids_info, subses_dict, dwi_affine,
 
     Parameters
     ----------
-    reg_subject_spec : str, instance of `AFQ.definitions.scalar`, optional  # noqa
+    reg_subject_spec : str, instance of `AFQ.definitions.ImageDefinition`, optional  # noqa
         The source image data to be registered.
-        Can either be a Nifti1Image, a scalar definition, or str.
+        Can either be a Nifti1Image, an ImageFile, or str.
         if "b0", "dti_fa_subject", "subject_sls", or "power_map,"
         image data will be loaded automatically.
         If "subject_sls" is used, slr registration will be used
         and reg_template should be "hcp_atlas".
         Default: "power_map"
     """
-    reg_template = data_imap["reg_template"]
     if not isinstance(reg_subject_spec, str)\
             and not isinstance(reg_subject_spec, nib.Nifti1Image)\
-            and not isinstance(reg_subject_spec, Definition):
+            and not isinstance(reg_subject_spec, ImageDefinition):
         raise TypeError(
-            "reg_subject must be a str, Definition, or Nifti1Image")
+            "reg_subject must be a str, ImageDefinition, or Nifti1Image")
 
     filename_dict = {
         "b0": data_imap["b0_file"],
@@ -210,19 +210,19 @@ def get_reg_subject(data_imap, bids_info, subses_dict, dwi_affine,
     }
     bm = nib.load(data_imap["brain_mask_file"])
 
-    if bids_info is not None and isinstance(reg_subject_spec, Definition):
+    if bids_info is not None and isinstance(reg_subject_spec, ImageDefinition):
         reg_subject_spec.find_path(
             bids_info["bids_layout"],
             subses_dict["dwi_file"],
             bids_info["subject"],
             bids_info["session"])
-        reg_subject_spec = reg_subject_spec.get_data(
-            subses_dict, bids_info, dwi_affine,
-            reg_template, None)
+        img, _ = reg_subject_spec.get_image_direct(
+            subses_dict, bids_info, dwi_affine, data_imap["b0_file"],
+            data_imap=data_imap)
     else:
         if reg_subject_spec in filename_dict:
             reg_subject_spec = filename_dict[reg_subject_spec]
-    img = nib.load(reg_subject_spec)
+        img = nib.load(reg_subject_spec)
     bm = bm.get_fdata().astype(bool)
     masked_data = img.get_fdata()
     masked_data[~bm] = 0
@@ -253,8 +253,9 @@ def get_mapping_plan(kwargs, use_sls=False):
                     bids_info["subject"],
                     bids_info["session"]
                 )
-            mapping_tasks[f"{scalar.name}_file_res"] =\
-                pimms.calc(f"{scalar.name}_file")(scalar.get_for_subses())
+            mapping_tasks[f"{scalar.get_name()}_scalar_res"] =\
+                pimms.calc(f"{scalar.get_name()}_scalar")(
+                    scalar.get_image_getter("mapping"))
 
     if use_sls:
         mapping_tasks["mapping_res"] = sls_mapping

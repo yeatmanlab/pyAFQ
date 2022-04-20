@@ -10,7 +10,7 @@ import dipy.reconst.dki as dpy_dki
 import dipy.reconst.dti as dpy_dti
 from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
-from AFQ.definitions.scalar import ScalarFile
+from AFQ.definitions.image import ImageDefinition
 
 from AFQ.tasks.decorators import as_file, as_model, as_dt_deriv
 from AFQ.tasks.utils import get_fname, with_name
@@ -18,7 +18,7 @@ import AFQ.api.bundle_dict as abd
 import AFQ.data.fetch as afd
 
 from AFQ.definitions.utils import Definition
-from AFQ.definitions.mask import B0Mask
+from AFQ.definitions.image import B0Image
 
 from AFQ.models.dti import noise_from_b0
 from AFQ.models.csd import _fit as csd_fit_model
@@ -485,12 +485,12 @@ def brain_mask(subses_dict, dwi_affine, b0_file,
         This will be used to create
         the brain mask, which gets applied before registration to a
         template.
-        If you want no brain mask to be applied, use FullMask.
-        If None, use B0Mask()
+        If you want no brain mask to be applied, use FullImage.
+        If None, use B0Image()
         Default: None
     """
     if brain_mask_definition is None:
-        brain_mask_definition = B0Mask()
+        brain_mask_definition = B0Image()
     if not isinstance(brain_mask_definition, Definition):
         raise TypeError(
             "brain_mask_definition must be a Definition")
@@ -500,13 +500,13 @@ def brain_mask(subses_dict, dwi_affine, b0_file,
             subses_dict["dwi_file"],
             bids_info["subject"],
             bids_info["session"])
-    return brain_mask_definition.get_brain_mask(
-        subses_dict, bids_info, dwi_affine, b0_file)
+    return brain_mask_definition.get_image_direct(
+        subses_dict, bids_info, dwi_affine, b0_file, data_imap=None)
 
 
 @pimms.calc("bundle_dict", "reg_template")
 def get_bundle_dict(subses_dict, dwi_affine, segmentation_params,
-                    brain_mask_file, bids_info,
+                    brain_mask_file, bids_info, b0_file,
                     bundle_info=None, reg_template_spec="mni_T1"):
     """
     Dictionary defining the different bundles to be segmented,
@@ -584,15 +584,15 @@ def get_bundle_dict(subses_dict, dwi_affine, segmentation_params,
             resample_to=reg_template)
 
     def roi_scalar_to_info(roi):
-        if isinstance(roi, ScalarFile):
+        if isinstance(roi, ImageDefinition):
             roi.find_path(
                 bids_info["bids_layout"],
                 subses_dict["dwi_file"],
                 bids_info["subject"],
                 bids_info["session"])
-            return nib.load(roi.get_data(
-                subses_dict, bids_info, dwi_affine,
-                reg_template, None))
+            roi_img, _ = roi.get_image_direct(
+                subses_dict, bids_info, dwi_affine, b0_file, data_imap=None)
+            return roi_img
         else:
             return roi
     for b_name, b_info in bundle_dict._dict.items():

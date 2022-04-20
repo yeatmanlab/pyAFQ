@@ -21,7 +21,7 @@ from AFQ.api.group import GroupAFQ
 import AFQ.api.bundle_dict as abd
 import AFQ.data.fetch as afd
 
-from AFQ.definitions.mask import RoiMask, MaskFile
+from AFQ.definitions.image import RoiImage, ImageFile
 
 ##########################################################################
 # Initialize an AFQ object:
@@ -59,7 +59,7 @@ myafq = GroupAFQ(  # ==== BIDS parameters ====
     reg_template=afd.read_pediatric_templates(
     )["UNCNeo-withCerebellum-for-babyAFQ"],
     reg_subject="b0",
-    brain_mask_definition=MaskFile(
+    brain_mask_definition=ImageFile(
         suffix="brainmask", filters={"scope": "derivatives"}),
     # ==== Bundle parameters ====
     bundle_info=abd.PediatricBundleDict(),
@@ -67,7 +67,7 @@ myafq = GroupAFQ(  # ==== BIDS parameters ====
     force_recompute=True,
     # ==== Tracking parameters ====
     tracking_params={
-        "seed_mask": RoiMask(),
+        "seed_mask": RoiImage(),
         "stop_threshold": 0.1},
     # ==== Segmentation parameters ====
     segmentation_params={

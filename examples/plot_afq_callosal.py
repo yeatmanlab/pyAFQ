@@ -11,7 +11,7 @@ import plotly
 
 from AFQ.api.group import GroupAFQ
 import AFQ.api.bundle_dict as abd
-from AFQ.definitions.mask import RoiMask
+from AFQ.definitions.image import RoiImage
 import AFQ.data.fetch as afd
 
 ##########################################################################
@@ -32,7 +32,7 @@ afd.organize_stanford_data(clear_previous_afq=True)
 #
 # We only do this to make this example faster and consume less space.
 
-tracking_params = dict(seed_mask=RoiMask(),
+tracking_params = dict(seed_mask=RoiImage(),
                        n_seeds=10000,
                        random_seeds=True,
                        rng_seed=42)

@@ -16,7 +16,7 @@ import os.path as op
 from AFQ.api.group import GroupAFQ
 import AFQ.api.bundle_dict as abd
 import AFQ.data.fetch as afd
-from AFQ.definitions.mask import LabelledMaskFile, RoiMask
+from AFQ.definitions.image import LabelledImageFile, RoiImage
 
 afd.organize_stanford_data(clear_previous_afq=True)
 
@@ -52,7 +52,7 @@ bundles = abd.BundleDict({
 # combine custom ROIs with default BundleDict ROIs
 bundles = bundles + abd.BundleDict()
 
-brain_mask_definition = LabelledMaskFile(
+brain_mask_definition = LabelledImageFile(
     suffix="seg",
     filters={"scope": "freesurfer"},
     exclusive_labels=[0])
@@ -65,7 +65,7 @@ my_afq = GroupAFQ(
     tracking_params={"n_seeds": 3,
                      "directions": "prob",
                      "odf_model": "CSD",
-                     "seed_mask": RoiMask()},
+                     "seed_mask": RoiImage()},
     bundle_info=bundles)
 
 my_afq.export_all()

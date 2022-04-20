@@ -7,9 +7,8 @@ import os
 from argparse import ArgumentParser
 from funcargparse import FuncArgParser
 
-from AFQ.definitions.mask import *  # interprets masks loaded from toml
+from AFQ.definitions.image import *  # interprets masks loaded from toml
 from AFQ.definitions.mapping import *  # interprets mappings loaded from toml
-from AFQ.definitions.scalar import *  # interprets scalars loaded from toml
 from AFQ.definitions.utils import Definition
 from AFQ.api.utils import kwargs_descriptors
 

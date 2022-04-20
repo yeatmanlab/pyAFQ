@@ -28,10 +28,10 @@ from AFQ.api.participant import ParticipantAFQ
 import AFQ.data.fetch as afd
 import AFQ.utils.streamlines as aus
 import AFQ.utils.bin as afb
-from AFQ.definitions.mask import RoiMask,\
-    PFTMask, MaskFile
+from AFQ.definitions.image import RoiImage,\
+    PFTImage, ImageFile
 from AFQ.definitions.mapping import SynMap, AffMap, SlrMap
-from AFQ.definitions.scalar import TemplateScalar, ScalarFile
+from AFQ.definitions.image import TemplateImage, ImageFile
 
 
 def touch(fname, times=None):
@@ -525,10 +525,10 @@ def test_AFQ_pft():
     os.rename(f_pve_gm, op.join(sub_path, "sub-01_ses-01_GMprobseg.nii.gz"))
     os.rename(f_pve_csf, op.join(sub_path, "sub-01_ses-01_CSFprobseg.nii.gz"))
 
-    stop_mask = PFTMask(
-        MaskFile(suffix="WMprobseg"),
-        MaskFile(suffix="GMprobseg"),
-        MaskFile(suffix="CSFprobseg"))
+    stop_mask = PFTImage(
+        ImageFile(suffix="WMprobseg"),
+        ImageFile(suffix="GMprobseg"),
+        ImageFile(suffix="CSFprobseg"))
 
     with nbtmp.InTemporaryDirectory() as t_output_dir:
         my_afq = GroupAFQ(
@@ -570,8 +570,7 @@ def test_AFQ_custom_subject_reg():
         preproc_pipeline='vistasoft',
         bundle_info=bundle_info,
         reg_template_spec="mni_T2",
-        reg_subject_spec=ScalarFile(
-            "customb0",
+        reg_subject_spec=ImageFile(
             suffix="customb0",
             filters={"scope": "vistasoft"}))
     my_afq.export_rois()
@@ -654,7 +653,7 @@ def test_AFQ_data_waypoint():
     del bundle_info["SLF_L"]["include"]  # test endpoint ROIs as include
 
     tracking_params = dict(odf_model="csd",
-                           seed_mask=RoiMask(),
+                           seed_mask=RoiImage(),
                            n_seeds=100,
                            random_seeds=True,
                            rng_seed=42)
@@ -679,7 +678,7 @@ def test_AFQ_data_waypoint():
             "dti_FA",
             "dti_MD",
             "dti_GA",
-            TemplateScalar("t1", t1_path)],
+            TemplateImage(t1_path)],
         robust_tensor_fitting=True,
         tracking_params=tracking_params,
         segmentation_params=segmentation_params,
@@ -758,7 +757,7 @@ def test_AFQ_data_waypoint():
     # Set up config to use the same parameters as above:
     # ROI mask needs to be put in quotes in config
     tracking_params = dict(odf_model="CSD",
-                           seed_mask="RoiMask()",
+                           seed_mask="RoiImage()",
                            n_seeds=100,
                            random_seeds=True,
                            rng_seed=42)

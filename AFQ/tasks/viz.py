@@ -22,7 +22,7 @@ logger = logging.getLogger('AFQ.api.viz')
 
 def _viz_prepare_vol(vol, xform, mapping, scalar_dict):
     if vol in scalar_dict.keys():
-        vol = nib.load(scalar_dict[vol]).get_fdata()
+        vol = scalar_dict[vol].get_fdata()
     if isinstance(vol, str):
         vol = nib.load(vol).get_fdata()
     if xform:
@@ -341,7 +341,7 @@ def plot_tract_profiles(subses_dict, scalars, tracking_params,
     fnames = []
     for scalar in scalars:
         if not isinstance(scalar, str):
-            this_scalar = scalar.name
+            this_scalar = scalar.get_name()
         else:
             this_scalar = scalar
         fname = get_fname(

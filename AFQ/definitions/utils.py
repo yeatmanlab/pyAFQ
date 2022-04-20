@@ -1,17 +1,18 @@
-__all__ = ["Definition", "find_file"]
+import os.path as op
+
+__all__ = ["Definition", "find_file", "name_from_path"]
 
 
 class Definition(object):
     '''
     All Definitions should inherit this.
     For a given subject and session within the API, the definition is used
-    to create a given mask, map, etc.
+    to create a given image or map.
     Definitions have an init function which the users uses to specify
     how they want the definition to behave.
-    The find_path and get_for_subses functions are called by the AFQ API.
+    The find_path function is called by the AFQ API.
     The api calls find_path to let the definition find relevant files
-    for the given subject and session. The api calls get_for_subses to get the
-    mask, map, etc.
+    for the given subject and session.
     '''
 
     def __init__(self):
@@ -58,6 +59,14 @@ def _arglist_to_string(args, get_attr=None):
     if to_string[-2:] == ', ':
         to_string = to_string[:-2]
     return to_string
+
+
+def name_from_path(path):
+    file_name = op.basename(path)  # get file name
+    file_name = file_name.split(".")[0]  # remove extension
+    if "-" in file_name:
+        file_name = file_name.split("-")[0]  # get suffix if exists
+    return file_name
 
 
 def find_file(bids_layout, path, filters, suffix, session, subject,
