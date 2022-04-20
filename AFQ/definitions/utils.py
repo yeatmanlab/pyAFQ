@@ -108,9 +108,9 @@ def find_file(bids_layout, path, filters, suffix, session, subject,
     )
     if path_subject != file_subject:
         raise ValueError(
-            f"Expected subject IDs to match for the retrieved mask file "
+            f"Expected subject IDs to match for the retrieved image file "
             f"and the supplied `from_path` file. Got sub-{file_subject} "
-            f"from mask file {nearest} and sub-{path_subject} "
+            f"from image file {nearest} and sub-{path_subject} "
             f"from `from_path` file {path}."
         )
 

@@ -773,7 +773,7 @@ def test_AFQ_data_waypoint():
                 "dti_fa",
                 "dti_md",
                 "dti_ga",
-                f"TemplateScalar('T1', '{t1_path}')"]),
+                f"TemplateImage('{t1_path}')"]),
         VIZ=dict(
             viz_backend_spec="plotly_no_gif"),
         TRACTOGRAPHY_PARAMS=tracking_params,

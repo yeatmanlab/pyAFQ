@@ -253,9 +253,10 @@ def get_mapping_plan(kwargs, use_sls=False):
                     bids_info["subject"],
                     bids_info["session"]
                 )
-            mapping_tasks[f"{scalar.get_name()}_scalar_res"] =\
-                pimms.calc(f"{scalar.get_name()}_scalar")(
-                    scalar.get_image_getter("mapping"))
+            mapping_tasks[f"{scalar.get_name()}_file_res"] =\
+                pimms.calc(f"{scalar.get_name()}_file")(
+                    as_file(f'-{scalar.get_name()}.nii.gz')(
+                        scalar.get_image_getter("mapping")))
 
     if use_sls:
         mapping_tasks["mapping_res"] = sls_mapping

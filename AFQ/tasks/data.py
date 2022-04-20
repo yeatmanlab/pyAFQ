@@ -481,7 +481,7 @@ def brain_mask(subses_dict, dwi_affine, b0_file,
 
     Parameters
     ----------
-    brain_mask_definition : instance from `AFQ.definitions.mask`, optional
+    brain_mask_definition : instance from `AFQ.definitions.image`, optional
         This will be used to create
         the brain mask, which gets applied before registration to a
         template.

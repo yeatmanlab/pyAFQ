@@ -265,8 +265,8 @@ def tract_profiles(subses_dict, clean_bundles_file, data_imap,
         this_sl = seg_sft.get_bundle(bundle_name).streamlines
         if len(this_sl) == 0:
             continue
-        for ii, (scalar, scalar_img) in enumerate(scalar_dict.items()):
-            scalar_data = scalar_img.get_fdata()
+        for ii, (scalar, scalar_file) in enumerate(scalar_dict.items()):
+            scalar_data = nib.load(scalar_file).get_fdata()
             if isinstance(profile_weights, str):
                 if profile_weights == "gauss":
                     this_prof_weights = gaussian_weights(this_sl)
@@ -330,9 +330,9 @@ def get_scalar_dict(data_imap, mapping_imap, scalars=["dti_fa", "dti_md"]):
     for scalar in scalars:
         if isinstance(scalar, str):
             sc = scalar.lower()
-            scalar_dict[sc] = nib.load(data_imap[f"{sc}_file"])
+            scalar_dict[sc] = data_imap[f"{sc}_file"]
         else:
-            scalar_dict[scalar.get_name()], _ = mapping_imap[
+            scalar_dict[scalar.get_name()] = mapping_imap[
                 f"{scalar.get_name()}_file"]
     return {"scalar_dict": scalar_dict}
 

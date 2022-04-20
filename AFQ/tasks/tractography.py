@@ -63,9 +63,9 @@ def streamlines(subses_dict, data_imap, seed_file, stop_file,
         the aft.track function. Seed mask and seed threshold, if not
         specified, are replaced with scalar masks from scalar[0]
         thresholded to 0.2. The ``seed_mask`` and ``stop_mask`` items of
-        this dict may be ``AFQ.definitions.mask.ImageFile`` instances.
+        this dict may be ``AFQ.definitions.image.ImageFile`` instances.
         If ``tracker`` is set to "pft" then ``stop_mask`` should be
-        an instance of ``AFQ.definitions.mask.PFTImage``.
+        an instance of ``AFQ.definitions.image.PFTImage``.
     """
     this_tracking_params = tracking_params.copy()
 
