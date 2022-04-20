@@ -139,8 +139,7 @@ def dict_to_toml(dictionary):
 # not shown to the user (mostly BIDS filters stuff)
 qsi_prep_ignore_params = [
     "bids_path", "bids_filters", "preproc_pipeline",
-    "custom_tractography_bids_filters", "brain_mask",
-    "mapping", "participant_labels", "output_dir"]
+    "participant_labels", "output_dir"]
 
 
 def dict_to_json(dictionary):
