@@ -7,6 +7,7 @@ from tqdm import tqdm
 from dipy.align import Bunch
 from dipy.tracking.local_tracking import (LocalTracking,
                                           ParticleFilteringTracking)
+from dipy.tracking.stopping_criterion import StreamlineStatus
 import random
 
 import math
@@ -28,8 +29,9 @@ def spherical_harmonics(m, n, theta, phi):
 TissueTypes = Bunch(OUTSIDEIMAGE=-1, INVALIDPOINT=0, TRACKPOINT=1, ENDPOINT=2)
 
 
-def _verbose_generate_streamlines(self):
+def _verbose_generate_tractogram(self):
     """A streamline generator"""
+
     # Get inverse transform (lin/offset) for seeds
     inv_A = np.linalg.inv(self.affine)
     lin = inv_A[:3, :3]
@@ -47,19 +49,23 @@ def _verbose_generate_streamlines(self):
             np.random.seed(s_random_seed)
         directions = self.direction_getter.initial_direction(s)
         if directions.size == 0 and self.return_all:
-            continue
+            # only the seed position
+            if self.save_seeds:
+                yield [s], s
+            else:
+                yield [s]
         directions = directions[:self.max_cross]
         for first_step in directions:
-            stepsF, tissue_class = self._tracker(s, first_step, F)
+            stepsF, stream_status = self._tracker(s, first_step, F)
             if not (self.return_all
-                    or tissue_class == TissueTypes.ENDPOINT
-                    or tissue_class == TissueTypes.OUTSIDEIMAGE):
+                    or stream_status == StreamlineStatus.ENDPOINT
+                    or stream_status == StreamlineStatus.OUTSIDEIMAGE):
                 continue
             first_step = -first_step
-            stepsB, tissue_class = self._tracker(s, first_step, B)
+            stepsB, stream_status = self._tracker(s, first_step, B)
             if not (self.return_all
-                    or tissue_class == TissueTypes.ENDPOINT
-                    or tissue_class == TissueTypes.OUTSIDEIMAGE):
+                    or stream_status == StreamlineStatus.ENDPOINT
+                    or stream_status == StreamlineStatus.OUTSIDEIMAGE):
                 continue
             if stepsB == 1:
                 streamline = F[:stepsF].copy()
@@ -67,12 +73,17 @@ def _verbose_generate_streamlines(self):
                 parts = (B[stepsB - 1:0:-1], F[:stepsF])
                 streamline = np.concatenate(parts, axis=0)
 
+            # move to the next streamline if only the seed position
+            # and not return all
             len_sl = len(streamline)
             if len_sl < self.min_length * self.step_size \
                     or len_sl > self.max_length * self.step_size:
                 continue
-            else:
-                yield streamline
+            elif len(streamline) > 1 or self.return_all:
+                if self.save_seeds:
+                    yield streamline, s
+                else:
+                    yield streamline
 
 
 class VerboseLocalTracking(LocalTracking):
@@ -80,7 +91,7 @@ class VerboseLocalTracking(LocalTracking):
         super().__init__(*args, **kwargs)
         self.min_length = min_length
         self.max_length = max_length
-    _generate_streamlines = _verbose_generate_streamlines
+    _generate_tractogram = _verbose_generate_tractogram
 
 
 class VerboseParticleFilteringTracking(ParticleFilteringTracking):
@@ -88,7 +99,7 @@ class VerboseParticleFilteringTracking(ParticleFilteringTracking):
         super().__init__(*args, **kwargs)
         self.min_length = min_length
         self.max_length = max_length
-    _generate_streamlines = _verbose_generate_streamlines
+    _generate_tractogram = _verbose_generate_tractogram
 
 
 def in_place_norm(vec, axis=-1, keepdims=False, delvec=True):
