@@ -1,7 +1,7 @@
 from dipy.align import resample
 from dipy.segment.clustering import QuickBundles
-from dipy.segment.metric import (AveragePointwiseEuclideanMetric,
-                                 ResampleFeature)
+from dipy.segment.metric import AveragePointwiseEuclideanMetric
+from dipy.segment.featurespeed import ResampleFeature
 from dipy.io.streamline import (
     load_tractogram, save_tractogram, StatefulTractogram, Space)
 from dipy.data.fetcher import _make_fetcher
@@ -924,9 +924,9 @@ def read_hcp_atlas(n_bundles=16, as_file=False):
             atlas_folder,
             "bundles", "*.trk"))
     centroid_folder = op.join(
-            folder,
-            atlas_folder,
-            "centroid")
+        folder,
+        atlas_folder,
+        "centroid")
     os.makedirs(centroid_folder, exist_ok=True)
     for bundle_file in bundle_files:
         bundle = op.splitext(op.split(bundle_file)[-1])[0]
