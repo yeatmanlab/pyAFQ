@@ -1,6 +1,7 @@
 Adding Definitions 
 ~~~~~~~~~~~~~~~~~~
-pyAFQ uses definitions to allow users to customize the mappings and images,
+pyAFQ uses definitions to allow users to customize the mappings and images
+(see :ref:`usage/image` and :ref:`usage/mapping`),
 used by the :class:`AFQ.api.group.GroupAFQ` object. All definitions ultimately
 inherit from :class:`AFQ.definitions.utils.Definition`. For a given subject and
 session within the API, a definition is used to create a given mask, map, etc.

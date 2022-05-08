@@ -3,32 +3,32 @@ The pyAFQ Image API
 In the process of tractometry, it is sometimes necessary to apply images to
 the data. By default, pyAFQ can automatically generate these images from the
 DWI data. However, pyAFQ also has a system for users to specify which image to
-use, called the Image API. Specifying a image, in general, is not as simple as
+use, called the Image API. Specifying an image, in general, is not as simple as
 just providing a path to a file, because each subject and each session will
 have a different image. That is why we developed pyAFQ's Image API. 
 
 Currently, there are three different images that pyAFQ uses for tractometry:
 
-#. The brain image. This is used to image the dwi data and throwout any signal
-   that is outside of the brain. It is typicall applied before fitting ODF
+#. The brain image. This is used to mask the dwi data and throw out any signal
+   that is outside of the brain. It is typically applied before fitting ODF
    models. By default, it is calculated using :class:`AFQ.definitions.image.B0Image`.
 
 #. The tractography seed image. This image determines where tractography is
    seeded. If it is floating point, the image is thresholded interally after
-   interpolation using the seed_threshold parameter. This is reccomended.
+   interpolation using the seed_threshold parameter. This is recommended.
    However, the seed image can aslo be a binary image. By default, the
    seed image is :class:`AFQ.definitions.image.ScalarImage` (best_scalar) where best_scalar is chosen by the API
    based on valid scalars (typically "dti_fa"). 
 
 #. The tractography stop image. This image determines where tractography stops.
    If it is floating point, the image is thresholded interally after
-   interpolation using the stop_threshold parameter. This is reccomended.
+   interpolation using the stop_threshold parameter. This is recommended.
    However, the stop image can aslo be a binary image. By default, the
    stop image is :class:`AFQ.definitions.image.ScalarImage` (best_scalar) where best_scalar is chosen by the API
    based on valid scalars (typically "dti_fa"). 
 
 In AFQ/definitions/image.py, there are several image classes one can use to specify images.
-As a user, one should initialize image classes and pass them to the AFQ object,
+As a user, one should initialize image classes and pass them to theapi.AFQ objects,
 or write out the initialization as a string inside of one's configuration file
 for use with the CLI.
 
@@ -36,7 +36,7 @@ for use with the CLI.
   is already generated, use this class. It is initialized using BIDS filters,
   which pyAFQ will use to find images for each subject in each session.
 
-- :class:`AFQ.definitions.image.FullImage`: The :class:`AFQ.definitions.image.FullImage` class is used if one does not want to image at all.
+- :class:`AFQ.definitions.image.FullImage`: The :class:`AFQ.definitions.image.FullImage` class is used if one does not want to mask at all.
   This image is True everywhere.
 
 - :class:`AFQ.definitions.image.RoiImage`: All ROIs are "logically or'd" together in subject space to create
@@ -45,7 +45,7 @@ for use with the CLI.
   efficiency, one can choose to only seed in the ROIs in the first place.
 
 - :class:`AFQ.definitions.image.B0Image`: This image uses dipy's median_otsu on the subject's b0 to generate
-  a image. This is the default brain image.
+  an image. This is the default brain image.
 
 - :class:`AFQ.definitions.image.LabelledImageFile`: This image is similar to :class:`AFQ.definitions.image.ImageFile`. It is also initialized
   using BIDS filters but instead expects to find a labelled segmentation file.
@@ -65,7 +65,7 @@ for use with the CLI.
   parameters, not using an already thresholded image.
 
 - :class:`AFQ.definitions.image.ScalarImage`: This image is initialized only by specifying a scalar. Use this
-  image if you want a image to be based on a scalar that pyAFQ already
+  image if you want an image to be based on a scalar that pyAFQ already
   calculates, like "dti_fa" or "dti_md".
 
 - :class:`AFQ.definitions.image.ThresholdedScalarImage`: This image is similar to :class:`AFQ.definitions.image.ScalarImage`. It allows the user to
@@ -84,7 +84,7 @@ for use with the CLI.
   combined using a logical "and" or "or".
 
 Here is an example of using the :class:`AFQ.definitions.image.RoiImage` and :class:`AFQ.definitions.image.LabelledImageFile` on the HCP
-data with the AFQ object::
+data with theapi.AFQ objects::
 
     from AFQ.data.fetch import fetch_hcp
     from AFQ.api.group import GroupAFQ

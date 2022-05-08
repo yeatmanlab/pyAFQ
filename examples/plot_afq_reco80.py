@@ -26,7 +26,7 @@ afd.organize_stanford_data(clear_previous_afq=True)
 ##########################################################################
 # Set tractography parameters (optional)
 # ---------------------
-# We make this tracking_params which we will pass to the AFQ object
+# We make this tracking_params which we will pass to the GroupAFQ object
 # which specifies that we want 50,000 seeds randomly distributed
 # in the white matter.
 #
@@ -37,7 +37,7 @@ tracking_params = dict(n_seeds=50000,
                        rng_seed=42)
 
 ##########################################################################
-# Initialize an AFQ object:
+# Initialize a GroupAFQ object:
 # -------------------------
 #
 # We specify seg_algo as reco80 in segmentation_params. This tells the AFQ
@@ -45,10 +45,10 @@ tracking_params = dict(n_seeds=50000,
 # segmentation step.
 
 myafq = GroupAFQ(bids_path=op.join(afd.afq_home,
-                                  'stanford_hardi'),
-                preproc_pipeline='vistasoft',
-                segmentation_params={"seg_algo": "reco80"},
-                tracking_params=tracking_params)
+                                   'stanford_hardi'),
+                 preproc_pipeline='vistasoft',
+                 segmentation_params={"seg_algo": "reco80"},
+                 tracking_params=tracking_params)
 
 ##########################################################################
 # Visualizing bundles and tract profiles:

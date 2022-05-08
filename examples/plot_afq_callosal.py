@@ -26,7 +26,7 @@ afd.organize_stanford_data(clear_previous_afq=True)
 ##########################################################################
 # Set tractography parameters (optional)
 # ---------------------
-# We make this tracking_params which we will pass to the AFQ object
+# We make this tracking_params which we will pass to the GroupAFQ object
 # which specifies that we want 100,000 seeds randomly distributed
 # in the ROIs of every bundle.
 #
@@ -40,7 +40,7 @@ tracking_params = dict(seed_mask=RoiImage(),
 ##########################################################################
 # Set segmentation parameters (optional)
 # ---------------------
-# We make this segmentation_params which we will pass to the AFQ object
+# We make this segmentation_params which we will pass to the GroupAFQ object
 # which specifies that we want to clip the extracted tract profiles
 # to only be between the two ROIs.
 #
@@ -52,13 +52,13 @@ tracking_params = dict(seed_mask=RoiImage(),
 segmentation_params = {"clip_edges": True}
 
 ##########################################################################
-# Initialize an AFQ object:
+# Initialize a GroupAFQ object:
 # -------------------------
 #
 # We specify bundle_info as the callosal bundles only
 # (`abd.CALLOSUM_BUNDLES`). If we want to segment both the callosum
 # and the other bundles, we would pass `abd.CALLOSUM_BUNDLES + abd.BUNDLES`
-# instead. This would tell the AFQ object to use bundles from both
+# instead. This would tell the GroupAFQ object to use bundles from both
 # the standard and callosal templates.
 
 myafq = GroupAFQ(

@@ -24,7 +24,7 @@ import AFQ.data.fetch as afd
 from AFQ.definitions.image import RoiImage, ImageFile
 
 ##########################################################################
-# Initialize an AFQ object:
+# Initialize a GroupAFQ object:
 # -------------------------
 #
 # .. note::

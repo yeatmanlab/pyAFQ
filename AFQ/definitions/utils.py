@@ -63,9 +63,9 @@ def _arglist_to_string(args, get_attr=None):
 
 def name_from_path(path):
     file_name = op.basename(path)  # get file name
-    file_name = file_name.split(".")[0]  # remove extension
+    file_name = op.splitext(file_name)[0]  # remove extension
     if "-" in file_name:
-        file_name = file_name.split("-")[0]  # get suffix if exists
+        file_name = file_name.split("-")[-1]  # get suffix if exists
     return file_name
 
 

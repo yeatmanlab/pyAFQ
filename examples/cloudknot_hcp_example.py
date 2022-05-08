@@ -82,7 +82,7 @@ def afq_process_subject(subject, seed_mask, n_seeds,
         suffix='seg', filters={'scope': 'dmriprep'},
         exclusive_labels=[0])
 
-    # define the api AFQ object
+    # define the api GroupAFQ object
     myafq = GroupAFQ(
         hcp_bids,
         brain_mask_definition=brain_mask_definition,

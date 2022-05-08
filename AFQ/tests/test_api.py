@@ -264,7 +264,7 @@ def test_AFQ_custom_tract():
 @pytest.mark.nightly_basic
 def test_AFQ_no_derivs():
     """
-    Test the initialization of the AFQ object
+    Test the initialization of the GroupAFQ object
     """
     bids_path = create_dummy_bids_path(1, 1)
     os.remove(op.join(
@@ -291,7 +291,7 @@ def test_AFQ_fury():
 
 def test_AFQ_init():
     """
-    Test the initialization of the AFQ object
+    Test the initialization of the GroupAFQ object
     """
     for n_sessions in [1, 2, 3]:
         if n_sessions == 3:
@@ -547,7 +547,7 @@ def test_AFQ_pft():
 @pytest.mark.nightly_custom
 def test_AFQ_custom_subject_reg():
     """
-    Test custom subject registration using AFQ object
+    Test custom subject registration using GroupAFQ object
     """
     # make first temproary directory to generate b0
     _, bids_path, sub_path = get_temp_hardi()

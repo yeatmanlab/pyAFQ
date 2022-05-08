@@ -2,7 +2,7 @@ Tractography from other pipelines
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 pyAFQ can use tractography from other pipelines. To tell pyAFQ to use
 tractography from another pipeline, use the custom_tractography_bids_filters
-argument in the AFQ object or in the configuration file. This argument expects
+argument in the api.AFQ objects or in the configuration file. This argument expects
 a dictionary of BIDS filters. pyAFQ will use these BIDS filters to find the
 tractography for each subject in each session.
 Here is an example custom_tractography_bids_filters::

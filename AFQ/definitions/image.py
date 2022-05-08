@@ -54,7 +54,7 @@ class ImageDefinition(Definition):
 class CombineImageMixin(object):
     """
     Helper Class
-    Useful for making a image by combining different conditions
+    Useful for making an image by combining different conditions
     """
 
     def __init__(self, combine):
@@ -84,7 +84,7 @@ class CombineImageMixin(object):
 
 class ImageFile(ImageDefinition):
     """
-    Define a image based on a file.
+    Define an image based on a file.
     Does not apply any labels or thresholds;
     Generates image with floating point data.
     Useful for seed and stop images, where threshold can be applied
@@ -119,16 +119,16 @@ class ImageFile(ImageDefinition):
                 "a value other than None."))
 
         if path is not None:
-            self.from_path = True
+            self._from_path = True
             self.fname = path
         else:
-            self.from_path = False
+            self._from_path = False
             self.suffix = suffix
             self.filters = filters
             self.fnames = {}
 
     def find_path(self, bids_layout, from_path, subject, session):
-        if self.from_path:
+        if self._from_path:
             return
         if session not in self.fnames:
             self.fnames[session] = {}
@@ -140,7 +140,7 @@ class ImageFile(ImageDefinition):
         self.fnames[session][subject] = nearest_image
 
     def get_path_data_affine(self, subses_dict, bids_info):
-        if self.from_path:
+        if self._from_path:
             image_file = self.fname
         else:
             image_file = self.fnames[
@@ -186,7 +186,7 @@ class ImageFile(ImageDefinition):
 
 class FullImage(ImageDefinition):
     """
-    Define a image which covers a full volume.
+    Define an image which covers a full volume.
 
     Examples
     --------
@@ -217,7 +217,7 @@ class FullImage(ImageDefinition):
 
 class RoiImage(ImageDefinition):
     """
-    Define a image which is all include ROIs or'd together.
+    Define an image which is all include ROIs or'd together.
 
     Parameters
     ----------
@@ -308,7 +308,7 @@ class RoiImage(ImageDefinition):
 
 class B0Image(ImageDefinition):
     """
-    Define a image using b0 and dipy's median_otsu.
+    Define an image using b0 and dipy's median_otsu.
 
     Parameters
     ----------
@@ -357,7 +357,7 @@ class B0Image(ImageDefinition):
 
 class LabelledImageFile(ImageFile, CombineImageMixin):
     """
-    Define a image based on labels in a file.
+    Define an image based on labels in a file.
 
     Parameters
     ----------
@@ -374,7 +374,7 @@ class LabelledImageFile(ImageFile, CombineImageMixin):
     inclusive_labels : list of ints, optional
         The labels from the file to include from the boolean image.
         If None, no inclusive labels are applied.
-    exclusive_labels : lits of ints, optional
+    exclusive_labels : list of ints, optional
         The labels from the file to exclude from the boolean image.
         If None, no exclusive labels are applied.
         Default: None.
@@ -425,7 +425,7 @@ class LabelledImageFile(ImageFile, CombineImageMixin):
 
 class ThresholdedImageFile(ImageFile, CombineImageMixin):
     """
-    Define a image based on thresholding a file.
+    Define an image based on thresholding a file.
     Note that this should not be used to directly make a seed image
     or a stop image. In those cases, consider thresholding after
     interpolation, as in the example for ImageFile.
@@ -490,7 +490,7 @@ class ThresholdedImageFile(ImageFile, CombineImageMixin):
 
 class ScalarImage(ImageDefinition):
     """
-    Define a image based on a scalar.
+    Define an image based on a scalar.
     Does not apply any labels or thresholds;
     Generates image with floating point data.
     Useful for seed and stop images, where threshold can be applied
@@ -539,7 +539,7 @@ class ScalarImage(ImageDefinition):
 
 class ThresholdedScalarImage(ThresholdedImageFile, ScalarImage):
     """
-    Define a image based on thresholding a scalar image.
+    Define an image based on thresholding a scalar image.
     Note that this should not be used to directly make a seed image
     or a stop image. In those cases, consider thresholding after
     interpolation, as in the example for ScalarImage.
@@ -581,7 +581,7 @@ class ThresholdedScalarImage(ThresholdedImageFile, ScalarImage):
 
 class PFTImage(ImageDefinition):
     """
-    Define a image for use in PFT tractography. Only use
+    Define an image for use in PFT tractography. Only use
     if tracker set to 'pft' in tractography.
 
     Parameters

@@ -96,10 +96,10 @@ class FnirtMap(Definition):
                 "If passing a value for `warp_path`, "
                 "you must also pass a value for `space_path`"))
         if warp_path is not None:
-            self.from_path = True
+            self._from_path = True
             self.fnames = (warp_path, space_path)
         else:
-            self.from_path = False
+            self._from_path = False
             self.warp_suffix = warp_suffix
             self.warp_filters = warp_filters
             self.space_suffix = space_suffix
@@ -107,7 +107,7 @@ class FnirtMap(Definition):
             self.fnames = {}
 
     def find_path(self, bids_layout, from_path, subject, session):
-        if self.from_path:
+        if self._from_path:
             return
         if session not in self.fnames:
             self.fnames[session] = {}
@@ -124,7 +124,7 @@ class FnirtMap(Definition):
 
     def get_for_subses(self, subses_dict, bids_info, reg_subject,
                        reg_template):
-        if self.from_path:
+        if self._from_path:
             nearest_warp, nearest_space = self.fnames
         else:
             nearest_warp, nearest_space = self.fnames[
@@ -227,16 +227,16 @@ class ItkMap(Definition):
                 "to a value other than None."))
 
         if warp_path is not None:
-            self.from_path = True
+            self._from_path = True
             self.fname = warp_path
         else:
-            self.from_path = False
+            self._from_path = False
             self.suffix = warp_suffix
             self.filters = warp_filters
             self.fnames = {}
 
     def find_path(self, bids_layout, from_path, subject, session):
-        if self.from_path:
+        if self._from_path:
             return
         if session not in self.fnames:
             self.fnames[session] = {}
@@ -247,7 +247,7 @@ class ItkMap(Definition):
 
     def get_for_subses(self, subses_dict, bids_info, reg_subject,
                        reg_template):
-        if self.from_path:
+        if self._from_path:
             nearest_warp = self.fname
         else:
             nearest_warp = self.fnames[
