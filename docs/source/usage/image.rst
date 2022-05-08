@@ -28,7 +28,7 @@ Currently, there are three different images that pyAFQ uses for tractometry:
    based on valid scalars (typically "dti_fa"). 
 
 In AFQ/definitions/image.py, there are several image classes one can use to specify images.
-As a user, one should initialize image classes and pass them to theAFQ.api objects,
+As a user, one should initialize image classes and pass them to the AFQ.api objects,
 or write out the initialization as a string inside of one's configuration file
 for use with the CLI.
 
@@ -84,7 +84,7 @@ for use with the CLI.
   combined using a logical "and" or "or".
 
 Here is an example of using the :class:`AFQ.definitions.image.RoiImage` and :class:`AFQ.definitions.image.LabelledImageFile` on the HCP
-data with theAFQ.api objects::
+data with the AFQ.api objects::
 
     from AFQ.data.fetch import fetch_hcp
     from AFQ.api.group import GroupAFQ
