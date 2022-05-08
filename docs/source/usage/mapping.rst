@@ -6,7 +6,7 @@ to our Mask API.
 
 In AFQ/definitions/mapping.py, there are four mapping classes one
 can use to specify the mapping. As a user, one should initialize mapping
-classes and pass them to theapi.AFQ objects, or write out the initialization as
+classes and pass them to theAFQ.api objects, or write out the initialization as
 a string inside of one's configuration file for use with the CLI.
 
 - :class:`AFQ.definitions.mapping.SynMap`: The default mapping class is to

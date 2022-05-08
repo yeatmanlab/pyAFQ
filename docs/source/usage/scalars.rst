@@ -8,7 +8,7 @@ numeric value per voxel).
 In AFQ/definitions/image.py, there are many classes one can use to define
 custom images. Two of these classes are particularly useful to
 specify custom scalars. As a user, one should initialize one of these
-classes and pass them to theapi.AFQ objects, or write out the initialization as
+classes and pass them to theAFQ.api objects, or write out the initialization as
 a string inside of one's configuration file for use with the CLI. To do this,
 give an image object as an element of the scalars array passed to :class:`AFQ.api.group.GroupAFQ`.
 Then your custom image will be automatically used during tract profile extraction.
@@ -40,7 +40,7 @@ As an example, one might have "ICVF" and "ODI" maps in a BIDS pipeline named "no
                           └── sub-01_ses-01_dwi.nii.gz
 
 You can use :class:`AFQ.definitions.image.ImageFile`
-to provide these custom scalars to theapi.AFQ objects::
+to provide these custom scalars to theAFQ.api objects::
 
     ICVF_scalar = ImageFile(
       suffix="ICVF",
