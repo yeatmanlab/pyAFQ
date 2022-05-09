@@ -322,7 +322,7 @@ def get_scalar_dict(data_imap, mapping_imap, scalars=["dti_fa", "dti_md"]):
     scalars : list of strings and/or scalar definitions, optional
         List of scalars to use.
         Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md", "dki_awf",
-        "dki_mk". Can also be a scalar from AFQ.definitions.scalar.
+        "dki_mk". Can also be a scalar from AFQ.definitions.image.
         Default: ["dti_fa", "dti_md"]
     """
     # Note: some scalars preprocessing done in plans, before this step
@@ -332,7 +332,8 @@ def get_scalar_dict(data_imap, mapping_imap, scalars=["dti_fa", "dti_md"]):
             sc = scalar.lower()
             scalar_dict[sc] = data_imap[f"{sc}_file"]
         else:
-            scalar_dict[scalar.name] = mapping_imap[f"{scalar.name}_file"]
+            scalar_dict[scalar.get_name()] = mapping_imap[
+                f"{scalar.get_name()}_file"]
     return {"scalar_dict": scalar_dict}
 
 

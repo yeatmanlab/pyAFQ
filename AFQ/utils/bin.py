@@ -7,9 +7,8 @@ import os
 from argparse import ArgumentParser
 from funcargparse import FuncArgParser
 
-from AFQ.definitions.mask import *  # interprets masks loaded from toml
+from AFQ.definitions.image import *  # interprets masks loaded from toml
 from AFQ.definitions.mapping import *  # interprets mappings loaded from toml
-from AFQ.definitions.scalar import *  # interprets scalars loaded from toml
 from AFQ.definitions.utils import Definition
 from AFQ.api.utils import kwargs_descriptors
 
@@ -79,7 +78,7 @@ def toml_to_val(t):
         return eval(t)
     elif isinstance(t, str) and t[0] == '{':
         return eval(t)  # interpret as dictionary
-    elif isinstance(t, str) and ("Mask" in t or "Map" in t or "Scalar" in t):
+    elif isinstance(t, str) and ("Image" in t or "Map" in t):
         try:
             definition = eval(t)
         except NameError:

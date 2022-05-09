@@ -28,10 +28,10 @@ from AFQ.api.participant import ParticipantAFQ
 import AFQ.data.fetch as afd
 import AFQ.utils.streamlines as aus
 import AFQ.utils.bin as afb
-from AFQ.definitions.mask import RoiMask,\
-    PFTMask, MaskFile
+from AFQ.definitions.image import RoiImage,\
+    PFTImage, ImageFile
 from AFQ.definitions.mapping import SynMap, AffMap, SlrMap
-from AFQ.definitions.scalar import TemplateScalar, ScalarFile
+from AFQ.definitions.image import TemplateImage, ImageFile
 
 
 def touch(fname, times=None):
@@ -264,7 +264,7 @@ def test_AFQ_custom_tract():
 @pytest.mark.nightly_basic
 def test_AFQ_no_derivs():
     """
-    Test the initialization of the AFQ object
+    Test the initialization of the GroupAFQ object
     """
     bids_path = create_dummy_bids_path(1, 1)
     os.remove(op.join(
@@ -291,7 +291,7 @@ def test_AFQ_fury():
 
 def test_AFQ_init():
     """
-    Test the initialization of the AFQ object
+    Test the initialization of the GroupAFQ object
     """
     for n_sessions in [1, 2, 3]:
         if n_sessions == 3:
@@ -525,10 +525,10 @@ def test_AFQ_pft():
     os.rename(f_pve_gm, op.join(sub_path, "sub-01_ses-01_GMprobseg.nii.gz"))
     os.rename(f_pve_csf, op.join(sub_path, "sub-01_ses-01_CSFprobseg.nii.gz"))
 
-    stop_mask = PFTMask(
-        MaskFile(suffix="WMprobseg"),
-        MaskFile(suffix="GMprobseg"),
-        MaskFile(suffix="CSFprobseg"))
+    stop_mask = PFTImage(
+        ImageFile(suffix="WMprobseg"),
+        ImageFile(suffix="GMprobseg"),
+        ImageFile(suffix="CSFprobseg"))
 
     with nbtmp.InTemporaryDirectory() as t_output_dir:
         my_afq = GroupAFQ(
@@ -547,7 +547,7 @@ def test_AFQ_pft():
 @pytest.mark.nightly_custom
 def test_AFQ_custom_subject_reg():
     """
-    Test custom subject registration using AFQ object
+    Test custom subject registration using GroupAFQ object
     """
     # make first temproary directory to generate b0
     _, bids_path, sub_path = get_temp_hardi()
@@ -570,8 +570,7 @@ def test_AFQ_custom_subject_reg():
         preproc_pipeline='vistasoft',
         bundle_info=bundle_info,
         reg_template_spec="mni_T2",
-        reg_subject_spec=ScalarFile(
-            "customb0",
+        reg_subject_spec=ImageFile(
             suffix="customb0",
             filters={"scope": "vistasoft"}))
     my_afq.export_rois()
@@ -654,7 +653,7 @@ def test_AFQ_data_waypoint():
     del bundle_info["SLF_L"]["include"]  # test endpoint ROIs as include
 
     tracking_params = dict(odf_model="csd",
-                           seed_mask=RoiMask(),
+                           seed_mask=RoiImage(),
                            n_seeds=100,
                            random_seeds=True,
                            rng_seed=42)
@@ -679,7 +678,7 @@ def test_AFQ_data_waypoint():
             "dti_FA",
             "dti_MD",
             "dti_GA",
-            TemplateScalar("t1", t1_path)],
+            TemplateImage(t1_path)],
         robust_tensor_fitting=True,
         tracking_params=tracking_params,
         segmentation_params=segmentation_params,
@@ -758,7 +757,7 @@ def test_AFQ_data_waypoint():
     # Set up config to use the same parameters as above:
     # ROI mask needs to be put in quotes in config
     tracking_params = dict(odf_model="CSD",
-                           seed_mask="RoiMask()",
+                           seed_mask="RoiImage()",
                            n_seeds=100,
                            random_seeds=True,
                            rng_seed=42)
@@ -774,7 +773,7 @@ def test_AFQ_data_waypoint():
                 "dti_fa",
                 "dti_md",
                 "dti_ga",
-                f"TemplateScalar('T1', '{t1_path}')"]),
+                f"TemplateImage('{t1_path}')"]),
         VIZ=dict(
             viz_backend_spec="plotly_no_gif"),
         TRACTOGRAPHY_PARAMS=tracking_params,

@@ -57,7 +57,7 @@ class ParticipantAFQ(object):
         Notes
         -----
         In tracking_params, parameters with the suffix mask which are also
-        a mask from AFQ.definitions.mask will be handled automatically by
+        an image from AFQ.definitions.image will be handled automatically by
         the api.
 
         It is recommended that you leave the bids_info parameter as None,

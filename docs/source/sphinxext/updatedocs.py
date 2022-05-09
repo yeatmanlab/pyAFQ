@@ -8,11 +8,10 @@ The pyAFQ configuration file
 ----------------------------
 
 This file should be a `toml <https://github.com/toml-lang/toml>`_ file. At
-minimum, the file should contain information about the location of the
-`dmriprep` folder::
+minimum, the file should contain the BIDS path::
 
     [files]
-    dmriprep_folder = '/path/to/study/derivatives/dmriprep'
+    bids_path = "path/to/study"
 
 
 But additional configuration options can be provided.

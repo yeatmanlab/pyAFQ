@@ -9,7 +9,7 @@ from AFQ.tasks.utils import with_name
 from AFQ.definitions.utils import Definition
 import AFQ.tractography as aft
 from AFQ.tasks.utils import get_default_args
-from AFQ.definitions.mask import ScalarMask
+from AFQ.definitions.image import ScalarImage
 
 logger = logging.getLogger('AFQ.api')
 
@@ -63,9 +63,9 @@ def streamlines(subses_dict, data_imap, seed_file, stop_file,
         the aft.track function. Seed mask and seed threshold, if not
         specified, are replaced with scalar masks from scalar[0]
         thresholded to 0.2. The ``seed_mask`` and ``stop_mask`` items of
-        this dict may be ``AFQ.definitions.mask.MaskFile`` instances.
+        this dict may be ``AFQ.definitions.image.ImageFile`` instances.
         If ``tracker`` is set to "pft" then ``stop_mask`` should be
-        an instance of ``AFQ.definitions.mask.PFTMask``.
+        an instance of ``AFQ.definitions.image.PFTImage``.
     """
     this_tracking_params = tracking_params.copy()
 
@@ -188,7 +188,7 @@ def get_tractography_plan(kwargs):
                 best_scalar = scalar
                 break
         else:
-            if "fa" in scalar.name:
+            if "fa" in scalar.get_name():
                 best_scalar = scalar
                 break
     kwargs["best_scalar"] = best_scalar
@@ -205,11 +205,11 @@ def get_tractography_plan(kwargs):
     kwargs["tracking_params"]["odf_model"] =\
         kwargs["tracking_params"]["odf_model"].upper()
     if kwargs["tracking_params"]["seed_mask"] is None:
-        kwargs["tracking_params"]["seed_mask"] = ScalarMask(
+        kwargs["tracking_params"]["seed_mask"] = ScalarImage(
             kwargs["best_scalar"])
         kwargs["tracking_params"]["seed_threshold"] = 0.2
     if kwargs["tracking_params"]["stop_mask"] is None:
-        kwargs["tracking_params"]["stop_mask"] = ScalarMask(
+        kwargs["tracking_params"]["stop_mask"] = ScalarImage(
             kwargs["best_scalar"])
         kwargs["tracking_params"]["stop_threshold"] = 0.2
 
@@ -233,7 +233,7 @@ def get_tractography_plan(kwargs):
                 bids_info["session"])
 
     if kwargs["tracking_params"]["tracker"] == "pft":
-        probseg_funcs = stop_mask.get_mask_getter()
+        probseg_funcs = stop_mask.get_image_getter("tractography")
         tractography_tasks["wm_res"] = pimms.calc("pve_wm")(probseg_funcs[0])
         tractography_tasks["gm_res"] = pimms.calc("pve_gm")(probseg_funcs[1])
         tractography_tasks["csf_res"] = pimms.calc("pve_csf")(probseg_funcs[2])
@@ -242,11 +242,11 @@ def get_tractography_plan(kwargs):
     elif isinstance(stop_mask, Definition):
         tractography_tasks["export_stop_mask_res"] =\
             pimms.calc("stop_file")(as_file('_stop_mask.nii.gz')(
-                stop_mask.get_mask_getter()))
+                stop_mask.get_image_getter("tractography")))
 
     if isinstance(seed_mask, Definition):
         tractography_tasks["export_seed_mask_res"] = pimms.calc("seed_file")(
             as_file('_seed_mask.nii.gz')(
-                seed_mask.get_mask_getter()))
+                seed_mask.get_image_getter("tractography")))
 
     return pimms.plan(**tractography_tasks)

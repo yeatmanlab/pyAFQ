@@ -5,47 +5,47 @@ import pytest
 
 from bids.layout import BIDSLayout
 
-import AFQ.definitions.mask as afm
-from AFQ.definitions.mask import *  # interprets masks from eval
+import AFQ.definitions.image as afm
+from AFQ.definitions.image import *  # interprets images from eval
 from AFQ.definitions.mapping import *  # interprets mappings from eval
 from AFQ.tests.test_api import create_dummy_bids_path
 
 
 def test_str_instantiates_mixin():
-    thresh_mask = afm.ThresholdedScalarMask("dti_fa", lower_bound=0.2)
-    thresh_mask_str = thresh_mask.str_for_toml()
-    thresh_mask_from_str = eval(thresh_mask_str)
+    thresh_image = afm.ThresholdedScalarImage("dti_fa", lower_bound=0.2)
+    thresh_image_str = thresh_image.str_for_toml()
+    thresh_image_from_str = eval(thresh_image_str)
 
-    npt.assert_(thresh_mask.combine == thresh_mask_from_str.combine)
-    npt.assert_(thresh_mask.lower_bound ==
-                thresh_mask_from_str.lower_bound)
-    npt.assert_(thresh_mask.upper_bound ==
-                thresh_mask_from_str.upper_bound)
+    npt.assert_(thresh_image.combine == thresh_image_from_str.combine)
+    npt.assert_(thresh_image.lower_bound ==
+                thresh_image_from_str.lower_bound)
+    npt.assert_(thresh_image.upper_bound ==
+                thresh_image_from_str.upper_bound)
 
 
-def test_resample_mask():
-    mask_data = np.zeros((2, 2, 2), dtype=bool)
-    mask_data[0] = True
+def test_resample_image():
+    image_data = np.zeros((2, 2, 2), dtype=bool)
+    image_data[0] = True
     dwi_data = np.zeros((2, 2, 2, 5))
-    mask_affine = np.eye(4)
+    image_affine = np.eye(4)
     dwi_affine = np.eye(4) * 2
     npt.assert_array_equal(
-        afm._resample_mask(mask_data, None, mask_affine, dwi_affine),
-        mask_data)
+        afm._resample_image(image_data, None, image_affine, dwi_affine),
+        image_data)
     npt.assert_array_equal(
-        afm._resample_mask(mask_data, dwi_data, mask_affine, dwi_affine),
-        mask_data)
+        afm._resample_image(image_data, dwi_data, image_affine, dwi_affine),
+        image_data)
 
-    mask_data = np.zeros((3, 3, 3), dtype=bool)
-    mask_data[0] = True
-    resampled_mask = afm._resample_mask(
-        mask_data, dwi_data, mask_affine, dwi_affine)
+    image_data = np.zeros((3, 3, 3), dtype=bool)
+    image_data[0] = True
+    resampled_image = afm._resample_image(
+        image_data, dwi_data, image_affine, dwi_affine)
     npt.assert_array_equal(
-        resampled_mask.shape,
+        resampled_image.shape,
         dwi_data[..., 0].shape)
     npt.assert_equal(
-        resampled_mask.dtype,
-        mask_data.dtype)
+        resampled_image.dtype,
+        image_data.dtype)
 
 
 @pytest.mark.parametrize("subject", ["01", "02"])
@@ -59,17 +59,17 @@ def test_find_path(subject, session):
         suffix="dwi", extension="nii.gz"
     )[0]
 
-    mask_file = MaskFile(suffix="seg", filters={'scope': 'synthetic'})
-    mask_file.find_path(bids_layout, test_dwi_path, subject, session)
+    image_file = ImageFile(suffix="seg", filters={'scope': 'synthetic'})
+    image_file.find_path(bids_layout, test_dwi_path, subject, session)
 
-    assert mask_file.fnames[session][subject] == op.join(
+    assert image_file.fnames[session][subject] == op.join(
         bids_dir, "derivatives", "dmriprep", "sub-" + subject,
         "ses-" + session, "anat", "seg.nii.gz"
     )
 
     other_sub = "01" if subject == "02" else "02"
     with pytest.raises(ValueError):
-        mask_file.find_path(
+        image_file.find_path(
             bids_layout,
             test_dwi_path,
             subject=other_sub,

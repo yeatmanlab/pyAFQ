@@ -37,7 +37,7 @@ import AFQ.data.fetch as afd
 #   ``AFQ_data/stanford_hardi/``
 #
 # This data represents the required preprocessed diffusion data necessary for
-# intializing the AFQ object (which we will do next)
+# intializing the GroupAFQ object (which we will do next)
 #
 # The clear_previous_afq is used to remove any previous runs of the afq object
 # stored in the AFQ_data/stanford_hardi/ BIDS directory. Set it to false if
@@ -46,10 +46,10 @@ import AFQ.data.fetch as afd
 afd.organize_stanford_data(clear_previous_afq=True)
 
 ##########################################################################
-# Initialize an AFQ object:
+# Initialize a GroupAFQ object:
 # -------------------------
 #
-# Creates an AFQ object, that encapsulates tractometry. This object can be
+# Creates a GroupAFQ object, that encapsulates tractometry. This object can be
 # used to manage the entire AFQ pipeline, including:
 #
 # - Tractography
@@ -64,7 +64,7 @@ afd.organize_stanford_data(clear_previous_afq=True)
 #
 # .. note::
 #
-#    The first time intializing the AFQ object will download necessary
+#    The first time intializing the GroupAFQ object will download necessary
 #    waypoint regions of interest (ROIs) templates into AFQ data directory:
 #
 # - Human corpus callosum templates: ``AFQ_data/callosum_templates/``
@@ -103,7 +103,7 @@ myafq = GroupAFQ(
 ##########################################################################
 # Reading in DTI FA (Diffusion Tensor Imaging Fractional Anisotropy)
 # ------------------------------------------------------------------
-# The AFQ object holds a table with file names to various data derivatives.
+# The GroupAFQ object holds a table with file names to various data derivatives.
 #
 # For example, the file where the FA computed from DTI is stored can be
 # retrieved by inspecting the ``dti_fa`` property. The measures are stored

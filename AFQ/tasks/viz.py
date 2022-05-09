@@ -341,7 +341,7 @@ def plot_tract_profiles(subses_dict, scalars, tracking_params,
     fnames = []
     for scalar in scalars:
         if not isinstance(scalar, str):
-            this_scalar = scalar.name
+            this_scalar = scalar.get_name()
         else:
             this_scalar = scalar
         fname = get_fname(

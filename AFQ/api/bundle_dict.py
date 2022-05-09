@@ -449,7 +449,7 @@ class BundleDict(MutableMapping):
                         resample_to=resample_to)
                     self._dict[b_name]["resampled"] = True
                 except AttributeError as e:
-                    if "'ScalarFile' object" in str(e):
+                    if "'ImageFile' object" in str(e):
                         self._dict[b_name]["resampled"] = False
                     else:
                         raise
