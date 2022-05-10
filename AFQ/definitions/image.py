@@ -169,7 +169,7 @@ class ImageFile(ImageDefinition):
             # Resample to DWI data:
             image_data = _resample_image(
                 image_data,
-                nib.load(subses_dict["dwi_file"]).get_fdata(),
+                nib.load(subses_dict["dwi"]).get_fdata(),
                 image_affine,
                 dwi_affine)
             return image_data, meta
@@ -203,7 +203,7 @@ class FullImage(ImageDefinition):
         @as_img
         def image_getter(subses_dict, dwi_affine):
             return np.ones(nib.load(
-                subses_dict["dwi_file"]).get_fdata()[..., 0].shape),\
+                subses_dict["dwi"]).get_fdata()[..., 0].shape),\
                 dict(source="Entire Volume")
         return image_getter
 
@@ -331,11 +331,11 @@ class B0Image(ImageDefinition):
     def get_image_getter(self, task_name):
         @as_img
         def image_getter(subses_dict, dwi_affine, data_imap):
-            mean_b0_img = nib.load(data_imap["b0_file"])
+            mean_b0_img = nib.load(data_imap["b0"])
             mean_b0 = mean_b0_img.get_fdata()
             _, image_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
             return image_data, dict(
-                source=data_imap["b0_file"],
+                source=data_imap["b0"],
                 technique="median_otsu applied to b0",
                 median_otsu_kwargs=self.median_otsu_kwargs)
         return image_getter
@@ -519,7 +519,7 @@ class ScalarImage(ImageDefinition):
 
     def get_image_getter(self, task_name):
         def image_getter(subses_dict, dwi_affine, data_imap):
-            scalar_file = data_imap[self.scalar + "_file"]
+            scalar_file = data_imap[self.scalar]
             return nib.load(scalar_file), dict(FromScalar=self.scalar)
         return image_getter
 

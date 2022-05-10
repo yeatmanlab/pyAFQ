@@ -55,7 +55,7 @@ def get_data_gtab(subses_dict, bval_file, bvec_file, min_bval=None,
         The value of b under which
         it is considered to be b0. Default: 50.
     """
-    img = nib.load(subses_dict["dwi_file"])
+    img = nib.load(subses_dict["dwi"])
     data = img.get_fdata()
     bvals, bvecs = read_bvals_bvecs(bval_file, bvec_file)
     if filter_b and (min_bval is not None):
@@ -76,7 +76,7 @@ def get_data_gtab(subses_dict, bval_file, bvec_file, min_bval=None,
     return data, gtab, img
 
 
-@pimms.calc("b0_file")
+@pimms.calc("b0")
 @as_file('_b0.nii.gz')
 def b0(subses_dict, data, gtab, img):
     """
@@ -89,7 +89,7 @@ def b0(subses_dict, data, gtab, img):
     return mean_b0_img, meta
 
 
-@pimms.calc("masked_b0_file")
+@pimms.calc("masked_b0")
 @as_file('_maskedb0.nii.gz')
 def b0_mask(subses_dict, b0_file, brain_mask_file):
     """
@@ -157,7 +157,7 @@ def dti(subses_dict, dwi_affine, brain_mask_file, data, gtab,
     return dtf.model_params, meta
 
 
-dti_params = pimms.calc("dti_params_file")(dti)
+dti_params = pimms.calc("dti_params")(dti)
 
 
 @pimms.calc("dki_tf")
@@ -189,7 +189,7 @@ def dki(subses_dict, dwi_affine, brain_mask_file, gtab, data):
     return dkf.model_params, meta
 
 
-dki_params = pimms.calc("dki_params_file")(dki)
+dki_params = pimms.calc("dki_params")(dki)
 
 
 @as_file(suffix='_model-CSD_diffmodel.nii.gz')
@@ -246,7 +246,7 @@ def csd(subses_dict, dwi_affine,
         raise CsdNanResponseError(
             'Could not compute CSD response function for subject: '
             f'{subses_dict["subject"]} in session: {subses_dict["ses"]} '
-            f'file: {subses_dict["dwi_file"]}.'
+            f'file: {subses_dict["dwi"]}.'
         )
     meta = dict(
         SphericalHarmonicDegree=csd_sh_order,
@@ -258,10 +258,10 @@ def csd(subses_dict, dwi_affine,
     return csdf.shm_coeff, meta
 
 
-csd_params = pimms.calc("csd_params_file")(csd)
+csd_params = pimms.calc("csd_params")(csd)
 
 
-@pimms.calc("pmap_file")
+@pimms.calc("pmap")
 @as_file(suffix='_model-CSD_APM.nii.gz')
 def anisotropic_power_map(subses_dict, csd_params_file):
     """
@@ -274,7 +274,7 @@ def anisotropic_power_map(subses_dict, csd_params_file):
     return pmap, dict(CSDParamsFile=csd_params_file)
 
 
-@pimms.calc("dti_fa_file")
+@pimms.calc("dti_fa")
 @as_file(suffix='_model-DTI_FA.nii.gz')
 @as_dt_deriv(tf_name='DTI')
 def dti_fa(subses_dict, dwi_affine, dti_params_file, dti_tf):
@@ -285,7 +285,7 @@ def dti_fa(subses_dict, dwi_affine, dti_params_file, dti_tf):
     return dti_tf.fa
 
 
-@pimms.calc("dti_cfa_file")
+@pimms.calc("dti_cfa")
 @as_file(suffix='_model-DTI_desc-DEC_FA.nii.gz')
 @as_dt_deriv(tf_name='DTI')
 def dti_cfa(subses_dict, dwi_affine, dti_params_file, dti_tf):
@@ -296,7 +296,7 @@ def dti_cfa(subses_dict, dwi_affine, dti_params_file, dti_tf):
     return dti_tf.color_fa
 
 
-@pimms.calc("dti_pdd_file")
+@pimms.calc("dti_pdd")
 @as_file(suffix='_model-DTI_PDD.nii.gz')
 @as_dt_deriv(tf_name='DTI')
 def dti_pdd(subses_dict, dwi_affine, dti_params_file, dti_tf):
@@ -310,7 +310,7 @@ def dti_pdd(subses_dict, dwi_affine, dti_params_file, dti_tf):
     return pdd
 
 
-@pimms.calc("dti_md_file")
+@pimms.calc("dti_md")
 @as_file('_model-DTI_MD.nii.gz')
 @as_dt_deriv('DTI')
 def dti_md(subses_dict, dwi_affine, dti_params_file, dti_tf):
@@ -321,7 +321,7 @@ def dti_md(subses_dict, dwi_affine, dti_params_file, dti_tf):
     return dti_tf.md
 
 
-@pimms.calc("dti_ga_file")
+@pimms.calc("dti_ga")
 @as_file(suffix='_model-DTI_GA.nii.gz')
 @as_dt_deriv(tf_name='DTI')
 def dti_ga(subses_dict, dwi_affine, dti_params_file, dti_tf):
@@ -332,7 +332,7 @@ def dti_ga(subses_dict, dwi_affine, dti_params_file, dti_tf):
     return dti_tf.ga
 
 
-@pimms.calc("dti_rd_file")
+@pimms.calc("dti_rd")
 @as_file(suffix='_model-DTI_RD.nii.gz')
 @as_dt_deriv(tf_name='DTI')
 def dti_rd(subses_dict, dwi_affine, dti_params_file, dti_tf):
@@ -343,7 +343,7 @@ def dti_rd(subses_dict, dwi_affine, dti_params_file, dti_tf):
     return dti_tf.rd
 
 
-@pimms.calc("dti_ad_file")
+@pimms.calc("dti_ad")
 @as_file(suffix='_model-DTI_AD.nii.gz')
 @as_dt_deriv(tf_name='DTI')
 def dti_ad(subses_dict, dwi_affine, dti_params_file, dti_tf):
@@ -354,7 +354,7 @@ def dti_ad(subses_dict, dwi_affine, dti_params_file, dti_tf):
     return dti_tf.ad
 
 
-@pimms.calc("dki_fa_file")
+@pimms.calc("dki_fa")
 @as_file('_model-DKI_FA.nii.gz')
 @as_dt_deriv('DKI')
 def dki_fa(subses_dict, dwi_affine, dki_params_file, dki_tf):
@@ -365,7 +365,7 @@ def dki_fa(subses_dict, dwi_affine, dki_params_file, dki_tf):
     return dki_tf.fa
 
 
-@pimms.calc("dki_md_file")
+@pimms.calc("dki_md")
 @as_file('_model-DKI_MD.nii.gz')
 @as_dt_deriv('DKI')
 def dki_md(subses_dict, dwi_affine, dki_params_file, dki_tf):
@@ -376,7 +376,7 @@ def dki_md(subses_dict, dwi_affine, dki_params_file, dki_tf):
     return dki_tf.md
 
 
-@pimms.calc("dki_awf_file")
+@pimms.calc("dki_awf")
 @as_file('_model-DKI_AWF.nii.gz')
 @as_dt_deriv('DKI')
 def dki_awf(subses_dict, dwi_affine, dki_params_file, dki_tf,
@@ -405,7 +405,7 @@ def dki_awf(subses_dict, dwi_affine, dki_params_file, dki_tf,
     return awf
 
 
-@pimms.calc("dki_mk_file")
+@pimms.calc("dki_mk")
 @as_file('_model-DKI_MK.nii.gz')
 @as_dt_deriv('DKI')
 def dki_mk(subses_dict, dwi_affine, dki_params_file, dki_tf):
@@ -416,7 +416,7 @@ def dki_mk(subses_dict, dwi_affine, dki_params_file, dki_tf):
     return dki_tf.mk()
 
 
-@pimms.calc("dki_ga_file")
+@pimms.calc("dki_ga")
 @as_file(suffix='_model-DKI_GA.nii.gz')
 @as_dt_deriv(tf_name='DKI')
 def dki_ga(subses_dict, dwi_affine, dki_params_file, dki_tf):
@@ -427,7 +427,7 @@ def dki_ga(subses_dict, dwi_affine, dki_params_file, dki_tf):
     return dki_tf.ga
 
 
-@pimms.calc("dki_rd_file")
+@pimms.calc("dki_rd")
 @as_file(suffix='_model-DKI_RD.nii.gz')
 @as_dt_deriv(tf_name='DKI')
 def dki_rd(subses_dict, dwi_affine, dki_params_file, dki_tf):
@@ -438,7 +438,7 @@ def dki_rd(subses_dict, dwi_affine, dki_params_file, dki_tf):
     return dki_tf.rd
 
 
-@pimms.calc("dki_ad_file")
+@pimms.calc("dki_ad")
 @as_file(suffix='_model-DKI_AD.nii.gz')
 @as_dt_deriv(tf_name='DKI')
 def dki_ad(subses_dict, dwi_affine, dki_params_file, dki_tf):
@@ -449,7 +449,7 @@ def dki_ad(subses_dict, dwi_affine, dki_params_file, dki_tf):
     return dki_tf.ad
 
 
-@pimms.calc("dki_rk_file")
+@pimms.calc("dki_rk")
 @as_file(suffix='_model-DKI_RK.nii.gz')
 @as_dt_deriv(tf_name='DKI')
 def dki_rk(subses_dict, dwi_affine, dki_params_file, dki_tf):
@@ -460,7 +460,7 @@ def dki_rk(subses_dict, dwi_affine, dki_params_file, dki_tf):
     return dki_tf.rk
 
 
-@pimms.calc("dki_ak_file")
+@pimms.calc("dki_ak")
 @as_file(suffix='_model-DKI_AK.nii.gz')
 @as_dt_deriv(tf_name='DKI')
 def dki_ak(subses_dict, dwi_affine, dki_params_file, dki_tf):
@@ -471,7 +471,7 @@ def dki_ak(subses_dict, dwi_affine, dki_params_file, dki_tf):
     return dki_tf.ak
 
 
-@pimms.calc("brain_mask_file")
+@pimms.calc("brain_mask")
 @as_file('_brain_mask.nii.gz')
 def brain_mask(subses_dict, dwi_affine, b0_file,
                bids_info, brain_mask_definition=None):
@@ -497,7 +497,7 @@ def brain_mask(subses_dict, dwi_affine, b0_file,
     if bids_info is not None:
         brain_mask_definition.find_path(
             bids_info["bids_layout"],
-            subses_dict["dwi_file"],
+            subses_dict["dwi"],
             bids_info["subject"],
             bids_info["session"])
     return brain_mask_definition.get_image_direct(
@@ -587,7 +587,7 @@ def get_bundle_dict(subses_dict, dwi_affine, segmentation_params,
         if isinstance(roi, ImageDefinition):
             roi.find_path(
                 bids_info["bids_layout"],
-                subses_dict["dwi_file"],
+                subses_dict["dwi"],
                 bids_info["subject"],
                 bids_info["session"])
             roi_img, _ = roi.get_image_direct(

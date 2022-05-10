@@ -6,7 +6,7 @@ __all__ = ["get_fname", "with_name"]
 
 def get_fname(subses_dict, suffix,
               tracking_params=None, segmentation_params=None):
-    split_fdwi = op.split(subses_dict["dwi_file"])
+    split_fdwi = op.split(subses_dict["dwi"])
     fname = op.join(subses_dict["results_dir"], split_fdwi[1].split('.')[0])
 
     if tracking_params is not None and 'odf_model' in tracking_params:

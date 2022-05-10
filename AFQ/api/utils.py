@@ -87,10 +87,7 @@ def add_method_descriptions(AFQclass):
             \"\"\"
             return self.{output}"""))
         fn = locals()[f"export_{output}"]
-        if output[-5:] == "_file":
-            setattr(AFQclass, f"export_{output[:-5]}", fn)
-        else:
-            setattr(AFQclass, f"export_{output}", fn)
+        setattr(AFQclass, f"export_{output}", fn)
 
     AFQclass_doc_intro = (
         "Here are the arguments you can pass to kwargs,"

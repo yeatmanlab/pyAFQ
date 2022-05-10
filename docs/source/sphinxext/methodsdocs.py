@@ -22,8 +22,6 @@ def setup(app):
     method_descriptions = ""
     for output, desc in methods_descriptors.items():
         desc = desc.replace("\n", " ").replace("\t", "").replace("    ", "")
-        if output[-5:] == "_file":
-            output = output[:-5]
         method_descriptions = method_descriptions + dedent(f"""
 
         def  export_{output}(self):

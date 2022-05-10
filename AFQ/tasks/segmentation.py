@@ -28,7 +28,7 @@ from dipy.tracking.streamline import set_number_of_points, values_from_volume
 logger = logging.getLogger('AFQ.api.seg')
 
 
-@pimms.calc("bundles_file")
+@pimms.calc("bundles")
 @as_file('_tractography.trk', include_track=True, include_seg=True)
 def segment(subses_dict, data_imap, mapping_imap,
             tractography_imap, tracking_params, segmentation_params):
@@ -44,7 +44,7 @@ def segment(subses_dict, data_imap, mapping_imap,
     """
     bundle_dict = data_imap["bundle_dict"]
     reg_template = data_imap["reg_template"]
-    streamlines_file = tractography_imap["streamlines_file"]
+    streamlines_file = tractography_imap["streamlines"]
     # We pass `clean_params` here, but do not use it, so we have the
     # same signature as `_clean_bundles`.
     img = nib.load(subses_dict['dwi_file'])
@@ -59,8 +59,8 @@ def segment(subses_dict, data_imap, mapping_imap,
         bundle_dict,
         tg,
         subses_dict['dwi_file'],
-        data_imap["bval_file"],
-        data_imap["bvec_file"],
+        data_imap["bval"],
+        data_imap["bvec"],
         reg_template=reg_template,
         mapping=mapping_imap["mapping"])
 
@@ -81,7 +81,7 @@ def segment(subses_dict, data_imap, mapping_imap,
     return tgram, meta
 
 
-@pimms.calc("clean_bundles_file")
+@pimms.calc("clean_bundles")
 @as_file('-clean_tractography.trk', include_track=True, include_seg=True)
 def clean_bundles(subses_dict, bundles_file, data_imap,
                   tracking_params, segmentation_params, clean_params=None):
@@ -184,7 +184,7 @@ def export_bundles(subses_dict, clean_bundles_file, bundles_file,
     return True
 
 
-@pimms.calc("sl_counts_file")
+@pimms.calc("sl_counts")
 @as_file('_sl_count.csv', include_track=True, include_seg=True)
 def export_sl_counts(subses_dict, data_imap,
                      clean_bundles_file, bundles_file,
@@ -218,7 +218,7 @@ def export_sl_counts(subses_dict, data_imap,
     return counts_df, dict(sources=bundles_files)
 
 
-@pimms.calc("profiles_file")
+@pimms.calc("profiles")
 @as_file('_profiles.csv', include_track=True, include_seg=True)
 def tract_profiles(subses_dict, clean_bundles_file, data_imap,
                    scalar_dict, dwi_affine,
@@ -331,10 +331,10 @@ def get_scalar_dict(data_imap, mapping_imap, scalars=["dti_fa", "dti_md"]):
     for scalar in scalars:
         if isinstance(scalar, str):
             sc = scalar.lower()
-            scalar_dict[sc] = data_imap[f"{sc}_file"]
+            scalar_dict[sc] = data_imap[f"{sc}"]
         else:
             scalar_dict[scalar.get_name()] = mapping_imap[
-                f"{scalar.get_name()}_file"]
+                f"{scalar.get_name()}"]
     return {"scalar_dict": scalar_dict}
 
 

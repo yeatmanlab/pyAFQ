@@ -83,7 +83,7 @@ class ParticipantAFQ(object):
 
         kwargs["bids_info"] = bids_info
         kwargs["subses_dict"] = {
-            "dwi_file": dwi_data_file,
+            "dwi": dwi_data_file,
             "results_dir": output_dir}
 
         # construct pimms plans
@@ -131,17 +131,12 @@ class ParticipantAFQ(object):
             pass
 
         # find what name to use
-        attr_file = attr + "_file"
         if attr in self.wf_dict:
             return self.wf_dict[attr]
-        elif attr_file in self.wf_dict:
-            return self.wf_dict[attr_file]
-        else:
-            for sub_attr in wf_sections:
-                if attr in self.wf_dict[sub_attr]:
-                    return self.wf_dict[sub_attr][attr]
-                elif attr_file in self.wf_dict[sub_attr]:
-                    return self.wf_dict[sub_attr][attr_file]
+
+        for sub_attr in wf_sections:
+            if attr in self.wf_dict[sub_attr]:
+                return self.wf_dict[sub_attr][attr]
 
         # attr not found, allow typical AttributeError
         return object.__getattribute__(self, attr)

@@ -314,22 +314,14 @@ class GroupAFQ(object):
         # find what name to use
         first_dict =\
             self.wf_dict[self.valid_sub_list[0]][str(self.valid_ses_list[0])]
-        attr_file = attr + "_file"
         attr_name = None
         if attr in first_dict:
             attr_name = attr
-            section = None
-        elif attr_file in first_dict:
-            attr_name = attr_file
             section = None
         else:
             for sub_attr in wf_sections:
                 if attr in first_dict[sub_attr]:
                     attr_name = attr
-                    section = sub_attr
-                    break
-                elif attr_file in first_dict[sub_attr]:
-                    attr_name = attr_file
                     section = sub_attr
                     break
 

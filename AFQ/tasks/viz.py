@@ -67,9 +67,9 @@ def viz_bundles(subses_dict,
     mapping = mapping_imap["mapping"]
     bundle_dict = data_imap["bundle_dict"]
     scalar_dict = segmentation_imap["scalar_dict"]
-    profiles_file = segmentation_imap["profiles_file"]
-    volume = data_imap["b0_file"]
-    shade_by_volume = data_imap[best_scalar + "_file"]
+    profiles_file = segmentation_imap["profiles"]
+    volume = data_imap["b0"]
+    shade_by_volume = data_imap[best_scalar]
     start_time = time()
     volume = _viz_prepare_vol(volume, False, mapping, scalar_dict)
     shade_by_volume = _viz_prepare_vol(
@@ -95,7 +95,7 @@ def viz_bundles(subses_dict,
         figure=figure)
 
     figure = viz_backend.visualize_bundles(
-        segmentation_imap["clean_bundles_file"],
+        segmentation_imap["clean_bundles"],
         shade_by_volume=shade_by_volume,
         sbv_lims=sbv_lims_bundles,
         bundle_dict=bundle_dict,
@@ -167,9 +167,9 @@ def viz_indivBundle(subses_dict,
     bundle_dict = data_imap["bundle_dict"]
     reg_template = data_imap["reg_template"]
     scalar_dict = segmentation_imap["scalar_dict"]
-    volume = data_imap["b0_file"]
-    shade_by_volume = data_imap[best_scalar + "_file"]
-    profiles = pd.read_csv(segmentation_imap["profiles_file"])
+    volume = data_imap["b0"]
+    shade_by_volume = data_imap[best_scalar]
+    profiles = pd.read_csv(segmentation_imap["profiles"])
 
     start_time = time()
     volume = _viz_prepare_vol(
@@ -193,7 +193,7 @@ def viz_indivBundle(subses_dict,
             inline=False)
         try:
             figure = viz_backend.visualize_bundles(
-                segmentation_imap["clean_bundles_file"],
+                segmentation_imap["clean_bundles"],
                 shade_by_volume=shade_by_volume,
                 sbv_lims=sbv_lims_indiv,
                 bundle_dict=bundle_dict,
@@ -235,7 +235,7 @@ def viz_indivBundle(subses_dict,
                     interact=False,
                     figure=figure)
 
-        for i, roi in enumerate(mapping_imap["rois_file"][bundle_name]):
+        for i, roi in enumerate(mapping_imap["rois"][bundle_name]):
             figure = viz_backend.visualize_roi(
                 roi,
                 name=f"{bundle_name} ROI {i}",
@@ -299,7 +299,7 @@ def viz_indivBundle(subses_dict,
                     interact=False,
                     inline=False)
                 core_fig = viz_backend.visualize_bundles(
-                    segmentation_imap["clean_bundles_file"],
+                    segmentation_imap["clean_bundles"],
                     shade_by_volume=shade_by_volume,
                     sbv_lims=sbv_lims_indiv,
                     bundle_dict=bundle_dict,
@@ -312,7 +312,7 @@ def viz_indivBundle(subses_dict,
                     figure=core_fig)
                 core_fig = viz_backend.single_bundle_viz(
                     indiv_profile,
-                    segmentation_imap["clean_bundles_file"],
+                    segmentation_imap["clean_bundles"],
                     bundle_name,
                     best_scalar,
                     bundle_dict=bundle_dict,
@@ -357,7 +357,7 @@ def plot_tract_profiles(subses_dict, scalars, tracking_params,
         os.makedirs(op.abspath(tract_profiles_folder), exist_ok=True)
 
         visualize_tract_profiles(
-            segmentation_imap["profiles_file"],
+            segmentation_imap["profiles"],
             scalar=this_scalar,
             file_name=fname,
             n_boot=100)
