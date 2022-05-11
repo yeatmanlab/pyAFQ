@@ -423,7 +423,7 @@ class GroupAFQ(object):
 
         # if some need to be calculated, do those in parallel
         if to_calc_list:
-            par_results = parfor(
+            par_results = paramap(
                 lambda wf, attr: wf[attr], in_list,
                 func_args=[attr_name],
                 **self.parallel_params)
