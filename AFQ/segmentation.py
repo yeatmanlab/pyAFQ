@@ -23,7 +23,7 @@ import AFQ.utils.models as ut
 import AFQ.utils.volume as auv
 import AFQ.data.fetch as afd
 from AFQ.data.utils import BUNDLE_RECO_2_AFQ
-from AFQ.utils.parallel import parfor
+from dipy.utils.parallel import paramap
 
 __all__ = ["Segmentation", "clean_bundle", "clean_by_endpoints"]
 
@@ -668,7 +668,7 @@ class Segmentation:
 
             # collects results from the submitted streamlines
             if parallelizing:
-                results = parfor(
+                results = paramap(
                     _is_streamline_in_ROIs_parallel, in_list,
                     func_args=[
                         tol, include_roi, include_roi_tols, exclude_roi,

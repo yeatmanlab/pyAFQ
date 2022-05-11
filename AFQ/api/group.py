@@ -9,7 +9,7 @@ from AFQ.api.utils import wf_sections, add_method_descriptions
 import AFQ.utils.streamlines as aus
 
 import AFQ.viz.utils as vut
-from AFQ.utils.parallel import parfor
+from dipy.utils.parallel import paramap
 
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 import dipy.tracking.streamlinespeed as dps
@@ -96,7 +96,7 @@ class GroupAFQ(object):
             to recalculate a derivative).
             Default: None
         parallel_params : dict, optional
-            Parameters to pass to parfor in AFQ.utils.parallel,
+            Parameters to pass to paramap in AFQ.utils.parallel,
             to parallelize computations across subjects and sessions.
             Set "n_jobs" to -1 to automatically parallelize as
             the number of cpus. Here is an example for how to do
@@ -360,7 +360,7 @@ class GroupAFQ(object):
 
         # if some need to be calculated, do those in parallel
         if len(to_calc_list) > 0:
-            par_results = parfor(
+            par_results = paramap(
                 _getter_helper, in_list,
                 func_args=[attr_name],
                 **self.parallel_params)
