@@ -13,6 +13,7 @@ from AFQ.tasks.mapping import get_mapping_plan
 from AFQ.tasks.tractography import get_tractography_plan
 from AFQ.tasks.segmentation import get_segmentation_plan
 from AFQ.tasks.viz import get_viz_plan
+from AFQ.utils.path import drop_extension
 
 
 __all__ = ["ParticipantAFQ"]
@@ -92,7 +93,7 @@ class ParticipantAFQ(object):
             bids_info=bids_info,
             base_fname=op.join(
                 output_dir,
-                op.split(dwi_data_file)[1].split('.')[0]),
+                drop_extension(op.basename(dwi_data_file))),
             **kwargs)
 
         # construct pimms plans
