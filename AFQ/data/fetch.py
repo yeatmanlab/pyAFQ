@@ -6,6 +6,7 @@ from dipy.io.streamline import (
     load_tractogram, save_tractogram, StatefulTractogram, Space)
 from dipy.data.fetcher import _make_fetcher
 import dipy.data as dpd
+from AFQ.utils.path import drop_extension
 
 import os
 import os.path as op
@@ -93,7 +94,7 @@ def _fetcher_to_template(fetcher, as_img=False, resample_to=False):
                                            img.affine,
                                            resample_to.affine).get_fdata(),
                                   resample_to.affine)
-        template_dict[f.split('.')[0]] = img
+        template_dict[drop_extension(f)] = img
     return template_dict
 
 
@@ -929,8 +930,8 @@ def read_hcp_atlas(n_bundles=16, as_file=False):
         "centroid")
     os.makedirs(centroid_folder, exist_ok=True)
     for bundle_file in bundle_files:
-        bundle = op.splitext(op.split(bundle_file)[-1])[0]
-        centroid_file = op.join(centroid_folder, bundle + ".trk")
+        bundle = drop_extension(op.split(bundle_file)[-1])
+        centroid_file = op.join(centroid_folder, f"{bundle}.trk")
         bundle_dict[bundle] = {}
         if not op.exists(centroid_file):
             bundle_sl = load_tractogram(

@@ -9,6 +9,7 @@ from AFQ.tasks.decorators import as_file
 from AFQ.tasks.utils import get_fname, with_name
 import AFQ.data.fetch as afd
 from AFQ.data.s3bids import write_json
+from AFQ.utils.path import drop_extension
 import AFQ.utils.volume as auv
 from AFQ.definitions.mapping import SynMap
 from AFQ.definitions.utils import Definition
@@ -86,8 +87,8 @@ def export_rois(subses_dict, data_imap, mapping, dwi_affine):
                             nib.Nifti1Image(
                                 warped_roi.astype(np.float32),
                                 dwi_affine), fname)
-                        meta = dict()
-                        meta_fname = fname.split('.')[0] + '.json'
+                        meta = {}
+                        meta_fname = f'{drop_extension(fname)}.json'
                         write_json(meta_fname, meta)
                     roi_files[bundle].append(fname)
     return {'rois_file': roi_files}

@@ -5,6 +5,8 @@ from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from AFQ.data.s3bids import read_json
 import os.path as op
 
+from AFQ.utils.path import drop_extension
+
 
 class SegmentedSFT():
     def __init__(self, bundles, space):
@@ -60,7 +62,7 @@ class SegmentedSFT():
         if sidecar_file is None:
             # assume json sidecar has the same name as trk_file,
             # but with json suffix
-            sidecar_file = trk_file.split('.')[0] + '.json'
+            sidecar_file = f'{drop_extension(trk_file)}.json'
             if not op.exists(sidecar_file):
                 raise ValueError((
                     "JSON sidecars are required for trk files. "
