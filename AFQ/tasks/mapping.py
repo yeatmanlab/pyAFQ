@@ -86,8 +86,8 @@ def export_rois(subses_dict, data_imap, mapping, dwi_affine):
                             nib.Nifti1Image(
                                 warped_roi.astype(np.float32),
                                 dwi_affine), fname)
-                        meta = dict()
-                        meta_fname = fname.split('.')[0] + '.json'
+                        meta = {}
+                        meta_fname = f'{op.splitext(fname)[0]}.json'
                         write_json(meta_fname, meta)
                     roi_files[bundle].append(fname)
     return {'rois_file': roi_files}

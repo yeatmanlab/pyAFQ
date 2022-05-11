@@ -104,7 +104,7 @@ def as_file(suffix, include_track=False, include_seg=False):
                 else:
                     img_trk_or_csv.to_csv(this_file)
                 meta_fname = get_fname(
-                    subses_dict, suffix.split('.')[0] + '.json',
+                    subses_dict, op.splitext(suffix)[0] + '.json',
                     tracking_params=tracking_params,
                     segmentation_params=segmentation_params)
                 write_json(meta_fname, meta)

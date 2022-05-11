@@ -60,7 +60,7 @@ class SegmentedSFT():
         if sidecar_file is None:
             # assume json sidecar has the same name as trk_file,
             # but with json suffix
-            sidecar_file = trk_file.split('.')[0] + '.json'
+            sidecar_file = f'{op.splitext(trk_file)[0]}.json'
             if not op.exists(sidecar_file):
                 raise ValueError((
                     "JSON sidecars are required for trk files. "

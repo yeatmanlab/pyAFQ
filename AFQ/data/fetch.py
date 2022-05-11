@@ -93,7 +93,7 @@ def _fetcher_to_template(fetcher, as_img=False, resample_to=False):
                                            img.affine,
                                            resample_to.affine).get_fdata(),
                                   resample_to.affine)
-        template_dict[f.split('.')[0]] = img
+        template_dict[op.splitext(f)[0]] = img
     return template_dict
 
 
