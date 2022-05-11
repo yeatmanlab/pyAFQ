@@ -38,7 +38,7 @@ must provide a base image with the fury requiements installed.
 Below is an example dockerfile that can be used to build that base image:: 
 
    # Use official python base image
-   FROM python:3.7
+   FROM python:3.9
    # Install libgl
    RUN apt-get update
    RUN apt-get install -y libgl1-mesa-glx
