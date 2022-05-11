@@ -6,7 +6,9 @@ warnings.simplefilter(action='ignore', category=FutureWarning)  # noqa
 import logging
 import AFQ.data.s3bids as afs
 from AFQ.api.participant import ParticipantAFQ
-from AFQ.api.utils import AFQclass_doc, check_attribute, export_all_helper
+from AFQ.api.utils import (
+    check_attribute, AFQclass_doc,
+    export_all_helper, valid_exports_string)
 import AFQ.utils.streamlines as aus
 
 from dipy.utils.parallel import paramap
@@ -378,9 +380,10 @@ class GroupAFQ(object):
         return sls_json_fname
 
     def export(self, attr_name="help"):
-        """
+        f"""
         Export a specific output. To print a list of available outputs,
         call export without arguments.
+        {valid_exports_string}
 
         Parameters
         ----------

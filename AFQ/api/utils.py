@@ -76,7 +76,7 @@ for task_module in task_modules:
 
 valid_exports_string = (
     "Here is a list of valid attributes "
-    f"to export: {methods_sections.keys()}")  # TODO: put this in export docstring
+    f"to export: {methods_sections.keys()}")
 
 
 def check_attribute(attr_name):

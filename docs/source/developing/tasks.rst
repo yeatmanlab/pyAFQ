@@ -32,16 +32,13 @@ same output, or if the task being provided by a `Definition`-inherited object
 of both).
 
 The outputs of each task can be accessed by the user through the
-AFQ object, either as an attribute or using a `export_` method,
-such as `export_b0`. Descriptions for these methods are taken from
+AFQ object using the `export` method,
+such as `myafq.export("b0")`. Descriptions for these methods are taken from
 each tasks' dosctring. Additionally, if there are any parameters in your
 task which the user should input, make them a kwarg with a reasonable default,
 and add a description to the docstring in a properly formatted parameters
-section. Note that when an output is attached to the AFQ class either as
-an attribute or method, if that output name ends in '_file',
-the '_file' is removed from the name automatically. Also, do not use
-the % character in task docstrings, as this will lead to an error in
-parsing the docstring.
+section. Do not use the % character in task docstrings, as this will lead
+to an error in parsing the docstring.
 
 Task Decorators
 ~~~~~~~~~~~~~~~
@@ -53,18 +50,11 @@ decorators would be useful. Here are descriptions of some useful decorators:
   the disk so they can be reused in later runs. This decorator implements an if
   statement: if the file already exists, return that, otherwise generate the file
   with a BIDS-compliant filename using the output of the task. To use this
-  decorator, your task must have as input subses_dict and return two objects:
+  decorator, your task must return two objects:
   (1) either a Nifti1Image, StatefulTractogram, or pandas dataframe, and (2)
   a dictionary containing metadata. Provide the decorator with the suffix you
   want the file to have and whether or not tracking or segmentation information
   should be included in the BIDS-compliant filename.
-
-- :func:`AFQ.tasks.decorators.as_model`: this decorator is useful for
-  implementing ODF models. It adds timing information
-  to the metadata dictionary and converts model data into a Nifti1Image, both
-  of which can then be passed to :func:`AFQ.tasks.decorators.as_file`. To use
-  this decorator, your task must have as input dwi_affine and return two objects:
-  (1) model data as an ndarray and (2) a dictionary containing metadata.
 
 - :func:`AFQ.tasks.decorators.as_fit_deriv`: this decorator is useful for
   implementing both DTI and DKI derivatives. You provide it with which model
@@ -72,14 +62,11 @@ decorators would be useful. Here are descriptions of some useful decorators:
   the location of the model params file
   and converts the derivative data into a Nifti1Image, both
   of which can then be passed to :func:`AFQ.tasks.decorators.as_file`. To use
-  this decorator, your task must have as input dwi_affine and either
-  dki_params_file or dti_params_file. Your task must return the derivative data
-  as an ndarray.
+  this decorator, your task must return the derivative data as an ndarray.
 
 - :func:`AFQ.tasks.decorators.as_img`: this decorator simply converts the ndarray
   output of a task into a Nifti1Image, typically to be passed to
-  :func:`AFQ.tasks.decorators.as_file`. To use this decorator, your task must
-  have as input with affine in its name. Your decorator must return two objects:
+  :func:`AFQ.tasks.decorators.as_file`. To use this decorator, task must return two objects:
   (1) data as an ndarray and (2) a dictionary containing metadata.
 
 Checklist for Adding Tasks to the pyAFQ Workflow

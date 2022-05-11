@@ -4,7 +4,9 @@ from time import time
 import logging
 
 from AFQ.definitions.mapping import SlrMap
-from AFQ.api.utils import check_attribute, AFQclass_doc, export_all_helper
+from AFQ.api.utils import (
+    check_attribute, AFQclass_doc,
+    export_all_helper, valid_exports_string)
 
 from AFQ.tasks.data import get_data_plan
 from AFQ.tasks.mapping import get_mapping_plan
@@ -143,7 +145,8 @@ class ParticipantAFQ(object):
 
     def export_all(self, viz=True, xforms=True,
                    indiv=True):
-        """ Exports all the possible outputs
+        f""" Exports all the possible outputs
+        {valid_exports_string}
 
         Parameters
         ----------
