@@ -11,6 +11,7 @@ import pimms
 from AFQ.tasks.decorators import as_file
 from AFQ.tasks.utils import get_fname, with_name
 import AFQ.segmentation as seg
+from AFQ.utils.path import drop_extension
 import AFQ.utils.streamlines as aus
 from AFQ.tasks.utils import get_default_args
 from AFQ.data.s3bids import write_json
@@ -178,7 +179,7 @@ def export_bundles(subses_dict, clean_bundles_file, bundles_file,
                     seg_sft.get_bundle(bundle), fname,
                     bbox_valid_check=False)
                 meta = dict(source=this_bundles_file)
-                meta_fname = op.splitext(fname)[0] + '.json'
+                meta_fname = drop_extension(fname) + '.json'
                 write_json(meta_fname, meta)
     return True
 

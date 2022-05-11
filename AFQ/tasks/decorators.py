@@ -12,6 +12,7 @@ from AFQ.data.s3bids import write_json
 import numpy as np
 
 from AFQ.tasks.utils import get_fname
+from AFQ.utils.path import drop_extension
 
 
 __all__ = ["as_file", "as_model", "as_dt_deriv", "as_img"]
@@ -104,7 +105,7 @@ def as_file(suffix, include_track=False, include_seg=False):
                 else:
                     img_trk_or_csv.to_csv(this_file)
                 meta_fname = get_fname(
-                    subses_dict, op.splitext(suffix)[0] + '.json',
+                    subses_dict, drop_extension(suffix) + '.json',
                     tracking_params=tracking_params,
                     segmentation_params=segmentation_params)
                 write_json(meta_fname, meta)
