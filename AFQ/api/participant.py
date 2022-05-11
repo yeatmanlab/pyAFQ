@@ -4,8 +4,7 @@ from time import time
 import logging
 
 from AFQ.definitions.mapping import SlrMap
-from AFQ.api.utils import wf_sections, add_method_descriptions
-from AFQ.viz.utils import viz_import_msg_error
+from AFQ.api.utils import check_attribute, AFQclass_doc, export_all_helper
 
 from AFQ.tasks.data import get_data_plan
 from AFQ.tasks.mapping import get_mapping_plan
@@ -17,8 +16,9 @@ from AFQ.tasks.viz import get_viz_plan
 __all__ = ["ParticipantAFQ"]
 
 
-@add_method_descriptions
 class ParticipantAFQ(object):
+    f"""{AFQclass_doc}"""
+
     def __init__(self,
                  dwi_data_file,
                  bval_file, bvec_file,
@@ -81,10 +81,17 @@ class ParticipantAFQ(object):
 
         self.logger = logging.getLogger('AFQ.api')
 
-        kwargs["bids_info"] = bids_info
-        kwargs["subses_dict"] = {
-            "dwi": dwi_data_file,
-            "results_dir": output_dir}
+        kwargs = dict(
+            dwi=dwi_data_file,
+            bval=bval_file,
+            bvec=bvec_file,
+            results_dir=output_dir,
+            dwi_affine=nib.load(dwi_data_file).affine,
+            bids_info=bids_info,
+            base_fname=op.join(
+                output_dir,
+                op.split(dwi_data_file)[1].split('.')[0]),
+            **kwargs)
 
         # construct pimms plans
         if "mapping_definition" in kwargs and isinstance(
@@ -103,43 +110,36 @@ class ParticipantAFQ(object):
                 "segmentation": get_segmentation_plan(kwargs),
                 "viz": get_viz_plan(kwargs)}
 
-        img = nib.load(dwi_data_file)
-
-        input_data = dict(
-            dwi_img=img,
-            dwi_affine=img.affine,
-            bval_file=bval_file,
-            bvec_file=bvec_file,
-            **kwargs)
-
         # chain together a complete plan from individual plans
         previous_data = {}
         for name, plan in plans.items():
             previous_data[f"{name}_imap"] = plan(
-                **input_data,
+                **kwargs,
                 **previous_data)
-            last_name = name
 
         self.wf_dict =\
-            previous_data[f"{last_name}_imap"]
+            previous_data[f"{name}_imap"]
 
-    def __getattribute__(self, attr):
-        # check if normal attr exists first
-        try:
-            return object.__getattribute__(self, attr)
-        except AttributeError:
-            pass
+    def export(self, attr_name="help"):
+        """
+        Export a specific output. To print a list of available outputs,
+        call export without arguments.
 
-        # find what name to use
-        if attr in self.wf_dict:
-            return self.wf_dict[attr]
+        Parameters
+        ----------
+        attr_name : str
+            Name of the output to export. Default: "help"
 
-        for sub_attr in wf_sections:
-            if attr in self.wf_dict[sub_attr]:
-                return self.wf_dict[sub_attr][attr]
+        Returns
+        -------
+        output : any
+            The specific output, or None if called without arguments.
+        """
+        section = check_attribute(attr_name)
 
-        # attr not found, allow typical AttributeError
-        return object.__getattribute__(self, attr)
+        if section is None:
+            return self.wf_dict[attr_name]
+        return self.wf_dict[section][attr_name]
 
     def export_all(self, viz=True, xforms=True,
                    indiv=True):
@@ -165,35 +165,7 @@ class ParticipantAFQ(object):
             Default: True
         """
         start_time = time()
-        seg_algo = self.segmentation_params.get("seg_algo", "AFQ")
-
-        if xforms:
-            try:
-                self.b0_warped
-            except Exception as e:
-                self.logger.warning((
-                    "Failed to export warped b0. This could be because your "
-                    "mapping type is only compatible with transformation "
-                    f"from template to subject space. The error is: {e}"))
-            self.template_xform
-        if indiv:
-            self.indiv_bundles
-            if seg_algo == "AFQ":
-                self.rois
-        self.sl_counts
-        self.profiles
-
-        if viz:
-            try:
-                self.tract_profile_plots
-            except ImportError as e:
-                plotly_err_message = viz_import_msg_error("plot")
-                if str(e) != plotly_err_message:
-                    raise
-                else:
-                    self.logger.warning(plotly_err_message)
-            self.all_bundles_figure
-            if seg_algo == "AFQ":
-                self.indiv_bundles_figures
+        seg_algo = self.export("segmentation_params").get("seg_algo", "AFQ")
+        export_all_helper(self, seg_algo, xforms, indiv, viz)
         self.logger.info(
-            "Time taken for export all: " + str(time() - start_time))
+            f"Time taken for export all: {time() - start_time}")

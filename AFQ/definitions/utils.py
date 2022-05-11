@@ -56,7 +56,7 @@ def _arglist_to_string(args, get_attr=None):
         elif isinstance(arg, str):
             arg = f"\"{arg}\""
         elif isinstance(arg, list):
-            arg = "[" + _arglist_to_string(arg) + "]"
+            arg = f"[{_arglist_to_string(arg)}]"
         to_string = to_string + str(arg) + ', '
     if to_string[-2:] == ', ':
         to_string = to_string[:-2]

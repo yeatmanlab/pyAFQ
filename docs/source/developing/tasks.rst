@@ -66,7 +66,7 @@ decorators would be useful. Here are descriptions of some useful decorators:
   this decorator, your task must have as input dwi_affine and return two objects:
   (1) model data as an ndarray and (2) a dictionary containing metadata.
 
-- :func:`AFQ.tasks.decorators.as_dt_deriv`: this decorator is useful for
+- :func:`AFQ.tasks.decorators.as_fit_deriv`: this decorator is useful for
   implementing both DTI and DKI derivatives. You provide it with which model
   you are using, either "DTI" or "DKI". It creates a metadata dictionary using
   the location of the model params file

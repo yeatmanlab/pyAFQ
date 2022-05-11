@@ -17,7 +17,7 @@ logger = logging.getLogger('AFQ.api')
 @pimms.calc("seed")
 @as_file('_seed_mask.nii.gz')
 @as_img
-def export_seed_mask(subses_dict, dwi_affine, tracking_params):
+def export_seed_mask(tracking_params):
     """
     full path to a nifti file containing the
     tractography seed mask
@@ -30,7 +30,7 @@ def export_seed_mask(subses_dict, dwi_affine, tracking_params):
 @pimms.calc("stop")
 @as_file('_stop_mask.nii.gz')
 @as_img
-def export_stop_mask(subses_dict, dwi_affine, tracking_params):
+def export_stop_mask(tracking_params):
     """
     full path to a nifti file containing the
     tractography stop mask
@@ -51,7 +51,7 @@ def export_stop_mask_pft(pve_wm, pve_gm, pve_csf):
 
 @pimms.calc("streamlines")
 @as_file('_tractography.trk', include_track=True)
-def streamlines(subses_dict, data_imap, seed_file, stop_file,
+def streamlines(data_imap, seed, stop,
                 tracking_params):
     """
     full path to the complete, unsegmented tractography file
@@ -82,11 +82,11 @@ def streamlines(subses_dict, data_imap, seed_file, stop_file,
             f"The ODF model you gave ({odf_model}) was not recognized"))
 
     # get masks
-    this_tracking_params['seed_mask'] = nib.load(seed_file).get_fdata()
-    if isinstance(stop_file, str):
-        this_tracking_params['stop_mask'] = nib.load(stop_file).get_fdata()
+    this_tracking_params['seed_mask'] = nib.load(seed).get_fdata()
+    if isinstance(stop, str):
+        this_tracking_params['stop_mask'] = nib.load(stop).get_fdata()
     else:
-        this_tracking_params['stop_mask'] = stop_file
+        this_tracking_params['stop_mask'] = stop
 
     # perform tractography
     start_time = time()
@@ -101,10 +101,10 @@ def streamlines(subses_dict, data_imap, seed_file, stop_file,
             tracking_params["directions"]],
         Count=len(sft.streamlines),
         Seeding=dict(
-            ROI=seed_file,
+            ROI=seed,
             n_seeds=tracking_params["n_seeds"],
             random_seeds=tracking_params["random_seeds"]),
-        Constraints=dict(ROI=stop_file),
+        Constraints=dict(ROI=stop),
         Parameters=dict(
             Units="mm",
             StepSize=tracking_params["step_size"],
@@ -215,20 +215,20 @@ def get_tractography_plan(kwargs):
 
     stop_mask = kwargs["tracking_params"]['stop_mask']
     seed_mask = kwargs["tracking_params"]['seed_mask']
-    subses_dict = kwargs["subses_dict"]
+    dwi = kwargs["dwi"]
     bids_info = kwargs["bids_info"]
 
     if bids_info is not None:
         if isinstance(stop_mask, Definition):
             stop_mask.find_path(
                 bids_info["bids_layout"],
-                subses_dict["dwi"],
+                dwi,
                 bids_info["subject"],
                 bids_info["session"])
         if isinstance(seed_mask, Definition):
             seed_mask.find_path(
                 bids_info["bids_layout"],
-                subses_dict["dwi"],
+                dwi,
                 bids_info["subject"],
                 bids_info["session"])
 

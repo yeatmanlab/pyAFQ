@@ -119,7 +119,7 @@ myafq = GroupAFQ(
 # We will then use `nibabel` to load the deriviative file and retrieve the
 # data array.
 
-FA_fname = myafq.dti_fa["01"]
+FA_fname = myafq.export("dti_fa")["01"]
 FA_img = nib.load(FA_fname)
 FA = FA_img.get_fdata()
 
@@ -165,7 +165,7 @@ ax.axis("off")
 #    single bundle by double clicking the legend. The interactive
 #    visualization will also all you to pan, zoom, and rotate.
 
-bundle_html = myafq.all_bundles_figure
+bundle_html = myafq.export("all_bundles_figure")
 plotly.io.show(bundle_html["01"])
 
 ##########################################################################
@@ -175,7 +175,7 @@ plotly.io.show(bundle_html["01"])
 # `pip install pyAFQ[plot]` so that you have the necessary dependencies.
 #
 
-fig_files = myafq.tract_profile_plots["01"]
+fig_files = myafq.export("tract_profile_plots")["01"]
 
 ##########################################################################
 # .. figure:: {{ fig_files[0] }}

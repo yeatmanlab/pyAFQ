@@ -12,7 +12,7 @@ The pyAFQ API methods
 After defining your pyAFQ API object, you can ask for the output of
 any step of the pipeline. It is common for users to just call export_all
 (for example, `myafq.export_all()`). However, if the user only wants the
-tractography, the user can instead call `myafq.export_streamlines()`. Here
+tractography, the user can instead call `myafq.export("streamlines")`. Here
 is a list of all of pyAFQ's possible outputs:
 
 """
@@ -24,7 +24,7 @@ def setup(app):
         desc = desc.replace("\n", " ").replace("\t", "").replace("    ", "")
         method_descriptions = method_descriptions + dedent(f"""
 
-        def  export_{output}(self):
+        {output}:
             {desc}
         """)
 

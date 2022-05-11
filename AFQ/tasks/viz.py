@@ -31,7 +31,7 @@ def _viz_prepare_vol(vol, xform, mapping, scalar_dict):
 
 
 @pimms.calc("all_bundles_figure")
-def viz_bundles(subses_dict,
+def viz_bundles(base_fname,
                 dwi_affine,
                 viz_backend,
                 data_imap,
@@ -108,20 +108,20 @@ def viz_bundles(subses_dict,
 
     if "no_gif" not in viz_backend.backend:
         fname = get_fname(
-            subses_dict, '_viz.gif',
+            base_fname, '_viz.gif',
             tracking_params=tracking_params,
             segmentation_params=segmentation_params)
 
         viz_backend.create_gif(figure, fname)
     if "plotly" in viz_backend.backend:
         fname = get_fname(
-            subses_dict, '_viz.html',
+            base_fname, '_viz.html',
             tracking_params=tracking_params,
             segmentation_params=segmentation_params)
 
         figure.write_html(fname)
     meta_fname = get_fname(
-        subses_dict, '_viz.json',
+        base_fname, '_viz.json',
         tracking_params=tracking_params,
         segmentation_params=segmentation_params)
     meta = dict(Timing=time() - start_time)
@@ -130,7 +130,8 @@ def viz_bundles(subses_dict,
 
 
 @pimms.calc("indiv_bundles_figures")
-def viz_indivBundle(subses_dict,
+def viz_indivBundle(base_fname,
+                    results_dir,
                     dwi_affine,
                     viz_backend,
                     data_imap,
@@ -244,13 +245,13 @@ def viz_indivBundle(subses_dict,
                 interact=False,
                 figure=figure)
 
-        roi_dir = op.join(subses_dict['results_dir'], 'viz_bundles')
+        roi_dir = op.join(results_dir, 'viz_bundles')
         os.makedirs(roi_dir, exist_ok=True)
         fnames = []
         if "no_gif" not in viz_backend.backend:
             fname = op.split(
                 get_fname(
-                    subses_dict,
+                    base_fname,
                     f'_{bundle_name}'
                     f'_viz.gif',
                     tracking_params=tracking_params,
@@ -260,11 +261,11 @@ def viz_indivBundle(subses_dict,
             viz_backend.create_gif(figure, fname)
             fnames.append(fname)
         if "plotly" in viz_backend.backend:
-            roi_dir = op.join(subses_dict['results_dir'], 'viz_bundles')
+            roi_dir = op.join(results_dir, 'viz_bundles')
             os.makedirs(roi_dir, exist_ok=True)
             fname = op.split(
                 get_fname(
-                    subses_dict,
+                    base_fname,
                     f'_{bundle_name}'
                     f'_viz.html',
                     tracking_params=tracking_params,
@@ -275,14 +276,14 @@ def viz_indivBundle(subses_dict,
             fnames.append(fname)
 
             # also do the core visualizations when using the plotly backend
-            core_dir = op.join(subses_dict['results_dir'], 'viz_core_bundles')
+            core_dir = op.join(results_dir, 'viz_core_bundles')
             os.makedirs(core_dir, exist_ok=True)
             indiv_profile = profiles[
                 profiles.tractID == bundle_name][best_scalar].to_numpy()
             if len(indiv_profile) > 1:
                 fname = op.split(
                     get_fname(
-                        subses_dict,
+                        base_fname,
                         f'_{bundle_name}'
                         f'_viz.html',
                         tracking_params=tracking_params,
@@ -321,7 +322,7 @@ def viz_indivBundle(subses_dict,
                     include_profile=True)
                 core_fig.write_html(fname)
     meta_fname = get_fname(
-        subses_dict, '_vizIndiv.json',
+        base_fname, '_vizIndiv.json',
         tracking_params=tracking_params,
         segmentation_params=segmentation_params)
     meta = dict(Timing=time() - start_time)
@@ -330,7 +331,7 @@ def viz_indivBundle(subses_dict,
 
 
 @pimms.calc("tract_profile_plots")
-def plot_tract_profiles(subses_dict, scalars, tracking_params,
+def plot_tract_profiles(base_fname, scalars, tracking_params,
                         segmentation_params, segmentation_imap):
     """
     list of full paths to png files,
@@ -340,12 +341,9 @@ def plot_tract_profiles(subses_dict, scalars, tracking_params,
     start_time = time()
     fnames = []
     for scalar in scalars:
-        if not isinstance(scalar, str):
-            this_scalar = scalar.get_name()
-        else:
-            this_scalar = scalar
+        this_scalar = scalar if isinstance(scalar, str) else scalar.get_name()
         fname = get_fname(
-            subses_dict, f'_{this_scalar}_profile_plots',
+            base_fname, f'_{this_scalar}_profile_plots',
             tracking_params=tracking_params,
             segmentation_params=segmentation_params)
         tract_profiles_folder = op.join(
@@ -363,7 +361,7 @@ def plot_tract_profiles(subses_dict, scalars, tracking_params,
             n_boot=100)
         fnames.append(fname)
     meta_fname = get_fname(
-        subses_dict, '_profile_plots.json',
+        base_fname, '_profile_plots.json',
         tracking_params=tracking_params,
         segmentation_params=segmentation_params)
     meta = dict(Timing=time() - start_time)
