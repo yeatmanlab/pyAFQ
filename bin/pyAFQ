@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import warnings
+import os.path as op
 from argparse import ArgumentParser
 
 
@@ -35,7 +36,9 @@ def parse_cli(arg_dict):
     cli_parser.add_argument(
         dest='config',
         action="store",
-        help="Path to config file. For example, /path/to/afq_config.toml")
+        help=(
+            "Path to config file or folder. ",
+            "For example, /path/to/afq_config.toml"))
 
     cli_parser.add_argument(
         '-g',
@@ -52,9 +55,9 @@ def parse_cli(arg_dict):
         dest='generate_json',
         action="store_true",
         default=False,
-        help="Generate a default json file at the path"
-        + " specified without running pyAFQ; this json"
-        + " can be used to define a recon workflow in qsiprep.")
+        help="Generate two default json files at the path"
+        + " (which should be a folder) specified without running pyAFQ;"
+        + " this json can be used to define a recon workflow in qsiprep.")
 
     cli_parser.add_argument(
         '-o',
@@ -111,9 +114,9 @@ if __name__ == '__main__':
     if generate_only and generate_json:
         raise ValueError("Can only generate .toml or .json; not both")
     if generate_json:
-        if config_file[-5:] != ".json":
+        if not op.isdir(config_file):
             raise ValueError(
-                "Config file must be .json when generating a .json")
+                "Config must be a folder when generating a .json")
     else:
         if config_file[-5:] != ".toml":
             raise ValueError(

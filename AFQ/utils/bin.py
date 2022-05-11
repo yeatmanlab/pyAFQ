@@ -138,8 +138,7 @@ def dict_to_toml(dictionary):
 # not shown to the user (mostly BIDS filters stuff)
 qsi_prep_ignore_params = [
     "bids_path", "bids_filters", "preproc_pipeline",
-    "custom_tractography_bids_filters", "brain_mask",
-    "mapping", "participant_labels", "output_dir"]
+    "participant_labels", "output_dir"]
 
 
 def dict_to_json(dictionary):
@@ -321,16 +320,19 @@ def generate_config(toml_file, default_arg_dict, overwrite=False,
     toml_file.close()
 
 
-def generate_json(json_file, overwrite=False,
+def generate_json(json_folder, overwrite=False,
                   logger=None):
-    if not overwrite and op.exists(json_file):
+    json_file_our_trk = op.join(json_folder, "pyafq.json")
+    json_file_their_trk = op.join(json_folder, "pyafq_input_trk.json")
+    if not overwrite and (
+            op.exists(json_file_our_trk) or op.exists(json_file_their_trk)):
         raise FileExistsError(
             "Config file already exists. "
             + "If you want to overwrite this file,"
             + " add the argument --overwrite-config")
     if logger is not None:
         logger.info("Generating pyAFQ full pipeline QSIprep json file.")
-    qsi_spec_intro = """{
+    qsi_spec_intro_our_trk = """{
     "description": "Use pyAFQ to perform the full Tractometry pipeline",
     "space": "T1w",
     "name": "pyAFQ_full",
@@ -343,7 +345,59 @@ def generate_json(json_file, overwrite=False,
             "input": "qsiprep",
             "output_suffix": "PYAFQ_FULL",
             "parameters": {
+                "use_external_tracking": false,
 """
+    qsi_spec_intro_their_trk = """{
+    "description": "Use pyAFQ to perform the Tractometry pipeline, with tractography from qsiprep",
+    "space": "T1w",
+    "name": "pyAFQ_import_trk",
+    "atlases": [],
+    "nodes": [
+        {
+            "name": "msmt_csd",
+            "software": "MRTrix3",
+            "action": "csd",
+            "output_suffix": "msmtcsd",
+            "input": "qsiprep",
+            "parameters": {
+                "mtnormalize": true,
+                "response": {
+                "algorithm": "dhollander"
+                },
+                "fod": {
+                "algorithm": "msmt_csd",
+                "max_sh": [4, 8, 8]
+                }
+            }
+        },
+        {
+            "name": "track_ifod2",
+            "software": "MRTrix3",
+            "action": "tractography",
+            "output_suffix": "ifod2",
+            "input": "msmt_csd",
+            "parameters": {
+                "use_5tt": false,
+                "use_sift2": true,
+                "tckgen":{
+                "algorithm": "iFOD2",
+                "select": 1e6,
+                "max_length": 250,
+                "min_length": 30,
+                "power":0.33
+                },
+                "sift2":{}
+            }
+        },
+        {
+            "name": "pyAFQ_full",
+            "software": "pyAFQ",
+            "action": "pyAFQ_full",
+            "input": "track_ifod2",
+            "output_suffix": "PYAFQ_FULL_ET",
+            "parameters": {
+                "use_external_tracking": true,
+"""  # noqa
     qsi_spec_outro = """
             }
         }
@@ -359,8 +413,14 @@ def generate_json(json_file, overwrite=False,
 
     arg_dict = func_dict_to_arg_dict(func_dict, logger=logger)
 
-    json_file = open(json_file, 'w')
-    json_file.write(qsi_spec_intro)
+    json_file = open(json_file_our_trk, 'w')
+    json_file.write(qsi_spec_intro_our_trk)
+    json_file.write(dict_to_json(arg_dict))
+    json_file.write(qsi_spec_outro)
+    json_file.close()
+
+    json_file = open(json_file_their_trk, 'w')
+    json_file.write(qsi_spec_intro_their_trk)
     json_file.write(dict_to_json(arg_dict))
     json_file.write(qsi_spec_outro)
     json_file.close()
