@@ -153,10 +153,7 @@ class ImageFile(ImageDefinition):
         return image_data_orig, dict(source=image_file)
 
     def get_name(self):
-        if self.suffix is not None:
-            return self.suffix
-        else:
-            return name_from_path(self.path)
+        return name_from_path(self.fname) if self._from_path else self.suffix
 
     def get_image_getter(self, task_name):
         @as_img
