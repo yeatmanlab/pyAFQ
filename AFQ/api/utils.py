@@ -116,11 +116,11 @@ def export_all_helper(api_afq_object, seg_algo, xforms, indiv, viz):
         try:
             api_afq_object.export("tract_profile_plots")
         except ImportError as e:
-            plotly_err_message = viz_import_msg_error("plot")
-            if str(e) != plotly_err_message:
+            plot_err_message = viz_import_msg_error("plot")
+            if str(e) != plot_err_message:
                 raise
             else:
-                api_afq_object.logger.warning(plotly_err_message)
+                api_afq_object.logger.warning(plot_err_message)
         api_afq_object.export("all_bundles_figure")
         if seg_algo == "AFQ":
             api_afq_object.export("indiv_bundles_figures")
