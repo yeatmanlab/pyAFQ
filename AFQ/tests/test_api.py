@@ -643,9 +643,11 @@ def test_AFQ_data_waypoint():
     """
     tmpdir, bids_path, _ = get_temp_hardi()
     t1_path = op.join(tmpdir.name, "T1.nii.gz")
+    t1_path_other = op.join(tmpdir.name, "T1-untransformed.nii.gz")
     nib.save(
         afd.read_mni_template(mask=True, weight="T1w"),
         t1_path)
+    shutil.copy(t1_path, t1_path_other)
 
     bundle_names = [
         "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"]
@@ -678,6 +680,7 @@ def test_AFQ_data_waypoint():
             "dti_FA",
             "dti_MD",
             "dti_GA",
+            ImageFile(path=t1_path_other),
             TemplateImage(t1_path)],
         robust_tensor_fitting=True,
         tracking_params=tracking_params,
@@ -724,7 +727,7 @@ def test_AFQ_data_waypoint():
     tract_profiles = pd.read_csv(tract_profile_fname)
 
     assert tract_profiles.select_dtypes(include=[np.number]).sum().sum() != 0
-    assert tract_profiles.shape == (300, 7)
+    assert tract_profiles.shape == (300, 8)
 
     myafq.indiv_bundles_figures
     assert op.exists(op.join(
@@ -773,6 +776,7 @@ def test_AFQ_data_waypoint():
                 "dti_fa",
                 "dti_md",
                 "dti_ga",
+                f"ImageFile('{t1_path_other}')",
                 f"TemplateImage('{t1_path}')"]),
         VIZ=dict(
             viz_backend_spec="plotly_no_gif"),
@@ -794,7 +798,7 @@ def test_AFQ_data_waypoint():
     # The tract profiles should already exist from the CLI Run:
     from_file = pd.read_csv(tract_profile_fname)
 
-    assert from_file.shape == (300, 7)
+    assert from_file.shape == (300, 8)
     assert_series_equal(tract_profiles['dti_fa'], from_file['dti_fa'])
 
     # Make sure the CLI did indeed generate these:
