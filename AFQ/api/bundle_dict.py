@@ -307,16 +307,18 @@ class BundleDict(MutableMapping):
                 bbox_valid_check=False).streamlines
         if not self.keep_in_memory:
             old_vals = self.apply_to_rois(key, cond_load)
+            if self.resample_to:
+                self._resample_roi(key)
         else:
             if "loaded" not in self._dict[key] or\
                     not self._dict[key]["loaded"]:
                 self.apply_to_rois(key, cond_load)
                 self._dict[key]["loaded"] = True
             old_vals = None
-        if self.resample_to and key in self._dict and (
-            "resampled" not in self._dict[key] or not self._dict[
-                key]["resampled"]):
-            self._resample_roi(key)
+            if self.resample_to and (
+                "resampled" not in self._dict[key] or not self._dict[
+                    key]["resampled"]):
+                self._resample_roi(key)
         _item = self._dict[key].copy()
         if old_vals is not None:
             if isinstance(old_vals, dict):
