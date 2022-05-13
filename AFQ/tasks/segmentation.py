@@ -19,8 +19,7 @@ import AFQ.api.bundle_dict as abd
 import AFQ.utils.streamlines as aus
 
 from dipy.io.streamline import load_tractogram, save_tractogram
-from dipy.io.stateful_tractogram import StatefulTractogram, Space
-import dipy.tracking.utils as dtu
+from dipy.io.stateful_tractogram import Space
 from dipy.stats.analysis import afq_profile, gaussian_weights
 from dipy.tracking.streamline import set_number_of_points, values_from_volume
 
@@ -28,10 +27,10 @@ from dipy.tracking.streamline import set_number_of_points, values_from_volume
 logger = logging.getLogger('AFQ.api.seg')
 
 
-@pimms.calc("bundles_file")
+@pimms.calc("bundles")
 @as_file('_tractography.trk', include_track=True, include_seg=True)
-def segment(subses_dict, data_imap, mapping_imap,
-            tractography_imap, tracking_params, segmentation_params):
+def segment(dwi, data_imap, mapping_imap,
+            tractography_imap, segmentation_params):
     """
     full path to a trk file containing containting
     segmented streamlines, labeled by bundle
@@ -44,12 +43,12 @@ def segment(subses_dict, data_imap, mapping_imap,
     """
     bundle_dict = data_imap["bundle_dict"]
     reg_template = data_imap["reg_template"]
-    streamlines_file = tractography_imap["streamlines_file"]
+    streamlines = tractography_imap["streamlines"]
     # We pass `clean_params` here, but do not use it, so we have the
     # same signature as `_clean_bundles`.
-    img = nib.load(subses_dict['dwi_file'])
+    img = nib.load(dwi)
     tg = load_tractogram(
-        streamlines_file, img, Space.VOX,
+        streamlines, img, Space.VOX,
         bbox_valid_check=False)
     tg.remove_invalid_streamlines()
 
@@ -58,9 +57,9 @@ def segment(subses_dict, data_imap, mapping_imap,
     bundles = segmentation.segment(
         bundle_dict,
         tg,
-        subses_dict['dwi_file'],
-        data_imap["bval_file"],
-        data_imap["bvec_file"],
+        dwi,
+        data_imap["bval"],
+        data_imap["bvec"],
         reg_template=reg_template,
         mapping=mapping_imap["mapping"])
 
@@ -68,23 +67,20 @@ def segment(subses_dict, data_imap, mapping_imap,
 
     tgram, meta = seg_sft.get_sft_and_sidecar()
 
-    segmentation_params_out = {}
-    for arg_name, value in segmentation_params.items():
-        if isinstance(value, (int, float, bool, str))\
-                or (value is None):
-            segmentation_params_out[arg_name] = value
-        else:
-            segmentation_params_out[arg_name] = str(value)
-    meta["source"] = streamlines_file
+    segmentation_params_out = {
+        arg_name: value if isinstance(value, (int, float, bool, str)) or (
+            value is None) else str(value)
+        for arg_name, value in segmentation_params.items()}
+
+    meta["source"] = streamlines
     meta["Parameters"] = segmentation_params_out
     meta["Timing"] = time() - start_time
     return tgram, meta
 
 
-@pimms.calc("clean_bundles_file")
+@pimms.calc("clean_bundles")
 @as_file('-clean_tractography.trk', include_track=True, include_seg=True)
-def clean_bundles(subses_dict, bundles_file, data_imap,
-                  tracking_params, segmentation_params, clean_params=None):
+def clean_bundles(bundles, data_imap, clean_params=None):
     """
     full path to a trk file containting segmented
     streamlines, cleaned using the Mahalanobis distance, and labeled by
@@ -104,7 +100,7 @@ def clean_bundles(subses_dict, bundles_file, data_imap,
             default_clean_params[k] = clean_params[k]
     clean_params = default_clean_params
 
-    seg_sft = aus.SegmentedSFT.fromfile(bundles_file)
+    seg_sft = aus.SegmentedSFT.fromfile(bundles)
 
     start_time = time()
 
@@ -130,14 +126,15 @@ def clean_bundles(subses_dict, bundles_file, data_imap,
         if callable(seg_args[k]):
             seg_args[k] = seg_args[k].__name__
 
-    meta["source"] = bundles_file
+    meta["source"] = bundles
     meta["Parameters"] = seg_args
     meta["Timing"] = time() - start_time
     return sft, meta
 
 
 @pimms.calc("indiv_bundles")
-def export_bundles(subses_dict, clean_bundles_file, bundles_file,
+def export_bundles(base_fname, results_dir,
+                   clean_bundles, bundles,
                    data_imap, tracking_params,
                    segmentation_params):
     """
@@ -158,17 +155,16 @@ def export_bundles(subses_dict, clean_bundles_file, bundles_file,
                 seg_algo="afq",
                 resample_to=reg_template)
 
-    img = nib.load(subses_dict['dwi_file'])
-    for this_bundles_file, folder in zip([clean_bundles_file, bundles_file],
+    for this_bundles_file, folder in zip([clean_bundles, bundles],
                                          ['clean_bundles', 'bundles']):
-        bundles_dir = op.join(subses_dict['results_dir'], folder)
+        bundles_dir = op.join(results_dir, folder)
         os.makedirs(bundles_dir, exist_ok=True)
         seg_sft = aus.SegmentedSFT.fromfile(this_bundles_file)
         for bundle in bundle_dict:
             if bundle != "whole_brain":
                 fname = op.split(
                     get_fname(
-                        subses_dict,
+                        base_fname,
                         f'-{bundle}'
                         f'_tractography.trk',
                         tracking_params=tracking_params,
@@ -184,27 +180,26 @@ def export_bundles(subses_dict, clean_bundles_file, bundles_file,
     return True
 
 
-@pimms.calc("sl_counts_file")
+@pimms.calc("sl_counts")
 @as_file('_sl_count.csv', include_track=True, include_seg=True)
-def export_sl_counts(subses_dict, data_imap,
-                     clean_bundles_file, bundles_file,
-                     tracking_params, segmentation_params):
+def export_sl_counts(data_imap,
+                     clean_bundles, bundles):
     """
     full path to a JSON file containing streamline counts
     """
     bundle_dict = data_imap["bundle_dict"]
     sl_counts_clean = []
     sl_counts = []
-    bundles = list(bundle_dict.keys())
-    if "whole_brain" not in bundles:
-        bundles.append("whole_brain")
-    bundles_files = [clean_bundles_file, bundles_file]
+    bundle_names = list(bundle_dict.keys())
+    if "whole_brain" not in bundle_names:
+        bundle_names.append("whole_brain")
+    bundles_files = [clean_bundles, bundles]
     lists = [sl_counts_clean, sl_counts]
 
     for bundles_file, count in zip(bundles_files, lists):
         seg_sft = aus.SegmentedSFT.fromfile(bundles_file)
 
-        for bundle in bundles:
+        for bundle in bundle_names:
             if bundle == "whole_brain":
                 count.append(len(seg_sft.sft.streamlines))
             else:
@@ -214,15 +209,14 @@ def export_sl_counts(subses_dict, data_imap,
         data=dict(
             n_streamlines=sl_counts,
             n_streamlines_clean=sl_counts_clean),
-        index=bundles)
+        index=bundle_names)
     return counts_df, dict(sources=bundles_files)
 
 
-@pimms.calc("profiles_file")
+@pimms.calc("profiles")
 @as_file('_profiles.csv', include_track=True, include_seg=True)
-def tract_profiles(subses_dict, clean_bundles_file, data_imap,
+def tract_profiles(clean_bundles, data_imap,
                    scalar_dict, dwi_affine,
-                   tracking_params, segmentation_params,
                    profile_weights="gauss"):
     """
     full path to a CSV file containing tract profiles
@@ -260,7 +254,7 @@ def tract_profiles(subses_dict, clean_bundles_file, data_imap,
     this_profile = np.zeros((len(scalar_dict), 100))
 
     seg_sft = aus.SegmentedSFT.fromfile(
-        clean_bundles_file)
+        clean_bundles)
     seg_sft.sft.to_rasmm()
     for bundle_name in bundle_dict.keys():
         this_sl = seg_sft.get_bundle(bundle_name).streamlines
@@ -306,7 +300,7 @@ def tract_profiles(subses_dict, clean_bundles_file, data_imap,
         profile_dict[scalar] = profiles[ii]
 
     profile_dframe = pd.DataFrame(profile_dict)
-    meta = dict(source=clean_bundles_file,
+    meta = dict(source=clean_bundles,
                 parameters=get_default_args(afq_profile))
 
     return profile_dframe, meta
@@ -331,10 +325,10 @@ def get_scalar_dict(data_imap, mapping_imap, scalars=["dti_fa", "dti_md"]):
     for scalar in scalars:
         if isinstance(scalar, str):
             sc = scalar.lower()
-            scalar_dict[sc] = data_imap[f"{sc}_file"]
+            scalar_dict[sc] = data_imap[f"{sc}"]
         else:
             scalar_dict[scalar.get_name()] = mapping_imap[
-                f"{scalar.get_name()}_file"]
+                f"{scalar.get_name()}"]
     return {"scalar_dict": scalar_dict}
 
 

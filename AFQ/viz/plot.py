@@ -448,13 +448,13 @@ class GroupCSVComparison():
                 folder)
 
         if f_folder is None:
-            fig.savefig(f_name)
+            fig.savefig(f_name + ".png")
             fig.savefig(f_name + ".svg",
                         format='svg',
                         dpi=300)
         else:
             os.makedirs(f_folder, exist_ok=True)
-            fig.savefig(op.join(f_folder, f_name))
+            fig.savefig(op.join(f_folder, f_name) + ".png")
             fig.savefig(op.join(f_folder, f_name) + ".svg",
                         format='svg',
                         dpi=300)

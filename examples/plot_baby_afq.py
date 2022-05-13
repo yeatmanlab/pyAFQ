@@ -78,7 +78,8 @@ myafq = GroupAFQ(  # ==== BIDS parameters ====
 # Visualizing bundles:
 # --------------------
 
-plotly.io.show(myafq.all_bundles_figure[list(myafq.all_bundles_figure)[0]])
+plotly.io.show(myafq.export("all_bundles_figure")[
+    list(myafq.export("all_bundles_figure"))[0]])
 
 ##########################################################################
 # References:

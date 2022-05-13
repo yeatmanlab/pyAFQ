@@ -14,10 +14,10 @@ from AFQ.definitions.image import ScalarImage
 logger = logging.getLogger('AFQ.api')
 
 
-@pimms.calc("seed_file")
+@pimms.calc("seed")
 @as_file('_seed_mask.nii.gz')
 @as_img
-def export_seed_mask(subses_dict, dwi_affine, tracking_params):
+def export_seed_mask(tracking_params):
     """
     full path to a nifti file containing the
     tractography seed mask
@@ -27,10 +27,10 @@ def export_seed_mask(subses_dict, dwi_affine, tracking_params):
     return seed_mask, seed_mask_desc
 
 
-@pimms.calc("stop_file")
+@pimms.calc("stop")
 @as_file('_stop_mask.nii.gz')
 @as_img
-def export_stop_mask(subses_dict, dwi_affine, tracking_params):
+def export_stop_mask(tracking_params):
     """
     full path to a nifti file containing the
     tractography stop mask
@@ -40,18 +40,18 @@ def export_stop_mask(subses_dict, dwi_affine, tracking_params):
     return stop_mask, stop_mask_desc
 
 
-@pimms.calc("stop_file")
+@pimms.calc("stop")
 def export_stop_mask_pft(pve_wm, pve_gm, pve_csf):
     """
     full path to a nifti file containing the
     tractography stop mask
     """
-    return {"stop_file": [pve_wm, pve_gm, pve_csf]}
+    return {"stop": [pve_wm, pve_gm, pve_csf]}
 
 
-@pimms.calc("streamlines_file")
+@pimms.calc("streamlines")
 @as_file('_tractography.trk', include_track=True)
-def streamlines(subses_dict, data_imap, seed_file, stop_file,
+def streamlines(data_imap, seed, stop,
                 tracking_params):
     """
     full path to the complete, unsegmented tractography file
@@ -72,21 +72,21 @@ def streamlines(subses_dict, data_imap, seed_file, stop_file,
     # get odf_model
     odf_model = this_tracking_params["odf_model"]
     if odf_model == "DTI":
-        params_file = data_imap["dti_params_file"]
+        params_file = data_imap["dti_params"]
     elif odf_model == "CSD":
-        params_file = data_imap["csd_params_file"]
+        params_file = data_imap["csd_params"]
     elif odf_model == "DKI":
-        params_file = data_imap["dki_params_file"]
+        params_file = data_imap["dki_params"]
     else:
         raise TypeError((
             f"The ODF model you gave ({odf_model}) was not recognized"))
 
     # get masks
-    this_tracking_params['seed_mask'] = nib.load(seed_file).get_fdata()
-    if isinstance(stop_file, str):
-        this_tracking_params['stop_mask'] = nib.load(stop_file).get_fdata()
+    this_tracking_params['seed_mask'] = nib.load(seed).get_fdata()
+    if isinstance(stop, str):
+        this_tracking_params['stop_mask'] = nib.load(stop).get_fdata()
     else:
-        this_tracking_params['stop_mask'] = stop_file
+        this_tracking_params['stop_mask'] = stop
 
     # perform tractography
     start_time = time()
@@ -101,10 +101,10 @@ def streamlines(subses_dict, data_imap, seed_file, stop_file,
             tracking_params["directions"]],
         Count=len(sft.streamlines),
         Seeding=dict(
-            ROI=seed_file,
+            ROI=seed,
             n_seeds=tracking_params["n_seeds"],
             random_seeds=tracking_params["random_seeds"]),
-        Constraints=dict(ROI=stop_file),
+        Constraints=dict(ROI=stop),
         Parameters=dict(
             Units="mm",
             StepSize=tracking_params["step_size"],
@@ -116,7 +116,7 @@ def streamlines(subses_dict, data_imap, seed_file, stop_file,
     return sft, meta
 
 
-@pimms.calc("streamlines_file")
+@pimms.calc("streamlines")
 def custom_tractography(bids_info, import_tract=None):
     """
     full path to the complete, unsegmented tractography file
@@ -215,20 +215,20 @@ def get_tractography_plan(kwargs):
 
     stop_mask = kwargs["tracking_params"]['stop_mask']
     seed_mask = kwargs["tracking_params"]['seed_mask']
-    subses_dict = kwargs["subses_dict"]
+    dwi = kwargs["dwi"]
     bids_info = kwargs["bids_info"]
 
     if bids_info is not None:
         if isinstance(stop_mask, Definition):
             stop_mask.find_path(
                 bids_info["bids_layout"],
-                subses_dict["dwi_file"],
+                dwi,
                 bids_info["subject"],
                 bids_info["session"])
         if isinstance(seed_mask, Definition):
             seed_mask.find_path(
                 bids_info["bids_layout"],
-                subses_dict["dwi_file"],
+                dwi,
                 bids_info["subject"],
                 bids_info["session"])
 
@@ -241,11 +241,11 @@ def get_tractography_plan(kwargs):
             export_stop_mask_pft
     elif isinstance(stop_mask, Definition):
         tractography_tasks["export_stop_mask_res"] =\
-            pimms.calc("stop_file")(as_file('_stop_mask.nii.gz')(
+            pimms.calc("stop")(as_file('_stop_mask.nii.gz')(
                 stop_mask.get_image_getter("tractography")))
 
     if isinstance(seed_mask, Definition):
-        tractography_tasks["export_seed_mask_res"] = pimms.calc("seed_file")(
+        tractography_tasks["export_seed_mask_res"] = pimms.calc("seed")(
             as_file('_seed_mask.nii.gz')(
                 seed_mask.get_image_getter("tractography")))
 

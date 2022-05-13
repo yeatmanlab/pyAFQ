@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-# -*- coding: utf-8 -*-
+import contextlib
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)  # noqa
 
 import logging
 import AFQ.data.s3bids as afs
 from AFQ.api.participant import ParticipantAFQ
-from AFQ.api.utils import wf_sections, add_method_descriptions
+from AFQ.api.utils import (
+    check_attribute, AFQclass_doc,
+    export_all_helper, valid_exports_string)
 import AFQ.utils.streamlines as aus
 
-import AFQ.viz.utils as vut
 from dipy.utils.parallel import paramap
-
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 import dipy.tracking.streamlinespeed as dps
 import dipy.tracking.streamline as dts
@@ -27,15 +28,12 @@ import nibabel as nib
 
 from bids.layout import BIDSLayout
 import bids.config as bids_config
-try:
+with contextlib.suppress(ValueError):
     bids_config.set_option('extension_initial_dot', True)
-except ValueError:
-    pass
-
 try:
     import afqbrowser as afqb
     using_afqb = True
-except (ImportError, ModuleNotFoundError):
+except ImportError:
     using_afqb = False
 
 
@@ -49,15 +47,8 @@ def clean_pandas_df(df):
     return df
 
 
-# this is parallelized below
-def _getter_helper(wf_dict, attr_name):
-    return wf_dict[attr_name]
-
-
-@add_method_descriptions
 class GroupAFQ(object):
-    """
-    """
+    f"""{AFQclass_doc}"""
 
     def __init__(self,
                  bids_path,
@@ -225,10 +216,7 @@ class GroupAFQ(object):
                     + " See above warnings.")
 
         sessions = bids_layout.get(return_type='id', target='session')
-        if len(sessions):
-            self.sessions = sessions
-        else:
-            self.sessions = [None]
+        self.sessions = sessions if len(sessions) else [None]
 
         # do not bother to parallelize if less than 2 subject-sessions
         if len(self.sessions) * len(self.subjects) < 2:
@@ -304,80 +292,8 @@ class GroupAFQ(object):
                     **this_kwargs)
                 self.wf_dict[subject][str(session)] = this_pAFQ.wf_dict
 
-    def __getattribute__(self, attr):
-        # check if normal attr exists first
-        try:
-            return object.__getattribute__(self, attr)
-        except AttributeError:
-            pass
-
-        # find what name to use
-        first_dict =\
-            self.wf_dict[self.valid_sub_list[0]][str(self.valid_ses_list[0])]
-        attr_file = attr + "_file"
-        attr_name = None
-        if attr in first_dict:
-            attr_name = attr
-            section = None
-        elif attr_file in first_dict:
-            attr_name = attr_file
-            section = None
-        else:
-            for sub_attr in wf_sections:
-                if attr in first_dict[sub_attr]:
-                    attr_name = attr
-                    section = sub_attr
-                    break
-                elif attr_file in first_dict[sub_attr]:
-                    attr_name = attr_file
-                    section = sub_attr
-                    break
-
-        # attr not found, allow typical AttributeError
-        if attr_name is None:
-            return object.__getattribute__(self, attr)
-
-        # iterate over subjects / sessions,
-        # decide if they need to be calculated or not
-        in_list = []
-        to_calc_list = []
-        results = {}
-        for ii, subject in enumerate(self.valid_sub_list):
-            if subject not in results:
-                results[subject] = {}
-            session = self.valid_ses_list[ii]
-            wf_dict = self.wf_dict[subject][str(session)]
-            if section is not None:
-                wf_dict = wf_dict[section]
-            if ((self.parallel_params.get("engine", False) != "serial")
-                    and (hasattr(wf_dict, "efferents"))
-                    and (attr_name not in wf_dict.efferents)):
-                in_list.append((wf_dict))
-                to_calc_list.append((subject, session))
-            else:
-                results[subject][session] =\
-                    _getter_helper(wf_dict, attr_name)
-
-        # if some need to be calculated, do those in parallel
-        if len(to_calc_list) > 0:
-            par_results = paramap(
-                _getter_helper, in_list,
-                func_args=[attr_name],
-                **self.parallel_params)
-
-            for i, subses in enumerate(to_calc_list):
-                subject, session = subses
-                results[subject][session] = par_results[i]
-
-        # If only one session, collapse session dimension
-        if len(self.sessions) == 1:
-            for subject in self.valid_sub_list:
-                results[subject] = results[subject][self.valid_ses_list[0]]
-
-        return results
-
     def combine_profiles(self):
-        tract_profiles_dict = self.profiles
+        tract_profiles_dict = self.export("profiles")
         if len(self.sessions) > 1:
             tract_profiles_list = []
             for _, subject_dict in tract_profiles_dict.items():
@@ -403,20 +319,20 @@ class GroupAFQ(object):
                 sub = self.valid_sub_list[subses_idx]
                 ses = self.valid_ses_list[subses_idx]
                 if len(self.sessions) > 1:
-                    this_bundles_file = self.clean_bundles[sub][ses]
-                    this_mapping = self.mapping[sub][ses]
-                    this_img = nib.load(self.dwi[sub][ses])
+                    this_bundles_file = self.export("clean_bundles")[sub][ses]
+                    this_mapping = self.export("mapping")[sub][ses]
+                    this_img = nib.load(self.export("dwi")[sub][ses])
                 else:
-                    this_bundles_file = self.clean_bundles[sub]
-                    this_mapping = self.mapping[sub]
-                    this_img = nib.load(self.dwi[sub])
+                    this_bundles_file = self.export("clean_bundles")[sub]
+                    this_mapping = self.export("mapping")[sub]
+                    this_img = nib.load(self.export("dwi")[sub])
                 seg_sft = aus.SegmentedSFT.fromfile(
                     this_bundles_file,
                     this_img)
                 seg_sft.sft.to_rasmm()
                 subses_info.append((seg_sft, this_mapping))
 
-            bundle_dict = self.bundle_dict[
+            bundle_dict = self.export("bundle_dict")[
                 self.valid_sub_list[0]]
             if len(self.sessions) > 1:
                 bundle_dict = bundle_dict[self.valid_ses_list[0]]
@@ -463,6 +379,66 @@ class GroupAFQ(object):
                 json.dump(sls_dict, fp)
         return sls_json_fname
 
+    def export(self, attr_name="help"):
+        f"""
+        Export a specific output. To print a list of available outputs,
+        call export without arguments.
+        {valid_exports_string}
+
+        Parameters
+        ----------
+        attr_name : str
+            Name of the output to export. Default: "help"
+
+        Returns
+        -------
+        output : dict
+            The specific output as a dictionary. Keys are subjects.
+            Values are dictionaries with keys of sessions
+            if multiple sessions are used. Otherwise, values are
+            the output.
+            None if called without arguments.
+        """
+        section = check_attribute(attr_name)
+
+        # iterate over subjects / sessions,
+        # decide if they need to be calculated or not
+        in_list = []
+        to_calc_list = []
+        results = {}
+        for ii, subject in enumerate(self.valid_sub_list):
+            if subject not in results:
+                results[subject] = {}
+            session = self.valid_ses_list[ii]
+            wf_dict = self.wf_dict[subject][str(session)]
+            if section is not None:
+                wf_dict = wf_dict[section]
+            if ((self.parallel_params.get("engine", False) != "serial")
+                    and (hasattr(wf_dict, "efferents"))
+                    and (attr_name not in wf_dict.efferents)):
+                in_list.append((wf_dict))
+                to_calc_list.append((subject, session))
+            else:
+                results[subject][session] = wf_dict[attr_name]
+
+        # if some need to be calculated, do those in parallel
+        if to_calc_list:
+            par_results = paramap(
+                lambda wf, attr: wf[attr], in_list,
+                func_args=[attr_name],
+                **self.parallel_params)
+
+            for i, subses in enumerate(to_calc_list):
+                subject, session = subses
+                results[subject][session] = par_results[i]
+
+        # If only one session, collapse session dimension
+        if len(self.sessions) == 1:
+            for subject in self.valid_sub_list:
+                results[subject] = results[subject][self.valid_ses_list[0]]
+
+        return results
+
     def export_all(self, viz=True, afqbrowser=True, xforms=True,
                    indiv=True):
         """ Exports all the possible outputs
@@ -490,47 +466,19 @@ class GroupAFQ(object):
             Default: True
         """
         start_time = time()
-        seg_params = self.segmentation_params[
+        seg_params = self.export("segmentation_params")[
             self.valid_sub_list[0]]
         if len(self.sessions) > 1:
             seg_params = seg_params[self.valid_ses_list[0]]
         seg_algo = seg_params.get("seg_algo", "AFQ")
 
-        if xforms:
-            try:
-                self.b0_warped
-            except Exception as e:
-                self.logger.warning((
-                    "Failed to export warped b0. This could be because your "
-                    "mapping type is only compatible with transformation "
-                    f"from template to subject space. The error is: {e}"))
-            self.template_xform
-        if indiv:
-            self.indiv_bundles
-            if seg_algo == "AFQ":
-                self.rois
-        self.sl_counts
-        self.profiles
-        # We combine profiles even if there is only 1 subject / session,
-        # as the combined profiles format may still be useful
-        # i.e., for AFQ Browser
+        export_all_helper(self, seg_algo, xforms, indiv, viz)
+
         self.combine_profiles()
-        if viz:
-            try:
-                self.tract_profile_plots
-            except ImportError as e:
-                plotly_err_message = vut.viz_import_msg_error("plot")
-                if str(e) != plotly_err_message:
-                    raise
-                else:
-                    self.logger.warning(plotly_err_message)
-            self.all_bundles_figure
-            if seg_algo == "AFQ":
-                self.indiv_bundles_figures
         if afqbrowser:
             self.assemble_AFQ_browser()
         self.logger.info(
-            "Time taken for export all: " + str(time() - start_time))
+            f"Time taken for export all: {str(time() - start_time)}")
 
     def upload_to_s3(self, s3fs, remote_path):
         """ Upload entire AFQ derivatives folder to S3"""

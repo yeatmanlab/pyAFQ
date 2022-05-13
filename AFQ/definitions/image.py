@@ -6,7 +6,6 @@ from dipy.segment.mask import median_otsu
 from dipy.align import resample
 import AFQ.utils.volume as auv
 from AFQ.definitions.utils import Definition, find_file, name_from_path
-from AFQ.tasks.decorators import as_img
 
 
 __all__ = [
@@ -45,8 +44,7 @@ class ImageDefinition(Definition):
         raise NotImplementedError(
             "Please implement a get_image_getter method")
 
-    def get_image_direct(self, subses_dict, bids_info,
-                         dwi_affine, b0_file, data_imap=None):
+    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
         raise NotImplementedError(
             "Please implement a get_image_direct method")
 
@@ -139,7 +137,7 @@ class ImageFile(ImageDefinition):
 
         self.fnames[session][subject] = nearest_image
 
-    def get_path_data_affine(self, subses_dict, bids_info):
+    def get_path_data_affine(self, bids_info):
         if self._from_path:
             image_file = self.fname
         else:
@@ -156,29 +154,28 @@ class ImageFile(ImageDefinition):
         return name_from_path(self.fname) if self._from_path else self.suffix
 
     def get_image_getter(self, task_name):
-        @as_img
-        def image_getter(subses_dict, dwi_affine, bids_info):
+        def image_getter(dwi, bids_info):
             # Load data
             image_file, image_data_orig, image_affine = \
-                self.get_path_data_affine(subses_dict, bids_info)
+                self.get_path_data_affine(bids_info)
 
             # Apply any conditions on the data
             image_data, meta = self.apply_conditions(
                 image_data_orig, image_file)
 
             # Resample to DWI data:
+            dwi_img = nib.load(dwi)
             image_data = _resample_image(
                 image_data,
-                nib.load(subses_dict["dwi_file"]).get_fdata(),
+                dwi_img.get_fdata(),
                 image_affine,
-                dwi_affine)
-            return image_data, meta
+                dwi_img.affine)
+            return nib.Nifti1Image(image_data, dwi_img.affine), meta
         return image_getter
 
-    def get_image_direct(self, subses_dict, bids_info,
-                         dwi_affine, b0_file, data_imap=None):
+    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
         return self.get_image_getter("direct")(
-            subses_dict, dwi_affine, bids_info)
+            dwi, bids_info)
 
 
 class FullImage(ImageDefinition):
@@ -200,16 +197,15 @@ class FullImage(ImageDefinition):
         return "entire_volume"
 
     def get_image_getter(self, task_name):
-        @as_img
-        def image_getter(subses_dict, dwi_affine):
-            return np.ones(nib.load(
-                subses_dict["dwi_file"]).get_fdata()[..., 0].shape),\
-                dict(source="Entire Volume")
+        def image_getter(dwi):
+            dwi_img = nib.load(dwi)
+            return nib.Nifti1Image(
+                np.ones(dwi_img.get_fdata()[..., 0].shape),
+                dwi_img.affine), dict(source="Entire Volume")
         return image_getter
 
-    def get_image_direct(self, subses_dict, bids_info,
-                         dwi_affine, b0_file, data_imap=None):
-        return self.get_image_getter("direct")(subses_dict, dwi_affine)
+    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
+        return self.get_image_getter("direct")(dwi)
 
 
 class RoiImage(ImageDefinition):
@@ -242,7 +238,8 @@ class RoiImage(ImageDefinition):
         return "roi"
 
     def get_image_getter(self, task_name):
-        def _image_getter_helper(mapping, data_imap, segmentation_params):
+        def _image_getter_helper(dwi_affine, mapping,
+                                 data_imap, segmentation_params):
             image_data = None
             bundle_dict = data_imap["bundle_dict"]
             if self.use_presegment:
@@ -253,15 +250,11 @@ class RoiImage(ImageDefinition):
 
             for bundle_name, bundle_info in bundle_dict.items():
                 if self.use_endpoints:
-                    rois = []
-                    for end_type in ["start", "end"]:
-                        if end_type in bundle_info:
-                            rois.append(end_type)
+                    rois = [end_type for end_type in ["start", "end"]
+                            if end_type in bundle_info]
                 else:
-                    if 'include' in bundle_info:
-                        rois = bundle_info['include']
-                    else:
-                        rois = []
+                    rois = bundle_info['include']\
+                        if 'include' in bundle_info else []
                 for roi in rois:
                     if "space" not in bundle_info\
                         or bundle_info[
@@ -278,26 +271,27 @@ class RoiImage(ImageDefinition):
                     image_data = np.logical_or(
                         image_data,
                         warped_roi.astype(bool))
-            return image_data, dict(source="ROIs")
+            return nib.Nifti1Image(
+                image_data.astype(np.float32),
+                dwi_affine), dict(source="ROIs")
 
         if task_name == "mapping":
-            @as_img
             def image_getter(
-                    subses_dict, dwi_affine, mapping,
+                    dwi_affine, mapping,
                     data_imap, segmentation_params):
                 return _image_getter_helper(
-                    mapping, data_imap, segmentation_params)
+                    dwi_affine, mapping,
+                    data_imap, segmentation_params)
         else:
-            @as_img
             def image_getter(
-                    subses_dict, dwi_affine, mapping_imap,
+                    dwi_affine, mapping_imap,
                     data_imap, segmentation_params):
                 return _image_getter_helper(
-                    mapping_imap["mapping"], data_imap, segmentation_params)
+                    dwi_affine, mapping_imap["mapping"],
+                    data_imap, segmentation_params)
         return image_getter
 
-    def get_image_direct(self, subses_dict, bids_info,
-                         dwi_affine, b0_file, data_imap=None):
+    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
         raise ValueError((
             "RoiImage cannot be used in this context, as they"
             "require later derivatives to be calculated"))
@@ -329,27 +323,22 @@ class B0Image(ImageDefinition):
         return "b0"
 
     def get_image_getter(self, task_name):
-        @as_img
-        def image_getter(subses_dict, dwi_affine, data_imap):
-            mean_b0_img = nib.load(data_imap["b0_file"])
+        def image_getter_helper(b0):
+            mean_b0_img = nib.load(b0)
             mean_b0 = mean_b0_img.get_fdata()
             _, image_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
-            return image_data, dict(
-                source=data_imap["b0_file"],
-                technique="median_otsu applied to b0",
-                median_otsu_kwargs=self.median_otsu_kwargs)
-        return image_getter
+            return nib.Nifti1Image(
+                image_data.astype(int), mean_b0_img.affine), dict(
+                    source=b0,
+                    technique="median_otsu applied to b0",
+                    median_otsu_kwargs=self.median_otsu_kwargs)
+        if task_name == "data" or task_name == "direct":
+            return image_getter_helper
+        else:
+            return lambda data_imap: image_getter_helper(data_imap["b0"])
 
-    def get_image_direct(self, subses_dict, bids_info,
-                         dwi_affine, b0_file, data_imap=None):
-        mean_b0_img = nib.load(b0_file)
-        mean_b0 = mean_b0_img.get_fdata()
-        _, image_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
-        return nib.Nifti1Image(
-            image_data.astype(int), mean_b0_img.affine), dict(
-                source=b0_file,
-                technique="median_otsu applied to b0",
-                median_otsu_kwargs=self.median_otsu_kwargs)
+    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
+        return self.get_image_getter("direct")(b0_file)
 
 
 class LabelledImageFile(ImageFile, CombineImageMixin):
@@ -518,16 +507,14 @@ class ScalarImage(ImageDefinition):
         return self.scalar
 
     def get_image_getter(self, task_name):
-        def image_getter(subses_dict, dwi_affine, data_imap):
-            scalar_file = data_imap[self.scalar + "_file"]
-            return nib.load(scalar_file), dict(FromScalar=self.scalar)
+        def image_getter(data_imap):
+            return nib.load(data_imap[self.scalar]), dict(
+                FromScalar=self.scalar)
         return image_getter
 
-    def get_image_direct(self, subses_dict, bids_info,
-                         dwi_affine, b0_file, data_imap=None):
+    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
         if data_imap is not None:
-            return self.get_image_getter("direct")(
-                subses_dict, dwi_affine, data_imap)
+            return self.get_image_getter("direct")(data_imap)
         else:
             raise ValueError((
                 "ScalarImage cannot be used in this context, as they"
@@ -613,13 +600,10 @@ class PFTImage(ImageDefinition):
         return "pft"
 
     def get_image_getter(self, task_name):
-        probseg_funcs = []
-        for probseg in self.probsegs:
-            probseg_funcs.append(probseg.get_image_getter(task_name))
-        return probseg_funcs
+        return [probseg.get_image_getter(task_name)
+                for probseg in self.probsegs]
 
-    def get_image_direct(self, subses_dict, bids_info,
-                         dwi_affine, b0_file, data_imap=None):
+    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
         raise ValueError("PFTImage cannot be used in this context")
 
 
@@ -660,25 +644,20 @@ class TemplateImage(ImageDefinition):
 
             scalar_data = mapping.transform_inverse(
                 img_data, interpolation='nearest')
-            return scalar_data, dict(source=self.path)
+            return nib.Nifti1Image(
+                scalar_data, reg_template.affine), dict(source=self.path)
 
         if task_name == "mapping":
-            @as_img
-            def image_getter(
-                    subses_dict, dwi_affine, mapping, data_imap):
+            def image_getter(mapping, data_imap):
                 return _image_getter_helper(
                     mapping, data_imap["reg_template"])
         else:
-            @as_img
-            def image_getter(
-                    subses_dict, dwi_affine, mapping_imap,
-                    data_imap):
+            def image_getter(mapping_imap, data_imap):
                 return _image_getter_helper(
                     mapping_imap["mapping"], data_imap["reg_template"])
         return image_getter
 
-    def get_image_direct(self, subses_dict, bids_info,
-                         dwi_affine, b0_file, data_imap=None):
+    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
         raise ValueError((
             "ScalarImage cannot be used in this context, as they"
             "require later derivatives to be calculated"))

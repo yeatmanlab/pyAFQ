@@ -22,22 +22,22 @@ from dipy.io.stateful_tractogram import Space
 logger = logging.getLogger('AFQ.api.mapping')
 
 
-@pimms.calc("b0_warped_file")
+@pimms.calc("b0_warped")
 @as_file('_b0_in_MNI.nii.gz')
-def export_registered_b0(subses_dict, data_imap, mapping):
+def export_registered_b0(data_imap, mapping):
     """
     full path to a nifti file containing
     b0 transformed to template space
     """
-    mean_b0 = nib.load(data_imap["b0_file"]).get_fdata()
+    mean_b0 = nib.load(data_imap["b0"]).get_fdata()
     warped_b0 = mapping.transform(mean_b0)
     warped_b0 = nib.Nifti1Image(warped_b0, data_imap["reg_template"].affine)
-    return warped_b0, dict(b0InSubject=data_imap["b0_file"])
+    return warped_b0, dict(b0InSubject=data_imap["b0"])
 
 
-@pimms.calc("template_xform_file")
+@pimms.calc("template_xform")
 @as_file('_template_xform.nii.gz')
-def template_xform(subses_dict, dwi_affine, mapping, data_imap):
+def template_xform(dwi_affine, mapping, data_imap):
     """
     full path to a nifti file containing
     registration template transformed to subject space
@@ -48,14 +48,14 @@ def template_xform(subses_dict, dwi_affine, mapping, data_imap):
     return template_xform, dict()
 
 
-@pimms.calc("rois_file")
-def export_rois(subses_dict, data_imap, mapping, dwi_affine):
+@pimms.calc("rois")
+def export_rois(base_fname, results_dir, data_imap, mapping, dwi_affine):
     """
     dictionary of full paths to Nifti1Image files of ROIs
     transformed to subject space
     """
     bundle_dict = data_imap["bundle_dict"]
-    rois_dir = op.join(subses_dict['results_dir'], 'ROIs')
+    rois_dir = op.join(results_dir, 'ROIs')
     os.makedirs(rois_dir, exist_ok=True)
     roi_files = {}
     for bundle in bundle_dict:
@@ -65,7 +65,7 @@ def export_rois(subses_dict, data_imap, mapping, dwi_affine):
                 for ii, roi in enumerate(bundle_dict[bundle][roi_type]):
                     fname = op.split(
                         get_fname(
-                            subses_dict,
+                            base_fname,
                             f'_desc-ROI-{bundle}-{ii + 1}-{roi_type}.nii.gz'))
 
                     fname = op.join(rois_dir, fname[1])
@@ -91,11 +91,11 @@ def export_rois(subses_dict, data_imap, mapping, dwi_affine):
                         meta_fname = f'{drop_extension(fname)}.json'
                         write_json(meta_fname, meta)
                     roi_files[bundle].append(fname)
-    return {'rois_file': roi_files}
+    return {'rois': roi_files}
 
 
 @pimms.calc("mapping")
-def mapping(subses_dict, reg_subject, data_imap, bids_info,
+def mapping(base_fname, dwi, reg_subject, data_imap, bids_info,
             mapping_definition=None):
     """
     mapping from subject to template space.
@@ -120,15 +120,15 @@ def mapping(subses_dict, reg_subject, data_imap, bids_info,
     if bids_info is not None:
         mapping_definition.find_path(
             bids_info["bids_layout"],
-            subses_dict["dwi_file"],
+            dwi,
             bids_info["subject"],
             bids_info["session"])
     return mapping_definition.get_for_subses(
-        subses_dict, bids_info, reg_subject, reg_template)
+        base_fname, dwi, bids_info, reg_subject, reg_template)
 
 
 @pimms.calc("mapping")
-def sls_mapping(subses_dict, reg_subject, data_imap, bids_info,
+def sls_mapping(base_fname, dwi, reg_subject, data_imap, bids_info,
                 tractography_imap, mapping_definition=None):
     """
     mapping from subject to template space.
@@ -153,10 +153,10 @@ def sls_mapping(subses_dict, reg_subject, data_imap, bids_info,
     if bids_info is not None:
         mapping_definition.find_path(
             bids_info["bids_layout"],
-            subses_dict["dwi_file"],
+            dwi,
             bids_info["subject"],
             bids_info["session"])
-    streamlines_file = tractography_imap["streamlines_file"]
+    streamlines_file = tractography_imap["streamlines"]
     tg = load_tractogram(
         streamlines_file, reg_subject,
         Space.VOX, bbox_valid_check=False)
@@ -174,13 +174,13 @@ def sls_mapping(subses_dict, reg_subject, data_imap, bids_info,
         atlas_fname,
         'same', bbox_valid_check=False)
     return mapping_definition.get_for_subses(
-        subses_dict, bids_info, reg_subject, reg_template,
+        base_fname, dwi, bids_info, reg_subject, reg_template,
         subject_sls=tg.streamlines,
         template_sls=hcp_atlas.streamlines)
 
 
 @pimms.calc("reg_subject")
-def get_reg_subject(data_imap, bids_info, subses_dict, dwi_affine,
+def get_reg_subject(data_imap, bids_info, base_fname, dwi,
                     reg_subject_spec="power_map"):
     """
     Nifti1Image which represents this subject
@@ -204,21 +204,21 @@ def get_reg_subject(data_imap, bids_info, subses_dict, dwi_affine,
             "reg_subject must be a str, ImageDefinition, or Nifti1Image")
 
     filename_dict = {
-        "b0": data_imap["b0_file"],
-        "power_map": data_imap["pmap_file"],
-        "dti_fa_subject": data_imap["dti_fa_file"],
-        "subject_sls": data_imap["b0_file"],
+        "b0": data_imap["b0"],
+        "power_map": data_imap["pmap"],
+        "dti_fa_subject": data_imap["dti_fa"],
+        "subject_sls": data_imap["b0"],
     }
-    bm = nib.load(data_imap["brain_mask_file"])
+    bm = nib.load(data_imap["brain_mask"])
 
     if bids_info is not None and isinstance(reg_subject_spec, ImageDefinition):
         reg_subject_spec.find_path(
             bids_info["bids_layout"],
-            subses_dict["dwi_file"],
+            dwi,
             bids_info["subject"],
             bids_info["session"])
         img, _ = reg_subject_spec.get_image_direct(
-            subses_dict, bids_info, dwi_affine, data_imap["b0_file"],
+            base_fname, bids_info, data_imap["b0"],
             data_imap=data_imap)
     else:
         if reg_subject_spec in filename_dict:
@@ -243,19 +243,19 @@ def get_mapping_plan(kwargs, use_sls=False):
             if bids_info is None:
                 scalar.find_path(
                     None,
-                    kwargs["subses_dict"]["dwi_file"],
+                    kwargs["dwi"],
                     None,
                     None
                 )
             else:
                 scalar.find_path(
                     bids_info["bids_layout"],
-                    kwargs["subses_dict"]["dwi_file"],
+                    kwargs["dwi"],
                     bids_info["subject"],
                     bids_info["session"]
                 )
-            mapping_tasks[f"{scalar.get_name()}_file_res"] =\
-                pimms.calc(f"{scalar.get_name()}_file")(
+            mapping_tasks[f"{scalar.get_name()}_res"] =\
+                pimms.calc(f"{scalar.get_name()}")(
                     as_file(f'-{scalar.get_name()}.nii.gz')(
                         scalar.get_image_getter("mapping")))
 

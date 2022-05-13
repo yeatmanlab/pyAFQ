@@ -286,7 +286,7 @@ def test_AFQ_fury():
         bids_path=bids_path,
         preproc_pipeline='vistasoft',
         viz_backend_spec="fury")
-    myafq.all_bundles_figure
+    myafq.export("all_bundles_figure")
 
 
 def test_AFQ_init():
@@ -330,7 +330,7 @@ def test_AFQ_init():
                     if n_subjects == n_sessions:
                         npt.assert_equal(
                             len(my_afq.wf_dict[sub][sub]),
-                            26)
+                            27)
                     else:
                         for session in range(n_sessions):
                             if n_sessions == 1:
@@ -339,7 +339,7 @@ def test_AFQ_init():
                                 sess = f"0{session+1}"
                             npt.assert_equal(
                                 len(my_afq.wf_dict[sub][sess]),
-                                26)
+                                27)
 
 
 @pytest.mark.nightly_basic
@@ -354,11 +354,11 @@ def test_AFQ_data():
             bids_path=bids_path,
             preproc_pipeline='vistasoft',
             mapping_definition=mapping)
-        npt.assert_equal(nib.load(myafq.b0["01"]).shape,
-                         nib.load(myafq.dwi_file["01"]).shape[:3])
-        npt.assert_equal(nib.load(myafq.b0["01"]).shape,
-                         nib.load(myafq.dti_params["01"]).shape[:3])
-        myafq.rois
+        npt.assert_equal(nib.load(myafq.export("b0")["01"]).shape,
+                         nib.load(myafq.export("dwi")["01"]).shape[:3])
+        npt.assert_equal(nib.load(myafq.export("b0")["01"]).shape,
+                         nib.load(myafq.export("dti_params")["01"]).shape[:3])
+        myafq.export("rois")
         shutil.rmtree(op.join(
             bids_path,
             'derivatives/afq'))
@@ -380,7 +380,7 @@ def test_AFQ_anisotropic():
         reg_template_spec="mni_T1",
         reg_subject_spec="power_map")
 
-    gtab = myafq.gtab["01"]
+    gtab = myafq.export("gtab")["01"]
 
     # check the b0s mask is correct
     b0s_mask = np.zeros(160, dtype=bool)
@@ -395,9 +395,9 @@ def test_AFQ_anisotropic():
     npt.assert_equal(bvals_in_range_or_0, np.ones(160, dtype=bool))
 
     # check that the apm map was made
-    myafq.mapping
+    myafq.export("mapping")
     assert op.exists(op.join(
-        myafq.results_dir["01"],
+        myafq.export("results_dir")["01"],
         'sub-01_ses-01_dwi_model-CSD_APM.nii.gz'))
 
 
@@ -417,7 +417,7 @@ def test_API_type_checking():
         myafq = GroupAFQ(
             bids_path,
             import_tract=["dwi"])
-        myafq.streamlines
+        myafq.export("streamlines")
     del myafq
 
     with pytest.raises(
@@ -426,14 +426,14 @@ def test_API_type_checking():
         myafq = GroupAFQ(
             bids_path,
             brain_mask_definition="not a brain mask")
-        myafq.brain_mask_file
+        myafq.export("brain_mask")
     del myafq
 
     with pytest.raises(
             TypeError,
             match="viz_backend_spec must contain either 'fury' or 'plotly'"):
         myafq = GroupAFQ(bids_path, viz_backend_spec="matplotlib")
-        myafq.all_bundles_figure
+        myafq.export("all_bundles_figure")
     del myafq
 
     with pytest.raises(
@@ -442,7 +442,7 @@ def test_API_type_checking():
                 "bundle_info must be a list of strings,"
                 " a dict, or a BundleDict")):
         myafq = GroupAFQ(bids_path, bundle_info=[2, 3])
-        myafq.bundle_dict
+        myafq.export("bundle_dict")
 
 
 @pytest.mark.nightly_slr
@@ -459,7 +459,7 @@ def test_AFQ_slr():
         mapping_definition=SlrMap())
 
     seg_sft = aus.SegmentedSFT.fromfile(
-        myafq.clean_bundles["01"])
+        myafq.export("clean_bundles")["01"])
     npt.assert_(len(seg_sft.get_bundle('CST_L').streamlines) > 0)
 
 
@@ -479,7 +479,7 @@ def test_AFQ_reco():
             'rng': 42})
 
     seg_sft = aus.SegmentedSFT.fromfile(
-        myafq.clean_bundles["01"])
+        myafq.export("clean_bundles")["01"])
     npt.assert_(len(seg_sft.get_bundle('CCMid').streamlines) > 0)
     myafq.export_all()
 
@@ -506,7 +506,7 @@ def test_AFQ_reco80():
             'rng': 42})
 
     seg_sft = aus.SegmentedSFT.fromfile(
-        myafq.bundles["01"])
+        myafq.export("bundles")["01"])
     npt.assert_(len(seg_sft.get_bundle('CCMid').streamlines) > 0)
 
 
@@ -588,7 +588,7 @@ def test_AFQ_FA():
         preproc_pipeline='vistasoft',
         reg_template_spec='dti_fa_template',
         reg_subject_spec='dti_fa_subject')
-    myafq.rois
+    myafq.export("rois")
 
 
 @pytest.mark.nightly
@@ -600,8 +600,8 @@ def test_DKI_profile():
     afd.organize_cfin_data(path=tmpdir.name)
     myafq = GroupAFQ(bids_path=op.join(tmpdir.name, 'cfin_multib'),
                     preproc_pipeline='dipy')
-    myafq.dki_fa
-    myafq.dki_md
+    myafq.export("dki_fa")
+    myafq.export("dki_md")
 
 
 def test_auto_cli():
@@ -691,66 +691,67 @@ def test_AFQ_data_waypoint():
     file_dict = afd.read_stanford_hardi_tractography()
     mapping = file_dict['mapping.nii.gz']
     streamlines = file_dict['tractography_subsampled.trk']
+    dwi_affine = myafq.export("dwi_affine")
     streamlines = dts.Streamlines(
         dtu.transform_tracking_output(
             [s for s in streamlines if s.shape[0] > 100],
-            np.linalg.inv(myafq.dwi_affine)))
+            np.linalg.inv(dwi_affine)))
 
     mapping_file = op.join(
-        myafq.results_dir,
+        myafq.export("results_dir"),
         'sub-01_ses-01_dwi_mapping_from-DWI_to_MNI_xfm.nii.gz')
     nib.save(mapping, mapping_file)
     reg_prealign_file = op.join(
-        myafq.results_dir,
+        myafq.export("results_dir"),
         'sub-01_ses-01_dwi_prealign_from-DWI_to-MNI_xfm.npy')
     np.save(reg_prealign_file, np.eye(4))
 
     seg_sft = aus.SegmentedSFT.fromfile(
-        myafq.clean_bundles)
+        myafq.export("clean_bundles"))
     npt.assert_(len(seg_sft.get_bundle('SLF_L').streamlines) > 0)
 
     # Test ROI exporting:
-    myafq.export_rois()
+    myafq.export("rois")
     assert op.exists(op.join(
-        myafq.results_dir,
+        myafq.export("results_dir"),
         'ROIs',
         'sub-01_ses-01_dwi_desc-ROI-CST_R-1-include.json'))
 
     # Test bundles exporting:
-    myafq.export_indiv_bundles()
+    myafq.export("indiv_bundles")
     assert op.exists(op.join(
-        myafq.results_dir,
+        myafq.export("results_dir"),
         'bundles',
         'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ-SLF_L_tractography.trk'))  # noqa
 
-    tract_profile_fname = myafq.profiles
+    tract_profile_fname = myafq.export("profiles")
     tract_profiles = pd.read_csv(tract_profile_fname)
 
     assert tract_profiles.select_dtypes(include=[np.number]).sum().sum() != 0
     assert tract_profiles.shape == (300, 8)
 
-    myafq.indiv_bundles_figures
+    myafq.export("indiv_bundles_figures")
     assert op.exists(op.join(
-        myafq.results_dir,
+        myafq.export("results_dir"),
         "viz_bundles",
         'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ_SLF_L_viz.html'))  # noqa
 
     assert op.exists(op.join(
-        myafq.results_dir,
+        myafq.export("results_dir"),
         "viz_bundles",
         'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob-AFQ_SLF_L_viz.html'))  # noqa
 
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see
     # that the CLI generates them
-    shutil.rmtree(op.join(myafq.results_dir,
+    shutil.rmtree(op.join(myafq.export("results_dir"),
                           'bundles'))
 
-    shutil.rmtree(op.join(myafq.results_dir,
+    shutil.rmtree(op.join(myafq.export("results_dir"),
                           'ROIs'))
     os.remove(tract_profile_fname)
 
     # save memory
-    results_dir = myafq.results_dir
+    results_dir = myafq.export("results_dir")
     del myafq
     gc.collect()
 
@@ -788,7 +789,7 @@ def test_AFQ_data_waypoint():
     with open(config_file, 'w') as ff:
         toml.dump(config, ff)
 
-    cmd = "pyAFQ -v " + config_file
+    cmd = f"pyAFQ -v {config_file}"
     completed_process = subprocess.run(
         cmd, shell=True, capture_output=True)
     if completed_process.returncode != 0:
