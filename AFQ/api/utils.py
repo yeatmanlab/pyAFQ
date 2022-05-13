@@ -1,13 +1,17 @@
+import contextlib
 from importlib import import_module
 from textwrap import dedent
 import pimms
 from funcargparse import FuncArgParser
 import logging
-
 import warnings
-from outdated import OutdatedPackageWarning
 
 from dipy.io.stateful_tractogram import set_sft_logger_level
+
+
+with contextlib.suppress(Exception):  # only works on python 3.9
+    from outdated import OutdatedPackageWarning
+    warnings.filterwarnings("ignore", category=OutdatedPackageWarning)
 
 
 __all__ = [
@@ -16,9 +20,6 @@ __all__ = [
 
 
 set_sft_logger_level(logging.CRITICAL)
-
-
-warnings.filterwarnings("ignore", category=OutdatedPackageWarning)
 
 
 task_modules = ["data", "mapping", "segmentation", "tractography", "viz"]
