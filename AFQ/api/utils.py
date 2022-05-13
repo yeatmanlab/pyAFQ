@@ -2,10 +2,24 @@ from importlib import import_module
 from textwrap import dedent
 import pimms
 from funcargparse import FuncArgParser
+import logging
+
+import warnings
+from outdated import OutdatedPackageWarning
+
+from dipy.io.stateful_tractogram import set_sft_logger_level
+
 
 __all__ = [
     "methods_descriptors", "kwargs_descriptors",
     "wf_sections", "add_method_descriptions", "AFQclass_doc"]
+
+
+set_sft_logger_level(logging.CRITICAL)
+
+
+warnings.filterwarnings("ignore", category=OutdatedPackageWarning)
+
 
 task_modules = ["data", "mapping", "segmentation", "tractography", "viz"]
 
