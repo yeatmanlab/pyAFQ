@@ -1,10 +1,25 @@
+import contextlib
 from importlib import import_module
 from AFQ.viz.utils import viz_import_msg_error
 import pimms
 from funcargparse import FuncArgParser
+import logging
+import warnings
+
+from dipy.io.stateful_tractogram import set_sft_logger_level
+
+
+with contextlib.suppress(Exception):  # only works on python 3.9
+    from outdated import OutdatedPackageWarning
+    warnings.filterwarnings("ignore", category=OutdatedPackageWarning)
+
 
 __all__ = [
     "methods_descriptors", "kwargs_descriptors", "AFQclass_doc"]
+
+
+set_sft_logger_level(logging.CRITICAL)
+
 
 task_modules = ["data", "mapping", "segmentation", "tractography", "viz"]
 
