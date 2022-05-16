@@ -34,6 +34,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
     directions : str
         How tracking directions are determined.
         One of: {"det" | "prob"}
+        Default: "prob"
     max_angle : float, optional.
         The maximum turning angle in each step. Default: 30
     sphere : Sphere object, optional.
@@ -51,7 +52,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         voxel on each dimension (for example, 2 => [2, 2, 2]). If this is a 2D
         array, these are the coordinates of the seeds. Unless random_seeds is
         set to True, in which case this is the total number of random seeds
-        to generate within the mask.
+        to generate within the mask. Default: 1
     random_seeds : bool
         Whether to generate a total of n_seeds random seeds in the mask.
         Default: False.
@@ -76,7 +77,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         Defaults to 0 (this means that if no stop_mask is passed,
         we will stop only at the edge of the image).
     step_size : float, optional.
-        The size (in mm) of a step of tractography. Default: 1.0
+        The size (in mm) of a step of tractography. Default: 0.5
     min_length: int, optional
         The miminal length (mm) in a streamline. Default: 10
     max_length: int, optional
