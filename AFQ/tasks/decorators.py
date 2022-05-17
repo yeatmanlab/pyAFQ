@@ -7,6 +7,7 @@ from time import time
 import nibabel as nib
 from dipy.io.streamline import save_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram
+from pytest import param
 from AFQ.data.s3bids import write_json
 
 import numpy as np
@@ -65,7 +66,7 @@ def has_args(og_func, needed_args):
                     header += f"{name}='{default}', "
                 else:
                     header += f"{name}={default}, "
-                content += f"{name}, "
+                content += f"{name}={name}, "
 
         header = header[:-2]
         content = content[:-2]
