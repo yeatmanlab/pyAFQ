@@ -170,7 +170,9 @@ class ImageFile(ImageDefinition):
                 dwi_img.get_fdata(),
                 image_affine,
                 dwi_img.affine)
-            return nib.Nifti1Image(image_data, dwi_img.affine), meta
+            return nib.Nifti1Image(
+                image_data.astype(np.float32),
+                dwi_img.affine), meta
         return image_getter
 
     def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
@@ -200,7 +202,7 @@ class FullImage(ImageDefinition):
         def image_getter(dwi):
             dwi_img = nib.load(dwi)
             return nib.Nifti1Image(
-                np.ones(dwi_img.get_fdata()[..., 0].shape),
+                np.ones(dwi_img.get_fdata()[..., 0].shape, dtype=np.float32),
                 dwi_img.affine), dict(source="Entire Volume")
         return image_getter
 
@@ -328,7 +330,8 @@ class B0Image(ImageDefinition):
             mean_b0 = mean_b0_img.get_fdata()
             _, image_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
             return nib.Nifti1Image(
-                image_data.astype(int), mean_b0_img.affine), dict(
+                image_data.astype(np.float32),
+                mean_b0_img.affine), dict(
                     source=b0,
                     technique="median_otsu applied to b0",
                     median_otsu_kwargs=self.median_otsu_kwargs)
@@ -645,7 +648,8 @@ class TemplateImage(ImageDefinition):
             scalar_data = mapping.transform_inverse(
                 img_data, interpolation='nearest')
             return nib.Nifti1Image(
-                scalar_data, reg_template.affine), dict(source=self.path)
+                scalar_data.astype(np.float32),
+                reg_template.affine), dict(source=self.path)
 
         if task_name == "mapping":
             def image_getter(mapping, data_imap):
