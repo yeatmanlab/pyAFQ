@@ -495,7 +495,7 @@ def brain_mask(base_fname, dwi, b0,
             bids_info["subject"],
             bids_info["session"])
     return brain_mask_definition.get_image_direct(
-        base_fname, bids_info, b0, data_imap=None)
+        dwi, bids_info, b0, data_imap=None)
 
 
 @pimms.calc("bundle_dict", "reg_template")
@@ -586,7 +586,7 @@ def get_bundle_dict(base_fname, dwi, segmentation_params,
             bids_info["subject"],
             bids_info["session"])
         roi_img, _ = roi.get_image_direct(
-            base_fname, bids_info, b0, data_imap=None)
+            dwi, bids_info, b0, data_imap=None)
         return roi_img
     for b_name, b_info in bundle_dict._dict.items():
         if "space" in b_info and b_info["space"] == "subject":

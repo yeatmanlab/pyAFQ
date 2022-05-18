@@ -218,7 +218,7 @@ def get_reg_subject(data_imap, bids_info, base_fname, dwi,
             bids_info["subject"],
             bids_info["session"])
         img, _ = reg_subject_spec.get_image_direct(
-            base_fname, bids_info, data_imap["b0"],
+            dwi, bids_info, data_imap["b0"],
             data_imap=data_imap)
     else:
         if reg_subject_spec in filename_dict:

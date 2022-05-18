@@ -36,9 +36,8 @@ def parse_cli(arg_dict):
     cli_parser.add_argument(
         dest='config',
         action="store",
-        help=(
-            "Path to config file or folder. ",
-            "For example, /path/to/afq_config.toml"))
+        help="Path to config file or folder. "
+        + "For example, /path/to/afq_config.toml")
 
     cli_parser.add_argument(
         '-g',

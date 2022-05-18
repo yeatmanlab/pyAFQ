@@ -65,7 +65,7 @@ def has_args(og_func, needed_args):
                     header += f"{name}='{default}', "
                 else:
                     header += f"{name}={default}, "
-                content += f"{name}, "
+                content += f"{name}={name}, "
 
         header = header[:-2]
         content = content[:-2]

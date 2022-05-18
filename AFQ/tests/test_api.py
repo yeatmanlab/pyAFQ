@@ -250,7 +250,7 @@ def test_AFQ_custom_tract():
             'subsampled_tractography.trk'
             )
     )
-    my_afq = GroupAFQ(
+    myafq = GroupAFQ(
         bids_path,
         preproc_pipeline='vistasoft',
         bundle_info=bundle_names,
@@ -258,7 +258,7 @@ def test_AFQ_custom_tract():
             "suffix": "tractography",
             "scope": "vistasoft"
         })
-    my_afq.export_streamlines()
+    myafq.export("streamlines")
 
 
 @pytest.mark.nightly_basic
@@ -315,12 +315,12 @@ def test_AFQ_init():
                     match="No subjects specified in `participant_labels` "
                     + " found in BIDS derivatives folders."
                         + " See above warnings."):
-                    my_afq = GroupAFQ(
+                    myafq = GroupAFQ(
                         bids_path,
                         preproc_pipeline="synthetic",
                         participant_labels=participant_labels)
             else:
-                my_afq = GroupAFQ(
+                myafq = GroupAFQ(
                     bids_path,
                     preproc_pipeline="synthetic",
                     participant_labels=participant_labels)
@@ -329,7 +329,7 @@ def test_AFQ_init():
                     sub = f"0{subject+1}"
                     if n_subjects == n_sessions:
                         npt.assert_equal(
-                            len(my_afq.wf_dict[sub][sub]),
+                            len(myafq.wf_dict[sub][sub]),
                             27)
                     else:
                         for session in range(n_sessions):
@@ -338,7 +338,7 @@ def test_AFQ_init():
                             else:
                                 sess = f"0{session+1}"
                             npt.assert_equal(
-                                len(my_afq.wf_dict[sub][sess]),
+                                len(myafq.wf_dict[sub][sess]),
                                 27)
 
 
@@ -531,7 +531,7 @@ def test_AFQ_pft():
         ImageFile(suffix="CSFprobseg"))
 
     with nbtmp.InTemporaryDirectory() as t_output_dir:
-        my_afq = GroupAFQ(
+        myafq = GroupAFQ(
             bids_path,
             preproc_pipeline='vistasoft',
             bundle_info=bundle_names,
@@ -541,7 +541,7 @@ def test_AFQ_pft():
                 "stop_threshold": "CMC",
                 "tracker": "pft"
             })
-        my_afq.export_streamlines()
+        myafq.export("streamlines")
 
 
 @pytest.mark.nightly_custom
@@ -558,14 +558,14 @@ def test_AFQ_custom_subject_reg():
     b0_file = GroupAFQ(
         bids_path,
         preproc_pipeline='vistasoft',
-        bundle_info=bundle_info).b0["01"]
+        bundle_info=bundle_info).export("b0")["01"]
 
     # make a different temporary directly to test this custom file in
     _, bids_path, sub_path = get_temp_hardi()
 
     os.rename(b0_file, op.join(sub_path, "sub-01_ses-01_customb0.nii.gz"))
 
-    my_afq = GroupAFQ(
+    myafq = GroupAFQ(
         bids_path,
         preproc_pipeline='vistasoft',
         bundle_info=bundle_info,
@@ -573,7 +573,7 @@ def test_AFQ_custom_subject_reg():
         reg_subject_spec=ImageFile(
             suffix="customb0",
             filters={"scope": "vistasoft"}))
-    my_afq.export_rois()
+    myafq.export("rois")
 
 
 # Requires large download
