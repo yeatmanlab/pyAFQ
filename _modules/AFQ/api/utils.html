@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.api.utils &#8212; AFQ 0.11 documentation</title>
+    <title>AFQ.api.utils &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -181,18 +181,33 @@
               <div>
                 
   <h1>Source code for AFQ.api.utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">import_module</span>
-<span class="kn">from</span> <span class="nn">textwrap</span> <span class="kn">import</span> <span class="n">dedent</span>
+<span></span><span class="kn">import</span> <span class="nn">contextlib</span>
+<span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">import_module</span>
+<span class="kn">from</span> <span class="nn">AFQ.viz.utils</span> <span class="kn">import</span> <span class="n">viz_import_msg_error</span>
 <span class="kn">import</span> <span class="nn">pimms</span>
 <span class="kn">from</span> <span class="nn">funcargparse</span> <span class="kn">import</span> <span class="n">FuncArgParser</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">set_sft_logger_level</span>
+
+
+<span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">suppress</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>  <span class="c1"># only works on python 3.9</span>
+    <span class="kn">from</span> <span class="nn">outdated</span> <span class="kn">import</span> <span class="n">OutdatedPackageWarning</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">OutdatedPackageWarning</span><span class="p">)</span>
+
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;methods_descriptors&quot;</span><span class="p">,</span> <span class="s2">&quot;kwargs_descriptors&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;wf_sections&quot;</span><span class="p">,</span> <span class="s2">&quot;add_method_descriptions&quot;</span><span class="p">,</span> <span class="s2">&quot;AFQclass_doc&quot;</span><span class="p">]</span>
+    <span class="s2">&quot;methods_descriptors&quot;</span><span class="p">,</span> <span class="s2">&quot;kwargs_descriptors&quot;</span><span class="p">,</span> <span class="s2">&quot;AFQclass_doc&quot;</span><span class="p">]</span>
+
+
+<span class="n">set_sft_logger_level</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">)</span>
+
 
 <span class="n">task_modules</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;mapping&quot;</span><span class="p">,</span> <span class="s2">&quot;segmentation&quot;</span><span class="p">,</span> <span class="s2">&quot;tractography&quot;</span><span class="p">,</span> <span class="s2">&quot;viz&quot;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="methods_descriptors"><a class="viewcode-back" href="../../../autoapi/AFQ/api/utils/index.html#AFQ.api.utils.methods_descriptors">[docs]</a><span class="n">methods_descriptors</span> <span class="o">=</span> <span class="p">{}</span></div>
+<span class="n">methods_sections</span> <span class="o">=</span> <span class="p">{}</span>
 <div class="viewcode-block" id="kwargs_descriptors"><a class="viewcode-back" href="../../../autoapi/AFQ/api/utils/index.html#AFQ.api.utils.kwargs_descriptors">[docs]</a><span class="n">kwargs_descriptors</span> <span class="o">=</span> <span class="p">{}</span></div>
 <span class="k">for</span> <span class="n">task_module</span> <span class="ow">in</span> <span class="n">task_modules</span><span class="p">:</span>
     <span class="n">kwargs_descriptors</span><span class="p">[</span><span class="n">task_module</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
@@ -209,38 +224,39 @@
                         <span class="s2">&quot;their descriptions must be divided by commas.&quot;</span>
                         <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">calc_obj</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">eff_descs</span><span class="p">)</span><span class="si">}</span><span class="s2"> comma-divided&quot;</span>
                         <span class="sa">f</span><span class="s2">&quot;sections but </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">calc_obj</span><span class="o">.</span><span class="n">efferents</span><span class="p">)</span><span class="si">}</span><span class="s2"> outputs&quot;</span><span class="p">))</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">calc_obj</span><span class="o">.</span><span class="n">efferents</span><span class="p">)):</span>
-                    <span class="k">if</span> <span class="n">eff_descs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39; &#39;</span> <span class="ow">or</span> <span class="n">eff_descs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
-                        <span class="n">eff_descs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">eff_descs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
-                    <span class="k">if</span> <span class="n">eff_descs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;and&quot;</span><span class="p">:</span>
-                        <span class="n">eff_descs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">eff_descs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">3</span><span class="p">:]</span>
-                    <span class="k">if</span> <span class="n">eff_descs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39; &#39;</span> <span class="ow">or</span> <span class="n">eff_descs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
-                        <span class="n">eff_descs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">eff_descs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">calc_obj</span><span class="o">.</span><span class="n">efferents</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="n">eff_descs</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">]:</span>
+                        <span class="n">eff_descs</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="n">eff_descs</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+                    <span class="k">if</span> <span class="n">eff_descs</span><span class="p">[</span><span class="n">ii</span><span class="p">][:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;and&quot;</span><span class="p">:</span>
+                        <span class="n">eff_descs</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="n">eff_descs</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="mi">3</span><span class="p">:]</span>
+                    <span class="k">if</span> <span class="n">eff_descs</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">]:</span>
+                        <span class="n">eff_descs</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="n">eff_descs</span><span class="p">[</span><span class="n">ii</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
                     <span class="n">methods_descriptors</span><span class="p">[</span>
-                        <span class="n">calc_obj</span><span class="o">.</span><span class="n">efferents</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span>\
-                        <span class="n">eff_descs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                        <span class="n">calc_obj</span><span class="o">.</span><span class="n">efferents</span><span class="p">[</span><span class="n">ii</span><span class="p">]]</span> <span class="o">=</span>\
+                        <span class="n">eff_descs</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>
+                    <span class="n">methods_sections</span><span class="p">[</span><span class="n">calc_obj</span><span class="o">.</span><span class="n">efferents</span><span class="p">[</span><span class="n">ii</span><span class="p">]]</span> <span class="o">=</span>\
+                        <span class="n">task_module</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">methods_descriptors</span><span class="p">[</span>
                     <span class="n">calc_obj</span><span class="o">.</span><span class="n">efferents</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span>\
                     <span class="n">docstr_parser</span><span class="o">.</span><span class="n">description</span>
+                <span class="n">methods_sections</span><span class="p">[</span><span class="n">calc_obj</span><span class="o">.</span><span class="n">efferents</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span>\
+                    <span class="n">task_module</span>
             <span class="k">for</span> <span class="n">arg</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">docstr_parser</span><span class="o">.</span><span class="n">unfinished_arguments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="s2">&quot;help&quot;</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="s2">&quot;default&quot;</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
-                        <span class="n">default</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">default</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;default&quot;</span> <span class="ow">in</span> <span class="n">info</span> <span class="k">else</span> <span class="kc">None</span>
                     <span class="n">kwargs_descriptors</span><span class="p">[</span><span class="n">task_module</span><span class="p">][</span><span class="n">arg</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
                         <span class="n">desc</span><span class="o">=</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;help&quot;</span><span class="p">],</span>
                         <span class="n">kind</span><span class="o">=</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;metavar&quot;</span><span class="p">],</span>
                         <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">arg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">methods_sections</span><span class="p">:</span>
+                    <span class="n">methods_sections</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span> <span class="o">=</span> <span class="n">task_modules</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-<span class="c1"># define sections in workflow dictionary</span>
-<div class="viewcode-block" id="wf_sections"><a class="viewcode-back" href="../../../autoapi/AFQ/api/utils/index.html#AFQ.api.utils.wf_sections">[docs]</a><span class="n">wf_sections</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;data_imap&quot;</span><span class="p">,</span> <span class="s2">&quot;mapping_imap&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;tractography_imap&quot;</span><span class="p">,</span> <span class="s2">&quot;segmentation_imap&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;subses_dict&quot;</span><span class="p">]</span></div>
 
-<span class="n">AFQclass_doc</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="n">AFQclass_doc</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;Here are the arguments you can pass to kwargs,&quot;</span>
+    <span class="s2">&quot; to customize the tractometry pipeline. They are organized&quot;</span>
+    <span class="s2">&quot; into 5 sections.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">task_module</span> <span class="ow">in</span> <span class="n">task_modules</span><span class="p">:</span>
 <div class="viewcode-block" id="AFQclass_doc"><a class="viewcode-back" href="../../../autoapi/AFQ/api/utils/index.html#AFQ.api.utils.AFQclass_doc">[docs]</a>    <span class="n">AFQclass_doc</span> <span class="o">=</span> <span class="n">AFQclass_doc</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span></div>
     <span class="n">AFQclass_doc</span> <span class="o">=</span> <span class="n">AFQclass_doc</span> <span class="o">+</span>\
@@ -256,33 +272,56 @@
         <span class="n">AFQclass_doc</span> <span class="o">=</span> <span class="n">AFQclass_doc</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span>
 
 
-<div class="viewcode-block" id="add_method_descriptions"><a class="viewcode-back" href="../../../autoapi/AFQ/api/utils/index.html#AFQ.api.utils.add_method_descriptions">[docs]</a><span class="k">def</span> <span class="nf">add_method_descriptions</span><span class="p">(</span><span class="n">AFQclass</span><span class="p">):</span>
-    <span class="c1"># iterate through all attributes, setting methods for each one</span>
-    <span class="k">for</span> <span class="n">output</span><span class="p">,</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">methods_descriptors</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">desc</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;    &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-        <span class="n">exec</span><span class="p">(</span><span class="n">dedent</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
-<span class="s2">        def export_</span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="s2">(self):</span>
-<span class="s2">            </span><span class="se">\&quot;\&quot;\&quot;</span><span class="s2"></span>
-<span class="s2">            Triggers a cascade of calculations to generate the desired output.</span>
-<span class="s2">            Returns</span>
-<span class="s2">            -------</span>
-<span class="s2">            </span><span class="si">{</span><span class="n">desc</span><span class="si">}</span><span class="s2"></span>
-<span class="s2">            </span><span class="se">\&quot;\&quot;\&quot;</span><span class="s2"></span>
-<span class="s2">            return self.</span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span><span class="p">))</span>
-        <span class="n">fn</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()[</span><span class="sa">f</span><span class="s2">&quot;export_</span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">:]</span> <span class="o">==</span> <span class="s2">&quot;_file&quot;</span><span class="p">:</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="n">AFQclass</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;export_</span><span class="si">{</span><span class="n">output</span><span class="p">[:</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fn</span><span class="p">)</span>
+<span class="n">valid_exports_string</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;Here is a list of valid attributes &quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;to export: </span><span class="si">{</span><span class="n">methods_sections</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">check_attribute</span><span class="p">(</span><span class="n">attr_name</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">attr_name</span> <span class="o">==</span> <span class="s2">&quot;help&quot;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">valid_exports_string</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">attr_name</span> <span class="ow">in</span> <span class="n">methods_sections</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">methods_sections</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span> <span class="o">==</span> <span class="n">task_modules</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="n">AFQclass</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;export_</span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fn</span><span class="p">)</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">methods_sections</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span><span class="si">}</span><span class="s2">_imap&quot;</span>
 
-    <span class="n">AFQclass_doc_intro</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;Here are the arguments you can pass to kwargs,&quot;</span>
-        <span class="s2">&quot; to customize the tractometry pipeline. They are organized&quot;</span>
-        <span class="s2">&quot; into 5 sections.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attr_name</span><span class="si">}</span><span class="s2"> not found for export. </span><span class="si">{</span><span class="n">valid_exports_string</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="nb">setattr</span><span class="p">(</span><span class="n">AFQclass</span><span class="p">,</span> <span class="s2">&quot;__doc__&quot;</span><span class="p">,</span> <span class="n">AFQclass_doc_intro</span> <span class="o">+</span> <span class="n">AFQclass_doc</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">AFQclass</span></div>
+<span class="k">def</span> <span class="nf">export_all_helper</span><span class="p">(</span><span class="n">api_afq_object</span><span class="p">,</span> <span class="n">seg_algo</span><span class="p">,</span> <span class="n">xforms</span><span class="p">,</span> <span class="n">indiv</span><span class="p">,</span> <span class="n">viz</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">xforms</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">api_afq_object</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;b0_warped&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">api_afq_object</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span>
+                <span class="s2">&quot;Failed to export warped b0. This could be because your &quot;</span>
+                <span class="s2">&quot;mapping type is only compatible with transformation &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;from template to subject space. The error is: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+        <span class="n">api_afq_object</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;template_xform&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">indiv</span><span class="p">:</span>
+        <span class="n">api_afq_object</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;indiv_bundles&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;AFQ&quot;</span><span class="p">:</span>
+            <span class="n">api_afq_object</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;rois&quot;</span><span class="p">)</span>
+    <span class="n">api_afq_object</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;sl_counts&quot;</span><span class="p">)</span>
+    <span class="n">api_afq_object</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;profiles&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">viz</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">api_afq_object</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;tract_profile_plots&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">plot_err_message</span> <span class="o">=</span> <span class="n">viz_import_msg_error</span><span class="p">(</span><span class="s2">&quot;plot&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">!=</span> <span class="n">plot_err_message</span><span class="p">:</span>
+                <span class="k">raise</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">api_afq_object</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">plot_err_message</span><span class="p">)</span>
+        <span class="n">api_afq_object</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;all_bundles_figure&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;AFQ&quot;</span><span class="p">:</span>
+            <span class="n">api_afq_object</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;indiv_bundles_figures&quot;</span><span class="p">)</span>
 </pre></div>
 
               </div>

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.decorators &#8212; AFQ 0.11 documentation</title>
+    <title>AFQ.tasks.decorators &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -283,28 +283,19 @@
     </label>
     <ul>
      <li class="toctree-l3">
+      <a class="reference internal" href="../../definitions/image/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.definitions.image
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
       <a class="reference internal" href="../../definitions/mapping/index.html">
        <code class="xref py py-mod docutils literal notranslate">
         <span class="pre">
          AFQ.definitions.mapping
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../definitions/mask/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.definitions.mask
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../definitions/scalar/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.definitions.scalar
         </span>
        </code>
       </a>
@@ -475,10 +466,10 @@
       </a>
      </li>
      <li class="toctree-l3">
-      <a class="reference internal" href="../../utils/parallel/index.html">
+      <a class="reference internal" href="../../utils/path/index.html">
        <code class="xref py py-mod docutils literal notranslate">
         <span class="pre">
-         AFQ.utils.parallel
+         AFQ.utils.path
         </span>
        </code>
       </a>
@@ -632,13 +623,8 @@
       </a>
      </li>
      <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#AFQ.tasks.decorators.as_model">
-       as_model
-      </a>
-     </li>
-     <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#AFQ.tasks.decorators.as_dt_deriv">
-       as_dt_deriv
+      <a class="reference internal nav-link" href="#AFQ.tasks.decorators.as_fit_deriv">
+       as_fit_deriv
       </a>
      </li>
      <li class="toc-h4 nav-item toc-entry">
@@ -691,38 +677,34 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.decorators.as_file" title="AFQ.tasks.decorators.as_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_file</span></code></a>(suffix, include_track=False, include_seg=False)</p></td>
-<td><p></p></td>
+<td><p>return img and meta as saved file path, with json,</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.decorators.as_model" title="AFQ.tasks.decorators.as_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_model</span></code></a>(func)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.decorators.as_fit_deriv" title="AFQ.tasks.decorators.as_fit_deriv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_fit_deriv</span></code></a>(tf_name)</p></td>
+<td><p>return data as nibabel image, meta with params information</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.decorators.as_dt_deriv" title="AFQ.tasks.decorators.as_dt_deriv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_dt_deriv</span></code></a>(tf_name)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.decorators.as_img" title="AFQ.tasks.decorators.as_img"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_img</span></code></a>(func)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.decorators.as_img" title="AFQ.tasks.decorators.as_img"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_img</span></code></a>(func)</p></td>
+<td><p>return data, meta as nibabel image, meta with timing</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.decorators.as_file">
 <span class="sig-prename descclassname"><span class="pre">AFQ.tasks.decorators.</span></span><span class="sig-name descname"><span class="pre">as_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suffix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_track</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_seg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/decorators.html#as_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.decorators.as_file" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>return img and meta as saved file path, with json,
+and only run if not already found</p>
+</dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="AFQ.tasks.decorators.as_model">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.decorators.</span></span><span class="sig-name descname"><span class="pre">as_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/decorators.html#as_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.decorators.as_model" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="AFQ.tasks.decorators.as_dt_deriv">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.decorators.</span></span><span class="sig-name descname"><span class="pre">as_dt_deriv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tf_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/decorators.html#as_dt_deriv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.decorators.as_dt_deriv" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="AFQ.tasks.decorators.as_fit_deriv">
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.decorators.</span></span><span class="sig-name descname"><span class="pre">as_fit_deriv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tf_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/decorators.html#as_fit_deriv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.decorators.as_fit_deriv" title="Permalink to this definition">#</a></dt>
+<dd><p>return data as nibabel image, meta with params information</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.decorators.as_img">
 <span class="sig-prename descclassname"><span class="pre">AFQ.tasks.decorators.</span></span><span class="sig-name descname"><span class="pre">as_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/decorators.html#as_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.decorators.as_img" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>return data, meta as nibabel image, meta with timing</p>
+</dd></dl>
 
 </div>
 </div>

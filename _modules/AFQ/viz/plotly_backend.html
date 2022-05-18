@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.viz.plotly_backend &#8212; AFQ 0.11 documentation</title>
+    <title>AFQ.viz.plotly_backend &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -235,11 +235,11 @@
 
 <div class="viewcode-block" id="_color_arr2str"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._color_arr2str">[docs]</a><span class="k">def</span> <span class="nf">_color_arr2str</span><span class="p">(</span><span class="n">color_arr</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;rgba(</span><span class="si">{</span><span class="n">_to_color_range</span><span class="p">(</span><span class="n">color_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2">, &quot;</span></div>
+        <span class="sa">f</span><span class="s2">&quot;rgba(</span><span class="si">{</span><span class="n">_to_color_range</span><span class="p">(</span><span class="n">color_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2">, &quot;</span>
         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_to_color_range</span><span class="p">(</span><span class="n">color_arr</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="si">}</span><span class="s2">, &quot;</span>
         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_to_color_range</span><span class="p">(</span><span class="n">color_arr</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="si">}</span><span class="s2">, &quot;</span>
         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_to_color_range</span><span class="p">(</span><span class="n">opacity</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
-    <span class="p">)</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="set_layout"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.set_layout">[docs]</a><span class="k">def</span> <span class="nf">set_layout</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -255,9 +255,9 @@
                 <span class="n">showbackground</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">showticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">),</span>
             <span class="n">zaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
                 <span class="n">showbackground</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">showticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">),</span>
-            <span class="n">aspectmode</span><span class="o">=</span><span class="s1">&#39;data&#39;</span></div>
+            <span class="n">aspectmode</span><span class="o">=</span><span class="s1">&#39;data&#39;</span>
         <span class="p">)</span>
-    <span class="p">)</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="_draw_streamlines"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._draw_streamlines">[docs]</a><span class="k">def</span> <span class="nf">_draw_streamlines</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">sls</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">cbv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cbs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -614,8 +614,8 @@
             <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">_color_arr2str</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">)),</span>
             <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;rgba(0,0,0,0)&quot;</span><span class="p">)</span>
         <span class="p">),</span>
-        <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span></div>
-    <span class="p">)</span>
+        <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="visualize_roi"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend.visualize_roi">[docs]</a><span class="k">def</span> <span class="nf">visualize_roi</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">affine_or_mapping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">static_img</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -742,8 +742,8 @@
             <span class="n">hoverinfo</span><span class="o">=</span><span class="s1">&#39;skip&#39;</span><span class="p">,</span>
             <span class="n">showlegend</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">),</span>
-        <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span></div>
-    <span class="p">)</span>
+        <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="_name_from_enum"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._name_from_enum">[docs]</a><span class="k">def</span> <span class="nf">_name_from_enum</span><span class="p">(</span><span class="n">axis</span><span class="p">):</span>
@@ -845,7 +845,7 @@
 
 
 <div class="viewcode-block" id="_draw_core"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._draw_core">[docs]</a><span class="k">def</span> <span class="nf">_draw_core</span><span class="p">(</span><span class="n">sls</span><span class="p">,</span> <span class="n">n_points</span><span class="p">,</span> <span class="n">figure</span><span class="p">,</span> <span class="n">bundle_name</span><span class="p">,</span> <span class="n">indiv_profile</span><span class="p">,</span>
-               <span class="n">dimensions</span><span class="p">,</span> <span class="n">flip_axes</span><span class="p">):</span>
+               <span class="n">labelled_points</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">flip_axes</span><span class="p">):</span>
     <span class="n">fgarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">set_number_of_points</span><span class="p">(</span><span class="n">sls</span><span class="p">,</span> <span class="n">n_points</span><span class="p">))</span>
     <span class="n">fgarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">fgarray</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="c1"># colormap = px.colors.diverging.Portland</span>
@@ -871,9 +871,11 @@
             <span class="n">direc_adjust</span> <span class="o">=</span> <span class="p">(</span><span class="n">direc_adjust</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span> <span class="o">/</span> <span class="mi">4</span>
         <span class="n">line_color</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">line_color</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">direc_adjust</span>
     <span class="n">text</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_points</span>
-    <span class="n">text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="c1"># text[n_points // 2] = n_points // 2 # too much clutter</span>
-    <span class="n">text</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_points</span>
+    <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labelled_points</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">text</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">n_points</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">text</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">flip_axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
         <span class="n">fgarray</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">fgarray</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
@@ -909,6 +911,7 @@
                       <span class="n">bundle</span><span class="p">,</span> <span class="n">scalar_name</span><span class="p">,</span>
                       <span class="n">bundle_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                       <span class="n">flip_axes</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+                      <span class="n">labelled_nodes</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span>
                       <span class="n">figure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                       <span class="n">include_profile</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -946,6 +949,10 @@
 <span class="sd">        For example, if the input image is LAS, use [True, False, False].</span>
 <span class="sd">        Default: [False, False, False]</span>
 
+<span class="sd">    labelled_nodes : list or ndarray</span>
+<span class="sd">        Which nodes to label. -1 indicates the last node.</span>
+<span class="sd">        Default: [0, -1]</span>
+
 <span class="sd">    figure : Plotly Figure object, optional</span>
 <span class="sd">        If provided, the visualization will be added to this Figure. Default:</span>
 <span class="sd">        Initialize a new Figure.</span>
@@ -975,7 +982,7 @@
 
     <span class="n">line_color</span> <span class="o">=</span> <span class="n">_draw_core</span><span class="p">(</span>
         <span class="n">sls</span><span class="p">,</span> <span class="n">n_points</span><span class="p">,</span> <span class="n">figure</span><span class="p">,</span> <span class="n">bundle_name</span><span class="p">,</span> <span class="n">indiv_profile</span><span class="p">,</span>
-        <span class="n">dimensions</span><span class="p">,</span> <span class="n">flip_axes</span><span class="p">)</span>
+        <span class="n">labelled_nodes</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">flip_axes</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">include_profile</span><span class="p">:</span>
         <span class="n">_plot_profiles</span><span class="p">(</span>

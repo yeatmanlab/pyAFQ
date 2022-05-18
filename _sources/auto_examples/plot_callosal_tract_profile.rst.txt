@@ -774,9 +774,9 @@ contains the following keys:
     Preprocessing Streamlines
     Assigning Streamlines to Bundles
     Finding Streamlines for AntFrontal
-    1019 streamlines exceed the probability threshold.
-      0%|          | 0/1019 [00:00<?, ?it/s]      0%|          | 2/1019 [00:00<01:07, 15.14it/s]      0%|          | 4/1019 [00:03<17:45,  1.05s/it]      2%|2         | 24/1019 [00:03<01:55,  8.61it/s]     39%|###8      | 396/1019 [00:03<00:03, 199.66it/s]     77%|#######6  | 780/1019 [00:03<00:00, 444.85it/s]    100%|##########| 1019/1019 [00:03<00:00, 258.26it/s]
-    157 streamlines selected with waypoint ROIs
+    1020 streamlines exceed the probability threshold.
+      0%|          | 0/1020 [00:00<?, ?it/s]      0%|          | 2/1020 [00:00<00:53, 18.90it/s]      0%|          | 4/1020 [00:03<17:56,  1.06s/it]      8%|7         | 78/1020 [00:03<00:32, 29.10it/s]     52%|#####1    | 526/1020 [00:03<00:01, 257.42it/s]    100%|##########| 1020/1020 [00:03<00:00, 261.60it/s]
+    129 streamlines selected with waypoint ROIs
     Cleaning up Loky...
     Loky Cleaned up
     Re-orienting streamlines to consistent directions
@@ -854,8 +854,8 @@ of their trajectory and/or length.
 
     Cleaning fiber groups...
     Cleaning AntFrontal...
-    Before cleaning: 157 streamlines
-    After cleaning: 155 streamlines
+    Before cleaning: 129 streamlines
+    After cleaning: 126 streamlines
 
 
 
@@ -959,7 +959,7 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 14 minutes  56.079 seconds)
+   **Total running time of the script:** ( 14 minutes  55.088 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_callosal_tract_profile.py:

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.viz &#8212; AFQ 0.11 documentation</title>
+    <title>AFQ.tasks.viz &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -214,7 +214,7 @@
 
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;all_bundles_figure&quot;</span><span class="p">)</span>
-<div class="viewcode-block" id="viz_bundles"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/viz/index.html#AFQ.tasks.viz.viz_bundles">[docs]</a><span class="k">def</span> <span class="nf">viz_bundles</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span>
+<div class="viewcode-block" id="viz_bundles"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/viz/index.html#AFQ.tasks.viz.viz_bundles">[docs]</a><span class="k">def</span> <span class="nf">viz_bundles</span><span class="p">(</span><span class="n">base_fname</span><span class="p">,</span>
                 <span class="n">dwi_affine</span><span class="p">,</span>
                 <span class="n">viz_backend</span><span class="p">,</span>
                 <span class="n">data_imap</span><span class="p">,</span>
@@ -250,9 +250,9 @@
     <span class="n">mapping</span> <span class="o">=</span> <span class="n">mapping_imap</span><span class="p">[</span><span class="s2">&quot;mapping&quot;</span><span class="p">]</span>
     <span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;bundle_dict&quot;</span><span class="p">]</span>
     <span class="n">scalar_dict</span> <span class="o">=</span> <span class="n">segmentation_imap</span><span class="p">[</span><span class="s2">&quot;scalar_dict&quot;</span><span class="p">]</span>
-    <span class="n">profiles_file</span> <span class="o">=</span> <span class="n">segmentation_imap</span><span class="p">[</span><span class="s2">&quot;profiles_file&quot;</span><span class="p">]</span>
-    <span class="n">volume</span> <span class="o">=</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;b0_file&quot;</span><span class="p">]</span>
-    <span class="n">shade_by_volume</span> <span class="o">=</span> <span class="n">data_imap</span><span class="p">[</span><span class="n">best_scalar</span> <span class="o">+</span> <span class="s2">&quot;_file&quot;</span><span class="p">]</span>
+    <span class="n">profiles_file</span> <span class="o">=</span> <span class="n">segmentation_imap</span><span class="p">[</span><span class="s2">&quot;profiles&quot;</span><span class="p">]</span>
+    <span class="n">volume</span> <span class="o">=</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;b0&quot;</span><span class="p">]</span>
+    <span class="n">shade_by_volume</span> <span class="o">=</span> <span class="n">data_imap</span><span class="p">[</span><span class="n">best_scalar</span><span class="p">]</span>
     <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
     <span class="n">volume</span> <span class="o">=</span> <span class="n">_viz_prepare_vol</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">scalar_dict</span><span class="p">)</span>
     <span class="n">shade_by_volume</span> <span class="o">=</span> <span class="n">_viz_prepare_vol</span><span class="p">(</span>
@@ -278,7 +278,7 @@
         <span class="n">figure</span><span class="o">=</span><span class="n">figure</span><span class="p">)</span>
 
     <span class="n">figure</span> <span class="o">=</span> <span class="n">viz_backend</span><span class="o">.</span><span class="n">visualize_bundles</span><span class="p">(</span>
-        <span class="n">segmentation_imap</span><span class="p">[</span><span class="s2">&quot;clean_bundles_file&quot;</span><span class="p">],</span>
+        <span class="n">segmentation_imap</span><span class="p">[</span><span class="s2">&quot;clean_bundles&quot;</span><span class="p">],</span>
         <span class="n">shade_by_volume</span><span class="o">=</span><span class="n">shade_by_volume</span><span class="p">,</span>
         <span class="n">sbv_lims</span><span class="o">=</span><span class="n">sbv_lims_bundles</span><span class="p">,</span>
         <span class="n">bundle_dict</span><span class="o">=</span><span class="n">bundle_dict</span><span class="p">,</span>
@@ -291,20 +291,20 @@
 
     <span class="k">if</span> <span class="s2">&quot;no_gif&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">viz_backend</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
         <span class="n">fname</span> <span class="o">=</span> <span class="n">get_fname</span><span class="p">(</span>
-            <span class="n">subses_dict</span><span class="p">,</span> <span class="s1">&#39;_viz.gif&#39;</span><span class="p">,</span>
+            <span class="n">base_fname</span><span class="p">,</span> <span class="s1">&#39;_viz.gif&#39;</span><span class="p">,</span>
             <span class="n">tracking_params</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">,</span>
             <span class="n">segmentation_params</span><span class="o">=</span><span class="n">segmentation_params</span><span class="p">)</span>
 
         <span class="n">viz_backend</span><span class="o">.</span><span class="n">create_gif</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
     <span class="k">if</span> <span class="s2">&quot;plotly&quot;</span> <span class="ow">in</span> <span class="n">viz_backend</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
         <span class="n">fname</span> <span class="o">=</span> <span class="n">get_fname</span><span class="p">(</span>
-            <span class="n">subses_dict</span><span class="p">,</span> <span class="s1">&#39;_viz.html&#39;</span><span class="p">,</span>
+            <span class="n">base_fname</span><span class="p">,</span> <span class="s1">&#39;_viz.html&#39;</span><span class="p">,</span>
             <span class="n">tracking_params</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">,</span>
             <span class="n">segmentation_params</span><span class="o">=</span><span class="n">segmentation_params</span><span class="p">)</span>
 
         <span class="n">figure</span><span class="o">.</span><span class="n">write_html</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
     <span class="n">meta_fname</span> <span class="o">=</span> <span class="n">get_fname</span><span class="p">(</span>
-        <span class="n">subses_dict</span><span class="p">,</span> <span class="s1">&#39;_viz.json&#39;</span><span class="p">,</span>
+        <span class="n">base_fname</span><span class="p">,</span> <span class="s1">&#39;_viz.json&#39;</span><span class="p">,</span>
         <span class="n">tracking_params</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">,</span>
         <span class="n">segmentation_params</span><span class="o">=</span><span class="n">segmentation_params</span><span class="p">)</span>
     <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">Timing</span><span class="o">=</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span>
@@ -313,7 +313,8 @@
 
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;indiv_bundles_figures&quot;</span><span class="p">)</span>
-<div class="viewcode-block" id="viz_indivBundle"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/viz/index.html#AFQ.tasks.viz.viz_indivBundle">[docs]</a><span class="k">def</span> <span class="nf">viz_indivBundle</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span>
+<div class="viewcode-block" id="viz_indivBundle"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/viz/index.html#AFQ.tasks.viz.viz_indivBundle">[docs]</a><span class="k">def</span> <span class="nf">viz_indivBundle</span><span class="p">(</span><span class="n">base_fname</span><span class="p">,</span>
+                    <span class="n">results_dir</span><span class="p">,</span>
                     <span class="n">dwi_affine</span><span class="p">,</span>
                     <span class="n">viz_backend</span><span class="p">,</span>
                     <span class="n">data_imap</span><span class="p">,</span>
@@ -350,9 +351,9 @@
     <span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;bundle_dict&quot;</span><span class="p">]</span>
     <span class="n">reg_template</span> <span class="o">=</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;reg_template&quot;</span><span class="p">]</span>
     <span class="n">scalar_dict</span> <span class="o">=</span> <span class="n">segmentation_imap</span><span class="p">[</span><span class="s2">&quot;scalar_dict&quot;</span><span class="p">]</span>
-    <span class="n">volume</span> <span class="o">=</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;b0_file&quot;</span><span class="p">]</span>
-    <span class="n">shade_by_volume</span> <span class="o">=</span> <span class="n">data_imap</span><span class="p">[</span><span class="n">best_scalar</span> <span class="o">+</span> <span class="s2">&quot;_file&quot;</span><span class="p">]</span>
-    <span class="n">profiles</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">segmentation_imap</span><span class="p">[</span><span class="s2">&quot;profiles_file&quot;</span><span class="p">])</span>
+    <span class="n">volume</span> <span class="o">=</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;b0&quot;</span><span class="p">]</span>
+    <span class="n">shade_by_volume</span> <span class="o">=</span> <span class="n">data_imap</span><span class="p">[</span><span class="n">best_scalar</span><span class="p">]</span>
+    <span class="n">profiles</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">segmentation_imap</span><span class="p">[</span><span class="s2">&quot;profiles&quot;</span><span class="p">])</span>
 
     <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
     <span class="n">volume</span> <span class="o">=</span> <span class="n">_viz_prepare_vol</span><span class="p">(</span>
@@ -376,7 +377,7 @@
             <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">figure</span> <span class="o">=</span> <span class="n">viz_backend</span><span class="o">.</span><span class="n">visualize_bundles</span><span class="p">(</span>
-                <span class="n">segmentation_imap</span><span class="p">[</span><span class="s2">&quot;clean_bundles_file&quot;</span><span class="p">],</span>
+                <span class="n">segmentation_imap</span><span class="p">[</span><span class="s2">&quot;clean_bundles&quot;</span><span class="p">],</span>
                 <span class="n">shade_by_volume</span><span class="o">=</span><span class="n">shade_by_volume</span><span class="p">,</span>
                 <span class="n">sbv_lims</span><span class="o">=</span><span class="n">sbv_lims_indiv</span><span class="p">,</span>
                 <span class="n">bundle_dict</span><span class="o">=</span><span class="n">bundle_dict</span><span class="p">,</span>
@@ -418,7 +419,7 @@
                     <span class="n">interact</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">figure</span><span class="o">=</span><span class="n">figure</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">roi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mapping_imap</span><span class="p">[</span><span class="s2">&quot;rois_file&quot;</span><span class="p">][</span><span class="n">bundle_name</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">roi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mapping_imap</span><span class="p">[</span><span class="s2">&quot;rois&quot;</span><span class="p">][</span><span class="n">bundle_name</span><span class="p">]):</span>
             <span class="n">figure</span> <span class="o">=</span> <span class="n">viz_backend</span><span class="o">.</span><span class="n">visualize_roi</span><span class="p">(</span>
                 <span class="n">roi</span><span class="p">,</span>
                 <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bundle_name</span><span class="si">}</span><span class="s2"> ROI </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
@@ -427,13 +428,13 @@
                 <span class="n">interact</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="n">figure</span><span class="o">=</span><span class="n">figure</span><span class="p">)</span>
 
-        <span class="n">roi_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">[</span><span class="s1">&#39;results_dir&#39;</span><span class="p">],</span> <span class="s1">&#39;viz_bundles&#39;</span><span class="p">)</span>
+        <span class="n">roi_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results_dir</span><span class="p">,</span> <span class="s1">&#39;viz_bundles&#39;</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">roi_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">fnames</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="s2">&quot;no_gif&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">viz_backend</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
             <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
                 <span class="n">get_fname</span><span class="p">(</span>
-                    <span class="n">subses_dict</span><span class="p">,</span>
+                    <span class="n">base_fname</span><span class="p">,</span>
                     <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">bundle_name</span><span class="si">}</span><span class="s1">&#39;</span>
                     <span class="sa">f</span><span class="s1">&#39;_viz.gif&#39;</span><span class="p">,</span>
                     <span class="n">tracking_params</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">,</span>
@@ -443,11 +444,11 @@
             <span class="n">viz_backend</span><span class="o">.</span><span class="n">create_gif</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
             <span class="n">fnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
         <span class="k">if</span> <span class="s2">&quot;plotly&quot;</span> <span class="ow">in</span> <span class="n">viz_backend</span><span class="o">.</span><span class="n">backend</span><span class="p">:</span>
-            <span class="n">roi_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">[</span><span class="s1">&#39;results_dir&#39;</span><span class="p">],</span> <span class="s1">&#39;viz_bundles&#39;</span><span class="p">)</span>
+            <span class="n">roi_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results_dir</span><span class="p">,</span> <span class="s1">&#39;viz_bundles&#39;</span><span class="p">)</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">roi_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
                 <span class="n">get_fname</span><span class="p">(</span>
-                    <span class="n">subses_dict</span><span class="p">,</span>
+                    <span class="n">base_fname</span><span class="p">,</span>
                     <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">bundle_name</span><span class="si">}</span><span class="s1">&#39;</span>
                     <span class="sa">f</span><span class="s1">&#39;_viz.html&#39;</span><span class="p">,</span>
                     <span class="n">tracking_params</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">,</span>
@@ -458,14 +459,14 @@
             <span class="n">fnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
 
             <span class="c1"># also do the core visualizations when using the plotly backend</span>
-            <span class="n">core_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">[</span><span class="s1">&#39;results_dir&#39;</span><span class="p">],</span> <span class="s1">&#39;viz_core_bundles&#39;</span><span class="p">)</span>
+            <span class="n">core_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results_dir</span><span class="p">,</span> <span class="s1">&#39;viz_core_bundles&#39;</span><span class="p">)</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">core_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">indiv_profile</span> <span class="o">=</span> <span class="n">profiles</span><span class="p">[</span>
                 <span class="n">profiles</span><span class="o">.</span><span class="n">tractID</span> <span class="o">==</span> <span class="n">bundle_name</span><span class="p">][</span><span class="n">best_scalar</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indiv_profile</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
                     <span class="n">get_fname</span><span class="p">(</span>
-                        <span class="n">subses_dict</span><span class="p">,</span>
+                        <span class="n">base_fname</span><span class="p">,</span>
                         <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">bundle_name</span><span class="si">}</span><span class="s1">&#39;</span>
                         <span class="sa">f</span><span class="s1">&#39;_viz.html&#39;</span><span class="p">,</span>
                         <span class="n">tracking_params</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">,</span>
@@ -482,7 +483,7 @@
                     <span class="n">interact</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                 <span class="n">core_fig</span> <span class="o">=</span> <span class="n">viz_backend</span><span class="o">.</span><span class="n">visualize_bundles</span><span class="p">(</span>
-                    <span class="n">segmentation_imap</span><span class="p">[</span><span class="s2">&quot;clean_bundles_file&quot;</span><span class="p">],</span>
+                    <span class="n">segmentation_imap</span><span class="p">[</span><span class="s2">&quot;clean_bundles&quot;</span><span class="p">],</span>
                     <span class="n">shade_by_volume</span><span class="o">=</span><span class="n">shade_by_volume</span><span class="p">,</span>
                     <span class="n">sbv_lims</span><span class="o">=</span><span class="n">sbv_lims_indiv</span><span class="p">,</span>
                     <span class="n">bundle_dict</span><span class="o">=</span><span class="n">bundle_dict</span><span class="p">,</span>
@@ -495,7 +496,7 @@
                     <span class="n">figure</span><span class="o">=</span><span class="n">core_fig</span><span class="p">)</span>
                 <span class="n">core_fig</span> <span class="o">=</span> <span class="n">viz_backend</span><span class="o">.</span><span class="n">single_bundle_viz</span><span class="p">(</span>
                     <span class="n">indiv_profile</span><span class="p">,</span>
-                    <span class="n">segmentation_imap</span><span class="p">[</span><span class="s2">&quot;clean_bundles_file&quot;</span><span class="p">],</span>
+                    <span class="n">segmentation_imap</span><span class="p">[</span><span class="s2">&quot;clean_bundles&quot;</span><span class="p">],</span>
                     <span class="n">bundle_name</span><span class="p">,</span>
                     <span class="n">best_scalar</span><span class="p">,</span>
                     <span class="n">bundle_dict</span><span class="o">=</span><span class="n">bundle_dict</span><span class="p">,</span>
@@ -504,7 +505,7 @@
                     <span class="n">include_profile</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="n">core_fig</span><span class="o">.</span><span class="n">write_html</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
     <span class="n">meta_fname</span> <span class="o">=</span> <span class="n">get_fname</span><span class="p">(</span>
-        <span class="n">subses_dict</span><span class="p">,</span> <span class="s1">&#39;_vizIndiv.json&#39;</span><span class="p">,</span>
+        <span class="n">base_fname</span><span class="p">,</span> <span class="s1">&#39;_vizIndiv.json&#39;</span><span class="p">,</span>
         <span class="n">tracking_params</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">,</span>
         <span class="n">segmentation_params</span><span class="o">=</span><span class="n">segmentation_params</span><span class="p">)</span>
     <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">Timing</span><span class="o">=</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span>
@@ -513,7 +514,7 @@
 
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;tract_profile_plots&quot;</span><span class="p">)</span>
-<div class="viewcode-block" id="plot_tract_profiles"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/viz/index.html#AFQ.tasks.viz.plot_tract_profiles">[docs]</a><span class="k">def</span> <span class="nf">plot_tract_profiles</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">scalars</span><span class="p">,</span> <span class="n">tracking_params</span><span class="p">,</span>
+<div class="viewcode-block" id="plot_tract_profiles"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/viz/index.html#AFQ.tasks.viz.plot_tract_profiles">[docs]</a><span class="k">def</span> <span class="nf">plot_tract_profiles</span><span class="p">(</span><span class="n">base_fname</span><span class="p">,</span> <span class="n">scalars</span><span class="p">,</span> <span class="n">tracking_params</span><span class="p">,</span>
                         <span class="n">segmentation_params</span><span class="p">,</span> <span class="n">segmentation_imap</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    list of full paths to png files,</span>
@@ -523,12 +524,9 @@
     <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
     <span class="n">fnames</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">scalar</span> <span class="ow">in</span> <span class="n">scalars</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">this_scalar</span> <span class="o">=</span> <span class="n">scalar</span><span class="o">.</span><span class="n">name</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">this_scalar</span> <span class="o">=</span> <span class="n">scalar</span>
+        <span class="n">this_scalar</span> <span class="o">=</span> <span class="n">scalar</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">scalar</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
         <span class="n">fname</span> <span class="o">=</span> <span class="n">get_fname</span><span class="p">(</span>
-            <span class="n">subses_dict</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">this_scalar</span><span class="si">}</span><span class="s1">_profile_plots&#39;</span><span class="p">,</span>
+            <span class="n">base_fname</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">this_scalar</span><span class="si">}</span><span class="s1">_profile_plots&#39;</span><span class="p">,</span>
             <span class="n">tracking_params</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">,</span>
             <span class="n">segmentation_params</span><span class="o">=</span><span class="n">segmentation_params</span><span class="p">)</span>
         <span class="n">tract_profiles_folder</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
@@ -540,13 +538,13 @@
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">tract_profiles_folder</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="n">visualize_tract_profiles</span><span class="p">(</span>
-            <span class="n">segmentation_imap</span><span class="p">[</span><span class="s2">&quot;profiles_file&quot;</span><span class="p">],</span>
+            <span class="n">segmentation_imap</span><span class="p">[</span><span class="s2">&quot;profiles&quot;</span><span class="p">],</span>
             <span class="n">scalar</span><span class="o">=</span><span class="n">this_scalar</span><span class="p">,</span>
             <span class="n">file_name</span><span class="o">=</span><span class="n">fname</span><span class="p">,</span>
             <span class="n">n_boot</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
         <span class="n">fnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
     <span class="n">meta_fname</span> <span class="o">=</span> <span class="n">get_fname</span><span class="p">(</span>
-        <span class="n">subses_dict</span><span class="p">,</span> <span class="s1">&#39;_profile_plots.json&#39;</span><span class="p">,</span>
+        <span class="n">base_fname</span><span class="p">,</span> <span class="s1">&#39;_profile_plots.json&#39;</span><span class="p">,</span>
         <span class="n">tracking_params</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">,</span>
         <span class="n">segmentation_params</span><span class="o">=</span><span class="n">segmentation_params</span><span class="p">)</span>
     <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">Timing</span><span class="o">=</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span>

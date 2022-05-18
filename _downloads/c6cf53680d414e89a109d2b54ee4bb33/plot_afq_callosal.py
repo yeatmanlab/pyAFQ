@@ -11,7 +11,7 @@ import plotly
 
 from AFQ.api.group import GroupAFQ
 import AFQ.api.bundle_dict as abd
-from AFQ.definitions.mask import RoiMask
+from AFQ.definitions.image import RoiImage
 import AFQ.data.fetch as afd
 
 ##########################################################################
@@ -26,13 +26,13 @@ afd.organize_stanford_data(clear_previous_afq=True)
 ##########################################################################
 # Set tractography parameters (optional)
 # ---------------------
-# We make this tracking_params which we will pass to the AFQ object
+# We make this tracking_params which we will pass to the GroupAFQ object
 # which specifies that we want 100,000 seeds randomly distributed
 # in the ROIs of every bundle.
 #
 # We only do this to make this example faster and consume less space.
 
-tracking_params = dict(seed_mask=RoiMask(),
+tracking_params = dict(seed_mask=RoiImage(),
                        n_seeds=10000,
                        random_seeds=True,
                        rng_seed=42)
@@ -40,7 +40,7 @@ tracking_params = dict(seed_mask=RoiMask(),
 ##########################################################################
 # Set segmentation parameters (optional)
 # ---------------------
-# We make this segmentation_params which we will pass to the AFQ object
+# We make this segmentation_params which we will pass to the GroupAFQ object
 # which specifies that we want to clip the extracted tract profiles
 # to only be between the two ROIs.
 #
@@ -52,13 +52,13 @@ tracking_params = dict(seed_mask=RoiMask(),
 segmentation_params = {"clip_edges": True}
 
 ##########################################################################
-# Initialize an AFQ object:
+# Initialize a GroupAFQ object:
 # -------------------------
 #
 # We specify bundle_info as the callosal bundles only
 # (`abd.CALLOSUM_BUNDLES`). If we want to segment both the callosum
 # and the other bundles, we would pass `abd.CALLOSUM_BUNDLES + abd.BUNDLES`
-# instead. This would tell the AFQ object to use bundles from both
+# instead. This would tell the GroupAFQ object to use bundles from both
 # the standard and callosal templates.
 
 myafq = GroupAFQ(
@@ -80,5 +80,5 @@ myafq.export_all()
 # This would run the script and visualize the bundles using the plotly
 # interactive visualization, which should automatically open in a
 # new browser window.
-bundle_html = myafq.all_bundles_figure
+bundle_html = myafq.export("all_bundles_figure")
 plotly.io.show(bundle_html["01"])

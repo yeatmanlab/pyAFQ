@@ -59,7 +59,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: export_seed_mask(subses_dict, dwi_affine, tracking_params)
+.. py:function:: export_seed_mask(tracking_params)
 
    
    full path to a nifti file containing the
@@ -83,7 +83,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: export_stop_mask(subses_dict, dwi_affine, tracking_params)
+.. py:function:: export_stop_mask(tracking_params)
 
    
    full path to a nifti file containing the
@@ -131,7 +131,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: streamlines(subses_dict, data_imap, seed_file, stop_file, tracking_params)
+.. py:function:: streamlines(data_imap, seed, stop, tracking_params)
 
    
    full path to the complete, unsegmented tractography file
@@ -144,9 +144,9 @@ Attributes
            the aft.track function. Seed mask and seed threshold, if not
            specified, are replaced with scalar masks from scalar[0]
            thresholded to 0.2. The ``seed_mask`` and ``stop_mask`` items of
-           this dict may be ``AFQ.definitions.mask.MaskFile`` instances.
+           this dict may be ``AFQ.definitions.image.ImageFile`` instances.
            If ``tracker`` is set to "pft" then ``stop_mask`` should be
-           an instance of ``AFQ.definitions.mask.PFTMask``.
+           an instance of ``AFQ.definitions.image.PFTImage``.
 
 
 

@@ -1,0 +1,357 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The pyAFQ Image API &#8212; AFQ 0.12 documentation</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="../index.html">
+  <img src="../_static/logo.png" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../installation_guide.html">
+  Installing
+  <code class="docutils literal notranslate">
+   <span class="pre">
+    pyAFQ
+   </span>
+  </code>
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="index.html">
+  Using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../auto_examples/index.html">
+  Examples
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../getting_help.html">
+  Getting help using pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../contributing.html">
+  Contributing to pyAFQ
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../autoapi/index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../developing/index.html">
+  Developing
+  <cite>
+   pyAFQ
+  </cite>
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+
+<nav id="bd-toc-nav">
+    
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+
+<div class="tocsection editthispage">
+    <a href="https://github.com/yeatmanlab/pyAFQ/edit/master/docs/source/usage/image.rst">
+        <i class="fas fa-pencil-alt"></i> Edit this page
+    </a>
+</div>
+
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="the-pyafq-image-api">
+<h1>The pyAFQ Image API<a class="headerlink" href="#the-pyafq-image-api" title="Permalink to this headline">#</a></h1>
+<p>In the process of tractometry, it is sometimes necessary to apply images to
+the data. By default, pyAFQ can automatically generate these images from the
+DWI data. However, pyAFQ also has a system for users to specify which image to
+use, called the Image API. Specifying an image, in general, is not as simple as
+just providing a path to a file, because each subject and each session will
+have a different image. That is why we developed pyAFQ’s Image API.</p>
+<p>Currently, there are three different images that pyAFQ uses for tractometry:</p>
+<ol class="arabic simple">
+<li><p>The brain image. This is used to mask the dwi data and throw out any signal
+that is outside of the brain. It is typically applied before fitting ODF
+models. By default, it is calculated using <a class="reference internal" href="../autoapi/AFQ/definitions/image/index.html#AFQ.definitions.image.B0Image" title="AFQ.definitions.image.B0Image"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.image.B0Image</span></code></a>.</p></li>
+<li><p>The tractography seed image. This image determines where tractography is
+seeded. If it is floating point, the image is thresholded interally after
+interpolation using the seed_threshold parameter. This is recommended.
+However, the seed image can aslo be a binary image. By default, the
+seed image is <a class="reference internal" href="../autoapi/AFQ/definitions/image/index.html#AFQ.definitions.image.ScalarImage" title="AFQ.definitions.image.ScalarImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.image.ScalarImage</span></code></a> (best_scalar) where best_scalar is chosen by the API
+based on valid scalars (typically “dti_fa”).</p></li>
+<li><p>The tractography stop image. This image determines where tractography stops.
+If it is floating point, the image is thresholded interally after
+interpolation using the stop_threshold parameter. This is recommended.
+However, the stop image can aslo be a binary image. By default, the
+stop image is <a class="reference internal" href="../autoapi/AFQ/definitions/image/index.html#AFQ.definitions.image.ScalarImage" title="AFQ.definitions.image.ScalarImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.image.ScalarImage</span></code></a> (best_scalar) where best_scalar is chosen by the API
+based on valid scalars (typically “dti_fa”).</p></li>
+</ol>
+<p>In AFQ/definitions/image.py, there are several image classes one can use to specify images.
+As a user, one should initialize image classes and pass them to the AFQ.api objects,
+or write out the initialization as a string inside of one’s configuration file
+for use with the CLI.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../autoapi/AFQ/definitions/image/index.html#AFQ.definitions.image.ImageFile" title="AFQ.definitions.image.ImageFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.image.ImageFile</span></code></a>: The simplest image class is <a class="reference internal" href="../autoapi/AFQ/definitions/image/index.html#AFQ.definitions.image.ImageFile" title="AFQ.definitions.image.ImageFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.image.ImageFile</span></code></a>. If the image you want to use
+is already generated, use this class. It is initialized using BIDS filters,
+which pyAFQ will use to find images for each subject in each session.</p></li>
+<li><p><a class="reference internal" href="../autoapi/AFQ/definitions/image/index.html#AFQ.definitions.image.FullImage" title="AFQ.definitions.image.FullImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.image.FullImage</span></code></a>: The <a class="reference internal" href="../autoapi/AFQ/definitions/image/index.html#AFQ.definitions.image.FullImage" title="AFQ.definitions.image.FullImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.image.FullImage</span></code></a> class is used if one does not want to mask at all.
+This image is True everywhere.</p></li>
+<li><p><a class="reference internal" href="../autoapi/AFQ/definitions/image/index.html#AFQ.definitions.image.RoiImage" title="AFQ.definitions.image.RoiImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.image.RoiImage</span></code></a>: All ROIs are “logically or’d” together in subject space to create
+this image. This is useful to provide as the seed image. In segmentation,
+pyAFQ retains only streamlines that pass through the ROIs. So, for
+efficiency, one can choose to only seed in the ROIs in the first place.</p></li>
+<li><p><a class="reference internal" href="../autoapi/AFQ/definitions/image/index.html#AFQ.definitions.image.B0Image" title="AFQ.definitions.image.B0Image"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.image.B0Image</span></code></a>: This image uses dipy’s median_otsu on the subject’s b0 to generate
+an image. This is the default brain image.</p></li>
+<li><p><a class="reference internal" href="../autoapi/AFQ/definitions/image/index.html#AFQ.definitions.image.LabelledImageFile" title="AFQ.definitions.image.LabelledImageFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.image.LabelledImageFile</span></code></a>: This image is similar to <a class="reference internal" href="../autoapi/AFQ/definitions/image/index.html#AFQ.definitions.image.ImageFile" title="AFQ.definitions.image.ImageFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.image.ImageFile</span></code></a>. It is also initialized
+using BIDS filters but instead expects to find a labelled segmentation file.
+In the initialization, the user also provides inclusive and exclusive
+labels. These specify which labels to include and which labels to exclude
+in the image. If both inclusive and exclusive labels are set, the combine
+parameter is used to specify how to combine the images generated by the
+inclusive and exclusive labels. A common use of this class would be to pass
+BIDS filters to some segmentation file, and also set exclusive_labels = [0].
+This will mark all labels that are not 0 as a part of the image, and can
+be used as a brain image.</p></li>
+<li><p><a class="reference internal" href="../autoapi/AFQ/definitions/image/index.html#AFQ.definitions.image.ThresholdedImageFile" title="AFQ.definitions.image.ThresholdedImageFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.image.ThresholdedImageFile</span></code></a>: This image is similar to <a class="reference internal" href="../autoapi/AFQ/definitions/image/index.html#AFQ.definitions.image.ImageFile" title="AFQ.definitions.image.ImageFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.image.ImageFile</span></code></a>. It allows the user to
+also provide a lower and upper bound. The bounds threshold the data from
+the file. Note that for the tractography seed and stop images, thresholding
+should typically be done using the seed_threshold and stop_threshold
+parameters, not using an already thresholded image.</p></li>
+<li><p><a class="reference internal" href="../autoapi/AFQ/definitions/image/index.html#AFQ.definitions.image.ScalarImage" title="AFQ.definitions.image.ScalarImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.image.ScalarImage</span></code></a>: This image is initialized only by specifying a scalar. Use this
+image if you want an image to be based on a scalar that pyAFQ already
+calculates, like “dti_fa” or “dti_md”.</p></li>
+<li><p><a class="reference internal" href="../autoapi/AFQ/definitions/image/index.html#AFQ.definitions.image.ThresholdedScalarImage" title="AFQ.definitions.image.ThresholdedScalarImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.image.ThresholdedScalarImage</span></code></a>: This image is similar to <a class="reference internal" href="../autoapi/AFQ/definitions/image/index.html#AFQ.definitions.image.ScalarImage" title="AFQ.definitions.image.ScalarImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.image.ScalarImage</span></code></a>. It allows the user to
+also provide a lower and upper bound. The bounds threshold the scalar data.
+Note that for the tractography seed and stop images, thresholding
+should typically be done using the seed_threshold and stop_threshold
+parameters, not using an already thresholded image.</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.image.PFTImage</span></code>: A image for specifying the segmentations used in PFT. Should only
+be used as a stop image. It’s three arguments are three other images, which
+specify the three segmentations: white matter, gray matter, and
+corticospinal fluid.</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.image.CombinedImage</span></code>: This class can be used to combine the other images. It takes
+a list of images and allows the user to specify whether they should be
+combined using a logical “and” or “or”.</p></li>
+</ul>
+<p>Here is an example of using the <a class="reference internal" href="../autoapi/AFQ/definitions/image/index.html#AFQ.definitions.image.RoiImage" title="AFQ.definitions.image.RoiImage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.image.RoiImage</span></code></a> and <a class="reference internal" href="../autoapi/AFQ/definitions/image/index.html#AFQ.definitions.image.LabelledImageFile" title="AFQ.definitions.image.LabelledImageFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.image.LabelledImageFile</span></code></a> on the HCP
+data with the AFQ.api objects:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">AFQ.data.fetch</span> <span class="kn">import</span> <span class="n">fetch_hcp</span>
+<span class="kn">from</span> <span class="nn">AFQ.api.group</span> <span class="kn">import</span> <span class="n">GroupAFQ</span>
+<span class="kn">import</span> <span class="nn">AFQ.definitions.image</span> <span class="k">as</span> <span class="nn">afm</span>
+
+<span class="c1"># Download a subject to the AWS Batch machine from s3</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">hcp_bids</span> <span class="o">=</span> <span class="n">fetch_hcp</span><span class="p">(</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+    <span class="n">profile_name</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">study</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;HCP_1200&quot;</span><span class="p">)</span>
+
+<span class="c1"># make 500,000 seeds randomly distributed in the ROIs</span>
+<span class="n">tracking_params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;seed_image&quot;</span><span class="p">:</span> <span class="n">afm</span><span class="o">.</span><span class="n">RoiImage</span><span class="p">(),</span>
+    <span class="s2">&quot;n_seeds&quot;</span><span class="p">:</span> <span class="mi">500000</span><span class="p">,</span>
+    <span class="s2">&quot;random_seeds&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+<span class="c1"># use segmentation file from HCP to get a brain image,</span>
+<span class="c1"># where everything not labelled 0 is considered a part of the brain</span>
+<span class="n">brain_image_definition</span> <span class="o">=</span> <span class="n">afm</span><span class="o">.</span><span class="n">LabelledImageFile</span><span class="p">(</span>
+    <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;seg&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;scope&#39;</span><span class="p">:</span> <span class="s1">&#39;dmriprep&#39;</span><span class="p">},</span> <span class="n">exclusive_labels</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="c1"># define the api GroupAFQ object</span>
+<span class="n">myafq</span> <span class="o">=</span> <span class="n">GroupAFQ</span><span class="p">(</span>
+    <span class="n">hcp_bids</span><span class="p">,</span>
+    <span class="n">brain_image_definition</span><span class="o">=</span><span class="n">brain_image_definition</span><span class="p">,</span>
+    <span class="n">tracking_params</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">)</span>
+
+<span class="c1"># export_all runs the entire pipeline and creates many useful derivates</span>
+<span class="n">myafq</span><span class="o">.</span><span class="n">export_all</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2018--, The pyAFQ Contributors.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

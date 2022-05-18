@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tractography from other pipelines &#8212; AFQ 0.11 documentation</title>
+    <title>Tractography from other pipelines &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -190,11 +190,6 @@
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="mask.html">
-   The pyAFQ Mask API
-  </a>
- </li>
- <li class="toctree-l1">
   <a class="reference internal" href="mapping.html">
    The pyAFQ Mapping API
   </a>
@@ -284,7 +279,7 @@
 <h1>Tractography from other pipelines<a class="headerlink" href="#tractography-from-other-pipelines" title="Permalink to this headline">#</a></h1>
 <p>pyAFQ can use tractography from other pipelines. To tell pyAFQ to use
 tractography from another pipeline, use the custom_tractography_bids_filters
-argument in the AFQ object or in the configuration file. This argument expects
+argument in the AFQ.api objects or in the configuration file. This argument expects
 a dictionary of BIDS filters. pyAFQ will use these BIDS filters to find the
 tractography for each subject in each session.
 Here is an example custom_tractography_bids_filters:</p>

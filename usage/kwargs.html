@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The pyAFQ API optional arguments &#8212; AFQ 0.11 documentation</title>
+    <title>The pyAFQ API optional arguments &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -190,11 +190,6 @@
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="mask.html">
-   The pyAFQ Mask API
-  </a>
- </li>
- <li class="toctree-l1">
   <a class="reference internal" href="mapping.html">
    The pyAFQ Mapping API
   </a>
@@ -305,6 +300,7 @@ give the user control over each step of the tractometry pipeline,
 allowing customizaiton of tractography, bundle recognition, registration,
 etc. Here are all of these arguments and their descriptions, organized
 into 5 sections:</p>
+<p>Here are the arguments you can pass to kwargs, to customize the tractometry pipeline. They are organized into 5 sections.</p>
 <div class="section" id="data">
 <h2>DATA<a class="headerlink" href="#data" title="Permalink to this headline">#</a></h2>
 <dl class="simple">
@@ -359,11 +355,11 @@ If gtol is None, fiber direction is directly taken from the initial
 sampled directions of the given sphere object.
 Default: 1e-2</p>
 </dd>
-<dt>brain_mask_definition: instance from <cite>AFQ.definitions.mask</cite>, optional</dt><dd><p>This will be used to create
+<dt>brain_mask_definition: instance from <cite>AFQ.definitions.image</cite>, optional</dt><dd><p>This will be used to create
 the brain mask, which gets applied before registration to a
 template.
-If you want no brain mask to be applied, use FullMask.
-If None, use B0Mask()
+If you want no brain mask to be applied, use FullImage.
+If None, use B0Image()
 Default: None</p>
 </dd>
 <dt>bundle_info: strings, dict, or BundleDict, optional</dt><dd><p>List of bundle names to include in segmentation,
@@ -394,8 +390,8 @@ reg_template.
 If None, use SynMap()
 Default: None</p>
 </dd>
-<dt>reg_subject_spec: str, instance of <cite>AFQ.definitions.scalar</cite>, optional  # noqa</dt><dd><p>The source image data to be registered.
-Can either be a Nifti1Image, a scalar definition, or str.
+<dt>reg_subject_spec: str, instance of <cite>AFQ.definitions.ImageDefinition</cite>, optional  # noqa</dt><dd><p>The source image data to be registered.
+Can either be a Nifti1Image, an ImageFile, or str.
 if “b0”, “dti_fa_subject”, “subject_sls”, or “power_map,”
 image data will be loaded automatically.
 If “subject_sls” is used, slr registration will be used
@@ -424,7 +420,7 @@ Default: “gauss”</p>
 </dd>
 <dt>scalars: strings and/or scalar definitions, optional</dt><dd><p>List of scalars to use.
 Can be any of: “dti_fa”, “dti_md”, “dki_fa”, “dki_md”, “dki_awf”,
-“dki_mk”. Can also be a scalar from AFQ.definitions.scalar.
+“dki_mk”. Can also be a scalar from AFQ.definitions.image.
 Default: [“dti_fa”, “dti_md”]</p>
 </dd>
 </dl>
@@ -436,9 +432,9 @@ Default: [“dti_fa”, “dti_md”]</p>
 the aft.track function. Seed mask and seed threshold, if not
 specified, are replaced with scalar masks from scalar[0]
 thresholded to 0.2. The <code class="docutils literal notranslate"><span class="pre">seed_mask</span></code> and <code class="docutils literal notranslate"><span class="pre">stop_mask</span></code> items of
-this dict may be <code class="docutils literal notranslate"><span class="pre">AFQ.definitions.mask.MaskFile</span></code> instances.
+this dict may be <code class="docutils literal notranslate"><span class="pre">AFQ.definitions.image.ImageFile</span></code> instances.
 If <code class="docutils literal notranslate"><span class="pre">tracker</span></code> is set to “pft” then <code class="docutils literal notranslate"><span class="pre">stop_mask</span></code> should be
-an instance of <code class="docutils literal notranslate"><span class="pre">AFQ.definitions.mask.PFTMask</span></code>.</p>
+an instance of <code class="docutils literal notranslate"><span class="pre">AFQ.definitions.image.PFTImage</span></code>.</p>
 </dd>
 <dt>import_tract: dict, optional</dt><dd><p>BIDS filters for inputing a user made tractography file.
 If None, tractography will be performed automatically.

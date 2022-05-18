@@ -60,7 +60,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: export_registered_b0(subses_dict, data_imap, mapping)
+.. py:function:: export_registered_b0(data_imap, mapping)
 
    
    full path to a nifti file containing
@@ -84,7 +84,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: template_xform(subses_dict, dwi_affine, mapping, data_imap)
+.. py:function:: template_xform(dwi_affine, mapping, data_imap)
 
    
    full path to a nifti file containing
@@ -108,7 +108,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: export_rois(subses_dict, data_imap, mapping, dwi_affine)
+.. py:function:: export_rois(base_fname, results_dir, data_imap, mapping, dwi_affine)
 
    
    dictionary of full paths to Nifti1Image files of ROIs
@@ -132,7 +132,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: mapping(subses_dict, reg_subject, data_imap, bids_info, mapping_definition=None)
+.. py:function:: mapping(base_fname, dwi, reg_subject, data_imap, bids_info, mapping_definition=None)
 
    
    mapping from subject to template space.
@@ -164,7 +164,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: sls_mapping(subses_dict, reg_subject, data_imap, bids_info, tractography_imap, mapping_definition=None)
+.. py:function:: sls_mapping(base_fname, dwi, reg_subject, data_imap, bids_info, tractography_imap, mapping_definition=None)
 
    
    mapping from subject to template space.
@@ -196,7 +196,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: get_reg_subject(data_imap, bids_info, subses_dict, dwi_affine, reg_subject_spec='power_map')
+.. py:function:: get_reg_subject(data_imap, bids_info, base_fname, dwi, reg_subject_spec='power_map')
 
    
    Nifti1Image which represents this subject
@@ -205,9 +205,9 @@ Attributes
 
    :Parameters:
 
-       **reg_subject_spec** : str, instance of `AFQ.definitions.scalar`, optional  # noqa
+       **reg_subject_spec** : str, instance of `AFQ.definitions.ImageDefinition`, optional  # noqa
            The source image data to be registered.
-           Can either be a Nifti1Image, a scalar definition, or str.
+           Can either be a Nifti1Image, an ImageFile, or str.
            if "b0", "dti_fa_subject", "subject_sls", or "power_map,"
            image data will be loaded automatically.
            If "subject_sls" is used, slr registration will be used

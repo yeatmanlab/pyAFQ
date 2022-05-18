@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.definitions.mapping &#8212; AFQ 0.11 documentation</title>
+    <title>AFQ.definitions.mapping &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -36,8 +36,8 @@
     <script src="../../../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="AFQ.definitions.mask" href="../mask/index.html" />
-    <link rel="prev" title="AFQ.definitions" href="../index.html" />
+    <link rel="next" title="AFQ.definitions.utils" href="../utils/index.html" />
+    <link rel="prev" title="AFQ.definitions.image" href="../image/index.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -282,29 +282,20 @@
      </i>
     </label>
     <ul class="current">
+     <li class="toctree-l3">
+      <a class="reference internal" href="../image/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.definitions.image
+        </span>
+       </code>
+      </a>
+     </li>
      <li class="toctree-l3 current active">
       <a class="current reference internal" href="#">
        <code class="xref py py-mod docutils literal notranslate">
         <span class="pre">
          AFQ.definitions.mapping
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../mask/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.definitions.mask
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../scalar/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.definitions.scalar
         </span>
        </code>
       </a>
@@ -475,10 +466,10 @@
       </a>
      </li>
      <li class="toctree-l3">
-      <a class="reference internal" href="../../utils/parallel/index.html">
+      <a class="reference internal" href="../../utils/path/index.html">
        <code class="xref py py-mod docutils literal notranslate">
         <span class="pre">
-         AFQ.utils.parallel
+         AFQ.utils.path
         </span>
        </code>
       </a>
@@ -801,7 +792,7 @@ space_filters={“scope”: “TBSS”})</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mapping.FnirtMap.get_for_subses">
-<span class="sig-name descname"><span class="pre">get_for_subses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_template</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mapping.html#FnirtMap.get_for_subses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mapping.FnirtMap.get_for_subses" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">get_for_subses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_template</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mapping.html#FnirtMap.get_for_subses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mapping.FnirtMap.get_for_subses" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -840,7 +831,7 @@ Default: {}</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mapping.SynMap.gen_mapping">
-<span class="sig-name descname"><span class="pre">gen_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_template</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject_sls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_sls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_prealign</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mapping.html#SynMap.gen_mapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mapping.SynMap.gen_mapping" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">gen_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_template</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject_sls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_sls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_prealign</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mapping.html#SynMap.gen_mapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mapping.SynMap.gen_mapping" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -866,7 +857,7 @@ Default: {}</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mapping.SlrMap.gen_mapping">
-<span class="sig-name descname"><span class="pre">gen_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_template</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject_sls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_sls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_prealign</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mapping.html#SlrMap.gen_mapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mapping.SlrMap.gen_mapping" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">gen_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_template</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject_sls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_sls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_prealign</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mapping.html#SlrMap.gen_mapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mapping.SlrMap.gen_mapping" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -892,7 +883,7 @@ Default: {}</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.mapping.AffMap.gen_mapping">
-<span class="sig-name descname"><span class="pre">gen_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_template</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject_sls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_sls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_prealign</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mapping.html#AffMap.gen_mapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mapping.AffMap.gen_mapping" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">gen_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_template</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject_sls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_sls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_prealign</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/mapping.html#AffMap.gen_mapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.mapping.AffMap.gen_mapping" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -907,17 +898,17 @@ Default: {}</p>
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="../index.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="../image/index.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions</span></code></p>
+            <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.image</span></code></p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="../mask/index.html" title="next page">
+    <a class='right-next' id="next-link" href="../utils/index.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.mask</span></code></p>
+        <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.utils</span></code></p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

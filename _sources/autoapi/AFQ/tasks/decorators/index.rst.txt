@@ -20,8 +20,7 @@ Functions
 .. autoapisummary::
 
    AFQ.tasks.decorators.as_file
-   AFQ.tasks.decorators.as_model
-   AFQ.tasks.decorators.as_dt_deriv
+   AFQ.tasks.decorators.as_fit_deriv
    AFQ.tasks.decorators.as_img
 
 
@@ -29,6 +28,8 @@ Functions
 .. py:function:: as_file(suffix, include_track=False, include_seg=False)
 
    
+   return img and meta as saved file path, with json,
+   and only run if not already found
 
 
 
@@ -48,31 +49,10 @@ Functions
    ..
        !! processed by numpydoc !!
 
-.. py:function:: as_model(func)
+.. py:function:: as_fit_deriv(tf_name)
 
    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
-.. py:function:: as_dt_deriv(tf_name)
-
-   
+   return data as nibabel image, meta with params information
 
 
 
@@ -95,6 +75,7 @@ Functions
 .. py:function:: as_img(func)
 
    
+   return data, meta as nibabel image, meta with timing
 
 
 

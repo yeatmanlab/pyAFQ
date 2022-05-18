@@ -71,7 +71,7 @@ numbers of seeds per voxel).
         # cloudknot installs the appropriate packages from pip
         from AFQ.data.fetch import fetch_hcp
         from AFQ.api.group import GroupAFQ
-        import AFQ.definitions.mask as afm
+        import AFQ.definitions.image as afm
 
         # set logging level to your choice
         logging.basicConfig(level=logging.INFO)
@@ -89,11 +89,11 @@ numbers of seeds per voxel).
         # seed_mask argument, which is a string.
         # This is to avoid any complications with pickling the masks.
         if seed_mask == "roi":
-            seed_mask_obj = afm.RoiMask()
+            seed_mask_obj = afm.RoiImage()
         elif seed_mask == "fa":
-            seed_mask_obj = afm.ScalarMask("dti_fa")
+            seed_mask_obj = afm.ScalarImage("dti_fa")
         else:
-            seed_mask_obj = afm.FullMask()
+            seed_mask_obj = afm.FullImage()
 
         # Determined if n_seeds is per voxel or not
         if n_seeds > 3:
@@ -109,11 +109,11 @@ numbers of seeds per voxel).
 
         # use segmentation file from HCP to get a brain mask,
         # where everything not labelled 0 is considered a part of the brain
-        brain_mask_definition = afm.LabelledMaskFile(
+        brain_mask_definition = afm.LabelledImageFile(
             suffix='seg', filters={'scope': 'dmriprep'},
             exclusive_labels=[0])
 
-        # define the api AFQ object
+        # define the api GroupAFQ object
         myafq = GroupAFQ(
             hcp_bids,
             brain_mask_definition=brain_mask_definition,
@@ -126,7 +126,7 @@ numbers of seeds per voxel).
         myafq.upload_to_s3(
             s3fs.S3FileSystem(),
             (f"my_study_bucket/my_study_prefix_{seed_mask}_{n_seeds}"
-            f"/derivatives/afq"))
+             f"/derivatives/afq"))
 
 
 

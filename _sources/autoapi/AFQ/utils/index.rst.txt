@@ -34,7 +34,7 @@ Submodules
 
    bin/index.rst
    models/index.rst
-   parallel/index.rst
+   path/index.rst
    stats/index.rst
    streamlines/index.rst
    volume/index.rst

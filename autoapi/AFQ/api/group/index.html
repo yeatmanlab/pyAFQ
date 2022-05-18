@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.api.group &#8212; AFQ 0.11 documentation</title>
+    <title>AFQ.api.group &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -283,28 +283,19 @@
     </label>
     <ul>
      <li class="toctree-l3">
+      <a class="reference internal" href="../../definitions/image/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.definitions.image
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
       <a class="reference internal" href="../../definitions/mapping/index.html">
        <code class="xref py py-mod docutils literal notranslate">
         <span class="pre">
          AFQ.definitions.mapping
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../definitions/mask/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.definitions.mask
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../definitions/scalar/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.definitions.scalar
         </span>
        </code>
       </a>
@@ -475,10 +466,10 @@
       </a>
      </li>
      <li class="toctree-l3">
-      <a class="reference internal" href="../../utils/parallel/index.html">
+      <a class="reference internal" href="../../utils/path/index.html">
        <code class="xref py py-mod docutils literal notranslate">
         <span class="pre">
-         AFQ.utils.parallel
+         AFQ.utils.path
         </span>
        </code>
       </a>
@@ -632,11 +623,6 @@
       </a>
       <ul class="nav section-nav flex-column">
        <li class="toc-h5 nav-item toc-entry">
-        <a class="reference internal nav-link" href="#AFQ.api.group.GroupAFQ.__getattribute__">
-         __getattribute__
-        </a>
-       </li>
-       <li class="toc-h5 nav-item toc-entry">
         <a class="reference internal nav-link" href="#AFQ.api.group.GroupAFQ.combine_profiles">
          combine_profiles
         </a>
@@ -644,6 +630,11 @@
        <li class="toc-h5 nav-item toc-entry">
         <a class="reference internal nav-link" href="#AFQ.api.group.GroupAFQ.get_streamlines_json">
          get_streamlines_json
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.api.group.GroupAFQ.export">
+         export
         </a>
        </li>
        <li class="toc-h5 nav-item toc-entry">
@@ -717,12 +708,6 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.api.group.</span></span><span class="sig-name descname"><span class="pre">GroupAFQ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bids_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'suffix':</span> <span class="pre">'dwi'}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preproc_pipeline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">participant_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'engine':</span> <span class="pre">'serial'}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_layout_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/api/group.html#GroupAFQ"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.group.GroupAFQ" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="AFQ.api.group.GroupAFQ.__getattribute__">
-<span class="sig-name descname"><span class="pre">__getattribute__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/api/group.html#GroupAFQ.__getattribute__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.group.GroupAFQ.__getattribute__" title="Permalink to this definition">#</a></dt>
-<dd><p>Return getattr(self, name).</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="AFQ.api.group.GroupAFQ.combine_profiles">
 <span class="sig-name descname"><span class="pre">combine_profiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/api/group.html#GroupAFQ.combine_profiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.group.GroupAFQ.combine_profiles" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
@@ -730,6 +715,11 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.api.group.GroupAFQ.get_streamlines_json">
 <span class="sig-name descname"><span class="pre">get_streamlines_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/api/group.html#GroupAFQ.get_streamlines_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.group.GroupAFQ.get_streamlines_json" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="AFQ.api.group.GroupAFQ.export">
+<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'help'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/api/group.html#GroupAFQ.export"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.group.GroupAFQ.export" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">

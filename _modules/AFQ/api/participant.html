@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.api.participant &#8212; AFQ 0.11 documentation</title>
+    <title>AFQ.api.participant &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -187,21 +187,24 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">from</span> <span class="nn">AFQ.definitions.mapping</span> <span class="kn">import</span> <span class="n">SlrMap</span>
-<span class="kn">from</span> <span class="nn">AFQ.api.utils</span> <span class="kn">import</span> <span class="n">wf_sections</span><span class="p">,</span> <span class="n">add_method_descriptions</span>
-<span class="kn">from</span> <span class="nn">AFQ.viz.utils</span> <span class="kn">import</span> <span class="n">viz_import_msg_error</span>
+<span class="kn">from</span> <span class="nn">AFQ.api.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">check_attribute</span><span class="p">,</span> <span class="n">AFQclass_doc</span><span class="p">,</span>
+    <span class="n">export_all_helper</span><span class="p">,</span> <span class="n">valid_exports_string</span><span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">AFQ.tasks.data</span> <span class="kn">import</span> <span class="n">get_data_plan</span>
 <span class="kn">from</span> <span class="nn">AFQ.tasks.mapping</span> <span class="kn">import</span> <span class="n">get_mapping_plan</span>
 <span class="kn">from</span> <span class="nn">AFQ.tasks.tractography</span> <span class="kn">import</span> <span class="n">get_tractography_plan</span>
 <span class="kn">from</span> <span class="nn">AFQ.tasks.segmentation</span> <span class="kn">import</span> <span class="n">get_segmentation_plan</span>
 <span class="kn">from</span> <span class="nn">AFQ.tasks.viz</span> <span class="kn">import</span> <span class="n">get_viz_plan</span>
+<span class="kn">from</span> <span class="nn">AFQ.utils.path</span> <span class="kn">import</span> <span class="n">drop_extension</span>
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ParticipantAFQ&quot;</span><span class="p">]</span>
 
 
-<span class="nd">@add_method_descriptions</span>
 <div class="viewcode-block" id="ParticipantAFQ"><a class="viewcode-back" href="../../../autoapi/AFQ/api/participant/index.html#AFQ.api.participant.ParticipantAFQ">[docs]</a><span class="k">class</span> <span class="nc">ParticipantAFQ</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span><span class="si">{</span><span class="n">AFQclass_doc</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">dwi_data_file</span><span class="p">,</span>
                  <span class="n">bval_file</span><span class="p">,</span> <span class="n">bvec_file</span><span class="p">,</span>
@@ -240,7 +243,7 @@
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        In tracking_params, parameters with the suffix mask which are also</span>
-<span class="sd">        a mask from AFQ.definitions.mask will be handled automatically by</span>
+<span class="sd">        an image from AFQ.definitions.image will be handled automatically by</span>
 <span class="sd">        the api.</span>
 
 <span class="sd">        It is recommended that you leave the bids_info parameter as None,</span>
@@ -264,10 +267,17 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ.api&#39;</span><span class="p">)</span>
 
-        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bids_info&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bids_info</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;subses_dict&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;dwi_file&quot;</span><span class="p">:</span> <span class="n">dwi_data_file</span><span class="p">,</span>
-            <span class="s2">&quot;results_dir&quot;</span><span class="p">:</span> <span class="n">output_dir</span><span class="p">}</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">dwi</span><span class="o">=</span><span class="n">dwi_data_file</span><span class="p">,</span>
+            <span class="n">bval</span><span class="o">=</span><span class="n">bval_file</span><span class="p">,</span>
+            <span class="n">bvec</span><span class="o">=</span><span class="n">bvec_file</span><span class="p">,</span>
+            <span class="n">results_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">,</span>
+            <span class="n">dwi_affine</span><span class="o">=</span><span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dwi_data_file</span><span class="p">)</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+            <span class="n">bids_info</span><span class="o">=</span><span class="n">bids_info</span><span class="p">,</span>
+            <span class="n">base_fname</span><span class="o">=</span><span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">output_dir</span><span class="p">,</span>
+                <span class="n">drop_extension</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">dwi_data_file</span><span class="p">))),</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="c1"># construct pimms plans</span>
         <span class="k">if</span> <span class="s2">&quot;mapping_definition&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
@@ -286,105 +296,66 @@
                 <span class="s2">&quot;segmentation&quot;</span><span class="p">:</span> <span class="n">get_segmentation_plan</span><span class="p">(</span><span class="n">kwargs</span><span class="p">),</span>
                 <span class="s2">&quot;viz&quot;</span><span class="p">:</span> <span class="n">get_viz_plan</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)}</span>
 
-        <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dwi_data_file</span><span class="p">)</span>
-
-        <span class="n">input_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-            <span class="n">dwi_img</span><span class="o">=</span><span class="n">img</span><span class="p">,</span>
-            <span class="n">dwi_affine</span><span class="o">=</span><span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
-            <span class="n">bval_file</span><span class="o">=</span><span class="n">bval_file</span><span class="p">,</span>
-            <span class="n">bvec_file</span><span class="o">=</span><span class="n">bvec_file</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
         <span class="c1"># chain together a complete plan from individual plans</span>
         <span class="n">previous_data</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">plan</span> <span class="ow">in</span> <span class="n">plans</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">previous_data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_imap&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">plan</span><span class="p">(</span>
-                <span class="o">**</span><span class="n">input_data</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
                 <span class="o">**</span><span class="n">previous_data</span><span class="p">)</span>
-            <span class="n">last_name</span> <span class="o">=</span> <span class="n">name</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span> <span class="o">=</span>\
-            <span class="n">previous_data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">last_name</span><span class="si">}</span><span class="s2">_imap&quot;</span><span class="p">]</span>
+            <span class="n">previous_data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_imap&quot;</span><span class="p">]</span>
 
-<div class="viewcode-block" id="ParticipantAFQ.__getattribute__"><a class="viewcode-back" href="../../../autoapi/AFQ/api/participant/index.html#AFQ.api.participant.ParticipantAFQ.__getattribute__">[docs]</a>    <span class="k">def</span> <span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
-        <span class="c1"># check if normal attr exists first</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="k">pass</span>
-
-        <span class="c1"># find what name to use</span>
-        <span class="n">attr_file</span> <span class="o">=</span> <span class="n">attr</span> <span class="o">+</span> <span class="s2">&quot;_file&quot;</span>
-        <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="n">attr_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">[</span><span class="n">attr_file</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">sub_attr</span> <span class="ow">in</span> <span class="n">wf_sections</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">[</span><span class="n">sub_attr</span><span class="p">]:</span>
-                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">[</span><span class="n">sub_attr</span><span class="p">][</span><span class="n">attr</span><span class="p">]</span>
-                <span class="k">elif</span> <span class="n">attr_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">[</span><span class="n">sub_attr</span><span class="p">]:</span>
-                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">[</span><span class="n">sub_attr</span><span class="p">][</span><span class="n">attr_file</span><span class="p">]</span>
-
-        <span class="c1"># attr not found, allow typical AttributeError</span>
-        <span class="k">return</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="ParticipantAFQ.export_all"><a class="viewcode-back" href="../../../autoapi/AFQ/api/participant/index.html#AFQ.api.participant.ParticipantAFQ.export_all">[docs]</a>    <span class="k">def</span> <span class="nf">export_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viz</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">xforms</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                   <span class="n">indiv</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Exports all the possible outputs</span>
+<div class="viewcode-block" id="ParticipantAFQ.export"><a class="viewcode-back" href="../../../autoapi/AFQ/api/participant/index.html#AFQ.api.participant.ParticipantAFQ.export">[docs]</a>    <span class="k">def</span> <span class="nf">export</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="o">=</span><span class="s2">&quot;help&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export a specific output. To print a list of available outputs,</span>
+<span class="sd">        call export without arguments.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        viz : bool</span>
-<span class="sd">            Whether to output visualizations. This includes tract profile</span>
-<span class="sd">            plots, a figure containing all bundles, and, if using the AFQ</span>
-<span class="sd">            segmentation algorithm, individual bundle figures.</span>
-<span class="sd">            Default: True</span>
-<span class="sd">        xforms : bool</span>
-<span class="sd">            Whether to output the reg_template image in subject space and,</span>
-<span class="sd">            depending on if it is possible based on the mapping used, to</span>
-<span class="sd">            output the b0 in template space.</span>
-<span class="sd">            Default: True</span>
-<span class="sd">        indiv : bool</span>
-<span class="sd">            Whether to output individual bundles in their own files, in</span>
-<span class="sd">            addition to the one file containing all bundles. If using</span>
-<span class="sd">            the AFQ segmentation algorithm, individual ROIs are also</span>
-<span class="sd">            output.</span>
-<span class="sd">            Default: True</span>
+<span class="sd">        attr_name : str</span>
+<span class="sd">            Name of the output to export. Default: &quot;help&quot;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        output : any</span>
+<span class="sd">            The specific output, or None if called without arguments.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="n">check_attribute</span><span class="p">(</span><span class="n">attr_name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">section</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">attr_name</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="ParticipantAFQ.export_all"><a class="viewcode-back" href="../../../autoapi/AFQ/api/participant/index.html#AFQ.api.participant.ParticipantAFQ.export_all">[docs]</a>    <span class="k">def</span> <span class="nf">export_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viz</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">xforms</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                   <span class="n">indiv</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sa">f</span><span class="s2">&quot;&quot;&quot; Exports all the possible outputs</span>
+<span class="s2">        </span><span class="si">{</span><span class="n">valid_exports_string</span><span class="si">}</span><span class="s2"></span>
+
+<span class="s2">        Parameters</span>
+<span class="s2">        ----------</span>
+<span class="s2">        viz : bool</span>
+<span class="s2">            Whether to output visualizations. This includes tract profile</span>
+<span class="s2">            plots, a figure containing all bundles, and, if using the AFQ</span>
+<span class="s2">            segmentation algorithm, individual bundle figures.</span>
+<span class="s2">            Default: True</span>
+<span class="s2">        xforms : bool</span>
+<span class="s2">            Whether to output the reg_template image in subject space and,</span>
+<span class="s2">            depending on if it is possible based on the mapping used, to</span>
+<span class="s2">            output the b0 in template space.</span>
+<span class="s2">            Default: True</span>
+<span class="s2">        indiv : bool</span>
+<span class="s2">            Whether to output individual bundles in their own files, in</span>
+<span class="s2">            addition to the one file containing all bundles. If using</span>
+<span class="s2">            the AFQ segmentation algorithm, individual ROIs are also</span>
+<span class="s2">            output.</span>
+<span class="s2">            Default: True</span>
+<span class="s2">        &quot;&quot;&quot;</span>
         <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
-        <span class="n">seg_algo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">segmentation_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;seg_algo&quot;</span><span class="p">,</span> <span class="s2">&quot;AFQ&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">xforms</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">b0_warped</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span>
-                    <span class="s2">&quot;Failed to export warped b0. This could be because your &quot;</span>
-                    <span class="s2">&quot;mapping type is only compatible with transformation &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;from template to subject space. The error is: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">template_xform</span>
-        <span class="k">if</span> <span class="n">indiv</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">indiv_bundles</span>
-            <span class="k">if</span> <span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;AFQ&quot;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">rois</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sl_counts</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">profiles</span>
-
-        <span class="k">if</span> <span class="n">viz</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">tract_profile_plots</span>
-            <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">plotly_err_message</span> <span class="o">=</span> <span class="n">viz_import_msg_error</span><span class="p">(</span><span class="s2">&quot;plot&quot;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">!=</span> <span class="n">plotly_err_message</span><span class="p">:</span>
-                    <span class="k">raise</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">plotly_err_message</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">all_bundles_figure</span>
-            <span class="k">if</span> <span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;AFQ&quot;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">indiv_bundles_figures</span>
+        <span class="n">seg_algo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;segmentation_params&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;seg_algo&quot;</span><span class="p">,</span> <span class="s2">&quot;AFQ&quot;</span><span class="p">)</span>
+        <span class="n">export_all_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seg_algo</span><span class="p">,</span> <span class="n">xforms</span><span class="p">,</span> <span class="n">indiv</span><span class="p">,</span> <span class="n">viz</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="s2">&quot;Time taken for export all: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">))</span></div></div>
+            <span class="sa">f</span><span class="s2">&quot;Time taken for export all: </span><span class="si">{</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div></div>
 </pre></div>
 
               </div>

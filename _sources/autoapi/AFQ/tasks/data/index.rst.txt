@@ -84,7 +84,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: get_data_gtab(subses_dict, bval_file, bvec_file, min_bval=None, max_bval=None, filter_b=True, b0_threshold=50)
+.. py:function:: get_data_gtab(dwi, bval, bvec, min_bval=None, max_bval=None, filter_b=True, b0_threshold=50)
 
    
    DWI data as an ndarray for selected b values,
@@ -128,7 +128,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: b0(subses_dict, data, gtab, img)
+.. py:function:: b0(dwi, data, gtab, img)
 
    
    full path to a nifti file containing the mean b0
@@ -151,7 +151,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: b0_mask(subses_dict, b0_file, brain_mask_file)
+.. py:function:: b0_mask(base_fname, b0, brain_mask)
 
    
    full path to a nifti file containing the
@@ -175,7 +175,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dti_fit(dti_params_file, gtab)
+.. py:function:: dti_fit(dti_params, gtab)
 
    
    DTI TensorFit object
@@ -198,7 +198,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dti(subses_dict, dwi_affine, brain_mask_file, data, gtab, bval_file, bvec_file, b0_threshold=50, robust_tensor_fitting=False)
+.. py:function:: dti(brain_mask, data, gtab, bval, bvec, b0_threshold=50, robust_tensor_fitting=False)
 
    
    full path to a nifti file containing parameters
@@ -255,7 +255,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dki_fit(dki_params_file, gtab)
+.. py:function:: dki_fit(dki_params, gtab)
 
    
    DKI DiffusionKurtosisFit object
@@ -278,7 +278,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dki(subses_dict, dwi_affine, brain_mask_file, gtab, data)
+.. py:function:: dki(brain_mask, gtab, data)
 
    
    full path to a nifti file containing
@@ -325,7 +325,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: csd(subses_dict, dwi_affine, brain_mask_file, gtab, data, tracking_params, csd_response=None, csd_sh_order=None, csd_lambda_=1, csd_tau=0.1)
+.. py:function:: csd(dwi, brain_mask, gtab, data, csd_response=None, csd_sh_order=None, csd_lambda_=1, csd_tau=0.1)
 
    
    full path to a nifti file containing
@@ -408,7 +408,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: anisotropic_power_map(subses_dict, csd_params_file)
+.. py:function:: anisotropic_power_map(csd_params)
 
    
    full path to a nifti file containing
@@ -432,7 +432,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dti_fa(subses_dict, dwi_affine, dti_params_file, dti_tf)
+.. py:function:: dti_fa(dti_tf)
 
    
    full path to a nifti file containing
@@ -456,7 +456,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dti_cfa(subses_dict, dwi_affine, dti_params_file, dti_tf)
+.. py:function:: dti_cfa(dti_tf)
 
    
    full path to a nifti file containing
@@ -480,7 +480,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dti_pdd(subses_dict, dwi_affine, dti_params_file, dti_tf)
+.. py:function:: dti_pdd(dti_tf)
 
    
    full path to a nifti file containing
@@ -504,7 +504,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dti_md(subses_dict, dwi_affine, dti_params_file, dti_tf)
+.. py:function:: dti_md(dti_tf)
 
    
    full path to a nifti file containing
@@ -528,7 +528,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dti_ga(subses_dict, dwi_affine, dti_params_file, dti_tf)
+.. py:function:: dti_ga(dti_tf)
 
    
    full path to a nifti file containing
@@ -552,7 +552,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dti_rd(subses_dict, dwi_affine, dti_params_file, dti_tf)
+.. py:function:: dti_rd(dti_tf)
 
    
    full path to a nifti file containing
@@ -576,7 +576,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dti_ad(subses_dict, dwi_affine, dti_params_file, dti_tf)
+.. py:function:: dti_ad(dti_tf)
 
    
    full path to a nifti file containing
@@ -600,7 +600,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dki_fa(subses_dict, dwi_affine, dki_params_file, dki_tf)
+.. py:function:: dki_fa(dki_tf)
 
    
    full path to a nifti file containing
@@ -624,7 +624,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dki_md(subses_dict, dwi_affine, dki_params_file, dki_tf)
+.. py:function:: dki_md(dki_tf)
 
    
    full path to a nifti file containing
@@ -648,7 +648,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dki_awf(subses_dict, dwi_affine, dki_params_file, dki_tf, sphere='repulsion100', gtol=0.01)
+.. py:function:: dki_awf(dki_params, sphere='repulsion100', gtol=0.01)
 
    
    full path to a nifti file containing
@@ -687,7 +687,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dki_mk(subses_dict, dwi_affine, dki_params_file, dki_tf)
+.. py:function:: dki_mk(dki_tf)
 
    
    full path to a nifti file containing
@@ -711,7 +711,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dki_ga(subses_dict, dwi_affine, dki_params_file, dki_tf)
+.. py:function:: dki_ga(dki_tf)
 
    
    full path to a nifti file containing
@@ -735,7 +735,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dki_rd(subses_dict, dwi_affine, dki_params_file, dki_tf)
+.. py:function:: dki_rd(dki_tf)
 
    
    full path to a nifti file containing
@@ -759,7 +759,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dki_ad(subses_dict, dwi_affine, dki_params_file, dki_tf)
+.. py:function:: dki_ad(dki_tf)
 
    
    full path to a nifti file containing
@@ -783,7 +783,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dki_rk(subses_dict, dwi_affine, dki_params_file, dki_tf)
+.. py:function:: dki_rk(dki_tf)
 
    
    full path to a nifti file containing
@@ -807,7 +807,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dki_ak(subses_dict, dwi_affine, dki_params_file, dki_tf)
+.. py:function:: dki_ak(dki_tf)
 
    
    full path to a nifti file containing
@@ -831,7 +831,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: brain_mask(subses_dict, dwi_affine, b0_file, bids_info, brain_mask_definition=None)
+.. py:function:: brain_mask(base_fname, dwi, b0, bids_info, brain_mask_definition=None)
 
    
    full path to a nifti file containing
@@ -840,12 +840,12 @@ Attributes
 
    :Parameters:
 
-       **brain_mask_definition** : instance from `AFQ.definitions.mask`, optional
+       **brain_mask_definition** : instance from `AFQ.definitions.image`, optional
            This will be used to create
            the brain mask, which gets applied before registration to a
            template.
-           If you want no brain mask to be applied, use FullMask.
-           If None, use B0Mask()
+           If you want no brain mask to be applied, use FullImage.
+           If None, use B0Image()
            Default: None
 
 
@@ -864,7 +864,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: get_bundle_dict(subses_dict, dwi_affine, segmentation_params, brain_mask_file, bids_info, bundle_info=None, reg_template_spec='mni_T1')
+.. py:function:: get_bundle_dict(base_fname, dwi, segmentation_params, brain_mask, bids_info, b0, bundle_info=None, reg_template_spec='mni_T1')
 
    
    Dictionary defining the different bundles to be segmented,

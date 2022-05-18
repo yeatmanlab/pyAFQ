@@ -4,7 +4,7 @@
 Installing ``pyAFQ``
 ==========================
 
-The ``pyAFQ`` software works (at least) on Python 3.7 and 3.8.
+The ``pyAFQ`` software works (at least) on Python 3.9 and 3.8.
 
 Installing the release version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The pyAFQ configuration file &#8212; AFQ 0.11 documentation</title>
+    <title>The pyAFQ configuration file &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -190,11 +190,6 @@
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="mask.html">
-   The pyAFQ Mask API
-  </a>
- </li>
- <li class="toctree-l1">
   <a class="reference internal" href="mapping.html">
    The pyAFQ Mapping API
   </a>
@@ -268,10 +263,9 @@
   <div class="section" id="the-pyafq-configuration-file">
 <h1>The pyAFQ configuration file<a class="headerlink" href="#the-pyafq-configuration-file" title="Permalink to this headline">#</a></h1>
 <p>This file should be a <a class="reference external" href="https://github.com/toml-lang/toml">toml</a> file. At
-minimum, the file should contain information about the location of the
-<cite>dmriprep</cite> folder:</p>
+minimum, the file should contain the BIDS path:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">files</span><span class="p">]</span>
-<span class="n">dmriprep_folder</span> <span class="o">=</span> <span class="s1">&#39;/path/to/study/derivatives/dmriprep&#39;</span>
+<span class="n">bids_path</span> <span class="o">=</span> <span class="s2">&quot;path/to/study&quot;</span>
 </pre></div>
 </div>
 <p>But additional configuration options can be provided.
@@ -313,7 +307,7 @@ See an example configuration file below:</p>
 <span class="c1"># Default: None</span>
 <span class="n">output_dir</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-<span class="c1"># Parameters to pass to parfor in AFQ.utils.parallel,</span>
+<span class="c1"># Parameters to pass to paramap in AFQ.utils.parallel,</span>
 <span class="c1"># to parallelize computations across subjects and sessions.</span>
 <span class="c1"># Set &quot;n_jobs&quot; to -1 to automatically parallelize as</span>
 <span class="c1"># the number of cpus. Here is an example for how to do</span>
@@ -332,6 +326,7 @@ See an example configuration file below:</p>
 
 <span class="c1"># How tracking directions are determined.</span>
 <span class="c1"># One of: {&quot;det&quot; | &quot;prob&quot;}</span>
+<span class="c1"># Default: &quot;prob&quot;</span>
 <span class="n">directions</span> <span class="o">=</span> <span class="s2">&quot;prob&quot;</span>
 
 <span class="c1"># The maximum turning angle in each step. Default: 30</span>
@@ -354,7 +349,7 @@ See an example configuration file below:</p>
 <span class="c1"># voxel on each dimension (for example, 2 =&gt; [2, 2, 2]). If this is a 2D</span>
 <span class="c1"># array, these are the coordinates of the seeds. Unless random_seeds is</span>
 <span class="c1"># set to True, in which case this is the total number of random seeds</span>
-<span class="c1"># to generate within the mask.</span>
+<span class="c1"># to generate within the mask. Default: 1</span>
 <span class="n">n_seeds</span> <span class="o">=</span> <span class="mi">1</span>
 
 <span class="c1"># Whether to generate a total of n_seeds random seeds in the mask.</span>
@@ -384,7 +379,7 @@ See an example configuration file below:</p>
 <span class="c1"># we will stop only at the edge of the image).</span>
 <span class="n">stop_threshold</span> <span class="o">=</span> <span class="mi">0</span>
 
-<span class="c1"># The size (in mm) of a step of tractography. Default: 1.0</span>
+<span class="c1"># The size (in mm) of a step of tractography. Default: 0.5</span>
 <span class="n">step_size</span> <span class="o">=</span> <span class="mf">0.5</span>
 
 <span class="c1"># The miminal length (mm) in a streamline. Default: 10</span>
@@ -647,8 +642,8 @@ See an example configuration file below:</p>
 <span class="c1"># This will be used to create</span>
 <span class="c1"># the brain mask, which gets applied before registration to a</span>
 <span class="c1"># template.</span>
-<span class="c1"># If you want no brain mask to be applied, use FullMask.</span>
-<span class="c1"># If None, use B0Mask()</span>
+<span class="c1"># If you want no brain mask to be applied, use FullImage.</span>
+<span class="c1"># If None, use B0Image()</span>
 <span class="c1"># Default: None</span>
 <span class="n">brain_mask_definition</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
@@ -681,7 +676,7 @@ See an example configuration file below:</p>
 <span class="n">mapping_definition</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <span class="c1"># The source image data to be registered.</span>
-<span class="c1"># Can either be a Nifti1Image, a scalar definition, or str.</span>
+<span class="c1"># Can either be a Nifti1Image, an ImageFile, or str.</span>
 <span class="c1"># if &quot;b0&quot;, &quot;dti_fa_subject&quot;, &quot;subject_sls&quot;, or &quot;power_map,&quot;</span>
 <span class="c1"># image data will be loaded automatically.</span>
 <span class="c1"># If &quot;subject_sls&quot; is used, slr registration will be used</span>
@@ -702,7 +697,7 @@ See an example configuration file below:</p>
 
 <span class="c1"># List of scalars to use.</span>
 <span class="c1"># Can be any of: &quot;dti_fa&quot;, &quot;dti_md&quot;, &quot;dki_fa&quot;, &quot;dki_md&quot;, &quot;dki_awf&quot;,</span>
-<span class="c1"># &quot;dki_mk&quot;. Can also be a scalar from AFQ.definitions.scalar.</span>
+<span class="c1"># &quot;dki_mk&quot;. Can also be a scalar from AFQ.definitions.image.</span>
 <span class="c1"># Default: [&quot;dti_fa&quot;, &quot;dti_md&quot;]</span>
 <span class="n">scalars</span> <span class="o">=</span> <span class="s2">&quot;[&#39;dti_fa&#39;, &#39;dti_md&#39;]&quot;</span>
 

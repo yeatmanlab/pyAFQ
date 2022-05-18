@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.segmentation &#8212; AFQ 0.11 documentation</title>
+    <title>AFQ.tasks.segmentation &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -283,28 +283,19 @@
     </label>
     <ul>
      <li class="toctree-l3">
+      <a class="reference internal" href="../../definitions/image/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.definitions.image
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
       <a class="reference internal" href="../../definitions/mapping/index.html">
        <code class="xref py py-mod docutils literal notranslate">
         <span class="pre">
          AFQ.definitions.mapping
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../definitions/mask/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.definitions.mask
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../definitions/scalar/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.definitions.scalar
         </span>
        </code>
       </a>
@@ -475,10 +466,10 @@
       </a>
      </li>
      <li class="toctree-l3">
-      <a class="reference internal" href="../../utils/parallel/index.html">
+      <a class="reference internal" href="../../utils/path/index.html">
        <code class="xref py py-mod docutils literal notranslate">
         <span class="pre">
-         AFQ.utils.parallel
+         AFQ.utils.path
         </span>
        </code>
       </a>
@@ -715,19 +706,19 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.segmentation.segment" title="AFQ.tasks.segmentation.segment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">segment</span></code></a>(subses_dict, data_imap, mapping_imap, tractography_imap, tracking_params, segmentation_params)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.segmentation.segment" title="AFQ.tasks.segmentation.segment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">segment</span></code></a>(dwi, data_imap, mapping_imap, tractography_imap, segmentation_params)</p></td>
 <td><p>full path to a trk file containing containting</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.segmentation.clean_bundles" title="AFQ.tasks.segmentation.clean_bundles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clean_bundles</span></code></a>(subses_dict, bundles_file, data_imap, tracking_params, segmentation_params, clean_params=None)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.segmentation.clean_bundles" title="AFQ.tasks.segmentation.clean_bundles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clean_bundles</span></code></a>(bundles, data_imap, clean_params=None)</p></td>
 <td><p>full path to a trk file containting segmented</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.segmentation.export_bundles" title="AFQ.tasks.segmentation.export_bundles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_bundles</span></code></a>(subses_dict, clean_bundles_file, bundles_file, data_imap, tracking_params, segmentation_params)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.segmentation.export_bundles" title="AFQ.tasks.segmentation.export_bundles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_bundles</span></code></a>(base_fname, results_dir, clean_bundles, bundles, data_imap, tracking_params, segmentation_params)</p></td>
 <td><p>dictionary of paths, where each path is</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.segmentation.export_sl_counts" title="AFQ.tasks.segmentation.export_sl_counts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_sl_counts</span></code></a>(subses_dict, data_imap, clean_bundles_file, bundles_file, tracking_params, segmentation_params)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.segmentation.export_sl_counts" title="AFQ.tasks.segmentation.export_sl_counts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_sl_counts</span></code></a>(data_imap, clean_bundles, bundles)</p></td>
 <td><p>full path to a JSON file containing streamline counts</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.segmentation.tract_profiles" title="AFQ.tasks.segmentation.tract_profiles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tract_profiles</span></code></a>(subses_dict, clean_bundles_file, data_imap, scalar_dict, dwi_affine, tracking_params, segmentation_params, profile_weights='gauss')</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.segmentation.tract_profiles" title="AFQ.tasks.segmentation.tract_profiles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tract_profiles</span></code></a>(clean_bundles, data_imap, scalar_dict, dwi_affine, profile_weights='gauss')</p></td>
 <td><p>full path to a CSV file containing tract profiles</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.segmentation.get_scalar_dict" title="AFQ.tasks.segmentation.get_scalar_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_scalar_dict</span></code></a>(data_imap, mapping_imap, scalars=['dti_fa', 'dti_md'])</p></td>
@@ -759,7 +750,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.segmentation.segment">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.segmentation.</span></span><span class="sig-name descname"><span class="pre">segment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tractography_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracking_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentation_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/segmentation.html#segment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.segmentation.segment" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.segmentation.</span></span><span class="sig-name descname"><span class="pre">segment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dwi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tractography_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentation_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/segmentation.html#segment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.segmentation.segment" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a trk file containing containting
 segmented streamlines, labeled by bundle</p>
 <dl class="field-list simple">
@@ -775,7 +766,7 @@ Default: use the default behavior of the seg.Segmentation object.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.segmentation.clean_bundles">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.segmentation.</span></span><span class="sig-name descname"><span class="pre">clean_bundles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundles_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracking_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentation_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/segmentation.html#clean_bundles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.segmentation.clean_bundles" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.segmentation.</span></span><span class="sig-name descname"><span class="pre">clean_bundles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bundles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/segmentation.html#clean_bundles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.segmentation.clean_bundles" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a trk file containting segmented
 streamlines, cleaned using the Mahalanobis distance, and labeled by
 bundle</p>
@@ -793,7 +784,7 @@ function.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.segmentation.export_bundles">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.segmentation.</span></span><span class="sig-name descname"><span class="pre">export_bundles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_bundles_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundles_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracking_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentation_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/segmentation.html#export_bundles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.segmentation.export_bundles" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.segmentation.</span></span><span class="sig-name descname"><span class="pre">export_bundles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_bundles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracking_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentation_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/segmentation.html#export_bundles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.segmentation.export_bundles" title="Permalink to this definition">#</a></dt>
 <dd><p>dictionary of paths, where each path is
 a full path to a trk file containing the streamlines of a given bundle,
 cleaned or uncleaned</p>
@@ -801,13 +792,13 @@ cleaned or uncleaned</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.segmentation.export_sl_counts">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.segmentation.</span></span><span class="sig-name descname"><span class="pre">export_sl_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_bundles_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundles_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracking_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentation_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/segmentation.html#export_sl_counts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.segmentation.export_sl_counts" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.segmentation.</span></span><span class="sig-name descname"><span class="pre">export_sl_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_bundles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundles</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/segmentation.html#export_sl_counts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.segmentation.export_sl_counts" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a JSON file containing streamline counts</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.segmentation.tract_profiles">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.segmentation.</span></span><span class="sig-name descname"><span class="pre">tract_profiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_bundles_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalar_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracking_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentation_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gauss'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/segmentation.html#tract_profiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.segmentation.tract_profiles" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.segmentation.</span></span><span class="sig-name descname"><span class="pre">tract_profiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clean_bundles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scalar_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gauss'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/segmentation.html#tract_profiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.segmentation.tract_profiles" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a CSV file containing tract profiles</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -835,7 +826,7 @@ to their respective file paths</p>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>scalars</strong><span class="classifier">list of strings and/or scalar definitions, optional</span></dt><dd><p>List of scalars to use.
 Can be any of: “dti_fa”, “dti_md”, “dki_fa”, “dki_md”, “dki_awf”,
-“dki_mk”. Can also be a scalar from AFQ.definitions.scalar.
+“dki_mk”. Can also be a scalar from AFQ.definitions.image.
 Default: [“dti_fa”, “dti_md”]</p>
 </dd>
 </dl>

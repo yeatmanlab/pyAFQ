@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tractography &#8212; AFQ 0.11 documentation</title>
+    <title>AFQ.tractography &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -217,6 +217,7 @@
 <span class="sd">    directions : str</span>
 <span class="sd">        How tracking directions are determined.</span>
 <span class="sd">        One of: {&quot;det&quot; | &quot;prob&quot;}</span>
+<span class="sd">        Default: &quot;prob&quot;</span>
 <span class="sd">    max_angle : float, optional.</span>
 <span class="sd">        The maximum turning angle in each step. Default: 30</span>
 <span class="sd">    sphere : Sphere object, optional.</span>
@@ -234,7 +235,7 @@
 <span class="sd">        voxel on each dimension (for example, 2 =&gt; [2, 2, 2]). If this is a 2D</span>
 <span class="sd">        array, these are the coordinates of the seeds. Unless random_seeds is</span>
 <span class="sd">        set to True, in which case this is the total number of random seeds</span>
-<span class="sd">        to generate within the mask.</span>
+<span class="sd">        to generate within the mask. Default: 1</span>
 <span class="sd">    random_seeds : bool</span>
 <span class="sd">        Whether to generate a total of n_seeds random seeds in the mask.</span>
 <span class="sd">        Default: False.</span>
@@ -259,7 +260,7 @@
 <span class="sd">        Defaults to 0 (this means that if no stop_mask is passed,</span>
 <span class="sd">        we will stop only at the edge of the image).</span>
 <span class="sd">    step_size : float, optional.</span>
-<span class="sd">        The size (in mm) of a step of tractography. Default: 1.0</span>
+<span class="sd">        The size (in mm) of a step of tractography. Default: 0.5</span>
 <span class="sd">    min_length: int, optional</span>
 <span class="sd">        The miminal length (mm) in a streamline. Default: 10</span>
 <span class="sd">    max_length: int, optional</span>

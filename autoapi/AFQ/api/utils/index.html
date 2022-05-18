@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.api.utils &#8212; AFQ 0.11 documentation</title>
+    <title>AFQ.api.utils &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -283,28 +283,19 @@
     </label>
     <ul>
      <li class="toctree-l3">
+      <a class="reference internal" href="../../definitions/image/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.definitions.image
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
       <a class="reference internal" href="../../definitions/mapping/index.html">
        <code class="xref py py-mod docutils literal notranslate">
         <span class="pre">
          AFQ.definitions.mapping
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../definitions/mask/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.definitions.mask
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../definitions/scalar/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.definitions.scalar
         </span>
        </code>
       </a>
@@ -475,10 +466,10 @@
       </a>
      </li>
      <li class="toctree-l3">
-      <a class="reference internal" href="../../utils/parallel/index.html">
+      <a class="reference internal" href="../../utils/path/index.html">
        <code class="xref py py-mod docutils literal notranslate">
         <span class="pre">
-         AFQ.utils.parallel
+         AFQ.utils.path
         </span>
        </code>
       </a>
@@ -622,46 +613,24 @@
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#functions">
-     Functions
+    <a class="reference internal nav-link" href="#AFQ.api.utils.methods_descriptors">
+     methods_descriptors
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#attributes">
-     Attributes
+    <a class="reference internal nav-link" href="#AFQ.api.utils.kwargs_descriptors">
+     kwargs_descriptors
     </a>
-    <ul class="nav section-nav flex-column">
-     <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#AFQ.api.utils.methods_descriptors">
-       methods_descriptors
-      </a>
-     </li>
-     <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#AFQ.api.utils.kwargs_descriptors">
-       kwargs_descriptors
-      </a>
-     </li>
-     <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#AFQ.api.utils.wf_sections">
-       wf_sections
-      </a>
-     </li>
-     <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#AFQ.api.utils.AFQclass_doc">
-       AFQclass_doc
-      </a>
-     </li>
-     <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#id0">
-       AFQclass_doc
-      </a>
-     </li>
-     <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#AFQ.api.utils.add_method_descriptions">
-       add_method_descriptions
-      </a>
-     </li>
-    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#AFQ.api.utils.AFQclass_doc">
+     AFQclass_doc
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id0">
+     AFQclass_doc
+    </a>
    </li>
   </ul>
  </li>
@@ -697,45 +666,6 @@
 <span id="afq-api-utils"></span><h1><a class="reference internal" href="#module-AFQ.api.utils" title="AFQ.api.utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.utils</span></code></a><a class="headerlink" href="#module-AFQ.api.utils" title="Permalink to this headline">#</a></h1>
 <div class="section" id="module-contents">
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">#</a></h2>
-<div class="section" id="functions">
-<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">#</a></h3>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.api.utils.add_method_descriptions" title="AFQ.api.utils.add_method_descriptions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_method_descriptions</span></code></a>(AFQclass)</p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section" id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">#</a></h3>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.api.utils.methods_descriptors" title="AFQ.api.utils.methods_descriptors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">methods_descriptors</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.api.utils.kwargs_descriptors" title="AFQ.api.utils.kwargs_descriptors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kwargs_descriptors</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.api.utils.wf_sections" title="AFQ.api.utils.wf_sections"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wf_sections</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#id0" title="AFQ.api.utils.AFQclass_doc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AFQclass_doc</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#id0" title="AFQ.api.utils.AFQclass_doc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AFQclass_doc</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
 <dl class="py data">
 <dt class="sig sig-object py" id="AFQ.api.utils.methods_descriptors">
 <span class="sig-prename descclassname"><span class="pre">AFQ.api.utils.</span></span><span class="sig-name descname"><span class="pre">methods_descriptors</span></span><a class="reference internal" href="../../../../_modules/AFQ/api/utils.html#methods_descriptors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.utils.methods_descriptors" title="Permalink to this definition">#</a></dt>
@@ -747,13 +677,8 @@
 <dd></dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="AFQ.api.utils.wf_sections">
-<span class="sig-prename descclassname"><span class="pre">AFQ.api.utils.</span></span><span class="sig-name descname"><span class="pre">wf_sections</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">['data_imap',</span> <span class="pre">'mapping_imap',</span> <span class="pre">'tractography_imap',</span> <span class="pre">'segmentation_imap',</span> <span class="pre">'subses_dict']</span></em><a class="reference internal" href="../../../../_modules/AFQ/api/utils.html#wf_sections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.utils.wf_sections" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py data">
 <dt class="sig sig-object py" id="AFQ.api.utils.AFQclass_doc">
-<span class="sig-prename descclassname"><span class="pre">AFQ.api.utils.</span></span><span class="sig-name descname"><span class="pre">AFQclass_doc</span></span><em class="property"><span class="w"> </span><span class="pre">=</span></em><a class="reference internal" href="../../../../_modules/AFQ/api/utils.html#AFQclass_doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.utils.AFQclass_doc" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.api.utils.</span></span><span class="sig-name descname"><span class="pre">AFQclass_doc</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">Here</span> <span class="pre">are</span> <span class="pre">the</span> <span class="pre">arguments</span> <span class="pre">you</span> <span class="pre">can</span> <span class="pre">pass</span> <span class="pre">to</span> <span class="pre">kwargs,</span> <span class="pre">to</span> <span class="pre">customize</span> <span class="pre">the</span> <span class="pre">tractometry</span> <span class="pre">pipeline.</span> <span class="pre">They</span> <span class="pre">are...</span></em><a class="reference internal" href="../../../../_modules/AFQ/api/utils.html#AFQclass_doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.utils.AFQclass_doc" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py data">
@@ -761,12 +686,6 @@
 <span class="sig-prename descclassname"><span class="pre">AFQ.api.utils.</span></span><span class="sig-name descname"><span class="pre">AFQclass_doc</span></span><a class="reference internal" href="../../../../_modules/AFQ/api/utils.html#AFQclass_doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="AFQ.api.utils.add_method_descriptions">
-<span class="sig-prename descclassname"><span class="pre">AFQ.api.utils.</span></span><span class="sig-name descname"><span class="pre">add_method_descriptions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">AFQclass</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/api/utils.html#add_method_descriptions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.utils.add_method_descriptions" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-
-</div>
 </div>
 </div>
 

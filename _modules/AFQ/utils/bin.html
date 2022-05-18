@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.utils.bin &#8212; AFQ 0.11 documentation</title>
+    <title>AFQ.utils.bin &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -190,9 +190,8 @@
 <span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">ArgumentParser</span>
 <span class="kn">from</span> <span class="nn">funcargparse</span> <span class="kn">import</span> <span class="n">FuncArgParser</span>
 
-<span class="kn">from</span> <span class="nn">AFQ.definitions.mask</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c1"># interprets masks loaded from toml</span>
+<span class="kn">from</span> <span class="nn">AFQ.definitions.image</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c1"># interprets masks loaded from toml</span>
 <span class="kn">from</span> <span class="nn">AFQ.definitions.mapping</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c1"># interprets mappings loaded from toml</span>
-<span class="kn">from</span> <span class="nn">AFQ.definitions.scalar</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c1"># interprets scalars loaded from toml</span>
 <span class="kn">from</span> <span class="nn">AFQ.definitions.utils</span> <span class="kn">import</span> <span class="n">Definition</span>
 <span class="kn">from</span> <span class="nn">AFQ.api.utils</span> <span class="kn">import</span> <span class="n">kwargs_descriptors</span>
 
@@ -262,7 +261,7 @@
         <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;{&#39;</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>  <span class="c1"># interpret as dictionary</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;Mask&quot;</span> <span class="ow">in</span> <span class="n">t</span> <span class="ow">or</span> <span class="s2">&quot;Map&quot;</span> <span class="ow">in</span> <span class="n">t</span> <span class="ow">or</span> <span class="s2">&quot;Scalar&quot;</span> <span class="ow">in</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;Image&quot;</span> <span class="ow">in</span> <span class="n">t</span> <span class="ow">or</span> <span class="s2">&quot;Map&quot;</span> <span class="ow">in</span> <span class="n">t</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">definition</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
@@ -322,8 +321,7 @@
 <span class="c1"># not shown to the user (mostly BIDS filters stuff)</span>
 <div class="viewcode-block" id="qsi_prep_ignore_params"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/bin/index.html#AFQ.utils.bin.qsi_prep_ignore_params">[docs]</a><span class="n">qsi_prep_ignore_params</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;bids_path&quot;</span><span class="p">,</span> <span class="s2">&quot;bids_filters&quot;</span><span class="p">,</span> <span class="s2">&quot;preproc_pipeline&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;custom_tractography_bids_filters&quot;</span><span class="p">,</span> <span class="s2">&quot;brain_mask&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;mapping&quot;</span><span class="p">,</span> <span class="s2">&quot;participant_labels&quot;</span><span class="p">,</span> <span class="s2">&quot;output_dir&quot;</span><span class="p">]</span></div>
+    <span class="s2">&quot;participant_labels&quot;</span><span class="p">,</span> <span class="s2">&quot;output_dir&quot;</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="dict_to_json"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/bin/index.html#AFQ.utils.bin.dict_to_json">[docs]</a><span class="k">def</span> <span class="nf">dict_to_json</span><span class="p">(</span><span class="n">dictionary</span><span class="p">):</span>
@@ -505,16 +503,19 @@
     <span class="n">toml_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="generate_json"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/bin/index.html#AFQ.utils.bin.generate_json">[docs]</a><span class="k">def</span> <span class="nf">generate_json</span><span class="p">(</span><span class="n">json_file</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<div class="viewcode-block" id="generate_json"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/bin/index.html#AFQ.utils.bin.generate_json">[docs]</a><span class="k">def</span> <span class="nf">generate_json</span><span class="p">(</span><span class="n">json_folder</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                   <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">overwrite</span> <span class="ow">and</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">json_file</span><span class="p">):</span>
+    <span class="n">json_file_our_trk</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">json_folder</span><span class="p">,</span> <span class="s2">&quot;pyafq.json&quot;</span><span class="p">)</span>
+    <span class="n">json_file_their_trk</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">json_folder</span><span class="p">,</span> <span class="s2">&quot;pyafq_input_trk.json&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">overwrite</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">json_file_our_trk</span><span class="p">)</span> <span class="ow">or</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">json_file_their_trk</span><span class="p">)):</span>
         <span class="k">raise</span> <span class="ne">FileExistsError</span><span class="p">(</span>
             <span class="s2">&quot;Config file already exists. &quot;</span>
             <span class="o">+</span> <span class="s2">&quot;If you want to overwrite this file,&quot;</span>
             <span class="o">+</span> <span class="s2">&quot; add the argument --overwrite-config&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Generating pyAFQ full pipeline QSIprep json file.&quot;</span><span class="p">)</span>
-    <span class="n">qsi_spec_intro</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;{</span>
+    <span class="n">qsi_spec_intro_our_trk</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;{</span>
 <span class="s2">    &quot;description&quot;: &quot;Use pyAFQ to perform the full Tractometry pipeline&quot;,</span>
 <span class="s2">    &quot;space&quot;: &quot;T1w&quot;,</span>
 <span class="s2">    &quot;name&quot;: &quot;pyAFQ_full&quot;,</span>
@@ -527,7 +528,59 @@
 <span class="s2">            &quot;input&quot;: &quot;qsiprep&quot;,</span>
 <span class="s2">            &quot;output_suffix&quot;: &quot;PYAFQ_FULL&quot;,</span>
 <span class="s2">            &quot;parameters&quot;: {</span>
+<span class="s2">                &quot;use_external_tracking&quot;: false,</span>
 <span class="s2">&quot;&quot;&quot;</span>
+    <span class="n">qsi_spec_intro_their_trk</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;{</span>
+<span class="s2">    &quot;description&quot;: &quot;Use pyAFQ to perform the Tractometry pipeline, with tractography from qsiprep&quot;,</span>
+<span class="s2">    &quot;space&quot;: &quot;T1w&quot;,</span>
+<span class="s2">    &quot;name&quot;: &quot;pyAFQ_import_trk&quot;,</span>
+<span class="s2">    &quot;atlases&quot;: [],</span>
+<span class="s2">    &quot;nodes&quot;: [</span>
+<span class="s2">        {</span>
+<span class="s2">            &quot;name&quot;: &quot;msmt_csd&quot;,</span>
+<span class="s2">            &quot;software&quot;: &quot;MRTrix3&quot;,</span>
+<span class="s2">            &quot;action&quot;: &quot;csd&quot;,</span>
+<span class="s2">            &quot;output_suffix&quot;: &quot;msmtcsd&quot;,</span>
+<span class="s2">            &quot;input&quot;: &quot;qsiprep&quot;,</span>
+<span class="s2">            &quot;parameters&quot;: {</span>
+<span class="s2">                &quot;mtnormalize&quot;: true,</span>
+<span class="s2">                &quot;response&quot;: {</span>
+<span class="s2">                &quot;algorithm&quot;: &quot;dhollander&quot;</span>
+<span class="s2">                },</span>
+<span class="s2">                &quot;fod&quot;: {</span>
+<span class="s2">                &quot;algorithm&quot;: &quot;msmt_csd&quot;,</span>
+<span class="s2">                &quot;max_sh&quot;: [4, 8, 8]</span>
+<span class="s2">                }</span>
+<span class="s2">            }</span>
+<span class="s2">        },</span>
+<span class="s2">        {</span>
+<span class="s2">            &quot;name&quot;: &quot;track_ifod2&quot;,</span>
+<span class="s2">            &quot;software&quot;: &quot;MRTrix3&quot;,</span>
+<span class="s2">            &quot;action&quot;: &quot;tractography&quot;,</span>
+<span class="s2">            &quot;output_suffix&quot;: &quot;ifod2&quot;,</span>
+<span class="s2">            &quot;input&quot;: &quot;msmt_csd&quot;,</span>
+<span class="s2">            &quot;parameters&quot;: {</span>
+<span class="s2">                &quot;use_5tt&quot;: false,</span>
+<span class="s2">                &quot;use_sift2&quot;: true,</span>
+<span class="s2">                &quot;tckgen&quot;:{</span>
+<span class="s2">                &quot;algorithm&quot;: &quot;iFOD2&quot;,</span>
+<span class="s2">                &quot;select&quot;: 1e6,</span>
+<span class="s2">                &quot;max_length&quot;: 250,</span>
+<span class="s2">                &quot;min_length&quot;: 30,</span>
+<span class="s2">                &quot;power&quot;:0.33</span>
+<span class="s2">                },</span>
+<span class="s2">                &quot;sift2&quot;:</span><span class="si">{}</span><span class="s2"></span>
+<span class="s2">            }</span>
+<span class="s2">        },</span>
+<span class="s2">        {</span>
+<span class="s2">            &quot;name&quot;: &quot;pyAFQ_full&quot;,</span>
+<span class="s2">            &quot;software&quot;: &quot;pyAFQ&quot;,</span>
+<span class="s2">            &quot;action&quot;: &quot;pyAFQ_full&quot;,</span>
+<span class="s2">            &quot;input&quot;: &quot;track_ifod2&quot;,</span>
+<span class="s2">            &quot;output_suffix&quot;: &quot;PYAFQ_FULL_ET&quot;,</span>
+<span class="s2">            &quot;parameters&quot;: {</span>
+<span class="s2">                &quot;use_external_tracking&quot;: true,</span>
+<span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
     <span class="n">qsi_spec_outro</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">            }</span>
 <span class="s2">        }</span>
@@ -543,8 +596,14 @@
 
     <span class="n">arg_dict</span> <span class="o">=</span> <span class="n">func_dict_to_arg_dict</span><span class="p">(</span><span class="n">func_dict</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span>
 
-    <span class="n">json_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
-    <span class="n">json_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">qsi_spec_intro</span><span class="p">)</span>
+    <span class="n">json_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_file_our_trk</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">json_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">qsi_spec_intro_our_trk</span><span class="p">)</span>
+    <span class="n">json_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">dict_to_json</span><span class="p">(</span><span class="n">arg_dict</span><span class="p">))</span>
+    <span class="n">json_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">qsi_spec_outro</span><span class="p">)</span>
+    <span class="n">json_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="n">json_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">json_file_their_trk</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">json_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">qsi_spec_intro_their_trk</span><span class="p">)</span>
     <span class="n">json_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">dict_to_json</span><span class="p">(</span><span class="n">arg_dict</span><span class="p">))</span>
     <span class="n">json_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">qsi_spec_outro</span><span class="p">)</span>
     <span class="n">json_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>

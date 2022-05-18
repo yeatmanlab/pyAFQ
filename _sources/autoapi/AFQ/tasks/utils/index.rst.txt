@@ -24,7 +24,7 @@ Functions
 
 
 
-.. py:function:: get_fname(subses_dict, suffix, tracking_params=None, segmentation_params=None)
+.. py:function:: get_fname(base_fname, suffix, tracking_params=None, segmentation_params=None)
 
    
 

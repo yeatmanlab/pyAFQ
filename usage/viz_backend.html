@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Visualization Backends &#8212; AFQ 0.11 documentation</title>
+    <title>Visualization Backends &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -36,7 +36,7 @@
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="The pyAFQ Mask API" href="mask.html" />
+    <link rel="next" title="The pyAFQ Mapping API" href="mapping.html" />
     <link rel="prev" title="The pyAFQ configuration file" href="config.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -190,11 +190,6 @@
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="mask.html">
-   The pyAFQ Mask API
-  </a>
- </li>
- <li class="toctree-l1">
   <a class="reference internal" href="mapping.html">
    The pyAFQ Mapping API
   </a>
@@ -318,7 +313,7 @@ significant amount of time to generate rotating GIFs.</p>
 must provide a base image with the fury requiements installed.
 Below is an example dockerfile that can be used to build that base image:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use official python base image</span>
-<span class="n">FROM</span> <span class="n">python</span><span class="p">:</span><span class="mf">3.7</span>
+<span class="n">FROM</span> <span class="n">python</span><span class="p">:</span><span class="mf">3.9</span>
 <span class="c1"># Install libgl</span>
 <span class="n">RUN</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">update</span>
 <span class="n">RUN</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="o">-</span><span class="n">y</span> <span class="n">libgl1</span><span class="o">-</span><span class="n">mesa</span><span class="o">-</span><span class="n">glx</span>
@@ -340,10 +335,10 @@ Below is an example dockerfile that can be used to build that base image:</p>
             <p class="prev-next-title">The pyAFQ configuration file</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="mask.html" title="next page">
+    <a class='right-next' id="next-link" href="mapping.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">The pyAFQ Mask API</p>
+        <p class="prev-next-title">The pyAFQ Mapping API</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

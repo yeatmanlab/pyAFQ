@@ -151,7 +151,7 @@ Attributes
        !! processed by numpydoc !!
 
 .. py:data:: qsi_prep_ignore_params
-   :annotation: = ['bids_path', 'bids_filters', 'preproc_pipeline', 'custom_tractography_bids_filters',...
+   :annotation: = ['bids_path', 'bids_filters', 'preproc_pipeline', 'participant_labels', 'output_dir']
 
    
 
@@ -261,7 +261,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: generate_json(json_file, overwrite=False, logger=None)
+.. py:function:: generate_json(json_folder, overwrite=False, logger=None)
 
    
 

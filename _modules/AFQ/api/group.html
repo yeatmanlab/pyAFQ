@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.api.group &#8212; AFQ 0.11 documentation</title>
+    <title>AFQ.api.group &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -182,18 +182,19 @@
                 
   <h1>Source code for AFQ.api.group</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-# -*- coding: utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">contextlib</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">FutureWarning</span><span class="p">)</span>  <span class="c1"># noqa</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">AFQ.data.s3bids</span> <span class="k">as</span> <span class="nn">afs</span>
 <span class="kn">from</span> <span class="nn">AFQ.api.participant</span> <span class="kn">import</span> <span class="n">ParticipantAFQ</span>
-<span class="kn">from</span> <span class="nn">AFQ.api.utils</span> <span class="kn">import</span> <span class="n">wf_sections</span><span class="p">,</span> <span class="n">add_method_descriptions</span>
+<span class="kn">from</span> <span class="nn">AFQ.api.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">check_attribute</span><span class="p">,</span> <span class="n">AFQclass_doc</span><span class="p">,</span>
+    <span class="n">export_all_helper</span><span class="p">,</span> <span class="n">valid_exports_string</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">AFQ.utils.streamlines</span> <span class="k">as</span> <span class="nn">aus</span>
 
-<span class="kn">import</span> <span class="nn">AFQ.viz.utils</span> <span class="k">as</span> <span class="nn">vut</span>
-<span class="kn">from</span> <span class="nn">AFQ.utils.parallel</span> <span class="kn">import</span> <span class="n">parfor</span>
-
+<span class="kn">from</span> <span class="nn">dipy.utils.parallel</span> <span class="kn">import</span> <span class="n">paramap</span>
 <span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">StatefulTractogram</span><span class="p">,</span> <span class="n">Space</span>
 <span class="kn">import</span> <span class="nn">dipy.tracking.streamlinespeed</span> <span class="k">as</span> <span class="nn">dps</span>
 <span class="kn">import</span> <span class="nn">dipy.tracking.streamline</span> <span class="k">as</span> <span class="nn">dts</span>
@@ -210,15 +211,12 @@
 
 <span class="kn">from</span> <span class="nn">bids.layout</span> <span class="kn">import</span> <span class="n">BIDSLayout</span>
 <span class="kn">import</span> <span class="nn">bids.config</span> <span class="k">as</span> <span class="nn">bids_config</span>
-<span class="k">try</span><span class="p">:</span>
+<span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">suppress</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
     <span class="n">bids_config</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;extension_initial_dot&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-    <span class="k">pass</span>
-
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">afqbrowser</span> <span class="k">as</span> <span class="nn">afqb</span>
     <span class="n">using_afqb</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="k">except</span> <span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">ModuleNotFoundError</span><span class="p">):</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">using_afqb</span> <span class="o">=</span> <span class="kc">False</span>
 
 
@@ -232,15 +230,8 @@
     <span class="k">return</span> <span class="n">df</span>
 
 
-<span class="c1"># this is parallelized below</span>
-<span class="k">def</span> <span class="nf">_getter_helper</span><span class="p">(</span><span class="n">wf_dict</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">wf_dict</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span>
-
-
-<span class="nd">@add_method_descriptions</span>
 <div class="viewcode-block" id="GroupAFQ"><a class="viewcode-back" href="../../../autoapi/AFQ/api/group/index.html#AFQ.api.group.GroupAFQ">[docs]</a><span class="k">class</span> <span class="nc">GroupAFQ</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span><span class="si">{</span><span class="n">AFQclass_doc</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">bids_path</span><span class="p">,</span>
@@ -279,7 +270,7 @@
 <span class="sd">            to recalculate a derivative).</span>
 <span class="sd">            Default: None</span>
 <span class="sd">        parallel_params : dict, optional</span>
-<span class="sd">            Parameters to pass to parfor in AFQ.utils.parallel,</span>
+<span class="sd">            Parameters to pass to paramap in AFQ.utils.parallel,</span>
 <span class="sd">            to parallelize computations across subjects and sessions.</span>
 <span class="sd">            Set &quot;n_jobs&quot; to -1 to automatically parallelize as</span>
 <span class="sd">            the number of cpus. Here is an example for how to do</span>
@@ -408,10 +399,7 @@
                     <span class="o">+</span> <span class="s2">&quot; See above warnings.&quot;</span><span class="p">)</span>
 
         <span class="n">sessions</span> <span class="o">=</span> <span class="n">bids_layout</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">return_type</span><span class="o">=</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s1">&#39;session&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sessions</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span> <span class="o">=</span> <span class="n">sessions</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span> <span class="o">=</span> <span class="n">sessions</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sessions</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
 
         <span class="c1"># do not bother to parallelize if less than 2 subject-sessions</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subjects</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
@@ -487,80 +475,8 @@
                     <span class="o">**</span><span class="n">this_kwargs</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">[</span><span class="n">subject</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">session</span><span class="p">)]</span> <span class="o">=</span> <span class="n">this_pAFQ</span><span class="o">.</span><span class="n">wf_dict</span>
 
-<div class="viewcode-block" id="GroupAFQ.__getattribute__"><a class="viewcode-back" href="../../../autoapi/AFQ/api/group/index.html#AFQ.api.group.GroupAFQ.__getattribute__">[docs]</a>    <span class="k">def</span> <span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
-        <span class="c1"># check if normal attr exists first</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="k">pass</span>
-
-        <span class="c1"># find what name to use</span>
-        <span class="n">first_dict</span> <span class="o">=</span>\
-            <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">valid_sub_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valid_ses_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
-        <span class="n">attr_file</span> <span class="o">=</span> <span class="n">attr</span> <span class="o">+</span> <span class="s2">&quot;_file&quot;</span>
-        <span class="n">attr_name</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">first_dict</span><span class="p">:</span>
-            <span class="n">attr_name</span> <span class="o">=</span> <span class="n">attr</span>
-            <span class="n">section</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">elif</span> <span class="n">attr_file</span> <span class="ow">in</span> <span class="n">first_dict</span><span class="p">:</span>
-            <span class="n">attr_name</span> <span class="o">=</span> <span class="n">attr_file</span>
-            <span class="n">section</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">sub_attr</span> <span class="ow">in</span> <span class="n">wf_sections</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">first_dict</span><span class="p">[</span><span class="n">sub_attr</span><span class="p">]:</span>
-                    <span class="n">attr_name</span> <span class="o">=</span> <span class="n">attr</span>
-                    <span class="n">section</span> <span class="o">=</span> <span class="n">sub_attr</span>
-                    <span class="k">break</span>
-                <span class="k">elif</span> <span class="n">attr_file</span> <span class="ow">in</span> <span class="n">first_dict</span><span class="p">[</span><span class="n">sub_attr</span><span class="p">]:</span>
-                    <span class="n">attr_name</span> <span class="o">=</span> <span class="n">attr_file</span>
-                    <span class="n">section</span> <span class="o">=</span> <span class="n">sub_attr</span>
-                    <span class="k">break</span>
-
-        <span class="c1"># attr not found, allow typical AttributeError</span>
-        <span class="k">if</span> <span class="n">attr_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
-
-        <span class="c1"># iterate over subjects / sessions,</span>
-        <span class="c1"># decide if they need to be calculated or not</span>
-        <span class="n">in_list</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">to_calc_list</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">subject</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valid_sub_list</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">subject</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
-                <span class="n">results</span><span class="p">[</span><span class="n">subject</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_ses_list</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>
-            <span class="n">wf_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">[</span><span class="n">subject</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">session</span><span class="p">)]</span>
-            <span class="k">if</span> <span class="n">section</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">wf_dict</span> <span class="o">=</span> <span class="n">wf_dict</span><span class="p">[</span><span class="n">section</span><span class="p">]</span>
-            <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">parallel_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;engine&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;serial&quot;</span><span class="p">)</span>
-                    <span class="ow">and</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">wf_dict</span><span class="p">,</span> <span class="s2">&quot;efferents&quot;</span><span class="p">))</span>
-                    <span class="ow">and</span> <span class="p">(</span><span class="n">attr_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">wf_dict</span><span class="o">.</span><span class="n">efferents</span><span class="p">)):</span>
-                <span class="n">in_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">wf_dict</span><span class="p">))</span>
-                <span class="n">to_calc_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">))</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">results</span><span class="p">[</span><span class="n">subject</span><span class="p">][</span><span class="n">session</span><span class="p">]</span> <span class="o">=</span>\
-                    <span class="n">_getter_helper</span><span class="p">(</span><span class="n">wf_dict</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">)</span>
-
-        <span class="c1"># if some need to be calculated, do those in parallel</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">to_calc_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">par_results</span> <span class="o">=</span> <span class="n">parfor</span><span class="p">(</span>
-                <span class="n">_getter_helper</span><span class="p">,</span> <span class="n">in_list</span><span class="p">,</span>
-                <span class="n">func_args</span><span class="o">=</span><span class="p">[</span><span class="n">attr_name</span><span class="p">],</span>
-                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">parallel_params</span><span class="p">)</span>
-
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">subses</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">to_calc_list</span><span class="p">):</span>
-                <span class="n">subject</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="n">subses</span>
-                <span class="n">results</span><span class="p">[</span><span class="n">subject</span><span class="p">][</span><span class="n">session</span><span class="p">]</span> <span class="o">=</span> <span class="n">par_results</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-
-        <span class="c1"># If only one session, collapse session dimension</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">subject</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_sub_list</span><span class="p">:</span>
-                <span class="n">results</span><span class="p">[</span><span class="n">subject</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">subject</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">valid_ses_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-
-        <span class="k">return</span> <span class="n">results</span></div>
-
 <div class="viewcode-block" id="GroupAFQ.combine_profiles"><a class="viewcode-back" href="../../../autoapi/AFQ/api/group/index.html#AFQ.api.group.GroupAFQ.combine_profiles">[docs]</a>    <span class="k">def</span> <span class="nf">combine_profiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">tract_profiles_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">profiles</span>
+        <span class="n">tract_profiles_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;profiles&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">tract_profiles_list</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">subject_dict</span> <span class="ow">in</span> <span class="n">tract_profiles_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -586,20 +502,20 @@
                 <span class="n">sub</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_sub_list</span><span class="p">[</span><span class="n">subses_idx</span><span class="p">]</span>
                 <span class="n">ses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_ses_list</span><span class="p">[</span><span class="n">subses_idx</span><span class="p">]</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="n">this_bundles_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clean_bundles</span><span class="p">[</span><span class="n">sub</span><span class="p">][</span><span class="n">ses</span><span class="p">]</span>
-                    <span class="n">this_mapping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="p">[</span><span class="n">sub</span><span class="p">][</span><span class="n">ses</span><span class="p">]</span>
-                    <span class="n">this_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dwi</span><span class="p">[</span><span class="n">sub</span><span class="p">][</span><span class="n">ses</span><span class="p">])</span>
+                    <span class="n">this_bundles_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;clean_bundles&quot;</span><span class="p">)[</span><span class="n">sub</span><span class="p">][</span><span class="n">ses</span><span class="p">]</span>
+                    <span class="n">this_mapping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;mapping&quot;</span><span class="p">)[</span><span class="n">sub</span><span class="p">][</span><span class="n">ses</span><span class="p">]</span>
+                    <span class="n">this_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;dwi&quot;</span><span class="p">)[</span><span class="n">sub</span><span class="p">][</span><span class="n">ses</span><span class="p">])</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">this_bundles_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clean_bundles</span><span class="p">[</span><span class="n">sub</span><span class="p">]</span>
-                    <span class="n">this_mapping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="p">[</span><span class="n">sub</span><span class="p">]</span>
-                    <span class="n">this_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dwi</span><span class="p">[</span><span class="n">sub</span><span class="p">])</span>
+                    <span class="n">this_bundles_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;clean_bundles&quot;</span><span class="p">)[</span><span class="n">sub</span><span class="p">]</span>
+                    <span class="n">this_mapping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;mapping&quot;</span><span class="p">)[</span><span class="n">sub</span><span class="p">]</span>
+                    <span class="n">this_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;dwi&quot;</span><span class="p">)[</span><span class="n">sub</span><span class="p">])</span>
                 <span class="n">seg_sft</span> <span class="o">=</span> <span class="n">aus</span><span class="o">.</span><span class="n">SegmentedSFT</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span>
                     <span class="n">this_bundles_file</span><span class="p">,</span>
                     <span class="n">this_img</span><span class="p">)</span>
                 <span class="n">seg_sft</span><span class="o">.</span><span class="n">sft</span><span class="o">.</span><span class="n">to_rasmm</span><span class="p">()</span>
                 <span class="n">subses_info</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">seg_sft</span><span class="p">,</span> <span class="n">this_mapping</span><span class="p">))</span>
 
-            <span class="n">bundle_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="p">[</span>
+            <span class="n">bundle_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;bundle_dict&quot;</span><span class="p">)[</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">valid_sub_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">bundle_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">valid_ses_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
@@ -646,6 +562,66 @@
                 <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">sls_dict</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sls_json_fname</span></div>
 
+<div class="viewcode-block" id="GroupAFQ.export"><a class="viewcode-back" href="../../../autoapi/AFQ/api/group/index.html#AFQ.api.group.GroupAFQ.export">[docs]</a>    <span class="k">def</span> <span class="nf">export</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="o">=</span><span class="s2">&quot;help&quot;</span><span class="p">):</span>
+        <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        Export a specific output. To print a list of available outputs,</span>
+<span class="s2">        call export without arguments.</span>
+<span class="s2">        </span><span class="si">{</span><span class="n">valid_exports_string</span><span class="si">}</span><span class="s2"></span>
+
+<span class="s2">        Parameters</span>
+<span class="s2">        ----------</span>
+<span class="s2">        attr_name : str</span>
+<span class="s2">            Name of the output to export. Default: &quot;help&quot;</span>
+
+<span class="s2">        Returns</span>
+<span class="s2">        -------</span>
+<span class="s2">        output : dict</span>
+<span class="s2">            The specific output as a dictionary. Keys are subjects.</span>
+<span class="s2">            Values are dictionaries with keys of sessions</span>
+<span class="s2">            if multiple sessions are used. Otherwise, values are</span>
+<span class="s2">            the output.</span>
+<span class="s2">            None if called without arguments.</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="n">check_attribute</span><span class="p">(</span><span class="n">attr_name</span><span class="p">)</span>
+
+        <span class="c1"># iterate over subjects / sessions,</span>
+        <span class="c1"># decide if they need to be calculated or not</span>
+        <span class="n">in_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">to_calc_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">subject</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valid_sub_list</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">subject</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">subject</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_ses_list</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>
+            <span class="n">wf_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wf_dict</span><span class="p">[</span><span class="n">subject</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">session</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="n">section</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">wf_dict</span> <span class="o">=</span> <span class="n">wf_dict</span><span class="p">[</span><span class="n">section</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">parallel_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;engine&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;serial&quot;</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">wf_dict</span><span class="p">,</span> <span class="s2">&quot;efferents&quot;</span><span class="p">))</span>
+                    <span class="ow">and</span> <span class="p">(</span><span class="n">attr_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">wf_dict</span><span class="o">.</span><span class="n">efferents</span><span class="p">)):</span>
+                <span class="n">in_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">wf_dict</span><span class="p">))</span>
+                <span class="n">to_calc_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">subject</span><span class="p">][</span><span class="n">session</span><span class="p">]</span> <span class="o">=</span> <span class="n">wf_dict</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span>
+
+        <span class="c1"># if some need to be calculated, do those in parallel</span>
+        <span class="k">if</span> <span class="n">to_calc_list</span><span class="p">:</span>
+            <span class="n">par_results</span> <span class="o">=</span> <span class="n">paramap</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">wf</span><span class="p">,</span> <span class="n">attr</span><span class="p">:</span> <span class="n">wf</span><span class="p">[</span><span class="n">attr</span><span class="p">],</span> <span class="n">in_list</span><span class="p">,</span>
+                <span class="n">func_args</span><span class="o">=</span><span class="p">[</span><span class="n">attr_name</span><span class="p">],</span>
+                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">parallel_params</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">subses</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">to_calc_list</span><span class="p">):</span>
+                <span class="n">subject</span><span class="p">,</span> <span class="n">session</span> <span class="o">=</span> <span class="n">subses</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">subject</span><span class="p">][</span><span class="n">session</span><span class="p">]</span> <span class="o">=</span> <span class="n">par_results</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="c1"># If only one session, collapse session dimension</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">subject</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_sub_list</span><span class="p">:</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">subject</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">subject</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">valid_ses_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+
+        <span class="k">return</span> <span class="n">results</span></div>
+
 <div class="viewcode-block" id="GroupAFQ.export_all"><a class="viewcode-back" href="../../../autoapi/AFQ/api/group/index.html#AFQ.api.group.GroupAFQ.export_all">[docs]</a>    <span class="k">def</span> <span class="nf">export_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viz</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">afqbrowser</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">xforms</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                    <span class="n">indiv</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Exports all the possible outputs</span>
@@ -673,47 +649,19 @@
 <span class="sd">            Default: True</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
-        <span class="n">seg_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">segmentation_params</span><span class="p">[</span>
+        <span class="n">seg_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;segmentation_params&quot;</span><span class="p">)[</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">valid_sub_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">seg_params</span> <span class="o">=</span> <span class="n">seg_params</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">valid_ses_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
         <span class="n">seg_algo</span> <span class="o">=</span> <span class="n">seg_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;seg_algo&quot;</span><span class="p">,</span> <span class="s2">&quot;AFQ&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">xforms</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">b0_warped</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span>
-                    <span class="s2">&quot;Failed to export warped b0. This could be because your &quot;</span>
-                    <span class="s2">&quot;mapping type is only compatible with transformation &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;from template to subject space. The error is: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">template_xform</span>
-        <span class="k">if</span> <span class="n">indiv</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">indiv_bundles</span>
-            <span class="k">if</span> <span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;AFQ&quot;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">rois</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sl_counts</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">profiles</span>
-        <span class="c1"># We combine profiles even if there is only 1 subject / session,</span>
-        <span class="c1"># as the combined profiles format may still be useful</span>
-        <span class="c1"># i.e., for AFQ Browser</span>
+        <span class="n">export_all_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seg_algo</span><span class="p">,</span> <span class="n">xforms</span><span class="p">,</span> <span class="n">indiv</span><span class="p">,</span> <span class="n">viz</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">combine_profiles</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">viz</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">tract_profile_plots</span>
-            <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">plotly_err_message</span> <span class="o">=</span> <span class="n">vut</span><span class="o">.</span><span class="n">viz_import_msg_error</span><span class="p">(</span><span class="s2">&quot;plot&quot;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">!=</span> <span class="n">plotly_err_message</span><span class="p">:</span>
-                    <span class="k">raise</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">plotly_err_message</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">all_bundles_figure</span>
-            <span class="k">if</span> <span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;AFQ&quot;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">indiv_bundles_figures</span>
         <span class="k">if</span> <span class="n">afqbrowser</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assemble_AFQ_browser</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="s2">&quot;Time taken for export all: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">))</span></div>
+            <span class="sa">f</span><span class="s2">&quot;Time taken for export all: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GroupAFQ.upload_to_s3"><a class="viewcode-back" href="../../../autoapi/AFQ/api/group/index.html#AFQ.api.group.GroupAFQ.upload_to_s3">[docs]</a>    <span class="k">def</span> <span class="nf">upload_to_s3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s3fs</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Upload entire AFQ derivatives folder to S3&quot;&quot;&quot;</span>

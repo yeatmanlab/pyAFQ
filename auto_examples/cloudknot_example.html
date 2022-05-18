@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Using cloudknot to run pyAFQ on AWS batch: &#8212; AFQ 0.11 documentation</title>
+    <title>Using cloudknot to run pyAFQ on AWS batch: &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -343,7 +343,7 @@ what dependencies to install into AWS Batch to run this function.</p>
     <span class="c1"># cloudknot installs the appropriate packages from pip</span>
     <span class="kn">import</span> <span class="nn">AFQ.data.s3bids</span> <span class="k">as</span> <span class="nn">afs</span>
     <span class="kn">from</span> <span class="nn">AFQ.api.group</span> <span class="kn">import</span> <span class="n">GroupAFQ</span>
-    <span class="kn">import</span> <span class="nn">AFQ.definitions.mask</span> <span class="k">as</span> <span class="nn">afm</span>
+    <span class="kn">import</span> <span class="nn">AFQ.definitions.image</span> <span class="k">as</span> <span class="nn">afm</span>
 
     <span class="c1"># Download the given subject to your local machine from s3</span>
     <span class="c1"># Can find subjects more easily if they are specified in a</span>
@@ -363,7 +363,7 @@ what dependencies to install into AWS Batch to run this function.</p>
     <span class="c1"># in this case, we look for a file with suffix &#39;seg&#39;</span>
     <span class="c1"># in the &#39;pipeline_name&#39; pipeline,</span>
     <span class="c1"># and we consider all non-zero labels to be a part of the brain</span>
-    <span class="n">brain_mask_definition</span> <span class="o">=</span> <span class="n">afm</span><span class="o">.</span><span class="n">LabelledMaskFile</span><span class="p">(</span>
+    <span class="n">brain_mask_definition</span> <span class="o">=</span> <span class="n">afm</span><span class="o">.</span><span class="n">LabelledImageFile</span><span class="p">(</span>
         <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;seg&#39;</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;scope&#39;</span><span class="p">:</span> <span class="s1">&#39;pipeline_name&#39;</span><span class="p">},</span>
         <span class="n">exclusive_labels</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 

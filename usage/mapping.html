@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The pyAFQ Mapping API &#8212; AFQ 0.11 documentation</title>
+    <title>The pyAFQ Mapping API &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -37,7 +37,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="The pyAFQ Custom Tissue Properties API" href="scalars.html" />
-    <link rel="prev" title="The pyAFQ Mask API" href="mask.html" />
+    <link rel="prev" title="Visualization Backends" href="viz_backend.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -189,11 +189,6 @@
    Visualization Backends
   </a>
  </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="mask.html">
-   The pyAFQ Mask API
-  </a>
- </li>
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
    The pyAFQ Mapping API
@@ -272,7 +267,7 @@ subject to a given template, called the mapping. The mapping API is similar
 to our Mask API.</p>
 <p>In AFQ/definitions/mapping.py, there are four mapping classes one
 can use to specify the mapping. As a user, one should initialize mapping
-classes and pass them to the AFQ object, or write out the initialization as
+classes and pass them to the AFQ.api objects, or write out the initialization as
 a string inside of one’s configuration file for use with the CLI.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="../autoapi/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.SynMap" title="AFQ.definitions.mapping.SynMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">AFQ.definitions.mapping.SynMap</span></code></a>: The default mapping class is to
@@ -297,11 +292,11 @@ and pyAFQ will find and use that mapping.</p></li>
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="mask.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="viz_backend.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">The pyAFQ Mask API</p>
+            <p class="prev-next-title">Visualization Backends</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="scalars.html" title="next page">

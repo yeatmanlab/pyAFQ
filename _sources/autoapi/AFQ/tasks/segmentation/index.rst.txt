@@ -60,7 +60,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: segment(subses_dict, data_imap, mapping_imap, tractography_imap, tracking_params, segmentation_params)
+.. py:function:: segment(dwi, data_imap, mapping_imap, tractography_imap, segmentation_params)
 
    
    full path to a trk file containing containting
@@ -89,7 +89,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: clean_bundles(subses_dict, bundles_file, data_imap, tracking_params, segmentation_params, clean_params=None)
+.. py:function:: clean_bundles(bundles, data_imap, clean_params=None)
 
    
    full path to a trk file containting segmented
@@ -120,7 +120,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: export_bundles(subses_dict, clean_bundles_file, bundles_file, data_imap, tracking_params, segmentation_params)
+.. py:function:: export_bundles(base_fname, results_dir, clean_bundles, bundles, data_imap, tracking_params, segmentation_params)
 
    
    dictionary of paths, where each path is
@@ -145,7 +145,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: export_sl_counts(subses_dict, data_imap, clean_bundles_file, bundles_file, tracking_params, segmentation_params)
+.. py:function:: export_sl_counts(data_imap, clean_bundles, bundles)
 
    
    full path to a JSON file containing streamline counts
@@ -168,7 +168,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: tract_profiles(subses_dict, clean_bundles_file, data_imap, scalar_dict, dwi_affine, tracking_params, segmentation_params, profile_weights='gauss')
+.. py:function:: tract_profiles(clean_bundles, data_imap, scalar_dict, dwi_affine, profile_weights='gauss')
 
    
    full path to a CSV file containing tract profiles
@@ -213,7 +213,7 @@ Attributes
        **scalars** : list of strings and/or scalar definitions, optional
            List of scalars to use.
            Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md", "dki_awf",
-           "dki_mk". Can also be a scalar from AFQ.definitions.scalar.
+           "dki_mk". Can also be a scalar from AFQ.definitions.image.
            Default: ["dti_fa", "dti_md"]
 
 

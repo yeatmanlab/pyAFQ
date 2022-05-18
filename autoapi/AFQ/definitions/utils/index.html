@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.definitions.utils &#8212; AFQ 0.11 documentation</title>
+    <title>AFQ.definitions.utils &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -37,7 +37,7 @@
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="AFQ.models" href="../../models/index.html" />
-    <link rel="prev" title="AFQ.definitions.scalar" href="../scalar/index.html" />
+    <link rel="prev" title="AFQ.definitions.mapping" href="../mapping/index.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -283,28 +283,19 @@
     </label>
     <ul class="current">
      <li class="toctree-l3">
+      <a class="reference internal" href="../image/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.definitions.image
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
       <a class="reference internal" href="../mapping/index.html">
        <code class="xref py py-mod docutils literal notranslate">
         <span class="pre">
          AFQ.definitions.mapping
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../mask/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.definitions.mask
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../scalar/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.definitions.scalar
         </span>
        </code>
       </a>
@@ -475,10 +466,10 @@
       </a>
      </li>
      <li class="toctree-l3">
-      <a class="reference internal" href="../../utils/parallel/index.html">
+      <a class="reference internal" href="../../utils/path/index.html">
        <code class="xref py py-mod docutils literal notranslate">
         <span class="pre">
-         AFQ.utils.parallel
+         AFQ.utils.path
         </span>
        </code>
       </a>
@@ -649,6 +640,11 @@
       </ul>
      </li>
      <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.definitions.utils.name_from_path">
+       name_from_path
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
       <a class="reference internal nav-link" href="#AFQ.definitions.utils.find_file">
        find_file
       </a>
@@ -711,7 +707,10 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.definitions.utils.find_file" title="AFQ.definitions.utils.find_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_file</span></code></a>(bids_layout, path, filters, suffix, session, subject, extension='.nii.gz')</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.definitions.utils.name_from_path" title="AFQ.definitions.utils.name_from_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name_from_path</span></code></a>(path)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.definitions.utils.find_file" title="AFQ.definitions.utils.find_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_file</span></code></a>(bids_layout, path, filters, suffix, session, subject, extension='.nii.gz')</p></td>
 <td><p>Helper function</p></td>
 </tr>
 </tbody>
@@ -722,13 +721,12 @@
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>All Definitions should inherit this.
 For a given subject and session within the API, the definition is used
-to create a given mask, map, etc.
+to create a given image or map.
 Definitions have an init function which the users uses to specify
 how they want the definition to behave.
-The find_path and get_for_subses functions are called by the AFQ API.
+The find_path function is called by the AFQ API.
 The api calls find_path to let the definition find relevant files
-for the given subject and session. The api calls get_for_subses to get the
-mask, map, etc.</p>
+for the given subject and session.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.definitions.utils.Definition.find_path">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">find_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_layout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/utils.html#Definition.find_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.utils.Definition.find_path" title="Permalink to this definition">#</a></dt>
@@ -744,6 +742,11 @@ as arguments to config files.</p>
 </dd></dl>
 
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AFQ.definitions.utils.name_from_path">
+<span class="sig-prename descclassname"><span class="pre">AFQ.definitions.utils.</span></span><span class="sig-name descname"><span class="pre">name_from_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/definitions/utils.html#name_from_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.definitions.utils.name_from_path" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.definitions.utils.find_file">
@@ -762,11 +765,11 @@ Generic calls to get_nearest to find a file</p>
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="../scalar/index.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="../mapping/index.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.scalar</span></code></p>
+            <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.mapping</span></code></p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="../../models/index.html" title="next page">

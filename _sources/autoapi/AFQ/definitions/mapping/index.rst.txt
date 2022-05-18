@@ -109,7 +109,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: get_for_subses(self, subses_dict, bids_info, reg_subject, reg_template)
+   .. py:method:: get_for_subses(self, base_fname, dwi, bids_info, reg_subject, reg_template)
 
       
 
@@ -204,7 +204,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: gen_mapping(self, subses_dict, reg_subject, reg_template, subject_sls, template_sls, reg_prealign)
+   .. py:method:: gen_mapping(self, base_fname, reg_subject, reg_template, subject_sls, template_sls, reg_prealign)
 
       
 
@@ -281,7 +281,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: gen_mapping(self, subses_dict, reg_template, reg_subject, subject_sls, template_sls, reg_prealign)
+   .. py:method:: gen_mapping(self, base_fname, reg_template, reg_subject, subject_sls, template_sls, reg_prealign)
 
       
 
@@ -358,7 +358,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: gen_mapping(self, subses_dict, reg_subject, reg_template, subject_sls, template_sls, reg_prealign)
+   .. py:method:: gen_mapping(self, base_fname, reg_subject, reg_template, subject_sls, template_sls, reg_prealign)
 
       
 

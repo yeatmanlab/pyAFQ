@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.mapping &#8212; AFQ 0.11 documentation</title>
+    <title>AFQ.tasks.mapping &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -283,28 +283,19 @@
     </label>
     <ul>
      <li class="toctree-l3">
+      <a class="reference internal" href="../../definitions/image/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.definitions.image
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
       <a class="reference internal" href="../../definitions/mapping/index.html">
        <code class="xref py py-mod docutils literal notranslate">
         <span class="pre">
          AFQ.definitions.mapping
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../definitions/mask/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.definitions.mask
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../definitions/scalar/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.definitions.scalar
         </span>
        </code>
       </a>
@@ -475,10 +466,10 @@
       </a>
      </li>
      <li class="toctree-l3">
-      <a class="reference internal" href="../../utils/parallel/index.html">
+      <a class="reference internal" href="../../utils/path/index.html">
        <code class="xref py py-mod docutils literal notranslate">
         <span class="pre">
-         AFQ.utils.parallel
+         AFQ.utils.path
         </span>
        </code>
       </a>
@@ -715,22 +706,22 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.mapping.export_registered_b0" title="AFQ.tasks.mapping.export_registered_b0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_registered_b0</span></code></a>(subses_dict, data_imap, mapping)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.mapping.export_registered_b0" title="AFQ.tasks.mapping.export_registered_b0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_registered_b0</span></code></a>(data_imap, mapping)</p></td>
 <td><p>full path to a nifti file containing</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.mapping.template_xform" title="AFQ.tasks.mapping.template_xform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">template_xform</span></code></a>(subses_dict, dwi_affine, mapping, data_imap)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.mapping.template_xform" title="AFQ.tasks.mapping.template_xform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">template_xform</span></code></a>(dwi_affine, mapping, data_imap)</p></td>
 <td><p>full path to a nifti file containing</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.mapping.export_rois" title="AFQ.tasks.mapping.export_rois"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_rois</span></code></a>(subses_dict, data_imap, mapping, dwi_affine)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.mapping.export_rois" title="AFQ.tasks.mapping.export_rois"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_rois</span></code></a>(base_fname, results_dir, data_imap, mapping, dwi_affine)</p></td>
 <td><p>dictionary of full paths to Nifti1Image files of ROIs</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.mapping.mapping" title="AFQ.tasks.mapping.mapping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapping</span></code></a>(subses_dict, reg_subject, data_imap, bids_info, mapping_definition=None)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.mapping.mapping" title="AFQ.tasks.mapping.mapping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapping</span></code></a>(base_fname, dwi, reg_subject, data_imap, bids_info, mapping_definition=None)</p></td>
 <td><p>mapping from subject to template space.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.mapping.sls_mapping" title="AFQ.tasks.mapping.sls_mapping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sls_mapping</span></code></a>(subses_dict, reg_subject, data_imap, bids_info, tractography_imap, mapping_definition=None)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.mapping.sls_mapping" title="AFQ.tasks.mapping.sls_mapping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sls_mapping</span></code></a>(base_fname, dwi, reg_subject, data_imap, bids_info, tractography_imap, mapping_definition=None)</p></td>
 <td><p>mapping from subject to template space.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.mapping.get_reg_subject" title="AFQ.tasks.mapping.get_reg_subject"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_reg_subject</span></code></a>(data_imap, bids_info, subses_dict, dwi_affine, reg_subject_spec='power_map')</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.mapping.get_reg_subject" title="AFQ.tasks.mapping.get_reg_subject"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_reg_subject</span></code></a>(data_imap, bids_info, base_fname, dwi, reg_subject_spec='power_map')</p></td>
 <td><p>Nifti1Image which represents this subject</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.mapping.get_mapping_plan" title="AFQ.tasks.mapping.get_mapping_plan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mapping_plan</span></code></a>(kwargs, use_sls=False)</p></td>
@@ -759,28 +750,28 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.mapping.export_registered_b0">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.mapping.</span></span><span class="sig-name descname"><span class="pre">export_registered_b0</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/mapping.html#export_registered_b0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.mapping.export_registered_b0" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.mapping.</span></span><span class="sig-name descname"><span class="pre">export_registered_b0</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/mapping.html#export_registered_b0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.mapping.export_registered_b0" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 b0 transformed to template space</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.mapping.template_xform">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.mapping.</span></span><span class="sig-name descname"><span class="pre">template_xform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/mapping.html#template_xform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.mapping.template_xform" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.mapping.</span></span><span class="sig-name descname"><span class="pre">template_xform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/mapping.html#template_xform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.mapping.template_xform" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 registration template transformed to subject space</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.mapping.export_rois">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.mapping.</span></span><span class="sig-name descname"><span class="pre">export_rois</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/mapping.html#export_rois"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.mapping.export_rois" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.mapping.</span></span><span class="sig-name descname"><span class="pre">export_rois</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/mapping.html#export_rois"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.mapping.export_rois" title="Permalink to this definition">#</a></dt>
 <dd><p>dictionary of full paths to Nifti1Image files of ROIs
 transformed to subject space</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.mapping.mapping">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.mapping.</span></span><span class="sig-name descname"><span class="pre">mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping_definition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/mapping.html#mapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.mapping.mapping" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.mapping.</span></span><span class="sig-name descname"><span class="pre">mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping_definition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/mapping.html#mapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.mapping.mapping" title="Permalink to this definition">#</a></dt>
 <dd><p>mapping from subject to template space.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -799,7 +790,7 @@ Default: None</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.mapping.sls_mapping">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.mapping.</span></span><span class="sig-name descname"><span class="pre">sls_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tractography_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping_definition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/mapping.html#sls_mapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.mapping.sls_mapping" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.mapping.</span></span><span class="sig-name descname"><span class="pre">sls_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tractography_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping_definition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/mapping.html#sls_mapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.mapping.sls_mapping" title="Permalink to this definition">#</a></dt>
 <dd><p>mapping from subject to template space.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -818,14 +809,14 @@ Default: None</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.mapping.get_reg_subject">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.mapping.</span></span><span class="sig-name descname"><span class="pre">get_reg_subject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_subject_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'power_map'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/mapping.html#get_reg_subject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.mapping.get_reg_subject" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.mapping.</span></span><span class="sig-name descname"><span class="pre">get_reg_subject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_subject_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'power_map'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/mapping.html#get_reg_subject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.mapping.get_reg_subject" title="Permalink to this definition">#</a></dt>
 <dd><p>Nifti1Image which represents this subject
 when registering the subject to the template</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>reg_subject_spec</strong><span class="classifier">str, instance of <cite>AFQ.definitions.scalar</cite>, optional  # noqa</span></dt><dd><p>The source image data to be registered.
-Can either be a Nifti1Image, a scalar definition, or str.
+<dt><strong>reg_subject_spec</strong><span class="classifier">str, instance of <cite>AFQ.definitions.ImageDefinition</cite>, optional  # noqa</span></dt><dd><p>The source image data to be registered.
+Can either be a Nifti1Image, an ImageFile, or str.
 if “b0”, “dti_fa_subject”, “subject_sls”, or “power_map,”
 image data will be loaded automatically.
 If “subject_sls” is used, slr registration will be used

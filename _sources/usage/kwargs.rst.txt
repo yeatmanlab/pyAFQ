@@ -12,6 +12,7 @@ allowing customizaiton of tractography, bundle recognition, registration,
 etc. Here are all of these arguments and their descriptions, organized
 into 5 sections:
 
+Here are the arguments you can pass to kwargs, to customize the tractometry pipeline. They are organized into 5 sections.
 
 ==========================================================
 DATA
@@ -78,12 +79,12 @@ gtol: float, optional
 	sampled directions of the given sphere object.
 	Default: 1e-2
 
-brain_mask_definition: instance from `AFQ.definitions.mask`, optional
+brain_mask_definition: instance from `AFQ.definitions.image`, optional
 	This will be used to create
 	the brain mask, which gets applied before registration to a
 	template.
-	If you want no brain mask to be applied, use FullMask.
-	If None, use B0Mask()
+	If you want no brain mask to be applied, use FullImage.
+	If None, use B0Image()
 	Default: None
 
 bundle_info: strings, dict, or BundleDict, optional
@@ -116,9 +117,9 @@ mapping_definition: instance of `AFQ.definitions.mapping`, optional
 	If None, use SynMap()
 	Default: None
 
-reg_subject_spec: str, instance of `AFQ.definitions.scalar`, optional  # noqa
+reg_subject_spec: str, instance of `AFQ.definitions.ImageDefinition`, optional  # noqa
 	The source image data to be registered.
-	Can either be a Nifti1Image, a scalar definition, or str.
+	Can either be a Nifti1Image, an ImageFile, or str.
 	if "b0", "dti_fa_subject", "subject_sls", or "power_map,"
 	image data will be loaded automatically.
 	If "subject_sls" is used, slr registration will be used
@@ -150,7 +151,7 @@ profile_weights: str, 1D array, 2D array callable, optional
 scalars: strings and/or scalar definitions, optional
 	List of scalars to use.
 	Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md", "dki_awf",
-	"dki_mk". Can also be a scalar from AFQ.definitions.scalar.
+	"dki_mk". Can also be a scalar from AFQ.definitions.image.
 	Default: ["dti_fa", "dti_md"]
 
 
@@ -162,9 +163,9 @@ tracking_params: dict, optional
 	the aft.track function. Seed mask and seed threshold, if not
 	specified, are replaced with scalar masks from scalar[0]
 	thresholded to 0.2. The ``seed_mask`` and ``stop_mask`` items of
-	this dict may be ``AFQ.definitions.mask.MaskFile`` instances.
+	this dict may be ``AFQ.definitions.image.ImageFile`` instances.
 	If ``tracker`` is set to "pft" then ``stop_mask`` should be
-	an instance of ``AFQ.definitions.mask.PFTMask``.
+	an instance of ``AFQ.definitions.image.PFTImage``.
 
 import_tract: dict, optional
 	BIDS filters for inputing a user made tractography file.

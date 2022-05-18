@@ -81,7 +81,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: viz_bundles(subses_dict, dwi_affine, viz_backend, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, best_scalar, sbv_lims_bundles=[None, None], volume_opacity_bundles=0.3, n_points_bundles=40)
+.. py:function:: viz_bundles(base_fname, dwi_affine, viz_backend, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, best_scalar, sbv_lims_bundles=[None, None], volume_opacity_bundles=0.3, n_points_bundles=40)
 
    
    figure for the visualizaion of the recognized
@@ -123,7 +123,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: viz_indivBundle(subses_dict, dwi_affine, viz_backend, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, best_scalar, sbv_lims_indiv=[None, None], volume_opacity_indiv=0.3, n_points_indiv=40)
+.. py:function:: viz_indivBundle(base_fname, results_dir, dwi_affine, viz_backend, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, best_scalar, sbv_lims_indiv=[None, None], volume_opacity_indiv=0.3, n_points_indiv=40)
 
    
    list of full paths to html or gif files
@@ -165,7 +165,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: plot_tract_profiles(subses_dict, scalars, tracking_params, segmentation_params, segmentation_imap)
+.. py:function:: plot_tract_profiles(base_fname, scalars, tracking_params, segmentation_params, segmentation_imap)
 
    
    list of full paths to png files,

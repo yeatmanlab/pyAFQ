@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.utils.streamlines &#8212; AFQ 0.11 documentation</title>
+    <title>AFQ.utils.streamlines &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -188,6 +188,8 @@
 <span class="kn">from</span> <span class="nn">AFQ.data.s3bids</span> <span class="kn">import</span> <span class="n">read_json</span>
 <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
 
+<span class="kn">from</span> <span class="nn">AFQ.utils.path</span> <span class="kn">import</span> <span class="n">drop_extension</span>
+
 
 <div class="viewcode-block" id="SegmentedSFT"><a class="viewcode-back" href="../../../autoapi/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.SegmentedSFT">[docs]</a><span class="k">class</span> <span class="nc">SegmentedSFT</span><span class="p">():</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundles</span><span class="p">,</span> <span class="n">space</span><span class="p">):</span>
@@ -243,7 +245,7 @@
         <span class="k">if</span> <span class="n">sidecar_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># assume json sidecar has the same name as trk_file,</span>
             <span class="c1"># but with json suffix</span>
-            <span class="n">sidecar_file</span> <span class="o">=</span> <span class="n">trk_file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.json&#39;</span>
+            <span class="n">sidecar_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">drop_extension</span><span class="p">(</span><span class="n">trk_file</span><span class="p">)</span><span class="si">}</span><span class="s1">.json&#39;</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">sidecar_file</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
                     <span class="s2">&quot;JSON sidecars are required for trk files. &quot;</span>

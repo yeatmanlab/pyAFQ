@@ -32,9 +32,8 @@ Submodules
    :titlesonly:
    :maxdepth: 1
 
+   image/index.rst
    mapping/index.rst
-   mask/index.rst
-   scalar/index.rst
    utils/index.rst
 
 

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.decorators &#8212; AFQ 0.11 documentation</title>
+    <title>AFQ.tasks.decorators &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -195,34 +195,64 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">AFQ.tasks.utils</span> <span class="kn">import</span> <span class="n">get_fname</span>
+<span class="kn">from</span> <span class="nn">AFQ.utils.path</span> <span class="kn">import</span> <span class="n">drop_extension</span>
 
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;as_file&quot;</span><span class="p">,</span> <span class="s2">&quot;as_model&quot;</span><span class="p">,</span> <span class="s2">&quot;as_dt_deriv&quot;</span><span class="p">,</span> <span class="s2">&quot;as_img&quot;</span><span class="p">]</span>
+<span class="c1"># These should only be used with pimms.calc</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;as_file&quot;</span><span class="p">,</span> <span class="s2">&quot;as_fit_deriv&quot;</span><span class="p">,</span> <span class="s2">&quot;as_img&quot;</span><span class="p">]</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ.api&#39;</span><span class="p">)</span>
 
 
+<span class="c1"># get args and kwargs from function</span>
+<span class="k">def</span> <span class="nf">get_args_and_kwargs</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="n">param_dict</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
+    <span class="n">param_list</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__code__</span><span class="o">.</span><span class="n">co_varnames</span><span class="p">[</span>
+        <span class="p">:</span><span class="n">func</span><span class="o">.</span><span class="vm">__code__</span><span class="o">.</span><span class="n">co_argcount</span><span class="p">]</span>
+    <span class="n">is_param_kwarg</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">name</span><span class="p">:</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">param_dict</span> <span class="ow">and</span> <span class="n">param_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span>
+        <span class="ow">not</span> <span class="n">param_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">empty</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">param_list</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">param_list</span><span class="p">,</span> <span class="n">is_param_kwarg</span><span class="p">,</span> <span class="n">param_dict</span>
+
+
 <span class="c1"># replaces *args and **kwargs with specific parameters from og_func</span>
 <span class="c1"># so that pimms can see original parameter names after wrapping</span>
-<span class="k">def</span> <span class="nf">has_args</span><span class="p">(</span><span class="n">og_func</span><span class="p">):</span>
+<span class="c1"># also adds on any args the decorator requires</span>
+<span class="c1"># these will be extracted with extract_added_args</span>
+<span class="k">def</span> <span class="nf">has_args</span><span class="p">(</span><span class="n">og_func</span><span class="p">,</span> <span class="n">needed_args</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">_has_args</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
         <span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;def wrapper_has_args_func(&quot;</span>
         <span class="n">content</span> <span class="o">=</span> <span class="s2">&quot;):</span><span class="se">\n</span><span class="s2">    return func(&quot;</span>
-        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">og_func</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="n">param</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-                <span class="n">header</span> <span class="o">=</span> <span class="n">header</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">, &quot;</span>
-                <span class="n">content</span> <span class="o">=</span> <span class="n">content</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">, &quot;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">default</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                    <span class="n">header</span> <span class="o">=</span> <span class="n">header</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">=&#39;</span><span class="si">{</span><span class="n">param</span><span class="o">.</span><span class="n">default</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
-                    <span class="n">content</span> <span class="o">=</span> <span class="n">content</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">, &quot;</span>
+        <span class="n">found_args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">param_list</span><span class="p">,</span> <span class="n">is_param_kwarg</span><span class="p">,</span> <span class="n">param_dict</span> <span class="o">=</span> <span class="n">get_args_and_kwargs</span><span class="p">(</span><span class="n">og_func</span><span class="p">)</span>
+
+        <span class="c1"># add func args</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">param_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_param_kwarg</span><span class="p">[</span><span class="n">name</span><span class="p">]:</span>
+                <span class="n">header</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="n">content</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="n">found_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="c1"># add decorator args</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">needed_args</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">arg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">found_args</span><span class="p">:</span>
+                <span class="n">header</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="n">content</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="s2">, &quot;</span>
+
+        <span class="c1"># add func kwargs</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">param_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">is_param_kwarg</span><span class="p">[</span><span class="n">name</span><span class="p">]:</span>
+                <span class="n">default</span> <span class="o">=</span> <span class="n">param_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">default</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">header</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">=&#39;</span><span class="si">{</span><span class="n">default</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">header</span> <span class="o">=</span> <span class="n">header</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">param</span><span class="o">.</span><span class="n">default</span><span class="si">}</span><span class="s2">, &quot;</span>
-                    <span class="n">content</span> <span class="o">=</span> <span class="n">content</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">, &quot;</span>
+                    <span class="n">header</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">default</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="n">content</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">, &quot;</span>
+
         <span class="n">header</span> <span class="o">=</span> <span class="n">header</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
         <span class="n">content</span> <span class="o">=</span> <span class="n">content</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
-        <span class="n">content</span> <span class="o">=</span> <span class="n">content</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">content</span><span class="si">}</span><span class="s2">)&quot;</span>
 
         <span class="n">wrapper_has_args</span> <span class="o">=</span> <span class="n">header</span> <span class="o">+</span> <span class="n">content</span>
         <span class="n">scope</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;func&quot;</span><span class="p">:</span> <span class="n">func</span><span class="p">}</span>
@@ -231,52 +261,58 @@
     <span class="k">return</span> <span class="n">_has_args</span>
 
 
-<span class="c1"># get argument values, given names, from list of args</span>
-<span class="k">def</span> <span class="nf">get_args</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">inside</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="c1"># from function where needed args (like base_fname) are added,</span>
+<span class="c1"># return length of args before added args, and the added args</span>
+<span class="k">def</span> <span class="nf">extract_added_args</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">includes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">vals</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">arg_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span>
-                <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">())):</span>
-            <span class="k">if</span> <span class="n">inside</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">arg_name</span><span class="p">:</span>
-                    <span class="n">vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">])</span>
-                    <span class="k">break</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">arg_name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
-                    <span class="n">vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">])</span>
-                    <span class="k">break</span>
+    <span class="n">param_list</span><span class="p">,</span> <span class="n">is_param_kwarg</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_args_and_kwargs</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="n">arg_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">param</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">param_list</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">is_param_kwarg</span><span class="p">[</span><span class="n">param</span><span class="p">]]</span>
+    <span class="n">extra_count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">jj</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">includes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">includes</span><span class="p">[</span><span class="n">jj</span><span class="p">]:</span>
+            <span class="n">vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">continue</span>
 
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">names</span><span class="si">}</span><span class="s2"> requested but </span><span class="si">{</span><span class="n">vals</span><span class="si">}</span><span class="s2"> found in get_args&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">vals</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">arg_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">arg_list</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">arg_name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="n">vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">ii</span><span class="p">])</span>
+                <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
+            <span class="n">vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">arg_list</span><span class="p">)</span> <span class="o">+</span> <span class="n">extra_count</span><span class="p">])</span>
+            <span class="n">extra_count</span> <span class="o">=</span> <span class="n">extra_count</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">arg_list</span><span class="p">),</span> <span class="o">*</span><span class="n">vals</span>
 
 
-<span class="c1"># subses_dict must be in arguments</span>
-<span class="c1"># if including tracking or segmentation params in fname,</span>
-<span class="c1"># also include them in args</span>
 <div class="viewcode-block" id="as_file"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/decorators/index.html#AFQ.tasks.decorators.as_file">[docs]</a><span class="k">def</span> <span class="nf">as_file</span><span class="p">(</span><span class="n">suffix</span><span class="p">,</span> <span class="n">include_track</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">include_seg</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    return img and meta as saved file path, with json,</span>
+<span class="sd">    and only run if not already found</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">_as_file</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="n">needed_args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;base_fname&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">include_track</span><span class="p">:</span>
+            <span class="n">needed_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;tracking_params&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">include_seg</span><span class="p">:</span>
+            <span class="n">needed_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;segmentation_params&quot;</span><span class="p">)</span>
+
         <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-        <span class="nd">@has_args</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="nd">@has_args</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">needed_args</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">wrapper_as_file</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="n">subses_dict</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">(</span>
-                <span class="n">func</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;subses_dict&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">include_track</span><span class="p">:</span>
-                <span class="n">tracking_params</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">(</span>
-                    <span class="n">func</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;tracking_params&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">tracking_params</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">if</span> <span class="n">include_seg</span><span class="p">:</span>
-                <span class="n">segmentation_params</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">(</span>
-                    <span class="n">func</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;segmentation_params&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">segmentation_params</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">og_arg_count</span><span class="p">,</span> <span class="n">base_fname</span><span class="p">,</span> <span class="n">tracking_params</span><span class="p">,</span> <span class="n">segmentation_params</span> <span class="o">=</span>\
+                <span class="n">extract_added_args</span><span class="p">(</span>
+                    <span class="n">func</span><span class="p">,</span>
+                    <span class="p">[</span><span class="s2">&quot;base_fname&quot;</span><span class="p">,</span> <span class="s2">&quot;tracking_params&quot;</span><span class="p">,</span> <span class="s2">&quot;segmentation_params&quot;</span><span class="p">],</span>
+                    <span class="n">args</span><span class="p">,</span>
+                    <span class="n">includes</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="n">include_track</span><span class="p">,</span> <span class="n">include_seg</span><span class="p">])</span>
             <span class="n">this_file</span> <span class="o">=</span> <span class="n">get_fname</span><span class="p">(</span>
-                <span class="n">subses_dict</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span>
+                <span class="n">base_fname</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span>
                 <span class="n">tracking_params</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">,</span>
                 <span class="n">segmentation_params</span><span class="o">=</span><span class="n">segmentation_params</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">this_file</span><span class="p">):</span>
-                <span class="n">img_trk_or_csv</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">img_trk_or_csv</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">[:</span><span class="n">og_arg_count</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saving </span><span class="si">{</span><span class="n">this_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">img_trk_or_csv</span><span class="p">,</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">):</span>
@@ -287,7 +323,7 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">img_trk_or_csv</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">this_file</span><span class="p">)</span>
                 <span class="n">meta_fname</span> <span class="o">=</span> <span class="n">get_fname</span><span class="p">(</span>
-                    <span class="n">subses_dict</span><span class="p">,</span> <span class="n">suffix</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.json&#39;</span><span class="p">,</span>
+                    <span class="n">base_fname</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">drop_extension</span><span class="p">(</span><span class="n">suffix</span><span class="p">)</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">,</span>
                     <span class="n">tracking_params</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">,</span>
                     <span class="n">segmentation_params</span><span class="o">=</span><span class="n">segmentation_params</span><span class="p">)</span>
                 <span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
@@ -296,48 +332,39 @@
     <span class="k">return</span> <span class="n">_as_file</span></div>
 
 
-<span class="c1"># args must include dwi_affine</span>
-<div class="viewcode-block" id="as_model"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/decorators/index.html#AFQ.tasks.decorators.as_model">[docs]</a><span class="k">def</span> <span class="nf">as_model</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-    <span class="nd">@has_args</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">wrapper_as_model</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">dwi_affine</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">(</span>
-            <span class="n">func</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;dwi_affine&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
-        <span class="n">model</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
-        <span class="n">model_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span>
-            <span class="n">model</span><span class="p">,</span>
-            <span class="n">dwi_affine</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">model_img</span><span class="p">,</span> <span class="n">meta</span>
-    <span class="k">return</span> <span class="n">wrapper_as_model</span></div>
+<div class="viewcode-block" id="as_fit_deriv"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/decorators/index.html#AFQ.tasks.decorators.as_fit_deriv">[docs]</a><span class="k">def</span> <span class="nf">as_fit_deriv</span><span class="p">(</span><span class="n">tf_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    return data as nibabel image, meta with params information</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_as_fit_deriv</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="n">needed_args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;dwi_affine&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tf_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">_params&quot;</span><span class="p">]</span>
 
-
-<span class="c1"># args must include dwi_affine</span>
-<span class="c1"># args must include arg with name that contains &quot;param&quot;</span>
-<div class="viewcode-block" id="as_dt_deriv"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/decorators/index.html#AFQ.tasks.decorators.as_dt_deriv">[docs]</a><span class="k">def</span> <span class="nf">as_dt_deriv</span><span class="p">(</span><span class="n">tf_name</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">_as_dt_deriv</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
         <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-        <span class="nd">@has_args</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-        <span class="k">def</span> <span class="nf">wrapper_as_dt_deriv</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="n">dwi_affine</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">(</span>
-                <span class="n">func</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;dwi_affine&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">params</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">(</span>
-                <span class="n">func</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;param&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">,</span> <span class="n">inside</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span> <span class="n">dwi_affine</span><span class="p">)</span>
+        <span class="nd">@has_args</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">needed_args</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">wrapper_as_fit_deriv</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">og_arg_count</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">extract_added_args</span><span class="p">(</span>
+                <span class="n">func</span><span class="p">,</span> <span class="n">needed_args</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+            <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span>
+                <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">[:</span><span class="n">og_arg_count</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span> <span class="n">dwi_affine</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">img</span><span class="p">,</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tf_name</span><span class="si">}</span><span class="s2">ParamsFile&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">}</span>
-        <span class="k">return</span> <span class="n">wrapper_as_dt_deriv</span>
-    <span class="k">return</span> <span class="n">_as_dt_deriv</span></div>
+        <span class="k">return</span> <span class="n">wrapper_as_fit_deriv</span>
+    <span class="k">return</span> <span class="n">_as_fit_deriv</span></div>
 
 
-<span class="c1"># args must include arg with name that contains affine</span>
 <div class="viewcode-block" id="as_img"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/decorators/index.html#AFQ.tasks.decorators.as_img">[docs]</a><span class="k">def</span> <span class="nf">as_img</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    return data, meta as nibabel image, meta with timing</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">needed_args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;dwi_affine&quot;</span><span class="p">]</span>
+
     <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-    <span class="nd">@has_args</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="nd">@has_args</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">needed_args</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">wrapper_as_img</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">affine</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">(</span>
-            <span class="n">func</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;affine&quot;</span><span class="p">],</span> <span class="n">args</span><span class="p">,</span> <span class="n">inside</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">data</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">og_arg_count</span><span class="p">,</span> <span class="n">affine</span> <span class="o">=</span> <span class="n">extract_added_args</span><span class="p">(</span>
+            <span class="n">func</span><span class="p">,</span> <span class="n">needed_args</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">[:</span><span class="n">og_arg_count</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;timing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
         <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">affine</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">img</span><span class="p">,</span> <span class="n">meta</span>
     <span class="k">return</span> <span class="n">wrapper_as_img</span></div>

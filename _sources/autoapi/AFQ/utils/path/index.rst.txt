@@ -1,0 +1,47 @@
+:py:mod:`AFQ.utils.path`
+========================
+
+.. py:module:: AFQ.utils.path
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.utils.path.drop_extension
+
+
+
+.. py:function:: drop_extension(path)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

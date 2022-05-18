@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.tractography &#8212; AFQ 0.11 documentation</title>
+    <title>AFQ.tasks.tractography &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -283,28 +283,19 @@
     </label>
     <ul>
      <li class="toctree-l3">
+      <a class="reference internal" href="../../definitions/image/index.html">
+       <code class="xref py py-mod docutils literal notranslate">
+        <span class="pre">
+         AFQ.definitions.image
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toctree-l3">
       <a class="reference internal" href="../../definitions/mapping/index.html">
        <code class="xref py py-mod docutils literal notranslate">
         <span class="pre">
          AFQ.definitions.mapping
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../definitions/mask/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.definitions.mask
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../../definitions/scalar/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.definitions.scalar
         </span>
        </code>
       </a>
@@ -475,10 +466,10 @@
       </a>
      </li>
      <li class="toctree-l3">
-      <a class="reference internal" href="../../utils/parallel/index.html">
+      <a class="reference internal" href="../../utils/path/index.html">
        <code class="xref py py-mod docutils literal notranslate">
         <span class="pre">
-         AFQ.utils.parallel
+         AFQ.utils.path
         </span>
        </code>
       </a>
@@ -710,16 +701,16 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.tractography.export_seed_mask" title="AFQ.tasks.tractography.export_seed_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_seed_mask</span></code></a>(subses_dict, dwi_affine, tracking_params)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.tractography.export_seed_mask" title="AFQ.tasks.tractography.export_seed_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_seed_mask</span></code></a>(tracking_params)</p></td>
 <td><p>full path to a nifti file containing the</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.tractography.export_stop_mask" title="AFQ.tasks.tractography.export_stop_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_stop_mask</span></code></a>(subses_dict, dwi_affine, tracking_params)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.tractography.export_stop_mask" title="AFQ.tasks.tractography.export_stop_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_stop_mask</span></code></a>(tracking_params)</p></td>
 <td><p>full path to a nifti file containing the</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.tractography.export_stop_mask_pft" title="AFQ.tasks.tractography.export_stop_mask_pft"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_stop_mask_pft</span></code></a>(pve_wm, pve_gm, pve_csf)</p></td>
 <td><p>full path to a nifti file containing the</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.tractography.streamlines" title="AFQ.tasks.tractography.streamlines"><code class="xref py py-obj docutils literal notranslate"><span class="pre">streamlines</span></code></a>(subses_dict, data_imap, seed_file, stop_file, tracking_params)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.tractography.streamlines" title="AFQ.tasks.tractography.streamlines"><code class="xref py py-obj docutils literal notranslate"><span class="pre">streamlines</span></code></a>(data_imap, seed, stop, tracking_params)</p></td>
 <td><p>full path to the complete, unsegmented tractography file</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.tractography.custom_tractography" title="AFQ.tasks.tractography.custom_tractography"><code class="xref py py-obj docutils literal notranslate"><span class="pre">custom_tractography</span></code></a>(bids_info, import_tract=None)</p></td>
@@ -751,14 +742,14 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.tractography.export_seed_mask">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.tractography.</span></span><span class="sig-name descname"><span class="pre">export_seed_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracking_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/tractography.html#export_seed_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.tractography.export_seed_mask" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.tractography.</span></span><span class="sig-name descname"><span class="pre">export_seed_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tracking_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/tractography.html#export_seed_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.tractography.export_seed_mask" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing the
 tractography seed mask</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.tractography.export_stop_mask">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.tractography.</span></span><span class="sig-name descname"><span class="pre">export_stop_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dwi_affine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracking_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/tractography.html#export_stop_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.tractography.export_stop_mask" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.tractography.</span></span><span class="sig-name descname"><span class="pre">export_stop_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tracking_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/tractography.html#export_stop_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.tractography.export_stop_mask" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing the
 tractography stop mask</p>
 </dd></dl>
@@ -772,7 +763,7 @@ tractography stop mask</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.tractography.streamlines">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.tractography.</span></span><span class="sig-name descname"><span class="pre">streamlines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subses_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracking_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/tractography.html#streamlines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.tractography.streamlines" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.tractography.</span></span><span class="sig-name descname"><span class="pre">streamlines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracking_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/tasks/tractography.html#streamlines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.tractography.streamlines" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to the complete, unsegmented tractography file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -781,9 +772,9 @@ tractography stop mask</p>
 the aft.track function. Seed mask and seed threshold, if not
 specified, are replaced with scalar masks from scalar[0]
 thresholded to 0.2. The <code class="docutils literal notranslate"><span class="pre">seed_mask</span></code> and <code class="docutils literal notranslate"><span class="pre">stop_mask</span></code> items of
-this dict may be <code class="docutils literal notranslate"><span class="pre">AFQ.definitions.mask.MaskFile</span></code> instances.
+this dict may be <code class="docutils literal notranslate"><span class="pre">AFQ.definitions.image.ImageFile</span></code> instances.
 If <code class="docutils literal notranslate"><span class="pre">tracker</span></code> is set to “pft” then <code class="docutils literal notranslate"><span class="pre">stop_mask</span></code> should be
-an instance of <code class="docutils literal notranslate"><span class="pre">AFQ.definitions.mask.PFTMask</span></code>.</p>
+an instance of <code class="docutils literal notranslate"><span class="pre">AFQ.definitions.image.PFTImage</span></code>.</p>
 </dd>
 </dl>
 </dd>

@@ -3,11 +3,10 @@ The pyAFQ configuration file
 ----------------------------
 
 This file should be a `toml <https://github.com/toml-lang/toml>`_ file. At
-minimum, the file should contain information about the location of the
-`dmriprep` folder::
+minimum, the file should contain the BIDS path::
 
     [files]
-    dmriprep_folder = '/path/to/study/derivatives/dmriprep'
+    bids_path = "path/to/study"
 
 
 But additional configuration options can be provided.
@@ -50,7 +49,7 @@ See an example configuration file below::
     # Default: None
     output_dir = ""
     
-    # Parameters to pass to parfor in AFQ.utils.parallel,
+    # Parameters to pass to paramap in AFQ.utils.parallel,
     # to parallelize computations across subjects and sessions.
     # Set "n_jobs" to -1 to automatically parallelize as
     # the number of cpus. Here is an example for how to do
@@ -69,6 +68,7 @@ See an example configuration file below::
     
     # How tracking directions are determined.
     # One of: {"det" | "prob"}
+    # Default: "prob"
     directions = "prob"
     
     # The maximum turning angle in each step. Default: 30
@@ -91,7 +91,7 @@ See an example configuration file below::
     # voxel on each dimension (for example, 2 => [2, 2, 2]). If this is a 2D
     # array, these are the coordinates of the seeds. Unless random_seeds is
     # set to True, in which case this is the total number of random seeds
-    # to generate within the mask.
+    # to generate within the mask. Default: 1
     n_seeds = 1
     
     # Whether to generate a total of n_seeds random seeds in the mask.
@@ -121,7 +121,7 @@ See an example configuration file below::
     # we will stop only at the edge of the image).
     stop_threshold = 0
     
-    # The size (in mm) of a step of tractography. Default: 1.0
+    # The size (in mm) of a step of tractography. Default: 0.5
     step_size = 0.5
     
     # The miminal length (mm) in a streamline. Default: 10
@@ -384,8 +384,8 @@ See an example configuration file below::
     # This will be used to create
     # the brain mask, which gets applied before registration to a
     # template.
-    # If you want no brain mask to be applied, use FullMask.
-    # If None, use B0Mask()
+    # If you want no brain mask to be applied, use FullImage.
+    # If None, use B0Image()
     # Default: None
     brain_mask_definition = ""
     
@@ -418,7 +418,7 @@ See an example configuration file below::
     mapping_definition = ""
     
     # The source image data to be registered.
-    # Can either be a Nifti1Image, a scalar definition, or str.
+    # Can either be a Nifti1Image, an ImageFile, or str.
     # if "b0", "dti_fa_subject", "subject_sls", or "power_map,"
     # image data will be loaded automatically.
     # If "subject_sls" is used, slr registration will be used
@@ -439,7 +439,7 @@ See an example configuration file below::
     
     # List of scalars to use.
     # Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md", "dki_awf",
-    # "dki_mk". Can also be a scalar from AFQ.definitions.scalar.
+    # "dki_mk". Can also be a scalar from AFQ.definitions.image.
     # Default: ["dti_fa", "dti_md"]
     scalars = "['dti_fa', 'dti_md']"
     

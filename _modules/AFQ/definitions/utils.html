@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.definitions.utils &#8212; AFQ 0.11 documentation</title>
+    <title>AFQ.definitions.utils &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -181,20 +181,23 @@
               <div>
                 
   <h1>Source code for AFQ.definitions.utils</h1><div class="highlight"><pre>
-<span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Definition&quot;</span><span class="p">,</span> <span class="s2">&quot;find_file&quot;</span><span class="p">]</span>
+<span></span><span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+
+<span class="kn">from</span> <span class="nn">AFQ.utils.path</span> <span class="kn">import</span> <span class="n">drop_extension</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Definition&quot;</span><span class="p">,</span> <span class="s2">&quot;find_file&quot;</span><span class="p">,</span> <span class="s2">&quot;name_from_path&quot;</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="Definition"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/utils/index.html#AFQ.definitions.utils.Definition">[docs]</a><span class="k">class</span> <span class="nc">Definition</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    All Definitions should inherit this.</span>
 <span class="sd">    For a given subject and session within the API, the definition is used</span>
-<span class="sd">    to create a given mask, map, etc.</span>
+<span class="sd">    to create a given image or map.</span>
 <span class="sd">    Definitions have an init function which the users uses to specify</span>
 <span class="sd">    how they want the definition to behave.</span>
-<span class="sd">    The find_path and get_for_subses functions are called by the AFQ API.</span>
+<span class="sd">    The find_path function is called by the AFQ API.</span>
 <span class="sd">    The api calls find_path to let the definition find relevant files</span>
-<span class="sd">    for the given subject and session. The api calls get_for_subses to get the</span>
-<span class="sd">    mask, map, etc.</span>
+<span class="sd">    for the given subject and session.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -236,11 +239,19 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">arg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\&quot;</span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">arg</span> <span class="o">=</span> <span class="s2">&quot;[&quot;</span> <span class="o">+</span> <span class="n">_arglist_to_string</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;]&quot;</span>
+            <span class="n">arg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">_arglist_to_string</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span><span class="si">}</span><span class="s2">]&quot;</span>
         <span class="n">to_string</span> <span class="o">=</span> <span class="n">to_string</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span>
     <span class="k">if</span> <span class="n">to_string</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;, &#39;</span><span class="p">:</span>
         <span class="n">to_string</span> <span class="o">=</span> <span class="n">to_string</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">to_string</span>
+
+
+<div class="viewcode-block" id="name_from_path"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/utils/index.html#AFQ.definitions.utils.name_from_path">[docs]</a><span class="k">def</span> <span class="nf">name_from_path</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="n">file_name</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>  <span class="c1"># get file name</span>
+    <span class="n">file_name</span> <span class="o">=</span> <span class="n">drop_extension</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>  <span class="c1"># remove extension</span>
+    <span class="k">if</span> <span class="s2">&quot;-&quot;</span> <span class="ow">in</span> <span class="n">file_name</span><span class="p">:</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># get suffix if exists</span>
+    <span class="k">return</span> <span class="n">file_name</span></div>
 
 
 <div class="viewcode-block" id="find_file"><a class="viewcode-back" href="../../../autoapi/AFQ/definitions/utils/index.html#AFQ.definitions.utils.find_file">[docs]</a><span class="k">def</span> <span class="nf">find_file</span><span class="p">(</span><span class="n">bids_layout</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">filters</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span>
@@ -282,9 +293,9 @@
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">path_subject</span> <span class="o">!=</span> <span class="n">file_subject</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Expected subject IDs to match for the retrieved mask file &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Expected subject IDs to match for the retrieved image file &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;and the supplied `from_path` file. Got sub-</span><span class="si">{</span><span class="n">file_subject</span><span class="si">}</span><span class="s2"> &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;from mask file </span><span class="si">{</span><span class="n">nearest</span><span class="si">}</span><span class="s2"> and sub-</span><span class="si">{</span><span class="n">path_subject</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;from image file </span><span class="si">{</span><span class="n">nearest</span><span class="si">}</span><span class="s2"> and sub-</span><span class="si">{</span><span class="n">path_subject</span><span class="si">}</span><span class="s2"> &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;from `from_path` file </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.&quot;</span>
         <span class="p">)</span>
 

@@ -27,6 +27,7 @@ Functions
 
 .. autoapisummary::
 
+   AFQ.definitions.utils.name_from_path
    AFQ.definitions.utils.find_file
 
 
@@ -38,13 +39,12 @@ Functions
    
    All Definitions should inherit this.
    For a given subject and session within the API, the definition is used
-   to create a given mask, map, etc.
+   to create a given image or map.
    Definitions have an init function which the users uses to specify
    how they want the definition to behave.
-   The find_path and get_for_subses functions are called by the AFQ API.
+   The find_path function is called by the AFQ API.
    The api calls find_path to let the definition find relevant files
-   for the given subject and session. The api calls get_for_subses to get the
-   mask, map, etc.
+   for the given subject and session.
 
 
 
@@ -112,6 +112,28 @@ Functions
       ..
           !! processed by numpydoc !!
 
+
+.. py:function:: name_from_path(path)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
 
 .. py:function:: find_file(bids_layout, path, filters, suffix, session, subject, extension='.nii.gz')
 

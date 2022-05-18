@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.utils &#8212; AFQ 0.11 documentation</title>
+    <title>AFQ.tasks.utils &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -187,11 +187,9 @@
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;get_fname&quot;</span><span class="p">,</span> <span class="s2">&quot;with_name&quot;</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="get_fname"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/utils/index.html#AFQ.tasks.utils.get_fname">[docs]</a><span class="k">def</span> <span class="nf">get_fname</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span>
+<div class="viewcode-block" id="get_fname"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/utils/index.html#AFQ.tasks.utils.get_fname">[docs]</a><span class="k">def</span> <span class="nf">get_fname</span><span class="p">(</span><span class="n">base_fname</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span>
               <span class="n">tracking_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">segmentation_params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="n">split_fdwi</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">[</span><span class="s2">&quot;dwi_file&quot;</span><span class="p">])</span>
-    <span class="n">fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subses_dict</span><span class="p">[</span><span class="s2">&quot;results_dir&quot;</span><span class="p">],</span> <span class="n">split_fdwi</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-
+    <span class="n">fname</span> <span class="o">=</span> <span class="n">base_fname</span>
     <span class="k">if</span> <span class="n">tracking_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;odf_model&#39;</span> <span class="ow">in</span> <span class="n">tracking_params</span><span class="p">:</span>
         <span class="n">odf_model</span> <span class="o">=</span> <span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;odf_model&#39;</span><span class="p">]</span>
         <span class="n">directions</span> <span class="o">=</span> <span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;directions&#39;</span><span class="p">]</span>
@@ -201,24 +199,20 @@
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">segmentation_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;seg_algo&#39;</span> <span class="ow">in</span> <span class="n">segmentation_params</span><span class="p">:</span>
         <span class="n">seg_algo</span> <span class="o">=</span> <span class="n">segmentation_params</span><span class="p">[</span><span class="s1">&#39;seg_algo&#39;</span><span class="p">]</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="n">fname</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;-</span><span class="si">{</span><span class="n">seg_algo</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">seg_algo</span><span class="si">}</span><span class="s1">&#39;</span>
 
     <span class="k">return</span> <span class="n">fname</span> <span class="o">+</span> <span class="n">suffix</span></div>
 
 
 <span class="c1"># Turn list of tasks into dictionary with names for each task</span>
 <div class="viewcode-block" id="with_name"><a class="viewcode-back" href="../../../autoapi/AFQ/tasks/utils/index.html#AFQ.tasks.utils.with_name">[docs]</a><span class="k">def</span> <span class="nf">with_name</span><span class="p">(</span><span class="n">task_list</span><span class="p">):</span>
-    <span class="n">task_dict</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">task_list</span><span class="p">:</span>
-        <span class="n">task_dict</span><span class="p">[</span><span class="n">task</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;_res&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">task</span>
-    <span class="k">return</span> <span class="n">task_dict</span></div>
+    <span class="k">return</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">task</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">_res&quot;</span><span class="p">:</span> <span class="n">task</span> <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">task_list</span><span class="p">}</span></div>
 
 
 <span class="k">def</span> <span class="nf">get_default_args</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-    <span class="n">signature</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">{</span>
         <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">default</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">signature</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">empty</span>
     <span class="p">}</span>
 </pre></div>

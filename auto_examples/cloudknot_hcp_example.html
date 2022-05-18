@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ with HCP data &#8212; AFQ 0.11 documentation</title>
+    <title>AFQ with HCP data &#8212; AFQ 0.12 documentation</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -313,7 +313,7 @@ numbers of seeds per voxel).</p>
     <span class="c1"># cloudknot installs the appropriate packages from pip</span>
     <span class="kn">from</span> <span class="nn">AFQ.data.fetch</span> <span class="kn">import</span> <span class="n">fetch_hcp</span>
     <span class="kn">from</span> <span class="nn">AFQ.api.group</span> <span class="kn">import</span> <span class="n">GroupAFQ</span>
-    <span class="kn">import</span> <span class="nn">AFQ.definitions.mask</span> <span class="k">as</span> <span class="nn">afm</span>
+    <span class="kn">import</span> <span class="nn">AFQ.definitions.image</span> <span class="k">as</span> <span class="nn">afm</span>
 
     <span class="c1"># set logging level to your choice</span>
     <a href="https://docs.python.org/3/library/logging.html#logging.basicConfig" title="logging.basicConfig" class="sphx-glr-backref-module-logging sphx-glr-backref-type-py-function"><span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span></a><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
@@ -331,11 +331,11 @@ numbers of seeds per voxel).</p>
     <span class="c1"># seed_mask argument, which is a string.</span>
     <span class="c1"># This is to avoid any complications with pickling the masks.</span>
     <span class="k">if</span> <span class="n">seed_mask</span> <span class="o">==</span> <span class="s2">&quot;roi&quot;</span><span class="p">:</span>
-        <span class="n">seed_mask_obj</span> <span class="o">=</span> <span class="n">afm</span><span class="o">.</span><span class="n">RoiMask</span><span class="p">()</span>
+        <span class="n">seed_mask_obj</span> <span class="o">=</span> <span class="n">afm</span><span class="o">.</span><span class="n">RoiImage</span><span class="p">()</span>
     <span class="k">elif</span> <span class="n">seed_mask</span> <span class="o">==</span> <span class="s2">&quot;fa&quot;</span><span class="p">:</span>
-        <span class="n">seed_mask_obj</span> <span class="o">=</span> <span class="n">afm</span><span class="o">.</span><span class="n">ScalarMask</span><span class="p">(</span><span class="s2">&quot;dti_fa&quot;</span><span class="p">)</span>
+        <span class="n">seed_mask_obj</span> <span class="o">=</span> <span class="n">afm</span><span class="o">.</span><span class="n">ScalarImage</span><span class="p">(</span><span class="s2">&quot;dti_fa&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">seed_mask_obj</span> <span class="o">=</span> <span class="n">afm</span><span class="o">.</span><span class="n">FullMask</span><span class="p">()</span>
+        <span class="n">seed_mask_obj</span> <span class="o">=</span> <span class="n">afm</span><span class="o">.</span><span class="n">FullImage</span><span class="p">()</span>
 
     <span class="c1"># Determined if n_seeds is per voxel or not</span>
     <span class="k">if</span> <span class="n">n_seeds</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
@@ -351,11 +351,11 @@ numbers of seeds per voxel).</p>
 
     <span class="c1"># use segmentation file from HCP to get a brain mask,</span>
     <span class="c1"># where everything not labelled 0 is considered a part of the brain</span>
-    <span class="n">brain_mask_definition</span> <span class="o">=</span> <span class="n">afm</span><span class="o">.</span><span class="n">LabelledMaskFile</span><span class="p">(</span>
+    <span class="n">brain_mask_definition</span> <span class="o">=</span> <span class="n">afm</span><span class="o">.</span><span class="n">LabelledImageFile</span><span class="p">(</span>
         <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;seg&#39;</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;scope&#39;</span><span class="p">:</span> <span class="s1">&#39;dmriprep&#39;</span><span class="p">},</span>
         <span class="n">exclusive_labels</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-    <span class="c1"># define the api AFQ object</span>
+    <span class="c1"># define the api GroupAFQ object</span>
     <span class="n">myafq</span> <span class="o">=</span> <span class="n">GroupAFQ</span><span class="p">(</span>
         <span class="n">hcp_bids</span><span class="p">,</span>
         <span class="n">brain_mask_definition</span><span class="o">=</span><span class="n">brain_mask_definition</span><span class="p">,</span>
@@ -368,7 +368,7 @@ numbers of seeds per voxel).</p>
     <span class="n">myafq</span><span class="o">.</span><span class="n">upload_to_s3</span><span class="p">(</span>
         <span class="n">s3fs</span><span class="o">.</span><span class="n">S3FileSystem</span><span class="p">(),</span>
         <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;my_study_bucket/my_study_prefix_</span><span class="si">{</span><span class="n">seed_mask</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">n_seeds</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;/derivatives/afq&quot;</span><span class="p">))</span>
+         <span class="sa">f</span><span class="s2">&quot;/derivatives/afq&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>In this example, we will process the data from the following subjects</p>

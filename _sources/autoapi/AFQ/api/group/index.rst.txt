@@ -46,29 +46,6 @@ Classes
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: __getattribute__(self, attr)
-
-      
-      Return getattr(self, name).
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
    .. py:method:: combine_profiles(self)
 
       
@@ -92,6 +69,28 @@ Classes
           !! processed by numpydoc !!
 
    .. py:method:: get_streamlines_json(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: export(self, attr_name='help')
 
       
 

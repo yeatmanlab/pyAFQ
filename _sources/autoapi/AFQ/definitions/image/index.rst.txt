@@ -1,0 +1,1059 @@
+:py:mod:`AFQ.definitions.image`
+===============================
+
+.. py:module:: AFQ.definitions.image
+
+.. autoapi-nested-parse::
+
+   
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.definitions.image.ImageFile
+   AFQ.definitions.image.FullImage
+   AFQ.definitions.image.RoiImage
+   AFQ.definitions.image.B0Image
+   AFQ.definitions.image.LabelledImageFile
+   AFQ.definitions.image.ThresholdedImageFile
+   AFQ.definitions.image.ScalarImage
+   AFQ.definitions.image.ThresholdedScalarImage
+   AFQ.definitions.image.TemplateImage
+
+
+
+
+.. py:class:: ImageFile(path=None, suffix=None, filters={})
+
+   Bases: :py:obj:`ImageDefinition`
+
+   
+   Define an image based on a file.
+   Does not apply any labels or thresholds;
+   Generates image with floating point data.
+   Useful for seed and stop images, where threshold can be applied
+   after interpolation (see example).
+
+
+   :Parameters:
+
+       **path** : str, optional
+           path to file to get image from. Use this or suffix.
+           Default: None
+
+       **suffix** : str, optional
+           suffix to pass to bids_layout.get() to identify the file.
+           Default: None
+
+       **filters** : str, optional
+           Additional filters to pass to bids_layout.get() to identify
+           the file.
+           Default: {}
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   seed_image = ImageFile(
+       suffix="WM",
+       filters={"scope":"dmriprep"})
+   api.GroupAFQ(tracking_params={"seed_image": seed_image,
+                               "seed_threshold": 0.1})
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_path_data_affine(self, bids_info)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: apply_conditions(self, image_data_orig, image_file)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_name(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_image_getter(self, task_name)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_image_direct(self, dwi, bids_info, b0_file, data_imap=None)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: FullImage
+
+   Bases: :py:obj:`ImageDefinition`
+
+   
+   Define an image which covers a full volume.
+
+
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   brain_image_definition = FullImage()
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_name(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_image_getter(self, task_name)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_image_direct(self, dwi, bids_info, b0_file, data_imap=None)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: RoiImage(use_presegment=False, use_endpoints=False)
+
+   Bases: :py:obj:`ImageDefinition`
+
+   
+   Define an image which is all include ROIs or'd together.
+
+
+   :Parameters:
+
+       **use_presegment** : bool
+           Whether to use presegment bundle dict from segmentation params
+           to get ROIs.
+
+       **use_endpoints** : bool
+           Whether to use the endpoints ("start" and "end") instead of the
+           include ROIs to generate the image.
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   seed_image = RoiImage()
+   api.GroupAFQ(tracking_params={"seed_image": seed_image})
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_name(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_image_getter(self, task_name)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_image_direct(self, dwi, bids_info, b0_file, data_imap=None)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: B0Image(median_otsu_kwargs={})
+
+   Bases: :py:obj:`ImageDefinition`
+
+   
+   Define an image using b0 and dipy's median_otsu.
+
+
+   :Parameters:
+
+       **median_otsu_kwargs: dict, optional**
+           Optional arguments to pass into dipy's median_otsu.
+           Default: {}
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   brain_image_definition = B0Image()
+   api.GroupAFQ(brain_image_definition=brain_image_definition)
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_name(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_image_getter(self, task_name)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_image_direct(self, dwi, bids_info, b0_file, data_imap=None)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: LabelledImageFile(path=None, suffix=None, filters={}, inclusive_labels=None, exclusive_labels=None, combine='or')
+
+   Bases: :py:obj:`ImageFile`, :py:obj:`CombineImageMixin`
+
+   
+   Define an image based on labels in a file.
+
+
+   :Parameters:
+
+       **path** : str, optional
+           path to file to get image from. Use this or suffix.
+           Default: None
+
+       **suffix** : str, optional
+           suffix to pass to bids_layout.get() to identify the file.
+           Default: None
+
+       **filters** : str, optional
+           Additional filters to pass to bids_layout.get() to identify
+           the file.
+           Default: {}
+
+       **inclusive_labels** : list of ints, optional
+           The labels from the file to include from the boolean image.
+           If None, no inclusive labels are applied.
+
+       **exclusive_labels** : list of ints, optional
+           The labels from the file to exclude from the boolean image.
+           If None, no exclusive labels are applied.
+           Default: None.
+
+       **combine** : str, optional
+           How to combine the boolean images generated by inclusive_labels
+           and exclusive_labels. If "and", they will be and'd together.
+           If "or", they will be or'd.
+           Note: in this class, you will most likely want to either set
+           inclusive_labels or exclusive_labels, not both,
+           so combine will not matter.
+           Default: "or"
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   brain_image_definition = LabelledImageFile(
+       suffix="aseg",
+       filters={"scope": "dmriprep"},
+       exclusive_labels=[0])
+   api.GroupAFQ(brain_image_definition=brain_image_definition)
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: apply_conditions(self, image_data_orig, image_file)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: ThresholdedImageFile(path=None, suffix=None, filters={}, lower_bound=None, upper_bound=None, combine='and')
+
+   Bases: :py:obj:`ImageFile`, :py:obj:`CombineImageMixin`
+
+   
+   Define an image based on thresholding a file.
+   Note that this should not be used to directly make a seed image
+   or a stop image. In those cases, consider thresholding after
+   interpolation, as in the example for ImageFile.
+
+
+   :Parameters:
+
+       **path** : str, optional
+           path to file to get image from. Use this or suffix.
+           Default: None
+
+       **suffix** : str, optional
+           suffix to pass to bids_layout.get() to identify the file.
+           Default: None
+
+       **filters** : str, optional
+           Additional filters to pass to bids_layout.get() to identify
+           the file.
+           Default: {}
+
+       **lower_bound** : float, optional
+           Lower bound to generate boolean image from data in the file.
+           If None, no lower bound is applied.
+           Default: None.
+
+       **upper_bound** : float, optional
+           Upper bound to generate boolean image from data in the file.
+           If None, no upper bound is applied.
+           Default: None.
+
+       **combine** : str, optional
+           How to combine the boolean images generated by lower_bound
+           and upper_bound. If "and", they will be and'd together.
+           If "or", they will be or'd.
+           Default: "and"
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   brain_image_definition = ThresholdedImageFile(
+       suffix="BM",
+       filters={"scope":"dmriprep"},
+       lower_bound=0.1)
+   api.GroupAFQ(brain_image_definition=brain_image_definition)
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: apply_conditions(self, image_data_orig, image_file)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: ScalarImage(scalar)
+
+   Bases: :py:obj:`ImageDefinition`
+
+   
+   Define an image based on a scalar.
+   Does not apply any labels or thresholds;
+   Generates image with floating point data.
+   Useful for seed and stop images, where threshold can be applied
+   after interpolation (see example).
+
+
+   :Parameters:
+
+       **scalar** : str
+           Scalar to threshold.
+           Can be one of "dti_fa", "dti_md", "dki_fa", "dki_md".
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   seed_image = ScalarImage(
+       "dti_fa")
+   api.GroupAFQ(tracking_params={
+       "seed_image": seed_image,
+       "seed_threshold": 0.2})
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_name(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_image_getter(self, task_name)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_image_direct(self, dwi, bids_info, b0_file, data_imap=None)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: ThresholdedScalarImage(scalar, lower_bound=None, upper_bound=None, combine='and')
+
+   Bases: :py:obj:`ThresholdedImageFile`, :py:obj:`ScalarImage`
+
+   
+   Define an image based on thresholding a scalar image.
+   Note that this should not be used to directly make a seed image
+   or a stop image. In those cases, consider thresholding after
+   interpolation, as in the example for ScalarImage.
+
+
+   :Parameters:
+
+       **scalar** : str
+           Scalar to threshold.
+           Can be one of "dti_fa", "dti_md", "dki_fa", "dki_md".
+
+       **lower_bound** : float, optional
+           Lower bound to generate boolean image from data in the file.
+           If None, no lower bound is applied.
+           Default: None.
+
+       **upper_bound** : float, optional
+           Upper bound to generate boolean image from data in the file.
+           If None, no upper bound is applied.
+           Default: None.
+
+       **combine** : str, optional
+           How to combine the boolean images generated by lower_bound
+           and upper_bound. If "and", they will be and'd together.
+           If "or", they will be or'd.
+           Default: "and"
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   seed_image = ThresholdedScalarImage(
+       "dti_fa",
+       lower_bound=0.2)
+   api.GroupAFQ(tracking_params={"seed_image": seed_image})
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: TemplateImage(path)
+
+   Bases: :py:obj:`ImageDefinition`
+
+   
+   Define a scalar based on a template.
+   This template will be transformed into subject space before use.
+
+
+   :Parameters:
+
+       **path** : str
+           path to the template.
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   my_scalar = TemplateImage(
+       "path/to/my_scalar_in_MNI.nii.gz")
+   api.GroupAFQ(scalars=["dti_fa", "dti_md", my_scalar])
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_name(self)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_image_getter(self, task_name)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_image_direct(self, dwi, bids_info, b0_file, data_imap=None)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

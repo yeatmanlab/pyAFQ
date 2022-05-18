@@ -710,7 +710,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: _draw_core(sls, n_points, figure, bundle_name, indiv_profile, dimensions, flip_axes)
+.. py:function:: _draw_core(sls, n_points, figure, bundle_name, indiv_profile, labelled_points, dimensions, flip_axes)
 
    
 
@@ -732,7 +732,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: single_bundle_viz(indiv_profile, sft, bundle, scalar_name, bundle_dict=None, flip_axes=[False, False, False], figure=None, include_profile=False)
+.. py:function:: single_bundle_viz(indiv_profile, sft, bundle, scalar_name, bundle_dict=None, flip_axes=[False, False, False], labelled_nodes=[0, -1], figure=None, include_profile=False)
 
    
    Visualize a single bundle in 3D with core bundle and associated profile
@@ -769,6 +769,10 @@ Attributes
            visualize.
            For example, if the input image is LAS, use [True, False, False].
            Default: [False, False, False]
+
+       **labelled_nodes** : list or ndarray
+           Which nodes to label. -1 indicates the last node.
+           Default: [0, -1]
 
        **figure** : Plotly Figure object, optional
            If provided, the visualization will be added to this Figure. Default:
