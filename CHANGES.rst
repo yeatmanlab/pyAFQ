@@ -1,3 +1,22 @@
+0.12 (May 18, 2022)
+===================
+This release simplifies the API, in part by merging the 
+scalar and mask definitions into one image definition.
+pyAFQ now must use python >=3.8. Other minor bug fixes.
+  * [FIX] update nightly tests and fix kwargs (#834)
+  * [DOC] update track docstring (#833)
+  * [ENH] Ignore pandas out of date warning / SFT reference warning (#832)
+  * [ENH] Simplify API system (#825)
+  * [FIX] always resample when loading from disk, not just first time (#830)
+  * [FIX] fix ImageFile for scalars, add test (#829)
+  * [ENH] replace parfor with paramap (#828)
+  * [FIX] Replace split(.) with splitext() (#827)
+  * [ENH] Change pyAFQ to use python >=3.8 (#826)
+  * [ENH] Autogenerate two separate QSIprep pipelines (#816)
+  * [ENH] Reorganize mask and scalar system into one "Image" system (#817)
+  * Update DIPY to 1.5 (#814)
+  * [ENH] Allow user to customize core bundle text indicating nodeID (#815)
+
 0.11 (April 12, 2022)
 =====================
 This release introduces a new API for specifying Bundle Dictionaries,
