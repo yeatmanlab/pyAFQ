@@ -297,7 +297,10 @@ def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
     myafq = GroupAFQ(bids_path, **kwargs)
 
     # call user specified function:
-    getattr(myafq, to_call)()
+    if to_call == "all":
+        myafq.export_all()
+    else:
+        myafq.export(to_call)
 
     # If you got this far, you can report on time ended and record that:
     default_arg_dict['pyAFQ']['utc_time_ended'] = datetime.datetime.now(

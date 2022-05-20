@@ -80,9 +80,9 @@ def parse_cli(arg_dict):
         '-c',
         '--call',
         dest='to_call',
-        default="export_all",
-        help="AFQ.api method to call using the specified config file."
-        + " Defaults to 'export_all', which will perform the entire"
+        default="all",
+        help="AFQ.api attribute to get using the specified config file."
+        + " Defaults to 'all', which will perform the entire"
         + " tractometry pipeline.")
 
     cli_parser.add_argument(
