@@ -66,6 +66,7 @@ def viz_bundles(base_fname,
 
     Returns
     -------
+    Tuple of Figure, String or just the Figure:
     If file can be generated, returns a tuple including the figure and the
     path to the file.
     Otherwise, returns the figure.
