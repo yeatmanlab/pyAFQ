@@ -6,6 +6,8 @@ import numpy as np
 
 import AFQ.viz.utils as vut
 
+from dipy.tracking.streamline import set_number_of_points
+
 try:
     from dipy.viz import window, actor, ui
     from fury.colormap import line_colors
@@ -112,11 +114,18 @@ def visualize_bundles(sft, n_points=None, bundle_dict=None,
 
     figure.SetBackground(background[0], background[1], background[2])
 
-    for (sls, color, name, _) in vut.tract_generator(
+    for (sls, color, name, dimensions) in vut.tract_generator(
             sft, bundle, bundle_dict, colors, n_points):
         sls = list(sls)
         if name == "all_bundles":
             color = line_colors(sls)
+        for sl in sls:
+            if flip_axes[0]:
+                sl[:, 0] = dimensions[0] - sl[:, 0]
+            if flip_axes[1]:
+                sl[:, 1] = dimensions[1] - sl[:, 1]
+            if flip_axes[2]:
+                sl[:, 2] = dimensions[2] - sl[:, 2]
 
         sl_actor = actor.line(sls, color)
         figure.add(sl_actor)
@@ -246,7 +255,9 @@ def visualize_roi(roi, affine_or_mapping=None, static_img=None,
     """
     roi = vut.prepare_roi(roi, affine_or_mapping, static_img,
                           roi_affine, static_affine, reg_template)
-
+    for i, flip in enumerate(flip_axes):
+        if flip:
+            roi = np.flip(roi, axis=i)
     if figure is None:
         figure = window.Scene()
 
@@ -436,3 +447,129 @@ def visualize_volume(volume, x=None, y=None, z=None, figure=None,
         show_m.start()
 
     return _inline_interact(figure, inline, interact)
+
+
+def _draw_core(sls, n_points, figure, bundle_name, indiv_profile,
+               labelled_points, dimensions, flip_axes):
+    fgarray = np.asarray(set_number_of_points(sls, n_points))
+    fgarray = np.median(fgarray, axis=0)
+
+    colormap = np.asarray([
+        [0.265625, 0.00390625, 0.328125],
+        [0.28125, 0.15625, 0.46875],
+        [0.2421875, 0.28515625, 0.53515625],
+        [0.19140625, 0.40625, 0.5546875],
+        [0.1484375, 0.5078125, 0.5546875],
+        [0.12109375, 0.6171875, 0.53515625],
+        [0.20703125, 0.71484375, 0.47265625],
+        [0.4296875, 0.8046875, 0.34375],
+        [0.70703125, 0.8671875, 0.16796875],
+        [0.98828125, 0.90234375, 0.14453125]])
+    xp = np.linspace(
+        np.min(indiv_profile),
+        np.max(indiv_profile),
+        num=len(colormap))
+    line_color = np.ones((n_points, 3))
+    for i in range(3):
+        line_color[:, i] = np.interp(indiv_profile, xp, colormap[:, i])
+    line_color_untouched = line_color.copy()
+    for i in range(n_points):
+        if i < n_points - 1:
+            direc = fgarray[i + 1] - fgarray[i]
+            direc = direc / np.linalg.norm(direc)
+            light_direc = -fgarray[i] / np.linalg.norm(fgarray[i])
+            direc_adjust = np.dot(direc, light_direc)
+            direc_adjust = (direc_adjust + 3) / 4
+        line_color[i, 0:3] = line_color[i, 0:3] * direc_adjust
+    text = [None] * n_points
+    for label in labelled_points:
+        if label == -1:
+            text[label] = str(n_points)
+        else:
+            text[label] = str(label)
+
+    if flip_axes[0]:
+        fgarray[:, 0] = dimensions[0] - fgarray[:, 0]
+    if flip_axes[1]:
+        fgarray[:, 1] = dimensions[1] - fgarray[:, 1]
+    if flip_axes[2]:
+        fgarray[:, 2] = dimensions[2] - fgarray[:, 2]
+
+    sl_actor = actor.line([fgarray], line_color)
+    figure.add(sl_actor)
+    sl_actor.GetProperty().SetRenderLinesAsTubes(1)
+    sl_actor.GetProperty().SetLineWidth(20)
+
+    return line_color_untouched
+
+
+def single_bundle_viz(indiv_profile, sft,
+                      bundle, scalar_name,
+                      bundle_dict=None,
+                      flip_axes=[False, False, False],
+                      labelled_nodes=[0, -1],
+                      figure=None,
+                      include_profile=False):
+    """
+    Visualize a single bundle in 3D with core bundle and associated profile
+
+    Parameters
+    ----------
+    indiv_profile : ndarray
+        A numpy array containing a tract profile for this bundle for a scalar.
+
+    sft : Stateful Tractogram, str
+        A Stateful Tractogram containing streamline information.
+        If bundle is an int, the Stateful Tractogram
+        must contain a bundle key in it's data_per_streamline which is a list
+        of bundle `'uid'.
+        Otherwise, the entire Stateful Tractogram will be used as the bundle
+        for the visualization.
+
+    bundle : str or int
+        The name of the bundle to be used as the label for the plot,
+        and for selection from the sft metadata.
+
+    scalar_name : str
+        The name of the scalar being used.
+
+    bundle_dict : dict, optional
+        This parameter is used if bundle is an int.
+        Keys are names of bundles and values are dicts that specify them.
+        Default: Either the entire sft is treated as a bundle,
+        or identified only as unique integers in the metadata.
+
+    flip_axes : ndarray
+        Which axes to flip, to orient the image as RAS, which is how we
+        visualize.
+        For example, if the input image is LAS, use [True, False, False].
+        Default: [False, False, False]
+
+    labelled_nodes : list or ndarray
+        Which nodes to label. -1 indicates the last node.
+        Default: [0, -1]
+
+    figure : Plotly Figure object, optional
+        If provided, the visualization will be added to this Figure. Default:
+        Initialize a new Figure.
+
+    include_profile : bool, optional
+        Not yet implemented in fury. Default: False
+
+    Returns
+    -------
+    Fury Figure object
+    """
+    if figure is None:
+        figure = window.Scene()
+        figure.SetBackground(1, 1, 1)
+
+    n_points = len(indiv_profile)
+    sls, _, bundle_name, dimensions = next(vut.tract_generator(
+        sft, bundle, bundle_dict, None, n_points))
+
+    _draw_core(
+        sls, n_points, figure, bundle_name, indiv_profile,
+        labelled_nodes, dimensions, flip_axes)
+
+    return figure
