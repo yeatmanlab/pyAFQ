@@ -45,8 +45,7 @@ def viz_bundles(base_fname,
                 n_points_bundles=40):
     """
     figure for the visualizaion of the recognized
-    bundles in the subject's brain. Returns path
-    if file can be generated.
+    bundles in the subject's brain.
 
     Parameters
     ----------
@@ -64,6 +63,12 @@ def viz_bundles(base_fname,
         n_points to resample streamlines to before plotting. If None, no
         resampling is done.
         Default: 40
+
+    Returns
+    -------
+    If file can be generated, returns a tuple including the figure and the
+    path to the file.
+    Otherwise, returns the figure.
     """
     mapping = mapping_imap["mapping"]
     bundle_dict = data_imap["bundle_dict"]
@@ -131,7 +136,7 @@ def viz_bundles(base_fname,
     if fname is None:
         return figure
     else:
-        return fname
+        return (figure, fname)
 
 
 @pimms.calc("indiv_bundles_figures")
