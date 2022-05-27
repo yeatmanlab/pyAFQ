@@ -45,7 +45,7 @@ def viz_bundles(base_fname,
                 n_points_bundles=40):
     """
     figure for the visualizaion of the recognized
-    bundles in the subject's brain
+    bundles in the subject's brain.
 
     Parameters
     ----------
@@ -63,6 +63,13 @@ def viz_bundles(base_fname,
         n_points to resample streamlines to before plotting. If None, no
         resampling is done.
         Default: 40
+
+    Returns
+    -------
+    List of Figure, String or just the Figure:
+    If file can be generated, returns a tuple including the figure and the
+    path to the file.
+    Otherwise, returns the figure.
     """
     mapping = mapping_imap["mapping"]
     bundle_dict = data_imap["bundle_dict"]
@@ -106,6 +113,7 @@ def viz_bundles(base_fname,
         inline=False,
         figure=figure)
 
+    fname = None
     if "no_gif" not in viz_backend.backend:
         fname = get_fname(
             base_fname, '_viz.gif',
@@ -126,7 +134,10 @@ def viz_bundles(base_fname,
         segmentation_params=segmentation_params)
     meta = dict(Timing=time() - start_time)
     write_json(meta_fname, meta)
-    return figure
+    if fname is None:
+        return figure
+    else:
+        return [figure, fname]
 
 
 @pimms.calc("indiv_bundles_figures")
