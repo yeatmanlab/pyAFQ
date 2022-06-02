@@ -810,6 +810,10 @@ class Segmentation:
                 self.logger.info("After filtering "
                                  f"{len(select_sl)} streamlines")
 
+            if "custom_recognizer" in self.bundle_dict[bundle]:
+                select_sl = self.bundle_dict[bundle]["custom_recognizer"](
+                    select_sl, self.img)
+
             if self.clip_edges:
                 self.logger.info("Clipping Streamlines by ROI")
                 for idx in range(len(select_sl)):

@@ -19,5 +19,12 @@ key-value pairs::
     transformed from template to subject space before being used.
     - 'prob_map' : path to a Nifti file which is the probability map,
       optional.
+    - 'custom_recognizer' : function which accepts two arguments: (1) array of
+      streamlines of shape Kx3xN where K is the number of found streamlines, 
+      and N is the number of points in each streamline (default is 100), and
+      (2) a Nifti1Image for reference. Should return an array of streamlines
+      of shape Lx3xN, where L is the number of accepted streamlines. This
+      function is called near the end of bundle recognition, after cleaning
+      by endpoints but before the optional ROI clipping.
 
 For an example, see "Plotting the Optic Radiations" in :ref:`examples`.
