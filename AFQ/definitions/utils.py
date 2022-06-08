@@ -102,6 +102,16 @@ def find_file(bids_layout, path, filters, suffix, session, subject,
             strict=False,
         )
 
+    if nearest is None:
+        # If nothing is found still, raise an error
+        raise ValueError((
+            "No file found with these parameters:\n"
+            f"suffix: {suffix},\n"
+            f"session (searched with and without): {session},\n"
+            f"subject: {subject},\n"
+            f"filters: {filters},\n"
+            f"near path: {path},\n"))
+
     path_subject = bids_layout.parse_file_entities(path).get(
         "subject", None
     )
