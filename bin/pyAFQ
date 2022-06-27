@@ -14,8 +14,8 @@ with warnings.catch_warnings():
     import AFQ.utils.bin as afb
 
     import logging
-    logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger('pyAFQ')
+    logger.setLevel(level=logging.INFO)
 
 usage = \
     """pyAFQ /path/to/afq_config.toml
