@@ -258,6 +258,16 @@ def test_AFQ_custom_tract():
             "suffix": "tractography",
             "scope": "vistasoft"
         })
+
+    # equivalent ParticipantAFQ version of call may be useful as reference
+    # myafq = ParticipantAFQ(
+    #     sub_path + "/sub-01_ses-01_dwi.nii.gz",
+    #     sub_path + "/sub-01_ses-01_dwi.bval",
+    #     sub_path + "/sub-01_ses-01_dwi.bvec",
+    #     output_dir=sub_path,
+    #     bundle_info=bundle_names,
+    #     import_tract=sub_path + '/subsampled_tractography.trk')
+
     myafq.export("streamlines")
 
 

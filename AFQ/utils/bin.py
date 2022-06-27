@@ -349,6 +349,7 @@ def generate_json(json_folder, overwrite=False,
             "output_suffix": "PYAFQ_FULL",
             "parameters": {
                 "use_external_tracking": false,
+                "export": "all",
 """
     qsi_spec_intro_their_trk = """{
     "description": "Use pyAFQ to perform the Tractometry pipeline, with tractography from qsiprep",
@@ -400,6 +401,7 @@ def generate_json(json_folder, overwrite=False,
             "output_suffix": "PYAFQ_FULL_ET",
             "parameters": {
                 "use_external_tracking": true,
+                "export": "all",
 """  # noqa
     qsi_spec_outro = """
             }
