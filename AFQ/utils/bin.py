@@ -229,6 +229,7 @@ def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
                          overwrite=False,
                          logger=None,
                          verbose=False,
+                         dry_run=False,
                          special_args={
                              "CLEANING_PARAMS": "clean_params",
                              "SEGMENTATION_PARAMS": "segmentation_params",
@@ -267,8 +268,11 @@ def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
                 default_arg_dict[section][arg] = {}
             default_arg_dict[section][arg]['default'] = default
 
-    if logger is not None and verbose:
+    if logger is not None and (verbose or dry_run):
         logger.info("The following arguments are recognized: " + str(kwargs))
+
+    if dry_run:
+        return
 
     # if overwrite, write new file with updated docs / args
     if overwrite:
