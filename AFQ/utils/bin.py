@@ -229,6 +229,7 @@ def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
                          overwrite=False,
                          logger=None,
                          verbose=False,
+                         dry_run=False,
                          special_args={
                              "CLEANING_PARAMS": "clean_params",
                              "SEGMENTATION_PARAMS": "segmentation_params",
@@ -267,8 +268,11 @@ def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
                 default_arg_dict[section][arg] = {}
             default_arg_dict[section][arg]['default'] = default
 
-    if logger is not None and verbose:
+    if logger is not None and (verbose or dry_run):
         logger.info("The following arguments are recognized: " + str(kwargs))
+
+    if dry_run:
+        return
 
     # if overwrite, write new file with updated docs / args
     if overwrite:
@@ -349,6 +353,7 @@ def generate_json(json_folder, overwrite=False,
             "output_suffix": "PYAFQ_FULL",
             "parameters": {
                 "use_external_tracking": false,
+                "export": "all",
 """
     qsi_spec_intro_their_trk = """{
     "description": "Use pyAFQ to perform the Tractometry pipeline, with tractography from qsiprep",
@@ -400,6 +405,7 @@ def generate_json(json_folder, overwrite=False,
             "output_suffix": "PYAFQ_FULL_ET",
             "parameters": {
                 "use_external_tracking": true,
+                "export": "all",
 """  # noqa
     qsi_spec_outro = """
             }

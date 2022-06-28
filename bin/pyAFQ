@@ -14,8 +14,8 @@ with warnings.catch_warnings():
     import AFQ.utils.bin as afb
 
     import logging
-    logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger('pyAFQ')
+    logger.setLevel(level=logging.INFO)
 
 usage = \
     """pyAFQ /path/to/afq_config.toml
@@ -77,6 +77,15 @@ def parse_cli(arg_dict):
         help="Verbose when reading TOML file")
 
     cli_parser.add_argument(
+        '-d',
+        '--dry-run',
+        dest='dry_run',
+        action="store_true",
+        default=False,
+        help="Perform a dry run - prints recognized"
+        + " arguments without running pyAFQ")
+
+    cli_parser.add_argument(
         '-c',
         '--call',
         dest='to_call',
@@ -102,13 +111,14 @@ def parse_cli(arg_dict):
         popylar.track_event(AFQ._ga_id, "pyAFQ_cli", "CLI called")
 
     return opts.config, opts.generate_toml, opts.overwrite,\
-        opts.verbose, opts.to_call, opts.generate_json
+        opts.verbose, opts.dry_run, opts.to_call, opts.generate_json
 
 
 if __name__ == '__main__':
     arg_dict = afb.func_dict_to_arg_dict(logger=logger)
-    config_file, generate_only, overwrite, verbose, to_call, generate_json =\
-        parse_cli(arg_dict)
+    config_file, generate_only, overwrite, verbose,\
+        dry_run, to_call, generate_json =\
+            parse_cli(arg_dict)
 
     if generate_only and generate_json:
         raise ValueError("Can only generate .toml or .json; not both")
@@ -134,4 +144,5 @@ if __name__ == '__main__':
             to_call=to_call,
             overwrite=overwrite,
             verbose=verbose,
+            dry_run=dry_run,
             logger=logger)

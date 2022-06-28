@@ -123,9 +123,9 @@ def custom_tractography(bids_info, import_tract=None):
 
     Parameters
     ----------
-    import_tract : dict, optional
-        BIDS filters for inputing a user made tractography file.
-        If None, tractography will be performed automatically.
+    import_tract : dict or str, optional
+        BIDS filters for inputing a user made tractography file,
+        or a path to the tractography file.
         Default: None
     """
     if not isinstance(import_tract, dict) and\
