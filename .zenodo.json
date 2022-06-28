@@ -1,12 +1,13 @@
 {
   "contributors": [
     {
-      "affiliation": "The University of Washington, eScience Institute",
-      "name": "Kruper, John",
+      "affiliation": "University of Washington",
+      "name": "Bloom, David",
+      "orcid": " 0000-0003-4510-2468",
       "type": "Researcher"
     },
     {
-      "affiliation": "The University of Washington, eScience Institute",
+      "affiliation": "Stanford",
       "name": "Richie-Halford, Adam",
       "orcid": "0000-0001-9276-9084",
       "type": "Researcher"
@@ -18,7 +19,7 @@
       "type": "Researcher"
     },
     {
-      "affiliation": "The University of Washington, eScience Institute",
+      "affiliation": "University of Washington",
       "name": "Keshavan, Anisha",
       "orcid": "0000-0003-3554-043X",
       "type": "Researcher"
@@ -29,7 +30,7 @@
       "type": "Researcher"
     },
     {
-      "affiliation": "The University of Washington",
+      "affiliation": "University of Washington",
       "name": "Huber, Libby",
       "type": "Researcher"
     },
@@ -44,12 +45,17 @@
   ],
   "creators": [
     {
+      "affiliation": "University of Washington",
+      "name": "Kruper, John",
+      "orcid": "0000-0003-0081-391X"
+    },
+    {
       "affiliation": "Stanford University",
       "name": "Yeatman, Jason",
       "orcid": "0000-0002-2686-1293"
     },
     {
-      "affiliation": "The University of Washington eScience Institute",
+      "affiliation": "University of Washington",
       "name": "Rokem, Ariel",
       "orcid": "0000-0003-0679-1985"
     }
