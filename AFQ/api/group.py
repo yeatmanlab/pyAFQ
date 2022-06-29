@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-# -*- coding: utf-8 -*-
 import contextlib
 import warnings
+import tempfile
 warnings.simplefilter(action='ignore', category=FutureWarning)  # noqa
 
 import logging
@@ -17,6 +18,7 @@ import dipy.tracking.streamlinespeed as dps
 import dipy.tracking.streamline as dts
 
 from AFQ.version import version as pyafq_version
+from AFQ.viz.utils import trim
 import pandas as pd
 import numpy as np
 import os
@@ -25,6 +27,7 @@ import json
 import s3fs
 from time import time
 import nibabel as nib
+from PIL import Image
 
 from bids.layout import BIDSLayout
 import bids.config as bids_config
@@ -318,24 +321,19 @@ class GroupAFQ(object):
                 subses_idx = len(subses_info)
                 sub = self.valid_sub_list[subses_idx]
                 ses = self.valid_ses_list[subses_idx]
-                if len(self.sessions) > 1:
-                    this_bundles_file = self.export("clean_bundles")[sub][ses]
-                    this_mapping = self.export("mapping")[sub][ses]
-                    this_img = nib.load(self.export("dwi")[sub][ses])
-                else:
-                    this_bundles_file = self.export("clean_bundles")[sub]
-                    this_mapping = self.export("mapping")[sub]
-                    this_img = nib.load(self.export("dwi")[sub])
+                this_bundles_file = self.export(
+                    "clean_bundles", collapse=False)[sub][ses]
+                this_mapping = self.export("mapping", collapse=False)[sub][ses]
+                this_img = nib.load(self.export(
+                    "dwi", collapse=False)[sub][ses])
                 seg_sft = aus.SegmentedSFT.fromfile(
                     this_bundles_file,
                     this_img)
                 seg_sft.sft.to_rasmm()
                 subses_info.append((seg_sft, this_mapping))
 
-            bundle_dict = self.export("bundle_dict")[
-                self.valid_sub_list[0]]
-            if len(self.sessions) > 1:
-                bundle_dict = bundle_dict[self.valid_ses_list[0]]
+            bundle_dict = self.export("bundle_dict", collapse=False)[
+                self.valid_sub_list[0]][self.valid_ses_list[0]]
 
             sls_dict = {}
             load_next_subject()  # load first subject
@@ -379,7 +377,7 @@ class GroupAFQ(object):
                 json.dump(sls_dict, fp)
         return sls_json_fname
 
-    def export(self, attr_name="help"):
+    def export(self, attr_name="help", collapse=True):
         f"""
         Export a specific output. To print a list of available outputs,
         call export without arguments.
@@ -389,6 +387,9 @@ class GroupAFQ(object):
         ----------
         attr_name : str
             Name of the output to export. Default: "help"
+        collapse : bool
+            Whether to collapse session dimension if there is only 1 session.
+            Default: True
 
         Returns
         -------
@@ -433,7 +434,7 @@ class GroupAFQ(object):
                 results[subject][session] = par_results[i]
 
         # If only one session, collapse session dimension
-        if len(self.sessions) == 1:
+        if len(self.sessions) == 1 and collapse:
             for subject in self.valid_sub_list:
                 results[subject] = results[subject][self.valid_ses_list[0]]
 
@@ -466,10 +467,8 @@ class GroupAFQ(object):
             Default: True
         """
         start_time = time()
-        seg_params = self.export("segmentation_params")[
-            self.valid_sub_list[0]]
-        if len(self.sessions) > 1:
-            seg_params = seg_params[self.valid_ses_list[0]]
+        seg_params = self.export("segmentation_params", collapse=False)[
+            self.valid_sub_list[0]][self.valid_ses_list[0]]
         seg_algo = seg_params.get("seg_algo", "AFQ")
 
         export_all_helper(self, seg_algo, xforms, indiv, viz)
@@ -479,6 +478,154 @@ class GroupAFQ(object):
             self.assemble_AFQ_browser()
         self.logger.info(
             f"Time taken for export all: {str(time() - start_time)}")
+
+    def montage(self, bundle_name, size, view, slice_pos=None):
+        """
+        Generate montage file(s) of a given bundle at a given angle.
+
+        Parameters
+        ----------
+        bundle_name : str
+            Name of bundle to visualize, should be the same as in the
+            bundle dictionary.
+        size : tuple of int
+            The number of columns and rows for each file.
+        view : str
+            Which view to display. Can be one of Sagittal, Coronal, or Axial.
+        slice_pos : float, or None
+            If float, indicates the fractional position along the
+            perpendicular axis to the slice. Currently only works with plotly.
+            If None, no slice is displayed.
+        """
+        if view not in ["Sagittal", "Coronal", "Axial"]:
+            raise ValueError(
+                "View must be one of: Sagittal, Coronal, or Axial")
+
+        tdir = tempfile.gettempdir()
+
+        best_scalar = self.export("best_scalar", collapse=False)[
+            self.valid_sub_list[0]][self.valid_ses_list[0]]
+        bundle_dict = self.export("bundle_dict", collapse=False)[
+            self.valid_sub_list[0]][self.valid_ses_list[0]]
+
+        viz_backend_dict = self.export("viz_backend", collapse=False)
+        b0_backend_dict = self.export("b0", collapse=False)
+        dwi_affine_dict = self.export("dwi_affine", collapse=False)
+        clean_bundles_dict = self.export("clean_bundles", collapse=False)
+        best_scalar_dict = self.export(best_scalar, collapse=False)
+
+        for ii in range(len(self.valid_ses_list)):
+            this_sub = self.valid_sub_list[ii]
+            this_ses = str(self.valid_ses_list[ii])
+            viz_backend = viz_backend_dict[this_sub][this_ses]
+            b0 = b0_backend_dict[this_sub][this_ses]
+            dwi_affine = dwi_affine_dict[this_sub][this_ses]
+            clean_bundles = clean_bundles_dict[this_sub][this_ses]
+            best_scalar = best_scalar_dict[this_sub][this_ses]
+
+            flip_axes = [False, False, False]
+            for i in range(3):
+                flip_axes[i] = (dwi_affine[i, i] < 0)
+
+            if slice_pos is not None:
+                slice_kwargs = {}
+                if view == "Sagittal":
+                    slice_kwargs["x_pos"] = slice_pos
+                    slice_kwargs["y_pos"] = None
+                    slice_kwargs["z_pos"] = None
+                elif view == "Coronal":
+                    slice_kwargs["x_pos"] = None
+                    slice_kwargs["y_pos"] = slice_pos
+                    slice_kwargs["z_pos"] = None
+                elif view == "Axial":
+                    slice_kwargs["x_pos"] = None
+                    slice_kwargs["y_pos"] = None
+                    slice_kwargs["z_pos"] = slice_pos
+
+                figure = viz_backend.visualize_volume(
+                    b0,
+                    flip_axes=flip_axes,
+                    interact=False,
+                    inline=False,
+                    **slice_kwargs)
+            else:
+                figure = None
+
+            figure = viz_backend.visualize_bundles(
+                clean_bundles,
+                shade_by_volume=best_scalar,
+                bundle_dict=bundle_dict,
+                flip_axes=flip_axes,
+                bundle=bundle_name,
+                interact=False,
+                inline=False,
+                figure=figure)
+
+            eye = {}
+            if view == "Sagittal":
+                eye["x"] = 1
+                eye["y"] = 0
+                eye["z"] = 0
+            elif view == "Coronal":
+                eye["x"] = 0
+                eye["y"] = 1
+                eye["z"] = 0
+            elif view == "Axial":
+                eye["x"] = 0
+                eye["y"] = 0
+                eye["z"] = 1
+
+            this_fname = tdir + f"/t{ii}.png"
+            if "plotly" in viz_backend.backend:
+
+                figure.update_layout(scene_camera=dict(eye=eye))
+                figure.write_image(this_fname)
+
+                # temporary fix for memory leak
+                import plotly.io as pio
+                pio.kaleido.scope._shutdown_kaleido()
+            else:
+                from dipy.viz import window
+                direc = np.fromiter(eye.values(), dtype=int)
+                data_shape = np.asarray(nib.load(b0).get_fdata().shape)
+                figure.set_camera(
+                    position=direc * data_shape,
+                    focal_point=data_shape // 2,
+                    view_up=(0, 0, 1))
+                figure.zoom(0.5)
+                window.snapshot(figure, fname=this_fname, size=(600, 600))
+
+        ref_img = Image.open(tdir + f"/t{ii}.png")
+        ref_width, ref_height = ref_img.width, ref_img.height
+        curr_img = Image.new('RGB', (ref_width * size[0], ref_height * size[1]))
+        curr_file_num = 0
+
+        def _save_file(curr_img, curr_file_num):
+            curr_img.save(op.abspath(op.join(
+                self.afq_path,
+                (f"bundle-{bundle_name}_view-{view}"
+                    f"_idx-{curr_file_num}_montage.png"))))
+
+        for ii in range(len(self.valid_ses_list)):
+            x_pos = ii % size[0]
+            ii = ii // size[0]
+            y_pos = ii % size[1]
+            ii = ii // size[1]
+            file_num = ii
+
+            if file_num != curr_file_num:
+                _save_file(curr_img, curr_file_num)
+                curr_img = Image.new('RGB', (
+                    ref_width * size[0], ref_height * size[1]))
+                curr_file_num = file_num
+
+            this_img = Image.open(tdir + f"/t{ii}.png")
+            this_img_trimmed = trim(trim(this_img))
+            curr_img.paste(
+                this_img_trimmed,
+                (x_pos * ref_width, y_pos * ref_height))
+
+        _save_file(curr_img, curr_file_num)
 
     def upload_to_s3(self, s3fs, remote_path):
         """ Upload entire AFQ derivatives folder to S3"""
