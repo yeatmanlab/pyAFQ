@@ -123,9 +123,10 @@ def custom_tractography(bids_info, import_tract=None):
 
     Parameters
     ----------
-    import_tract : dict or str, optional
+    import_tract : dict or str or None, optional
         BIDS filters for inputing a user made tractography file,
-        or a path to the tractography file.
+        or a path to the tractography file. If None, DIPY is used
+        to generate the tractography.
         Default: None
     """
     if not isinstance(import_tract, dict) and\
@@ -177,7 +178,7 @@ def get_tractography_plan(kwargs):
         export_seed_mask, export_stop_mask, streamlines])
 
     # use imported tractography if given
-    if "import_tract" in kwargs:
+    if "import_tract" in kwargs and kwargs["import_tract"] is not None:
         tractography_tasks["streamlines_res"] = custom_tractography
 
     # determine reasonable defaults

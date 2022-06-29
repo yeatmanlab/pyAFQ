@@ -8,6 +8,8 @@ import logging
 
 import pimms
 
+from tqdm import tqdm
+
 from AFQ.tasks.decorators import as_file
 from AFQ.tasks.utils import get_fname, with_name
 import AFQ.segmentation as seg
@@ -217,7 +219,8 @@ def export_sl_counts(data_imap,
 @as_file('_profiles.csv', include_track=True, include_seg=True)
 def tract_profiles(clean_bundles, data_imap,
                    scalar_dict, dwi_affine,
-                   profile_weights="gauss"):
+                   profile_weights="gauss",
+                   bootstrap_resamples=1000):
     """
     full path to a CSV file containing tract profiles
 
@@ -231,6 +234,13 @@ def tract_profiles(clean_bundles, data_imap,
         If "median", the median of values at each node will be used
         instead of a mean or weighted mean.
         Default: "gauss"
+    bootstrap_resamples : int, optional
+        If greater than 0,
+        Bootstrap the streamlines when generating the tract profile
+        to estimate a confidence interval, with this being the number
+        of boostraps. Bootstrappping is only run on bundles with 10 or
+        more streamlines.
+        Default: 1000
     """
     bundle_dict = data_imap["bundle_dict"]
     if not (profile_weights is None
@@ -250,17 +260,20 @@ def tract_profiles(clean_bundles, data_imap,
 
     bundle_names = []
     node_numbers = []
-    profiles = np.empty((len(scalar_dict), 0)).tolist()
-    this_profile = np.zeros((len(scalar_dict), 100))
+    profiles = np.empty((len(scalar_dict), len(bundle_dict), 100))
+    if bootstrap_resamples > 0:
+        profiles_ci = np.empty((len(scalar_dict), 2, len(bundle_dict), 100))
+        logger.info(f"Bootstrapping profiles...")
 
     seg_sft = aus.SegmentedSFT.fromfile(
         clean_bundles)
     seg_sft.sft.to_rasmm()
-    for bundle_name in bundle_dict.keys():
+    for b_idx, bundle_name in enumerate(tqdm(bundle_dict.keys())):
         this_sl = seg_sft.get_bundle(bundle_name).streamlines
         if len(this_sl) == 0:
             continue
-        for ii, (scalar, scalar_file) in enumerate(scalar_dict.items()):
+        this_sl = set_number_of_points(this_sl, 100)
+        for ii, (scalar, scalar_file) in enumerate(tqdm(scalar_dict.items(), leave=False)):
             scalar_data = nib.load(scalar_file).get_fdata()
             if isinstance(profile_weights, str):
                 if profile_weights == "gauss":
@@ -268,11 +281,10 @@ def tract_profiles(clean_bundles, data_imap,
                 elif profile_weights == "median":
                     # weights bundle to only return the mean
                     def _median_weight(bundle):
-                        fgarray = set_number_of_points(bundle, 100)
                         values = np.array(
                             values_from_volume(
                                 scalar_data,
-                                fgarray,
+                                bundle,
                                 dwi_affine))
                         weights = np.zeros(values.shape)
                         for ii, jj in enumerate(
@@ -283,13 +295,46 @@ def tract_profiles(clean_bundles, data_imap,
                     this_prof_weights = _median_weight
             else:
                 this_prof_weights = profile_weights
-            this_profile[ii] = afq_profile(
+
+            this_profile = afq_profile(
                 scalar_data,
                 this_sl,
                 dwi_affine,
                 weights=this_prof_weights)
-            profiles[ii].extend(list(this_profile[ii]))
-        nodes = list(np.arange(this_profile[0].shape[0]))
+            if bootstrap_resamples > 0:
+                if len(this_sl) < 10:
+                    ci_l, ci_u = np.nan, np.nan
+                else:
+                    boot_profs = []
+                    for _ in tqdm(range(bootstrap_resamples), leave=False):
+                        boot_idx = np.random.choice(
+                            len(this_sl), replace=True,
+                            size=len(this_sl))
+
+                        if hasattr(this_prof_weights, "shape")\
+                                and len(this_prof_weights.shape) > 1:
+                            boot_prof_weights = this_prof_weights[boot_idx]
+                            boot_prof_weights = boot_prof_weights / np.sum(
+                                boot_prof_weights, 0)
+                        else:
+                            boot_prof_weights = this_prof_weights
+
+                        boot_profs.append(afq_profile(
+                            scalar_data,
+                            this_sl[boot_idx],
+                            dwi_affine,
+                            weights=boot_prof_weights))
+                    boot_profs = np.asarray(boot_profs)
+
+                    ci_l = np.percentile(boot_profs, 5, axis=0)
+                    ci_u = np.percentile(boot_profs, 95, axis=0)
+                    ci_l, ci_u = 2 * this_profile - ci_u, 2 * this_profile - ci_l
+
+            profiles[ii, b_idx, :] = this_profile
+            if bootstrap_resamples > 0:
+                profiles_ci[ii, 0, b_idx, :] = ci_l
+                profiles_ci[ii, 1, b_idx, :] = ci_u
+        nodes = list(np.arange(100))
         bundle_names.extend([bundle_name] * len(nodes))
         node_numbers.extend(nodes)
 
@@ -297,7 +342,10 @@ def tract_profiles(clean_bundles, data_imap,
     profile_dict["tractID"] = bundle_names
     profile_dict["nodeID"] = node_numbers
     for ii, scalar in enumerate(scalar_dict.keys()):
-        profile_dict[scalar] = profiles[ii]
+        profile_dict[scalar] = profiles[ii].flatten()
+        if bootstrap_resamples > 0:
+            profile_dict[f"{scalar}_ci_low"] = profiles_ci[ii, 0].flatten()
+            profile_dict[f"{scalar}_ci_high"] = profiles_ci[ii, 1].flatten()
 
     profile_dframe = pd.DataFrame(profile_dict)
     meta = dict(source=clean_bundles,
