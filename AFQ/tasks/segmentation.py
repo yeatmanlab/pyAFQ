@@ -273,7 +273,8 @@ def tract_profiles(clean_bundles, data_imap,
         if len(this_sl) == 0:
             continue
         this_sl = set_number_of_points(this_sl, 100)
-        for ii, (scalar, scalar_file) in enumerate(tqdm(scalar_dict.items(), leave=False)):
+        for ii, (scalar, scalar_file) in enumerate(
+                tqdm(scalar_dict.items(), leave=False)):
             scalar_data = nib.load(scalar_file).get_fdata()
             if isinstance(profile_weights, str):
                 if profile_weights == "gauss":
@@ -328,12 +329,13 @@ def tract_profiles(clean_bundles, data_imap,
 
                     ci_l = np.percentile(boot_profs, 5, axis=0)
                     ci_u = np.percentile(boot_profs, 95, axis=0)
-                    ci_l, ci_u = 2 * this_profile - ci_u, 2 * this_profile - ci_l
+                    ci_l_corrected = 2 * this_profile - ci_u
+                    ci_u_corrected = 2 * this_profile - ci_l
 
             profiles[ii, b_idx, :] = this_profile
             if bootstrap_resamples > 0:
-                profiles_ci[ii, 0, b_idx, :] = ci_l
-                profiles_ci[ii, 1, b_idx, :] = ci_u
+                profiles_ci[ii, 0, b_idx, :] = ci_l_corrected
+                profiles_ci[ii, 1, b_idx, :] = ci_u_corrected
         nodes = list(np.arange(100))
         bundle_names.extend([bundle_name] * len(nodes))
         node_numbers.extend(nodes)
