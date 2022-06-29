@@ -597,7 +597,8 @@ class GroupAFQ(object):
 
         ref_img = Image.open(tdir + f"/t{ii}.png")
         ref_width, ref_height = ref_img.width, ref_img.height
-        curr_img = Image.new('RGB', (ref_width * size[0], ref_height * size[1]))
+        curr_img = Image.new('RGB', (
+            ref_width * size[0], ref_height * size[1]))
         curr_file_num = 0
 
         def _save_file(curr_img, curr_file_num):
