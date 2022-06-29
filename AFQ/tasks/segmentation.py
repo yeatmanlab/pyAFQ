@@ -304,7 +304,7 @@ def tract_profiles(clean_bundles, data_imap,
                 weights=this_prof_weights)
             if bootstrap_resamples > 0:
                 if len(this_sl) < 10:
-                    ci_l, ci_u = np.nan, np.nan
+                    ci_l_corrected, ci_u_corrected = np.nan, np.nan
                 else:
                     boot_profs = []
                     for _ in tqdm(range(bootstrap_resamples), leave=False):
