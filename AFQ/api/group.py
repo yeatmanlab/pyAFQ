@@ -16,6 +16,7 @@ from dipy.utils.parallel import paramap
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 import dipy.tracking.streamlinespeed as dps
 import dipy.tracking.streamline as dts
+from dipy.io.streamline import save_tractogram
 
 from AFQ.version import version as pyafq_version
 from AFQ.viz.utils import trim
@@ -627,6 +628,48 @@ class GroupAFQ(object):
                 (x_pos * ref_width, y_pos * ref_height))
 
         _save_file(curr_img, curr_file_num)
+
+    def combine_bundle(self, bundle_name):
+        """
+        Transforms a given bundle to reg_template space for all subjects
+        then merges them to one trk file. 
+        Useful for visualizing the variability in the bundle across subjects.
+
+        Parameters
+        ----------
+        bundle_name : str
+        Name of the bundle to transform, should be one of the bundles in
+        bundle_dict.
+        """
+        reg_template = self.export("reg_template", collapse=False)[
+            self.valid_sub_list[0]][self.valid_ses_list[0]]
+        clean_bundles_dict = self.export("clean_bundles", collapse=False)
+        mapping_dict = self.export("mapping", collapse=False)
+
+        sls_mni = []
+        for ii in range(len(self.valid_ses_list)):
+            this_sub = self.valid_sub_list[ii]
+            this_ses = str(self.valid_ses_list[ii])
+            seg_sft = aus.SegmentedSFT.fromfile(clean_bundles_dict[
+                this_sub][this_ses])
+            sls = seg_sft.get_bundle(bundle_name).streamlines
+            mapping = mapping_dict[this_sub][this_ses]
+
+            delta = dts.values_from_volume(
+                mapping.forward,
+                sls, np.eye(4))
+            sls_mni.extend([d + s for d, s in zip(delta, sls)])
+
+        moved_sft = StatefulTractogram(
+            sls_mni,
+            reg_template,
+            Space.RASMM)
+        save_tractogram(
+            moved_sft,
+            op.abspath(op.join(
+                self.afq_path,
+                f"bundle-{bundle_name}_subjects-all_MNI.trk")),
+            bbox_valid_check=False)
 
     def upload_to_s3(self, s3fs, remote_path):
         """ Upload entire AFQ derivatives folder to S3"""
