@@ -632,7 +632,7 @@ class GroupAFQ(object):
     def combine_bundle(self, bundle_name):
         """
         Transforms a given bundle to reg_template space for all subjects
-        then merges them to one trk file. 
+        then merges them to one trk file.
         Useful for visualizing the variability in the bundle across subjects.
 
         Parameters
