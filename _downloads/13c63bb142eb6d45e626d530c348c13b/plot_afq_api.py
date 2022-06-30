@@ -166,7 +166,7 @@ ax.axis("off")
 #    visualization will also all you to pan, zoom, and rotate.
 
 bundle_html = myafq.export("all_bundles_figure")
-plotly.io.show(bundle_html["01"])
+plotly.io.show(bundle_html["01"][0])
 
 ##########################################################################
 # We can also visualize the tract profiles in all of the bundles. These

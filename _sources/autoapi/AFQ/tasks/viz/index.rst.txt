@@ -85,7 +85,7 @@ Attributes
 
    
    figure for the visualizaion of the recognized
-   bundles in the subject's brain
+   bundles in the subject's brain.
 
 
    :Parameters:
@@ -107,6 +107,19 @@ Attributes
            resampling is done.
            Default: 40
 
+   :Returns:
+
+       List of Figure, String or just the Figure:
+           ..
+
+       If file can be generated, returns a tuple including the figure and the
+           ..
+
+       path to the file.
+           ..
+
+       Otherwise, returns the figure.
+           ..
 
 
 

@@ -1,17 +1,21 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.viz.fury_backend &#8212; AFQ 0.12 documentation</title>
-    
-  <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+    <title>AFQ.viz.fury_backend &#8212; AFQ 0.12.1 documentation</title>
+<script>
+  document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+  document.documentElement.dataset.theme = localStorage.getItem("theme") || "light"
+</script>
 
-    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+
+
   <link rel="stylesheet"
     href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
   <link rel="preload" as="font" type="font/woff2" crossorigin
@@ -26,44 +30,52 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-    
+
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695">
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
-    
-
-    <!-- Google Analytics -->
-    
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="docsearch:language" content="en">
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
-    
-    <div class="container-fluid" id="banner"></div>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+    <div class="bd-header-announcement container-fluid" id="banner">
+      
+
+    </div>
 
     
-    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+    <nav class="bd-header navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="bd-header__inner container-xl">
 
   <div id="navbar-start">
     
     
+  
 
-<a class="navbar-brand" href="../../../index.html">
-  <img src="../../../_static/logo.png" class="logo" alt="logo">
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="Logo image">
+    <img src="../../../_static/logo.png" class="logo__image only-dark" alt="Logo image">
+  
+  
 </a>
-
-
     
   </div>
 
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
+    <span class="fas fa-bars"></span>
   </button>
 
   
@@ -131,6 +143,14 @@
     <div id="navbar-end">
       
       <div class="navbar-end-item">
+        <span id="theme-switch" class="btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
           <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
@@ -145,13 +165,13 @@
     </nav>
     
 
-    <div class="container-xl">
-      <div class="row">
+    <div class="bd-container container-xl">
+      <div class="bd-container__inner row">
           
-            
-            <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar">
-              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+
+<!-- Only show if we have sidebars configured, else just a small margin  -->
+<div class="bd-sidebar-primary col-12 col-md-3 bd-sidebar">
+  <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -159,26 +179,25 @@
     
   </div>
 </nav>
-              </div>
-              <div class="sidebar-end-items">
-              </div>
-            </div>
-            
-          
+  </div>
+  <div class="sidebar-end-items">
+  </div>
+</div>
+
 
           
-          <div class="d-none d-xl-block col-xl-2 bd-toc">
-            
-          </div>
-          
+
+
+<div class="bd-sidebar-secondary d-none d-xl-block col-xl-2 bd-toc">
+  
+</div>
+
 
           
           
-            
-          
-          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+          <div class="bd-content col-12 col-md-9 col-xl-7">
               
-              <div>
+              <article class="bd-article" role="main">
                 
   <h1>Source code for AFQ.viz.fury_backend</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">tempfile</span>
@@ -188,6 +207,8 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">import</span> <span class="nn">AFQ.viz.utils</span> <span class="k">as</span> <span class="nn">vut</span>
+
+<span class="kn">from</span> <span class="nn">dipy.tracking.streamline</span> <span class="kn">import</span> <span class="n">set_number_of_points</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">dipy.viz</span> <span class="kn">import</span> <span class="n">window</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">ui</span>
@@ -295,11 +316,18 @@
 
     <span class="n">figure</span><span class="o">.</span><span class="n">SetBackground</span><span class="p">(</span><span class="n">background</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">background</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">background</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
 
-    <span class="k">for</span> <span class="p">(</span><span class="n">sls</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">vut</span><span class="o">.</span><span class="n">tract_generator</span><span class="p">(</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">sls</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">)</span> <span class="ow">in</span> <span class="n">vut</span><span class="o">.</span><span class="n">tract_generator</span><span class="p">(</span>
             <span class="n">sft</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">n_points</span><span class="p">):</span>
         <span class="n">sls</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sls</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;all_bundles&quot;</span><span class="p">:</span>
             <span class="n">color</span> <span class="o">=</span> <span class="n">line_colors</span><span class="p">(</span><span class="n">sls</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">sl</span> <span class="ow">in</span> <span class="n">sls</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">flip_axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">sl</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">sl</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">flip_axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">sl</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">dimensions</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">sl</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">flip_axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+                <span class="n">sl</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">dimensions</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">sl</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
 
         <span class="n">sl_actor</span> <span class="o">=</span> <span class="n">actor</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">sls</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span>
         <span class="n">figure</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sl_actor</span><span class="p">)</span>
@@ -429,7 +457,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">roi</span> <span class="o">=</span> <span class="n">vut</span><span class="o">.</span><span class="n">prepare_roi</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">affine_or_mapping</span><span class="p">,</span> <span class="n">static_img</span><span class="p">,</span>
                           <span class="n">roi_affine</span><span class="p">,</span> <span class="n">static_affine</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">)</span>
-
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">flip</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">flip_axes</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">flip</span><span class="p">:</span>
+            <span class="n">roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">figure</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">figure</span> <span class="o">=</span> <span class="n">window</span><span class="o">.</span><span class="n">Scene</span><span class="p">()</span>
 
@@ -619,40 +649,170 @@
         <span class="n">show_m</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">_inline_interact</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">inline</span><span class="p">,</span> <span class="n">interact</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="_draw_core"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/fury_backend/index.html#AFQ.viz.fury_backend._draw_core">[docs]</a><span class="k">def</span> <span class="nf">_draw_core</span><span class="p">(</span><span class="n">sls</span><span class="p">,</span> <span class="n">n_points</span><span class="p">,</span> <span class="n">figure</span><span class="p">,</span> <span class="n">bundle_name</span><span class="p">,</span> <span class="n">indiv_profile</span><span class="p">,</span>
+               <span class="n">labelled_points</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">flip_axes</span><span class="p">):</span>
+    <span class="n">fgarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">set_number_of_points</span><span class="p">(</span><span class="n">sls</span><span class="p">,</span> <span class="n">n_points</span><span class="p">))</span>
+    <span class="n">fgarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">fgarray</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">colormap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span>
+        <span class="p">[</span><span class="mf">0.265625</span><span class="p">,</span> <span class="mf">0.00390625</span><span class="p">,</span> <span class="mf">0.328125</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.28125</span><span class="p">,</span> <span class="mf">0.15625</span><span class="p">,</span> <span class="mf">0.46875</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.2421875</span><span class="p">,</span> <span class="mf">0.28515625</span><span class="p">,</span> <span class="mf">0.53515625</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.19140625</span><span class="p">,</span> <span class="mf">0.40625</span><span class="p">,</span> <span class="mf">0.5546875</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.1484375</span><span class="p">,</span> <span class="mf">0.5078125</span><span class="p">,</span> <span class="mf">0.5546875</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.12109375</span><span class="p">,</span> <span class="mf">0.6171875</span><span class="p">,</span> <span class="mf">0.53515625</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.20703125</span><span class="p">,</span> <span class="mf">0.71484375</span><span class="p">,</span> <span class="mf">0.47265625</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.4296875</span><span class="p">,</span> <span class="mf">0.8046875</span><span class="p">,</span> <span class="mf">0.34375</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.70703125</span><span class="p">,</span> <span class="mf">0.8671875</span><span class="p">,</span> <span class="mf">0.16796875</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.98828125</span><span class="p">,</span> <span class="mf">0.90234375</span><span class="p">,</span> <span class="mf">0.14453125</span><span class="p">]])</span>
+    <span class="n">xp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">indiv_profile</span><span class="p">),</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">indiv_profile</span><span class="p">),</span>
+        <span class="n">num</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">colormap</span><span class="p">))</span>
+    <span class="n">line_color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n_points</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+        <span class="n">line_color</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">indiv_profile</span><span class="p">,</span> <span class="n">xp</span><span class="p">,</span> <span class="n">colormap</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span>
+    <span class="n">line_color_untouched</span> <span class="o">=</span> <span class="n">line_color</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_points</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n_points</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">direc</span> <span class="o">=</span> <span class="n">fgarray</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">fgarray</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">direc</span> <span class="o">=</span> <span class="n">direc</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">direc</span><span class="p">)</span>
+            <span class="n">light_direc</span> <span class="o">=</span> <span class="o">-</span><span class="n">fgarray</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">fgarray</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">direc_adjust</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">direc</span><span class="p">,</span> <span class="n">light_direc</span><span class="p">)</span>
+            <span class="n">direc_adjust</span> <span class="o">=</span> <span class="p">(</span><span class="n">direc_adjust</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span> <span class="o">/</span> <span class="mi">4</span>
+        <span class="n">line_color</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">line_color</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">direc_adjust</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_points</span>
+    <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labelled_points</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">text</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">n_points</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">text</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">flip_axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">fgarray</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">fgarray</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">flip_axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">fgarray</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">dimensions</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">fgarray</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">flip_axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+        <span class="n">fgarray</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">dimensions</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">fgarray</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+
+    <span class="n">sl_actor</span> <span class="o">=</span> <span class="n">actor</span><span class="o">.</span><span class="n">line</span><span class="p">([</span><span class="n">fgarray</span><span class="p">],</span> <span class="n">line_color</span><span class="p">)</span>
+    <span class="n">figure</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sl_actor</span><span class="p">)</span>
+    <span class="n">sl_actor</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetRenderLinesAsTubes</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">sl_actor</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetLineWidth</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">line_color_untouched</span></div>
+
+
+<div class="viewcode-block" id="single_bundle_viz"><a class="viewcode-back" href="../../../autoapi/AFQ/viz/fury_backend/index.html#AFQ.viz.fury_backend.single_bundle_viz">[docs]</a><span class="k">def</span> <span class="nf">single_bundle_viz</span><span class="p">(</span><span class="n">indiv_profile</span><span class="p">,</span> <span class="n">sft</span><span class="p">,</span>
+                      <span class="n">bundle</span><span class="p">,</span> <span class="n">scalar_name</span><span class="p">,</span>
+                      <span class="n">bundle_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">flip_axes</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+                      <span class="n">labelled_nodes</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                      <span class="n">figure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">include_profile</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Visualize a single bundle in 3D with core bundle and associated profile</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    indiv_profile : ndarray</span>
+<span class="sd">        A numpy array containing a tract profile for this bundle for a scalar.</span>
+
+<span class="sd">    sft : Stateful Tractogram, str</span>
+<span class="sd">        A Stateful Tractogram containing streamline information.</span>
+<span class="sd">        If bundle is an int, the Stateful Tractogram</span>
+<span class="sd">        must contain a bundle key in it&#39;s data_per_streamline which is a list</span>
+<span class="sd">        of bundle `&#39;uid&#39;.</span>
+<span class="sd">        Otherwise, the entire Stateful Tractogram will be used as the bundle</span>
+<span class="sd">        for the visualization.</span>
+
+<span class="sd">    bundle : str or int</span>
+<span class="sd">        The name of the bundle to be used as the label for the plot,</span>
+<span class="sd">        and for selection from the sft metadata.</span>
+
+<span class="sd">    scalar_name : str</span>
+<span class="sd">        The name of the scalar being used.</span>
+
+<span class="sd">    bundle_dict : dict, optional</span>
+<span class="sd">        This parameter is used if bundle is an int.</span>
+<span class="sd">        Keys are names of bundles and values are dicts that specify them.</span>
+<span class="sd">        Default: Either the entire sft is treated as a bundle,</span>
+<span class="sd">        or identified only as unique integers in the metadata.</span>
+
+<span class="sd">    flip_axes : ndarray</span>
+<span class="sd">        Which axes to flip, to orient the image as RAS, which is how we</span>
+<span class="sd">        visualize.</span>
+<span class="sd">        For example, if the input image is LAS, use [True, False, False].</span>
+<span class="sd">        Default: [False, False, False]</span>
+
+<span class="sd">    labelled_nodes : list or ndarray</span>
+<span class="sd">        Which nodes to label. -1 indicates the last node.</span>
+<span class="sd">        Default: [0, -1]</span>
+
+<span class="sd">    figure : Plotly Figure object, optional</span>
+<span class="sd">        If provided, the visualization will be added to this Figure. Default:</span>
+<span class="sd">        Initialize a new Figure.</span>
+
+<span class="sd">    include_profile : bool, optional</span>
+<span class="sd">        Not yet implemented in fury. Default: False</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Fury Figure object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">figure</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">figure</span> <span class="o">=</span> <span class="n">window</span><span class="o">.</span><span class="n">Scene</span><span class="p">()</span>
+        <span class="n">figure</span><span class="o">.</span><span class="n">SetBackground</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">n_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">indiv_profile</span><span class="p">)</span>
+    <span class="n">sls</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">bundle_name</span><span class="p">,</span> <span class="n">dimensions</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">vut</span><span class="o">.</span><span class="n">tract_generator</span><span class="p">(</span>
+        <span class="n">sft</span><span class="p">,</span> <span class="n">bundle</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">n_points</span><span class="p">))</span>
+
+    <span class="n">_draw_core</span><span class="p">(</span>
+        <span class="n">sls</span><span class="p">,</span> <span class="n">n_points</span><span class="p">,</span> <span class="n">figure</span><span class="p">,</span> <span class="n">bundle_name</span><span class="p">,</span> <span class="n">indiv_profile</span><span class="p">,</span>
+        <span class="n">labelled_nodes</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">flip_axes</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">figure</span></div>
 </pre></div>
 
-              </div>
+              </article>
               
+
               
-              <!-- Previous / next buttons -->
+              <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
 <div class='prev-next-area'>
 </div>
+              </footer>
               
-          </main>
+          </div>
           
-
       </div>
     </div>
+
+  
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695"></script>
 
-<footer class="footer mt-5 mt-md-0">
-  <div class="container">
-    
-    <div class="footer-item">
-      <p class="copyright">
+
+<footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    <p class="copyright">
     &copy; Copyright 2018--, The pyAFQ Contributors.<br>
 </p>
-    </div>
-    
-    <div class="footer-item">
-      <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
-</p>
-    </div>
-    
   </div>
+  
+  <div class="footer-item">
+    <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.2.<br>
+</p>
+  </div>
+  
+</div>
 </footer>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");

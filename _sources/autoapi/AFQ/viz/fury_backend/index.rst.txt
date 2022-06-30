@@ -25,6 +25,8 @@ Functions
    AFQ.viz.fury_backend.create_gif
    AFQ.viz.fury_backend.visualize_roi
    AFQ.viz.fury_backend.visualize_volume
+   AFQ.viz.fury_backend._draw_core
+   AFQ.viz.fury_backend.single_bundle_viz
 
 
 
@@ -345,6 +347,97 @@ Attributes
    :Returns:
 
        Fury Scene object
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: _draw_core(sls, n_points, figure, bundle_name, indiv_profile, labelled_points, dimensions, flip_axes)
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: single_bundle_viz(indiv_profile, sft, bundle, scalar_name, bundle_dict=None, flip_axes=[False, False, False], labelled_nodes=[0, -1], figure=None, include_profile=False)
+
+   
+   Visualize a single bundle in 3D with core bundle and associated profile
+
+
+   :Parameters:
+
+       **indiv_profile** : ndarray
+           A numpy array containing a tract profile for this bundle for a scalar.
+
+       **sft** : Stateful Tractogram, str
+           A Stateful Tractogram containing streamline information.
+           If bundle is an int, the Stateful Tractogram
+           must contain a bundle key in it's data_per_streamline which is a list
+           of bundle `'uid'.
+           Otherwise, the entire Stateful Tractogram will be used as the bundle
+           for the visualization.
+
+       **bundle** : str or int
+           The name of the bundle to be used as the label for the plot,
+           and for selection from the sft metadata.
+
+       **scalar_name** : str
+           The name of the scalar being used.
+
+       **bundle_dict** : dict, optional
+           This parameter is used if bundle is an int.
+           Keys are names of bundles and values are dicts that specify them.
+           Default: Either the entire sft is treated as a bundle,
+           or identified only as unique integers in the metadata.
+
+       **flip_axes** : ndarray
+           Which axes to flip, to orient the image as RAS, which is how we
+           visualize.
+           For example, if the input image is LAS, use [True, False, False].
+           Default: [False, False, False]
+
+       **labelled_nodes** : list or ndarray
+           Which nodes to label. -1 indicates the last node.
+           Default: [0, -1]
+
+       **figure** : Plotly Figure object, optional
+           If provided, the visualization will be added to this Figure. Default:
+           Initialize a new Figure.
+
+       **include_profile** : bool, optional
+           Not yet implemented in fury. Default: False
+
+   :Returns:
+
+       Fury Figure object
            ..
 
 

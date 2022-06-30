@@ -167,9 +167,9 @@ tracking_params: dict, optional
 	If ``tracker`` is set to "pft" then ``stop_mask`` should be
 	an instance of ``AFQ.definitions.image.PFTImage``.
 
-import_tract: dict, optional
-	BIDS filters for inputing a user made tractography file.
-	If None, tractography will be performed automatically.
+import_tract: dict or str, optional
+	BIDS filters for inputing a user made tractography file,
+	or a path to the tractography file.
 	Default: None
 
 

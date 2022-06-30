@@ -445,8 +445,8 @@ See an example configuration file below::
     
     [TRACTOGRAPHY]
     
-    # BIDS filters for inputing a user made tractography file.
-    # If None, tractography will be performed automatically.
+    # BIDS filters for inputing a user made tractography file,
+    # or a path to the tractography file.
     # Default: None
     import_tract = ""
     

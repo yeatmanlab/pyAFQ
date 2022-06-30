@@ -291,18 +291,18 @@ the AFQ waypoint ROI approach.
     Optimizing level 1 [max iter: 1000]
     Optimizing level 0 [max iter: 100]
     Tracking...
-    16413
+    16383
     Segmenting fiber groups...
-    CST_L 61
-    CST_R 194
+    CST_L 73
+    CST_R 192
     UF_L 14
-    UF_R 7
-    CC_ForcepsMajor 232
-    CC_ForcepsMinor 719
+    UF_R 6
+    CC_ForcepsMajor 224
+    CC_ForcepsMinor 702
     OR_L 21
     OR_R 11
-    VOF_L 134
-    VOF_R 78
+    VOF_L 132
+    VOF_R 79
     Extracting tract profiles...
 
 
@@ -322,7 +322,7 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 17 minutes  53.835 seconds)
+   **Total running time of the script:** ( 16 minutes  35.543 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_recobundles.py:

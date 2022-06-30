@@ -22,6 +22,8 @@ obvious from mean measures of that tract ([Yeatman2012]_).
 fiber tracts in individual human brains, and quantification of the tissue
 properties within the tracts. To learn more about the software please refer to the Table of Contents.
 
+For further statistical analysis of pyAFQ results, see `AFQ-Insight <https://github.com/richford/AFQ-Insight>`_ .
+
 .. todo::
   create and link to page that lists the `major fiber tracts` supported by
   default. include information on how to add custom fiber bundles defintions.

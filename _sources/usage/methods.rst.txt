@@ -188,7 +188,7 @@ streamlines:
 
 
 all_bundles_figure:
-    figure for the visualizaion of the recognized bundles in the subject's brain
+    figure for the visualizaion of the recognized bundles in the subject's brain.
 
 
 indiv_bundles_figures:
