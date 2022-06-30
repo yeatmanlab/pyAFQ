@@ -1,3 +1,14 @@
+0.12.1 (June 30, 2022)
+======================
+  * [FIX] warn user about number of invalid streamlines removed (#850)
+  * TST: Test the nibabel release candidate. (#842)
+  * MAINT: Refreshes the zenodo metadata file. (#845)
+  * [ENH] minor docs updates and qsiprep changes (#847)
+  * [FIX] Error when file not found should be more informative (#844)
+  * [ENH] Return path to single viz file if its generated (#839)
+  * [ENH] Add core_bundle functionality to fury backend (#838)
+  * [FIX] update to_call in pyAFQ CLI to new API (#836)
+
 0.12 (May 18, 2022)
 ===================
 This release simplifies the API, in part by merging the 
