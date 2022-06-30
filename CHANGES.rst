@@ -1,5 +1,6 @@
 0.12.1 (June 30, 2022)
 ======================
+More informative warnings and errors, minor fixes.
   * [FIX] warn user about number of invalid streamlines removed (#850)
   * TST: Test the nibabel release candidate. (#842)
   * MAINT: Refreshes the zenodo metadata file. (#845)
