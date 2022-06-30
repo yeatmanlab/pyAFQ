@@ -50,7 +50,8 @@ def segment(dwi, data_imap, mapping_imap,
     tg = load_tractogram(
         streamlines, img, Space.VOX,
         bbox_valid_check=False)
-    tg.remove_invalid_streamlines()
+    indices_to_remove, _ = tg.remove_invalid_streamlines()
+    logger.warning(f"{len(indices_to_remove)} invalid streamlines removed")
 
     start_time = time()
     segmentation = seg.Segmentation(**segmentation_params)
