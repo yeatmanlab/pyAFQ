@@ -216,8 +216,8 @@ def export_sl_counts(data_imap,
 
 @pimms.calc("sl_lengths")
 @as_file('_sl_lengths.csv', include_track=True, include_seg=True)
-def export_sl_counts(data_imap,
-                     clean_bundles, bundles):
+def export_sl_lengths(data_imap,
+                      clean_bundles, bundles):
     """
     full path to a JSON file containing streamline counts
     """
@@ -381,6 +381,7 @@ def get_segmentation_plan(kwargs):
     segmentation_tasks = with_name([
         get_scalar_dict,
         export_sl_counts,
+        export_sl_lengths,
         export_bundles,
         clean_bundles,
         segment,
