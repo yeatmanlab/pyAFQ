@@ -214,6 +214,46 @@ def export_sl_counts(data_imap,
     return counts_df, dict(sources=bundles_files)
 
 
+@pimms.calc("sl_lengths")
+@as_file('_sl_lengths.csv', include_track=True, include_seg=True)
+def export_sl_counts(data_imap,
+                     clean_bundles, bundles):
+    """
+    full path to a JSON file containing streamline counts
+    """
+    bundle_dict = data_imap["bundle_dict"]
+    med_len_clean_counts = []
+    med_len_counts = []
+    bundle_names = list(bundle_dict.keys())
+    if "whole_brain" not in bundle_names:
+        bundle_names.append("whole_brain")
+    bundles_files = [clean_bundles, bundles]
+    lists = [med_len_clean_counts, med_len_counts]
+
+    for bundles_file, lens in zip(bundles_files, lists):
+        seg_sft = aus.SegmentedSFT.fromfile(bundles_file)
+
+        for bundle in bundle_names:
+            if bundle == "whole_brain":
+                lens.append(np.median(
+                    seg_sft.sft._tractogram._streamlines._lengths))
+            else:
+                lens.append(np.median(
+                    seg_sft.get_bundle(
+                        bundle)._tractogram._streamlines._lengths))
+            if np.isnan(lens[-1]):
+                lens[-1] = 0  # cannot be NaN to be int
+            else:
+                lens[-1] = int(lens[-1])
+
+    counts_df = pd.DataFrame(
+        data=dict(
+            median_len=med_len_counts,
+            median_len_clean=med_len_clean_counts),
+        index=bundle_names)
+    return counts_df, dict(sources=bundles_files)
+
+
 @pimms.calc("profiles")
 @as_file('_profiles.csv', include_track=True, include_seg=True)
 def tract_profiles(clean_bundles, data_imap,

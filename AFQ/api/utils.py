@@ -125,6 +125,7 @@ def export_all_helper(api_afq_object, seg_algo, xforms, indiv, viz):
         if seg_algo == "AFQ":
             api_afq_object.export("rois")
     api_afq_object.export("sl_counts")
+    api_afq_object.export("sl_lengths")
     api_afq_object.export("profiles")
 
     if viz:
