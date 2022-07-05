@@ -66,6 +66,9 @@ def segment(dwi, data_imap, mapping_imap,
 
     seg_sft = aus.SegmentedSFT(bundles, Space.VOX)
 
+    if len(seg_sft.sft) < 1:
+        raise ValueError("Fatal: No bundles recognized.")
+
     tgram, meta = seg_sft.get_sft_and_sidecar()
 
     segmentation_params_out = {
