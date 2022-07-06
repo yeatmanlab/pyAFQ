@@ -658,10 +658,11 @@ class GroupAFQ(object):
             sls = seg_sft.get_bundle(bundle_name).streamlines
             mapping = mapping_dict[this_sub][this_ses]
 
-            delta = dts.values_from_volume(
-                mapping.forward,
-                sls, np.eye(4))
-            sls_mni.extend([d + s for d, s in zip(delta, sls)])
+            if len(sls) > 0:
+                delta = dts.values_from_volume(
+                    mapping.forward,
+                    sls, np.eye(4))
+                sls_mni.extend([d + s for d, s in zip(delta, sls)])
 
         moved_sft = StatefulTractogram(
             sls_mni,
