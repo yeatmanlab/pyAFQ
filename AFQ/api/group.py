@@ -24,6 +24,7 @@ import pandas as pd
 import numpy as np
 import os
 import os.path as op
+from tqdm import tqdm
 import json
 import s3fs
 from time import time
@@ -515,7 +516,8 @@ class GroupAFQ(object):
         clean_bundles_dict = self.export("clean_bundles", collapse=False)
         best_scalar_dict = self.export(best_scalar, collapse=False)
 
-        for ii in range(len(self.valid_ses_list)):
+        self.logger.info("Generating Montage...")
+        for ii in tqdm(range(len(self.valid_ses_list))):
             this_sub = self.valid_sub_list[ii]
             this_ses = self.valid_ses_list[ii]
             viz_backend = viz_backend_dict[this_sub][this_ses]
@@ -582,7 +584,11 @@ class GroupAFQ(object):
             this_fname = tdir + f"/t{ii}.png"
             if "plotly" in viz_backend.backend:
 
-                figure.update_layout(scene_camera=dict(eye=eye))
+                figure.update_layout(scene_camera=dict(
+                    projection=dict(type="orthographic"),
+                    up=view_up,
+                    eye=eye,
+                    center=dict(x=0, y=0, z=0)))
                 figure.write_image(this_fname)
 
                 # temporary fix for memory leak
@@ -653,7 +659,8 @@ class GroupAFQ(object):
         mapping_dict = self.export("mapping", collapse=False)
 
         sls_mni = []
-        for ii in range(len(self.valid_ses_list)):
+        self.logger.info("Combining Bundles...")
+        for ii in tqdm(range(len(self.valid_ses_list))):
             this_sub = self.valid_sub_list[ii]
             this_ses = self.valid_ses_list[ii]
             seg_sft = aus.SegmentedSFT.fromfile(clean_bundles_dict[
