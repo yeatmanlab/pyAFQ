@@ -622,7 +622,10 @@ class GroupAFQ(object):
                 curr_file_num = file_num
 
             this_img = Image.open(tdir + f"/t{ii}.png")
-            this_img_trimmed = trim(trim(this_img))
+            try:
+                this_img_trimmed = trim(trim(this_img))
+            except IndexError:  # this_img is a picture of nothing
+                this_img_trimmed = this_img
             curr_img.paste(
                 this_img_trimmed,
                 (x_pos * ref_width, y_pos * ref_height))
