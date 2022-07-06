@@ -238,13 +238,13 @@ def export_sl_lengths(data_imap,
                 lens.append(np.median(
                     seg_sft.sft._tractogram._streamlines._lengths))
             else:
-                lens.append(np.median(
-                    seg_sft.get_bundle(
-                        bundle)._tractogram._streamlines._lengths))
-            if np.isnan(lens[-1]):
-                lens[-1] = 0  # cannot be NaN to be int
-            else:
-                lens[-1] = int(lens[-1])
+                these_lengths = seg_sft.get_bundle(
+                    bundle)._tractogram._streamlines._lengths
+                if len(these_lengths) > 0:
+                    lens.append(np.median(
+                        these_lengths))
+                else:
+                    lens.append(0)
 
     counts_df = pd.DataFrame(
         data=dict(
