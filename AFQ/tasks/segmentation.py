@@ -214,12 +214,12 @@ def export_sl_counts(data_imap,
     return counts_df, dict(sources=bundles_files)
 
 
-@pimms.calc("sl_lengths")
-@as_file('_sl_lengths.csv', include_track=True, include_seg=True)
-def export_sl_lengths(data_imap,
-                      clean_bundles, bundles):
+@pimms.calc("median_bundle_lengths")
+@as_file('_medianBundleLengths.csv', include_track=True, include_seg=True)
+def export_bundle_lengths(data_imap,
+                          clean_bundles, bundles):
     """
-    full path to a JSON file containing streamline counts
+    full path to a JSON file containing median bundle lengths
     """
     bundle_dict = data_imap["bundle_dict"]
     med_len_clean_counts = []
@@ -381,7 +381,7 @@ def get_segmentation_plan(kwargs):
     segmentation_tasks = with_name([
         get_scalar_dict,
         export_sl_counts,
-        export_sl_lengths,
+        export_bundle_lengths,
         export_bundles,
         clean_bundles,
         segment,
