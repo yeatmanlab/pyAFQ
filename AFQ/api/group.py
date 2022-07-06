@@ -565,21 +565,28 @@ class GroupAFQ(object):
                 figure=figure)
 
             eye = {}
+            view_up = {}
             if view == "Sagittal":
                 eye["x"] = 1
                 eye["y"] = 0
                 eye["z"] = 0
-                view_up = (0, 1, 0)
+                view_up["x"] = 0
+                view_up["y"] = 1
+                view_up["z"] = 0
             elif view == "Coronal":
                 eye["x"] = 0
                 eye["y"] = 1
                 eye["z"] = 0
-                view_up = (0, 0, 1)
+                view_up["x"] = 0
+                view_up["y"] = 0
+                view_up["z"] = 1
             elif view == "Axial":
                 eye["x"] = 0
                 eye["y"] = 0
                 eye["z"] = 1
-                view_up = (1, 0, 0)
+                view_up["x"] = 1
+                view_up["y"] = 0
+                view_up["z"] = 0
 
             this_fname = tdir + f"/t{ii}.png"
             if "plotly" in viz_backend.backend:
@@ -601,7 +608,7 @@ class GroupAFQ(object):
                 figure.set_camera(
                     position=direc * data_shape,
                     focal_point=data_shape // 2,
-                    view_up=view_up)
+                    view_up=tuple(view_up.values()))
                 figure.zoom(0.5)
                 window.snapshot(figure, fname=this_fname, size=(600, 600))
 
