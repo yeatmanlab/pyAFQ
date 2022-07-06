@@ -283,7 +283,7 @@ class GroupAFQ(object):
                     bids_filters["suffix"] = suffix
 
                 self.valid_sub_list.append(subject)
-                self.valid_ses_list.append(session)
+                self.valid_ses_list.append(str(session))
 
                 this_pAFQ = ParticipantAFQ(
                     dwi_data_file,
@@ -517,7 +517,7 @@ class GroupAFQ(object):
 
         for ii in range(len(self.valid_ses_list)):
             this_sub = self.valid_sub_list[ii]
-            this_ses = str(self.valid_ses_list[ii])
+            this_ses = self.valid_ses_list[ii]
             viz_backend = viz_backend_dict[this_sub][this_ses]
             b0 = b0_backend_dict[this_sub][this_ses]
             dwi_affine = dwi_affine_dict[this_sub][this_ses]
@@ -649,7 +649,7 @@ class GroupAFQ(object):
         sls_mni = []
         for ii in range(len(self.valid_ses_list)):
             this_sub = self.valid_sub_list[ii]
-            this_ses = str(self.valid_ses_list[ii])
+            this_ses = self.valid_ses_list[ii]
             seg_sft = aus.SegmentedSFT.fromfile(clean_bundles_dict[
                 this_sub][this_ses])
             sls = seg_sft.get_bundle(bundle_name).streamlines
