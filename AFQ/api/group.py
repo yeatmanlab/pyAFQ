@@ -626,10 +626,10 @@ class GroupAFQ(object):
 
         for ii in range(len(self.valid_ses_list)):
             x_pos = ii % size[0]
-            ii = ii // size[0]
-            y_pos = ii % size[1]
-            ii = ii // size[1]
-            file_num = ii
+            _ii = ii // size[0]
+            y_pos = _ii % size[1]
+            _ii = _ii // size[1]
+            file_num = _ii
 
             if file_num != curr_file_num:
                 _save_file(curr_img, curr_file_num)
