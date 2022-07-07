@@ -2,6 +2,8 @@
 import contextlib
 import warnings
 import tempfile
+
+from AFQ.definitions.mapping import SynMap
 warnings.simplefilter(action='ignore', category=FutureWarning)  # noqa
 
 import logging
@@ -653,6 +655,7 @@ class GroupAFQ(object):
         Transforms a given bundle to reg_template space for all subjects
         then merges them to one trk file.
         Useful for visualizing the variability in the bundle across subjects.
+        Note: currently only implemented using built-in SynMap
 
         Parameters
         ----------
@@ -660,6 +663,16 @@ class GroupAFQ(object):
         Name of the bundle to transform, should be one of the bundles in
         bundle_dict.
         """
+        reference_wf_dict = self.wf_dict[
+            self.valid_sub_list[0]][self.valid_ses_list[0]]
+        if "mapping_definition" in reference_wf_dict:
+            mapping_definition = reference_wf_dict["mapping_definition"]
+            if mapping_definition is not None and not isinstance(
+                    mapping_definition, SynMap):
+                raise NotImplementedError((
+                    "combine_bundle not implemented for mapping_definition"
+                    "other than SynMap"))
+
         reg_template = self.export("reg_template", collapse=False)[
             self.valid_sub_list[0]][self.valid_ses_list[0]]
         clean_bundles_dict = self.export("clean_bundles", collapse=False)
@@ -672,6 +685,7 @@ class GroupAFQ(object):
             this_ses = self.valid_ses_list[ii]
             seg_sft = aus.SegmentedSFT.fromfile(clean_bundles_dict[
                 this_sub][this_ses])
+            seg_sft.sft.to_vox()
             sls = seg_sft.get_bundle(bundle_name).streamlines
             mapping = mapping_dict[this_sub][this_ses]
 
@@ -684,7 +698,7 @@ class GroupAFQ(object):
         moved_sft = StatefulTractogram(
             sls_mni,
             reg_template,
-            Space.RASMM)
+            Space.VOX)
         save_tractogram(
             moved_sft,
             op.abspath(op.join(
