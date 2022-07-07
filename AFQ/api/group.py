@@ -614,18 +614,32 @@ class GroupAFQ(object):
                 figure.zoom(0.5)
                 window.snapshot(figure, fname=this_fname, size=(600, 600))
 
-        ref_img = Image.open(tdir + f"/t{ii}.png")
-        ref_width, ref_height = ref_img.width, ref_img.height
-        curr_img = Image.new('RGB', (
-            ref_width * size[0], ref_height * size[1]))
-        curr_file_num = 0
-
         def _save_file(curr_img, curr_file_num):
             curr_img.save(op.abspath(op.join(
                 self.afq_path,
                 (f"bundle-{bundle_name}_view-{view}"
                     f"_idx-{curr_file_num}_montage.png"))))
 
+        this_img_trimmed = {}
+        max_height = 0
+        max_width = 0
+        for ii in range(len(self.valid_ses_list)):
+            this_img = Image.open(tdir + f"/t{ii}.png")
+            try:
+                this_img_trimmed[ii] = trim(trim(this_img))
+            except IndexError:  # this_img is a picture of nothing
+                this_img_trimmed[ii] = this_img
+
+            if this_img_trimmed[ii].shape[0] > max_width:
+                max_width = this_img_trimmed[ii].shape[0]
+            if this_img_trimmed[ii].shape[1] > max_height:
+                max_height = this_img_trimmed[ii].shape[1]
+
+        curr_img = Image.new(
+            'RGB',
+            (max_width * size[0], max_height * size[1]),
+            color="white")
+        curr_file_num = 0
         for ii in range(len(self.valid_ses_list)):
             x_pos = ii % size[0]
             _ii = ii // size[0]
@@ -636,17 +650,11 @@ class GroupAFQ(object):
             if file_num != curr_file_num:
                 _save_file(curr_img, curr_file_num)
                 curr_img = Image.new('RGB', (
-                    ref_width * size[0], ref_height * size[1]))
+                    max_width * size[0], max_height * size[1]))
                 curr_file_num = file_num
-
-            this_img = Image.open(tdir + f"/t{ii}.png")
-            try:
-                this_img_trimmed = trim(trim(this_img))
-            except IndexError:  # this_img is a picture of nothing
-                this_img_trimmed = this_img
             curr_img.paste(
                 this_img_trimmed,
-                (x_pos * ref_width, y_pos * ref_height))
+                (x_pos * max_width, y_pos * max_height))
 
         _save_file(curr_img, curr_file_num)
 
