@@ -630,10 +630,10 @@ class GroupAFQ(object):
             except IndexError:  # this_img is a picture of nothing
                 this_img_trimmed[ii] = this_img
 
-            if this_img_trimmed[ii].shape[0] > max_width:
-                max_width = this_img_trimmed[ii].shape[0]
-            if this_img_trimmed[ii].shape[1] > max_height:
-                max_height = this_img_trimmed[ii].shape[1]
+            if this_img_trimmed[ii].size[0] > max_width:
+                max_width = this_img_trimmed[ii].size[0]
+            if this_img_trimmed[ii].size[1] > max_height:
+                max_height = this_img_trimmed[ii].size[1]
 
         curr_img = Image.new(
             'RGB',
@@ -649,11 +649,13 @@ class GroupAFQ(object):
 
             if file_num != curr_file_num:
                 _save_file(curr_img, curr_file_num)
-                curr_img = Image.new('RGB', (
-                    max_width * size[0], max_height * size[1]))
+                curr_img = Image.new(
+                    'RGB',
+                    (max_width * size[0], max_height * size[1]),
+                    color="white")
                 curr_file_num = file_num
             curr_img.paste(
-                this_img_trimmed,
+                this_img_trimmed[ii],
                 (x_pos * max_width, y_pos * max_height))
 
         _save_file(curr_img, curr_file_num)
