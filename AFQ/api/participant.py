@@ -81,6 +81,10 @@ class ParticipantAFQ(object):
         if not op.exists(output_dir):
             raise ValueError(
                 f"output_dir does not exist: {output_dir}")
+        if "tractography_params" in kwargs:
+            raise ValueError((
+                "unrecognized parameter tractography_params, "
+                "did you mean tracking_params ?"))
 
         self.logger = logging.getLogger('AFQ.api')
 
