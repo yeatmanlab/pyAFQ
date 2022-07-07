@@ -473,7 +473,9 @@ def test_API_type_checking():
         myafq = GroupAFQ(
             bids_path,
             mapping_definition=AffMap(
-                affine_kwargs={"level_iters": [10]}),
+                affine_kwargs={
+                    "level_iters": [1, 1],
+                    "pipeline": ["center_of_mass"]}),
             tracking_params={"n_seeds": 10, "random_seeds": True},
             bundle_info=["ARC_L", "ARC_R"])
         myafq.export("bundles")
