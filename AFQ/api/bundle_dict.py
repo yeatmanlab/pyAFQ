@@ -437,24 +437,22 @@ class BundleDict(MutableMapping):
             Name of the bundle to be resampled.
         """
         if self.resample_to and self.seg_algo == "afq":
-            if "resampled" not in self._dict[b_name]\
-                    or not self._dict[b_name]["resampled"]:
-                if "space" not in self._dict[b_name]\
-                        or self._dict[b_name]["space"] == "template":
-                    resample_to = self.resample_to
+            if "space" not in self._dict[b_name]\
+                    or self._dict[b_name]["space"] == "template":
+                resample_to = self.resample_to
+            else:
+                resample_to = self.resample_subject_to
+            try:
+                self.apply_to_rois(
+                    b_name,
+                    afd.read_resample_roi,
+                    resample_to=resample_to)
+                self._dict[b_name]["resampled"] = True
+            except AttributeError as e:
+                if "'ImageFile' object" in str(e):
+                    self._dict[b_name]["resampled"] = False
                 else:
-                    resample_to = self.resample_subject_to
-                try:
-                    self.apply_to_rois(
-                        b_name,
-                        afd.read_resample_roi,
-                        resample_to=resample_to)
-                    self._dict[b_name]["resampled"] = True
-                except AttributeError as e:
-                    if "'ImageFile' object" in str(e):
-                        self._dict[b_name]["resampled"] = False
-                    else:
-                        raise
+                    raise
 
     def __add__(self, other):
         self.gen_all()
