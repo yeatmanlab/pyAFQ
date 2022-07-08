@@ -459,18 +459,33 @@ def test_API_type_checking():
 
     with pytest.raises(
             TypeError,
-            match="viz_backend_spec must contain either 'fury' or 'plotly'"):
-        myafq = GroupAFQ(bids_path, viz_backend_spec="matplotlib")
-        myafq.export("all_bundles_figure")
-    del myafq
-
-    with pytest.raises(
-            TypeError,
             match=(
                 "bundle_info must be a list of strings,"
                 " a dict, or a BundleDict")):
         myafq = GroupAFQ(bids_path, bundle_info=[2, 3])
         myafq.export("bundle_dict")
+    del myafq
+
+    with pytest.raises(
+            ValueError,
+            match=(
+                "Fatal: No bundles recognized.")):
+        myafq = GroupAFQ(
+            bids_path,
+            mapping_definition=AffMap(
+                affine_kwargs={
+                    "level_iters": [1, 1],
+                    "pipeline": ["center_of_mass"]}),
+            tracking_params={"n_seeds": 10, "random_seeds": True},
+            bundle_info=["ARC_L", "ARC_R"])
+        myafq.export("bundles")
+    del myafq
+
+    with pytest.raises(
+            TypeError,
+            match="viz_backend_spec must contain either 'fury' or 'plotly'"):
+        myafq = GroupAFQ(bids_path, viz_backend_spec="matplotlib")
+        myafq.export("viz_backend")
     del myafq
 
 
