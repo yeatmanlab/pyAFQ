@@ -17,6 +17,7 @@ from AFQ.api.group import GroupAFQ
 import AFQ.api.bundle_dict as abd
 import AFQ.data.fetch as afd
 from AFQ.definitions.image import LabelledImageFile, RoiImage
+import AFQ.utils.streamlines as aus
 
 afd.organize_stanford_data(clear_previous_afq=True)
 
@@ -69,3 +70,12 @@ my_afq = GroupAFQ(
     bundle_info=bundles)
 
 my_afq.export_all()
+
+if len(aus.SegmentedSFT.fromfile(my_afq.export("clean_bundles")[
+        "01"]).get_bundle("L_OR").streamlines) > 1:
+    #  create bundle montage and bundle combination
+    #  across subject/session in MNI
+    my_afq.montage("L_OR", (1, 1), "Axial")
+    my_afq.combine_bundle("L_OR")
+else:
+    raise ValueError("No L_OR found")

@@ -4,6 +4,7 @@ import logging
 
 import numpy as np
 import imageio as io
+from PIL import Image, ImageChops
 
 import nibabel as nib
 from dipy.tracking.utils import transform_tracking_output
@@ -262,6 +263,26 @@ def tract_generator(trk_file, bundle, bundle_dict, colors, n_points,
             else:
                 color = colors[0]
             yield these_sls, color, bundle, seg_sft.sft.dimensions
+
+
+def bbox(img):
+    img = np.sum(img, axis=-1)
+    rows = np.any(img, axis=1)
+    cols = np.any(img, axis=0)
+    rmin, rmax = np.where(rows)[0][[0, -1]]
+    cmin, cmax = np.where(cols)[0][[0, -1]]
+
+    return cmin, rmin, cmax, rmax
+
+
+def trim(im):
+    bg = Image.new(im.mode, im.size, im.getpixel((0, 0)))
+    diff = ImageChops.difference(im, bg)
+    diff = ImageChops.add(diff, diff, 2.0, -100)
+    diff.getbbox
+    this_bbox = bbox(diff)
+    if this_bbox:
+        return im.crop(this_bbox)
 
 
 def gif_from_pngs(tdir, gif_fname, n_frames,
