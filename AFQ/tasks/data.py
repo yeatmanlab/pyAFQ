@@ -484,7 +484,7 @@ def dki_ak(dki_tf):
 
 
 @pimms.calc("brain_mask")
-@as_file('_brain_mask.nii.gz')
+@as_file('_brainMask.nii.gz')
 def brain_mask(base_fname, dwi, b0,
                bids_info, brain_mask_definition=None):
     """

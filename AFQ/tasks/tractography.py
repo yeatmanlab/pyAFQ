@@ -15,7 +15,7 @@ logger = logging.getLogger('AFQ.api')
 
 
 @pimms.calc("seed")
-@as_file('_seed_mask.nii.gz')
+@as_file('_seedMask.nii.gz')
 @as_img
 def export_seed_mask(tracking_params):
     """
@@ -28,7 +28,7 @@ def export_seed_mask(tracking_params):
 
 
 @pimms.calc("stop")
-@as_file('_stop_mask.nii.gz')
+@as_file('_stopMask.nii.gz')
 @as_img
 def export_stop_mask(tracking_params):
     """

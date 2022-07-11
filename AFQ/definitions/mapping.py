@@ -287,7 +287,7 @@ class GeneratedMapMixin(object):
     def get_fnames(self, extension, base_fname):
         mapping_file = get_fname(
             base_fname,
-            '_mapping_from-DWI_to_MNI_xfm')
+            '_mapping_from-DWI_to-MNI_xfm')
         meta_fname = get_fname(base_fname, '_mapping_reg')
         mapping_file = mapping_file + extension
         meta_fname = f'{meta_fname}.json'

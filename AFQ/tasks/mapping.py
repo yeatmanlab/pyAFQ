@@ -23,7 +23,7 @@ logger = logging.getLogger('AFQ.api.mapping')
 
 
 @pimms.calc("b0_warped")
-@as_file('_b0_in_MNI.nii.gz')
+@as_file('_b0InMNI.nii.gz')
 def export_registered_b0(data_imap, mapping):
     """
     full path to a nifti file containing
@@ -36,7 +36,7 @@ def export_registered_b0(data_imap, mapping):
 
 
 @pimms.calc("template_xform")
-@as_file('_template_xform.nii.gz')
+@as_file('_templateXform.nii.gz')
 def template_xform(dwi_affine, mapping, data_imap):
     """
     full path to a nifti file containing
