@@ -857,4 +857,4 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         results_dir,
         'bundles',
-        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob_algo-AFQ_dependent-rec_SLF_L_tractography.trk'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob_algo-AFQ_dependent-rec-SLF_L_tractography.trk'))  # noqa
