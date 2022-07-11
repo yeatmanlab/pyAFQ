@@ -1,5 +1,7 @@
 import nibabel as nib
 import os.path as op
+import os
+import shutil
 from time import time
 import logging
 
@@ -87,6 +89,7 @@ class ParticipantAFQ(object):
                 "did you mean tracking_params ?"))
 
         self.logger = logging.getLogger('AFQ.api')
+        self.output_dir = output_dir
 
         kwargs = dict(
             dwi=dwi_data_file,
@@ -177,3 +180,46 @@ class ParticipantAFQ(object):
         export_all_helper(self, seg_algo, xforms, indiv, viz)
         self.logger.info(
             f"Time taken for export all: {time() - start_time}")
+
+    def cmd_outputs(self, cmd="rm", dependent_on=None):
+        """
+        Perform some command some or all outputs of pyafq.
+        This is useful if you change a parameter and need
+        to recalculate derivatives that depend on it.
+        Some examples: cp, mv, rm .
+        -r will be automtically added when necessary.
+
+        Parameters
+        ----------
+        cmd : str
+            Command to run on outputs. Default: 'rm'
+        dependent_on : str or None
+            Which derivatives to perform command on .
+            If None, perform on all.
+            If "track", perform on all derivatives that depend on the
+            tractography.
+            If "recog", perform on all derivatives that depend on the
+            bundle recognition.
+            Default: None
+        """
+        if dependent_on is None:
+            dependent_on_list = [""]
+        elif dependent_on.lower() == "track":
+            dependent_on_list = ["dependent-trk", "dependent-rec"]
+        elif dependent_on.lower() == "recog":
+            dependent_on_list = ["dependent-rec"]
+        else:
+            raise ValueError((
+                "dependent_on must be one of "
+                "None, 'track', or 'recog'."))
+
+        for filename in os.listdir(self.output_dir):
+            full_path = os.path.join(self.output_dir, filename)
+            if os.path.isfile(full_path) or os.path.islink(full_path):
+                if any(dependent in filename
+                        for dependent in dependent_on_list):
+                    os.system(f"{cmd} {full_path}")
+            elif os.path.isdir(full_path):
+                # other than ROIs, folders are dependent on everything
+                if dependent_on is None or filename != "ROIs":
+                    os.system(f"{cmd} -r {full_path}")

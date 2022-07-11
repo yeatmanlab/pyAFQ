@@ -369,9 +369,9 @@ def test_AFQ_data():
         npt.assert_equal(nib.load(myafq.export("b0")["01"]).shape,
                          nib.load(myafq.export("dti_params")["01"]).shape[:3])
         myafq.export("rois")
-        shutil.rmtree(op.join(
-            bids_path,
-            'derivatives/afq'))
+        myafq.cmd_outputs()
+        assert len(os.listdir(op.join(
+            myafq.afq_path, "sub-01", "ses-01"))) == 0
 
 
 @pytest.mark.nightly_anisotropic
@@ -744,7 +744,7 @@ def test_AFQ_data_waypoint():
 
     mapping_file = op.join(
         myafq.export("results_dir"),
-        'sub-01_ses-01_dwi_mapping_from-DWI_to_MNI_xfm.nii.gz')
+        'sub-01_ses-01_dwi_mapping_from-DWI_to-MNI_xfm.nii.gz')
     nib.save(mapping, mapping_file)
     reg_prealign_file = op.join(
         myafq.export("results_dir"),
