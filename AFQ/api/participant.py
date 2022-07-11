@@ -1,7 +1,6 @@
 import nibabel as nib
 import os.path as op
 import os
-import shutil
 from time import time
 import logging
 
