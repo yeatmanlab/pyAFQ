@@ -26,7 +26,7 @@ try:
 except ModuleNotFoundError:
     has_h5py = False
 
-__all__ = ["FnirtMap", "SynMap", "SlrMap", "AffMap"]
+__all__ = ["FnirtMap", "SynMap", "SlrMap", "AffMap", "ItkMap"]
 
 
 logger = logging.getLogger('AFQ.definitions.mapping')
