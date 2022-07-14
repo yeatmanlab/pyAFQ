@@ -26,7 +26,7 @@ try:
 except ModuleNotFoundError:
     has_h5py = False
 
-__all__ = ["FnirtMap", "SynMap", "SlrMap", "AffMap"]
+__all__ = ["FnirtMap", "SynMap", "SlrMap", "AffMap", "ItkMap"]
 
 
 logger = logging.getLogger('AFQ.definitions.mapping')
@@ -230,8 +230,8 @@ class ItkMap(Definition):
             self.fname = warp_path
         else:
             self._from_path = False
-            self.suffix = warp_suffix
-            self.filters = warp_filters
+            self.warp_suffix = warp_suffix
+            self.warp_filters = warp_filters
             self.fnames = {}
 
     def find_path(self, bids_layout, from_path, subject, session):
