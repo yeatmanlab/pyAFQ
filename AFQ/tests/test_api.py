@@ -456,6 +456,7 @@ def test_API_type_checking():
                 suffix='dne_dne',
                 filters={'scope': 'dne_dne'}))
         myafq.export("brain_mask")
+    del myafq
 
     with pytest.raises(
             TypeError,
@@ -476,7 +477,7 @@ def test_API_type_checking():
                 affine_kwargs={
                     "level_iters": [1, 1],
                     "pipeline": ["center_of_mass"]}),
-            tracking_params={"n_seeds": 10, "random_seeds": True},
+            tracking_params={"n_seeds": 1, "random_seeds": True},
             bundle_info=["ARC_L", "ARC_R"])
         myafq.export("bundles")
     del myafq

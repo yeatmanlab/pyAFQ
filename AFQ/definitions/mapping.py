@@ -288,7 +288,7 @@ class GeneratedMapMixin(object):
         mapping_file = get_fname(
             base_fname,
             '_mapping_from-DWI_to-MNI_xfm')
-        meta_fname = get_fname(base_fname, '_mapping_reg')
+        meta_fname = get_fname(base_fname, '_mapping_from-DWI_to-MNI_xfm')
         mapping_file = mapping_file + extension
         meta_fname = f'{meta_fname}.json'
         return mapping_file, meta_fname
@@ -304,6 +304,7 @@ class GeneratedMapMixin(object):
                 **self.affine_kwargs)
             meta = dict(
                 type="rigid",
+                dependent="dwi",
                 timing=time() - start_time)
             if not save:
                 return aff
@@ -337,6 +338,10 @@ class GeneratedMapMixin(object):
             meta = dict(
                 type="displacementfield",
                 timing=total_time)
+            if subject_sls is None:
+                meta["dependent"] = "dwi"
+            else:
+                meta["dependent"] = "trk"
             afs.write_json(meta_fname, meta)
         reg_prealign_inv = np.linalg.inv(reg_prealign) if self.use_prealign\
             else None

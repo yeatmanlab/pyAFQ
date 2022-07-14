@@ -15,6 +15,7 @@ from AFQ.tasks.tractography import get_tractography_plan
 from AFQ.tasks.segmentation import get_segmentation_plan
 from AFQ.tasks.viz import get_viz_plan
 from AFQ.utils.path import drop_extension
+from AFQ.data.s3bids import read_json
 
 
 __all__ = ["ParticipantAFQ"]
@@ -202,11 +203,11 @@ class ParticipantAFQ(object):
             Default: None
         """
         if dependent_on is None:
-            dependent_on_list = [""]
+            dependent_on_list = ["trk", "rec", "dwi"]
         elif dependent_on.lower() == "track":
-            dependent_on_list = ["dependent-trk", "dependent-rec"]
+            dependent_on_list = ["trk", "rec"]
         elif dependent_on.lower() == "recog":
-            dependent_on_list = ["dependent-rec"]
+            dependent_on_list = ["rec"]
         else:
             raise ValueError((
                 "dependent_on must be one of "
@@ -215,9 +216,13 @@ class ParticipantAFQ(object):
         for filename in os.listdir(self.output_dir):
             full_path = os.path.join(self.output_dir, filename)
             if os.path.isfile(full_path) or os.path.islink(full_path):
-                if any(dependent in filename
-                        for dependent in dependent_on_list):
-                    os.system(f"{cmd} {full_path}")
+                if not filename.endswith("json"):
+                    sidecar_file = f'{drop_extension(full_path)}.json'
+                    sidecar_info = read_json(sidecar_file)
+                    if "dependent" in sidecar_info\
+                            and sidecar_info["dependent"] in dependent_on_list:
+                        os.system(f"{cmd} {full_path}")
+                        os.system(f"{cmd} {sidecar_file}")
             elif os.path.isdir(full_path):
                 # other than ROIs, folders are dependent on everything
                 if dependent_on is None or filename != "ROIs":
