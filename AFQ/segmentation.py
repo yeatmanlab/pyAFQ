@@ -594,6 +594,7 @@ class Segmentation:
             tol = dts.dist_to_corner(self.img_affine)
         else:
             tol = self.dist_to_waypoint / vox_dim
+        dist_to_atlas = self.dist_to_atlas / vox_dim
 
         self.logger.info("Assigning Streamlines to Bundles")
         for bundle_idx, bundle in enumerate(self.bundle_dict):
@@ -686,60 +687,11 @@ class Segmentation:
                 (f"{np.nansum(streamlines_in_bundles[:, bundle_idx] > 0)} "
                  "streamlines selected with waypoint ROIs"))
 
-        # see https://github.com/joblib/joblib/issues/945
-        if (
-                self.parallel_segmentation["engine"] != "serial"
-                and "backend" in self.parallel_segmentation
-                and self.parallel_segmentation["backend"] == "loky"):
-            from joblib.externals.loky import get_reusable_executor
-            self.logger.info("Cleaning up Loky...")
-            get_reusable_executor().shutdown(wait=True)
-            self.logger.info("Loky Cleaned up")
-
-        # Eliminate any fibers not selected using the waypoint ROIs:
-        possible_fibers = np.nansum(streamlines_in_bundles, -1) > 0
-        tg = StatefulTractogram(tg.streamlines[possible_fibers],
-                                self.img,
-                                Space.VOX)
-        if self.return_idx:
-            out_idx = out_idx[possible_fibers]
-
-        streamlines_in_bundles = streamlines_in_bundles[possible_fibers]
-        min_dist_coords = min_dist_coords[possible_fibers]
-        if self.roi_dist_tie_break:
-            bundle_choice = np.nanargmin(np.nanmin(min_dist_coords, -1), -1)
-        else:
-            bundle_choice = np.nanargmax(streamlines_in_bundles, -1)
-
-        # We do another round through, so that we can orient all the
-        # streamlines within a bundle in the same orientation with respect to
-        # the ROIs. This order is ARBITRARY but CONSISTENT (going from ROI0
-        # to ROI1).
-        self.logger.info("Re-orienting streamlines to consistent directions")
-        dist_to_atlas = self.dist_to_atlas / vox_dim
-        for bundle_idx, bundle in enumerate(self.bundle_dict):
-            self.logger.info(f"Processing {bundle}")
-
-            select_idx = np.where(bundle_choice == bundle_idx)
-
-            if len(select_idx[0]) == 0:
-                # There's nothing here, set and move to the next bundle:
-                self._return_empty(bundle)
-                continue
-
-            # Use a list here, because ArraySequence doesn't support item
-            # assignment:
-            select_sl = list(tg.streamlines[select_idx])
-            # Sub-sample min_dist_coords:
-            min_dist_coords_bundle = min_dist_coords[select_idx]
-            for idx in range(len(select_sl)):
-                min0 = min_dist_coords_bundle[idx, bundle_idx, 0]
-                min1 = min_dist_coords_bundle[idx, bundle_idx, 1]
-                if min0 > min1:
-                    select_sl[idx] = select_sl[idx][::-1]
-
+            possible_fibers = streamlines_in_bundles[:, bundle_idx] > 0
             if self.filter_by_endpoints:
                 self.logger.info("Filtering by endpoints")
+                select_sl = tg.streamlines[possible_fibers]
+                min_dist_sl = min_dist_coords[possible_fibers, bundle_idx]
                 self.logger.info("Before filtering "
                                  f"{len(select_sl)} streamlines")
                 # We use definitions of endpoints provided
@@ -779,36 +731,70 @@ class Segmentation:
                     else:
                         atlas_idx.append(None)
 
-                new_select_sl = clean_by_endpoints(
+                _, cleaned_idx = clean_by_endpoints(
                     select_sl,
                     atlas_idx[0],
                     atlas_idx[1],
                     tol=dist_to_atlas,
-                    return_idx=self.return_idx)
+                    flip_sls=np.greater(min_dist_sl[:, 0], min_dist_sl[:, 1]))
 
-                # Generate immediately:
-                new_select_sl = list(new_select_sl)
+                self.logger.info(
+                    "After filtering by endpoints, "
+                    f"{len(cleaned_idx)} streamlines")
 
-                # We need to check this again:
-                if len(new_select_sl) == 0:
-                    self.logger.info("After filtering "
-                                     f"{len(new_select_sl)} streamlines")
-                    # There's nothing here, set and move to the next bundle:
-                    self._return_empty(bundle)
-                    continue
+                removed_idx = set(range(len(select_sl))).difference(
+                    cleaned_idx)
+                removed_fibers = np.zeros_like(possible_fibers)
+                removed_fibers[possible_fibers][removed_idx] = 1
+                streamlines_in_bundles[
+                    removed_fibers, bundle_idx] = np.nan
+                min_dist_coords[
+                    removed_fibers, bundle_idx, :] = np.nan
 
-                if self.return_idx:
-                    temp_select_sl = []
-                    temp_select_idx = np.empty(len(new_select_sl), int)
-                    for ii, ss in enumerate(new_select_sl):
-                        temp_select_sl.append(ss[0])
-                        temp_select_idx[ii] = ss[1]
-                    select_idx = select_idx[0][temp_select_idx]
-                    new_select_sl = temp_select_sl
+        # see https://github.com/joblib/joblib/issues/945
+        if (
+                self.parallel_segmentation["engine"] != "serial"
+                and "backend" in self.parallel_segmentation
+                and self.parallel_segmentation["backend"] == "loky"):
+            from joblib.externals.loky import get_reusable_executor
+            self.logger.info("Cleaning up Loky...")
+            get_reusable_executor().shutdown(wait=True)
+            self.logger.info("Loky Cleaned up")
 
-                select_sl = new_select_sl
-                self.logger.info("After filtering "
-                                 f"{len(select_sl)} streamlines")
+        # Eliminate any fibers not selected using the waypoint ROIs:
+        possible_fibers = np.nansum(streamlines_in_bundles, -1) > 0
+        streamlines_in_bundles = streamlines_in_bundles[possible_fibers]
+        min_dist_coords = min_dist_coords[possible_fibers]
+        if self.roi_dist_tie_break:
+            bundle_choice = np.nanargmin(np.nanmin(min_dist_coords, -1), -1)
+        else:
+            bundle_choice = np.nanargmax(streamlines_in_bundles, -1)
+
+        # We do another round through, so that we can orient all the
+        # streamlines within a bundle in the same orientation with respect to
+        # the ROIs. This order is ARBITRARY but CONSISTENT (going from ROI0
+        # to ROI1).
+        self.logger.info("Re-orienting streamlines to consistent directions")
+        for bundle_idx, bundle in enumerate(self.bundle_dict):
+            self.logger.info(f"Processing {bundle}")
+
+            select_idx = np.where(bundle_choice == bundle_idx)
+
+            if len(select_idx[0]) == 0:
+                # There's nothing here, set and move to the next bundle:
+                self._return_empty(bundle)
+                continue
+
+            # Use a list here, because ArraySequence doesn't support item
+            # assignment:
+            select_sl = list(tg.streamlines[possible_fibers][select_idx])
+            # Sub-sample min_dist_coords:
+            min_dist_coords_bundle = min_dist_coords[possible_fibers]
+            for idx in range(len(select_sl)):
+                min0 = min_dist_coords_bundle[idx, bundle_idx, 0]
+                min1 = min_dist_coords_bundle[idx, bundle_idx, 1]
+                if min0 > min1:
+                    select_sl[idx] = select_sl[idx][::-1]
 
             if self.clip_edges:
                 self.logger.info("Clipping Streamlines by ROI")
@@ -832,7 +818,8 @@ class Segmentation:
             if self.return_idx:
                 self.fiber_groups[bundle] = {}
                 self.fiber_groups[bundle]['sl'] = select_sl
-                self.fiber_groups[bundle]['idx'] = out_idx[select_idx]
+                self.fiber_groups[bundle]['idx'] = out_idx[
+                    possible_fibers][select_idx]
             else:
                 self.fiber_groups[bundle] = select_sl
         return self.fiber_groups
@@ -1188,7 +1175,7 @@ def _is_streamline_in_ROIs_parallel(indiv_args, tol, include_roi,
 
 
 def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
-                       return_idx=False):
+                       flip_sls=None):
     """
     Clean a collection of streamlines based on their two endpoints
     Filters down to only include items that have their starting points close to
@@ -1209,6 +1196,8 @@ def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
         Contains numerical values for ROIs. Default: if not provided, assume
         that targets0 and targets1 are both arrays of indices, and this
         information is not needed.
+    flip_sls : 1d array, optional
+        Length is len(streamlines), whether to flip the streamline.
     Yields
     -------
     Generator of the filtered collection
@@ -1251,28 +1240,31 @@ def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
             endpoint_roi[atlas == targ] = 1
         idxes1 = np.array(np.where(endpoint_roi)).T
 
+    any_found = False
+    if flip_sls is None:
+        flip_sls = np.zeros_like(streamlines)
+    flip_sls = flip_sls.astype(int)
     for ii, sl in enumerate(streamlines):
         if targets0 is None:
             # Nothing to check
             dist0ok = True
         else:
             dist0ok = False
-            dist0 = np.min(cdist(np.array([sl[0]]), idxes0, 'sqeuclidean'))
+            dist0 = np.min(cdist(
+                np.array([sl[-flip_sls]]), idxes0, 'sqeuclidean'))
             if dist0 <= tol:
                 dist0ok = True
         # Only proceed if conditions for one side are fulfilled:
         if dist0ok:
             if targets1 is None:
                 # Nothing to check on this end:
-                if return_idx:
-                    yield sl, ii
-                else:
-                    yield sl
+                any_found = True
+                yield sl, ii,
             else:
-                dist2 = np.min(cdist(np.array([sl[-1]]), idxes1,
-                                     'sqeuclidean'))
+                dist2 = np.min(cdist(
+                    np.array([sl[flip_sls - 1]]), idxes1, 'sqeuclidean'))
                 if dist2 <= tol:
-                    if return_idx:
-                        yield sl, ii
-                    else:
-                        yield sl
+                    any_found = True
+                    yield sl, ii
+    if not any_found:
+        return [], []
