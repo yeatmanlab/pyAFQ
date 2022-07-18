@@ -731,21 +731,21 @@ class Segmentation:
                     else:
                         atlas_idx.append(None)
 
-                _, cleaned_idx = clean_by_endpoints(
+                cleaned_idx = clean_by_endpoints(
                     select_sl,
                     atlas_idx[0],
                     atlas_idx[1],
                     tol=dist_to_atlas,
                     flip_sls=np.greater(min_dist_sl[:, 0], min_dist_sl[:, 1]))
+                cleaned_idx = list(cleaned_idx)
 
                 self.logger.info(
                     "After filtering by endpoints, "
                     f"{len(cleaned_idx)} streamlines")
 
-                removed_idx = set(range(len(select_sl))).difference(
-                    cleaned_idx)
-                removed_fibers = np.zeros_like(possible_fibers)
-                removed_fibers[possible_fibers][removed_idx] = 1
+                removed_idx = list(set(range(len(select_sl))).difference(
+                    cleaned_idx))
+                removed_fibers = possible_fibers.nonzero()[0][removed_idx]
                 streamlines_in_bundles[
                     removed_fibers, bundle_idx] = np.nan
                 min_dist_coords[
@@ -1200,7 +1200,7 @@ def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
         Length is len(streamlines), whether to flip the streamline.
     Yields
     -------
-    Generator of the filtered collection
+    Generator of the indicies into streamlines that survive cleaning.
     """
     if tol is None:
         tol = 0
@@ -1251,7 +1251,7 @@ def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
         else:
             dist0ok = False
             dist0 = np.min(cdist(
-                np.array([sl[-flip_sls]]), idxes0, 'sqeuclidean'))
+                np.array([sl[-flip_sls[ii]]]), idxes0, 'sqeuclidean'))
             if dist0 <= tol:
                 dist0ok = True
         # Only proceed if conditions for one side are fulfilled:
@@ -1259,12 +1259,12 @@ def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
             if targets1 is None:
                 # Nothing to check on this end:
                 any_found = True
-                yield sl, ii,
+                yield ii
             else:
                 dist2 = np.min(cdist(
-                    np.array([sl[flip_sls - 1]]), idxes1, 'sqeuclidean'))
+                    np.array([sl[flip_sls[ii] - 1]]), idxes1, 'sqeuclidean'))
                 if dist2 <= tol:
                     any_found = True
-                    yield sl, ii
+                    yield ii
     if not any_found:
-        return [], []
+        return []
