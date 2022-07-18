@@ -787,9 +787,9 @@ class Segmentation:
 
             # Use a list here, because ArraySequence doesn't support item
             # assignment:
-            select_sl = list(tg.streamlines[possible_fibers][select_idx])
+            select_sl = list(tg.streamlines[select_idx])
             # Sub-sample min_dist_coords:
-            min_dist_coords_bundle = min_dist_coords[possible_fibers]
+            min_dist_coords_bundle = min_dist_coords[select_idx]
             for idx in range(len(select_sl)):
                 min0 = min_dist_coords_bundle[idx, bundle_idx, 0]
                 min1 = min_dist_coords_bundle[idx, bundle_idx, 1]
@@ -818,8 +818,7 @@ class Segmentation:
             if self.return_idx:
                 self.fiber_groups[bundle] = {}
                 self.fiber_groups[bundle]['sl'] = select_sl
-                self.fiber_groups[bundle]['idx'] = out_idx[
-                    possible_fibers][select_idx]
+                self.fiber_groups[bundle]['idx'] = out_idx[select_idx]
             else:
                 self.fiber_groups[bundle] = select_sl
         return self.fiber_groups
