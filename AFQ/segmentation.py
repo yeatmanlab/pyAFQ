@@ -763,12 +763,20 @@ class Segmentation:
 
         # Eliminate any fibers not selected using the waypoint ROIs:
         possible_fibers = np.nansum(streamlines_in_bundles, -1) > 0
+        tg = StatefulTractogram(tg.streamlines[possible_fibers],
+                                self.img,
+                                Space.VOX)
         streamlines_in_bundles = streamlines_in_bundles[possible_fibers]
         min_dist_coords = min_dist_coords[possible_fibers]
         if self.roi_dist_tie_break:
             bundle_choice = np.nanargmin(np.nanmin(min_dist_coords, -1), -1)
         else:
             bundle_choice = np.nanargmax(streamlines_in_bundles, -1)
+
+        if self.save_intermediates is not None:
+            os.makedirs(self.save_intermediates, exist_ok=True)
+            bc_path = op.join(self.save_intermediates, "bundle_choice.npy")
+            np.save(bc_path, bundle_choice)
 
         # We do another round through, so that we can orient all the
         # streamlines within a bundle in the same orientation with respect to
