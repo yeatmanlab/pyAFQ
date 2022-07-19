@@ -536,8 +536,8 @@ class Segmentation:
                         prob_map.copy(),
                         interpolation='nearest')
 
-            return warped_prob_map, include_rois, exclude_rois,\
-                include_roi_tols, exclude_roi_tols
+        return warped_prob_map, include_rois, exclude_rois,\
+            include_roi_tols, exclude_roi_tols
 
     def _return_empty(self, bundle):
         """
@@ -769,18 +769,18 @@ class Segmentation:
         if self.return_idx:
             out_idx = out_idx[possible_fibers]
 
+        if self.save_intermediates is not None:
+            os.makedirs(self.save_intermediates, exist_ok=True)
+            bc_path = op.join(self.save_intermediates,
+                              "sls_bundle_assignment.npy")
+            np.save(bc_path, streamlines_in_bundles)
+
         streamlines_in_bundles = streamlines_in_bundles[possible_fibers]
         min_dist_coords = min_dist_coords[possible_fibers]
         if self.roi_dist_tie_break:
             bundle_choice = np.nanargmin(np.nanmin(min_dist_coords, -1), -1)
         else:
             bundle_choice = np.nanargmax(streamlines_in_bundles, -1)
-
-        if self.save_intermediates is not None:
-            os.makedirs(self.save_intermediates, exist_ok=True)
-            bc_path = op.join(self.save_intermediates,
-                              "sls_bundle_assignment.npy")
-            np.save(bc_path, streamlines_in_bundles)
 
         # We do another round through, so that we can orient all the
         # streamlines within a bundle in the same orientation with respect to
