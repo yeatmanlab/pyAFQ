@@ -772,7 +772,7 @@ def test_AFQ_data_waypoint():
     tract_profiles = pd.read_csv(tract_profile_fname)
 
     assert tract_profiles.select_dtypes(include=[np.number]).sum().sum() != 0
-    assert tract_profiles.shape == (300, 8)
+    assert tract_profiles.shape == (500, 8)
 
     myafq.export("indiv_bundles_figures")
     assert op.exists(op.join(
@@ -843,7 +843,7 @@ def test_AFQ_data_waypoint():
     # The tract profiles should already exist from the CLI Run:
     from_file = pd.read_csv(tract_profile_fname)
 
-    assert from_file.shape == (300, 8)
+    assert from_file.shape == (500, 8)
     assert_series_equal(tract_profiles['dti_fa'], from_file['dti_fa'])
 
     # Make sure the CLI did indeed generate these:
