@@ -516,25 +516,25 @@ class Segmentation:
                                 bundle,
                                 'as_used.nii.gz'))
 
-            # The probability map if doesn't exist is all ones with the same
-            # shape as the ROIs:
-            if isinstance(roi, str):
-                roi = nib.load(roi)
-            if isinstance(roi, nib.Nifti1Image):
-                roi = roi.get_fdata()
-            prob_map = bundle_entry.get(
-                'prob_map', np.ones(roi.shape))
+        # The probability map if doesn't exist is all ones with the same
+        # shape as the ROIs:
+        if isinstance(roi, str):
+            roi = nib.load(roi)
+        if isinstance(roi, nib.Nifti1Image):
+            roi = roi.get_fdata()
+        prob_map = bundle_entry.get(
+            'prob_map', np.ones(roi.shape))
 
-            if not isinstance(prob_map, np.ndarray):
-                prob_map = prob_map.get_fdata()
-            if "space" in bundle_entry\
-                    and bundle_entry["space"] == "subject":
-                warped_prob_map = prob_map.copy()
-            else:
-                warped_prob_map = \
-                    self.mapping.transform_inverse(
-                        prob_map.copy(),
-                        interpolation='nearest')
+        if not isinstance(prob_map, np.ndarray):
+            prob_map = prob_map.get_fdata()
+        if "space" in bundle_entry\
+                and bundle_entry["space"] == "subject":
+            warped_prob_map = prob_map.copy()
+        else:
+            warped_prob_map = \
+                self.mapping.transform_inverse(
+                    prob_map.copy(),
+                    interpolation='nearest')
 
         return warped_prob_map, include_rois, exclude_rois,\
             include_roi_tols, exclude_roi_tols
