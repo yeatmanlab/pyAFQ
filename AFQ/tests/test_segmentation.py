@@ -194,34 +194,70 @@ def test_clean_by_endpoints():
     atlas[4, 1, 1] = 3
     atlas[4, 1, 2] = 4
 
-    clean_sl = seg.clean_by_endpoints(sl, [1, 2], [3, 4], atlas=atlas)
-    npt.assert_equal(list(clean_sl), sl[:2])
-
-    clean_results = list(seg.clean_by_endpoints(sl, [1, 2], [3, 4],
-                                                atlas=atlas,
-                                                return_idx=True))
-    clean_idx = []
-    clean_sl = []
-    for res in clean_results:
-        clean_sl.append(res[0])
-        clean_idx.append(res[1])
-    npt.assert_equal(list(clean_sl), sl[:2])
-    npt.assert_equal(clean_idx, np.array([0, 1]))
+    clean_idx = list(seg.clean_by_endpoints(
+        sl, [1, 2], [3, 4], atlas=atlas))
+    npt.assert_array_equal(clean_idx, np.array([0, 1]))
 
     # If tol=1, the third streamline also gets included
-    clean_sl = seg.clean_by_endpoints(sl, [1, 2], [3, 4], tol=1, atlas=atlas)
-    npt.assert_equal(list(clean_sl), sl[:3])
+    clean_idx = list(seg.clean_by_endpoints(
+        sl, [1, 2], [3, 4], tol=1, atlas=atlas))
+    npt.assert_array_equal(clean_idx, np.array([0, 1, 2]))
 
     # Provide the Nx3 array of indices instead.
     idx_start = np.array(np.where(atlas == 1)).T
     idx_end = np.array(np.where(atlas == 3)).T
 
-    clean_sl = seg.clean_by_endpoints(sl, idx_start, idx_end, atlas=atlas)
-    npt.assert_equal(list(clean_sl), np.array([sl[0]]))
+    clean_idx = list(seg.clean_by_endpoints(
+        sl, idx_start, idx_end, atlas=atlas))
+    npt.assert_array_equal(clean_idx, np.array([0]))
 
     # Sometimes no requirement for one side:
-    clean_sl = seg.clean_by_endpoints(sl, [1], None, atlas=atlas)
-    npt.assert_equal(list(clean_sl), [sl[0], sl[2], sl[3]])
+    clean_idx = list(seg.clean_by_endpoints(
+        sl, [1], None, atlas=atlas))
+    npt.assert_array_equal(clean_idx, np.array([0, 2, 3]))
+
+
+def test_exclusion_ROI():
+    segmentation = seg.Segmentation(
+        filter_by_endpoints=False
+    )
+    slf_bundle = {
+        'SLF_L': {
+            'include': [
+                templates['SLF_roi1_L'],
+                templates['SLF_roi2_L']],
+            'cross_midline': None}}
+
+    # tractogram where 1 streamline goes through include ROIs only
+    # and the other goes through both include and exclude ROIs
+    slf_tg = StatefulTractogram(
+        np.asarray(
+            [
+                [[6, 50, 39], [28, 38, 61], [28, 61, 38]],
+                [[6, 50, 39], [28, 38, 62], [18, 41, 31]]
+            ]).astype(float),
+        hardi_img, Space.VOX)
+    fiber_groups = segmentation.segment(
+        slf_bundle,
+        slf_tg,
+        hardi_fdata,
+        hardi_fbval,
+        hardi_fbvec,
+        mapping=mapping,
+    )
+    npt.assert_equal(len(fiber_groups["SLF_L"]), 2)
+
+    slf_bundle['SLF_L']['exclude'] = [templates["SLFt_roi2_L"]]
+
+    fiber_groups = segmentation.segment(
+        slf_bundle,
+        slf_tg,
+        hardi_fdata,
+        hardi_fbval,
+        hardi_fbvec,
+        mapping=mapping,
+    )
+    npt.assert_equal(len(fiber_groups["SLF_L"]), 1)
 
 
 def test_segment_sampled_streamlines():
