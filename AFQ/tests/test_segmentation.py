@@ -217,6 +217,49 @@ def test_clean_by_endpoints():
     npt.assert_array_equal(clean_idx, np.array([0, 2, 3]))
 
 
+def test_exclusion_ROI():
+    segmentation = seg.Segmentation(
+        filter_by_endpoints=False
+    )
+    slf_bundle = {
+        'SLF_L': {
+            'include': [
+                templates['SLF_roi1_L'],
+                templates['SLF_roi2_L']],
+            'cross_midline': None}}
+
+    # tractogram where 1 streamline goes through include ROIs only
+    # and the other goes through both include and exclude ROIs
+    slf_tg = StatefulTractogram(
+        np.asarray(
+            [
+                [[6, 50, 39], [28, 38, 61], [28, 61, 38]],
+                [[6, 50, 39], [28, 38, 62], [18, 41, 31]]
+            ]).astype(float),
+        hardi_img, Space.VOX)
+    fiber_groups = segmentation.segment(
+        slf_bundle,
+        slf_tg,
+        hardi_fdata,
+        hardi_fbval,
+        hardi_fbvec,
+        mapping=mapping,
+    )
+    npt.assert_equal(len(fiber_groups["SLF_L"]), 2)
+
+    slf_bundle['SLF_L']['exclude'] = [templates["SLFt_roi2_L"]]
+
+    fiber_groups = segmentation.segment(
+        slf_bundle,
+        slf_tg,
+        hardi_fdata,
+        hardi_fbval,
+        hardi_fbvec,
+        mapping=mapping,
+    )
+    npt.assert_equal(len(fiber_groups["SLF_L"]), 1)
+
+
 def test_segment_sampled_streamlines():
 
     # default segmentation
