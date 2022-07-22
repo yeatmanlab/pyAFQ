@@ -1,3 +1,14 @@
+0.12.2 (July 21, 2022)
+======================
+This release fixes a critical bug introduced in version 0.11, which
+caused exclusion ROIs to be ignored.
+  * [FIX]: Reorder endpoint (#858)
+  * [FIX] Some ITK map fixes for running with groupAFQ and in CLI (#855)
+  * [ENH] Add montage and combine bundle to GroupAFQ (#849)
+  * [DOC] add fatal error when no bundles found at all (#851)
+  * [ENH] add median bundle len function (#852)
+
+
 0.12.1 (June 30, 2022)
 ======================
 More informative warnings and errors, minor fixes.
@@ -12,7 +23,7 @@ More informative warnings and errors, minor fixes.
 
 0.12 (May 18, 2022)
 ===================
-This release simplifies the API, in part by merging the 
+This release simplifies the API, in part by merging the
 scalar and mask definitions into one image definition.
 pyAFQ now must use python >=3.8. Other minor bug fixes.
   * [FIX] update nightly tests and fix kwargs (#834)
