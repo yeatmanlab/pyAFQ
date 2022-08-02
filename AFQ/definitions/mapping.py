@@ -273,9 +273,17 @@ class ItkMap(Definition):
             "TransformParameters"])[9:]
         their_prealign[3, 3] = 1.0
         warp_f5.close()
-        return reg.read_mapping(
+        mapping = reg.read_mapping(
             their_disp, dwi,
             reg_template, prealign=their_prealign)
+
+        def transform(self, data, **kwargs):
+            raise NotImplementedError(
+                "ITK based mappings can currently"
+                + " only transform from template to subject space")
+
+        mapping.transform = transform
+        return mapping
 
 
 class GeneratedMapMixin(object):
