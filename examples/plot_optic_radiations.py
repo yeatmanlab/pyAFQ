@@ -85,5 +85,5 @@ else:
     raise ValueError("No L_OR found")
 
 # open interactive bundle visualization
-bundle_html = my_afq.export("all_bundles_figure")
-plotly.io.show(bundle_html["01"][0])
+bundle_html = my_afq.export("indiv_bundles_figures")
+plotly.io.show(bundle_html["01"]["L_OR"])

@@ -198,6 +198,7 @@ def viz_indivBundle(base_fname,
 
     bundle_names = bundle_dict.keys()
 
+    figures = {}
     for bundle_name in bundle_names:
         logger.info(f"Generating {bundle_name} visualization...")
         figure = viz_backend.visualize_volume(
@@ -261,7 +262,7 @@ def viz_indivBundle(base_fname,
 
         roi_dir = op.join(results_dir, 'viz_bundles')
         os.makedirs(roi_dir, exist_ok=True)
-        fnames = []
+        figures[bundle_name] = figure
         if "no_gif" not in viz_backend.backend:
             fname = op.split(
                 get_fname(
@@ -273,7 +274,6 @@ def viz_indivBundle(base_fname,
 
             fname = op.join(roi_dir, fname[1])
             viz_backend.create_gif(figure, fname)
-            fnames.append(fname)
         if "plotly" in viz_backend.backend:
             roi_dir = op.join(results_dir, 'viz_bundles')
             os.makedirs(roi_dir, exist_ok=True)
@@ -287,7 +287,6 @@ def viz_indivBundle(base_fname,
 
             fname = op.join(roi_dir, fname[1])
             figure.write_html(fname)
-            fnames.append(fname)
 
             # also do the core visualizations when using the plotly backend
             core_dir = op.join(results_dir, 'viz_core_bundles')
@@ -341,7 +340,7 @@ def viz_indivBundle(base_fname,
         segmentation_params=segmentation_params)
     meta = dict(Timing=time() - start_time)
     write_json(meta_fname, meta)
-    return fnames
+    return {"indiv_bundles_figures": figures}
 
 
 @pimms.calc("tract_profile_plots")
