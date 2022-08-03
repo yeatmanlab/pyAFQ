@@ -83,7 +83,7 @@ def segment(dwi, data_imap, mapping_imap,
 
 
 @pimms.calc("clean_bundles")
-@as_file('-cleanTractography.trk', include_track=True, include_seg=True)
+@as_file('_desc-clean_tractography.trk', include_track=True, include_seg=True)
 def clean_bundles(bundles, data_imap, clean_params=None):
     """
     full path to a trk file containting segmented
