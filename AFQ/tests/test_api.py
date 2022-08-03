@@ -822,6 +822,7 @@ def test_AFQ_data_waypoint():
                 "dti_fa",
                 "dti_md",
                 "dti_ga",
+                "dti_lt2",
                 f"ImageFile('{t1_path_other}')",
                 f"TemplateImage('{t1_path}')"]),
         VIZ=dict(
