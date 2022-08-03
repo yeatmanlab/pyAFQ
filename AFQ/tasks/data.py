@@ -280,6 +280,24 @@ def dti_fa(dti_tf):
     return dti_tf.fa
 
 
+@pimms.calc("dti_lt0", "dti_lt1", "dti_lt2", "dti_lt3", "dti_lt4", "dti_lt5")
+def dti_lt(dti_tf, dwi_affine):
+    """
+    Image of first element in the DTI tensor,
+    Image of second element in the DTI tensor,
+    Image of third element in the DTI tensor,
+    Image of fourth element in the DTI tensor,
+    Image of fifth element in the DTI tensor,
+    Image of sixth element in the DTI tensor
+    """
+    dti_lt_dict = {}
+    for ii in range(6):
+        dti_lt_dict[f"dti_lt{ii}"] = nib.Nifti1Image(
+            dti_tf.lower_triangular()[..., ii],
+            dwi_affine)
+    return dti_lt_dict
+
+
 @pimms.calc("dti_cfa")
 @as_file(suffix='_model-DTI_desc-DEC_FA.nii.gz')
 @as_fit_deriv('DTI')
@@ -605,9 +623,9 @@ def get_data_plan(kwargs):
     data_tasks = with_name([
         get_data_gtab, b0, b0_mask, brain_mask,
         dti_fit, dki_fit, anisotropic_power_map,
-        dti_fa, dti_cfa, dti_pdd, dti_md, dki_fa, dki_md, dki_awf, dki_mk,
-        dti_ga, dti_rd, dti_ad, dki_ga, dki_rd, dki_ad, dki_rk, dki_ak,
-        dti_params, dki_params, csd_params, get_bundle_dict])
+        dti_fa, dti_lt, dti_cfa, dti_pdd, dti_md, dki_fa, dki_md, dki_awf,
+        dki_mk, dti_ga, dti_rd, dti_ad, dki_ga, dki_rd, dki_ad, dki_rk,
+        dki_ak, dti_params, dki_params, csd_params, get_bundle_dict])
 
     if "scalars" not in kwargs:
         kwargs["scalars"] = ["dti_fa", "dti_md"]
