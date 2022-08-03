@@ -304,11 +304,16 @@ def tract_profiles(clean_bundles, data_imap,
         this_sl = seg_sft.get_bundle(bundle_name).streamlines
         if len(this_sl) == 0:
             continue
+        if profile_weights == "gauss":
+            # calculate only once per bundle
+            bundle_profile_weights = gaussian_weights(this_sl)
         for ii, (scalar, scalar_file) in enumerate(scalar_dict.items()):
-            scalar_data = nib.load(scalar_file).get_fdata()
+            if isinstance(scalar_file, str):
+                scalar_file = nib.load(scalar_file)
+            scalar_data = scalar_file.get_fdata()
             if isinstance(profile_weights, str):
                 if profile_weights == "gauss":
-                    this_prof_weights = gaussian_weights(this_sl)
+                    this_prof_weights = bundle_profile_weights
                 elif profile_weights == "median":
                     # weights bundle to only return the mean
                     def _median_weight(bundle):

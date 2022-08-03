@@ -22,7 +22,10 @@ logger = logging.getLogger('AFQ.api.viz')
 
 def _viz_prepare_vol(vol, xform, mapping, scalar_dict):
     if vol in scalar_dict.keys():
-        vol = nib.load(scalar_dict[vol]).get_fdata()
+        vol = scalar_dict[vol]
+        if isinstance(vol, str):
+            vol = nib.load(vol)
+        vol = vol.get_fdata()
     if isinstance(vol, str):
         vol = nib.load(vol).get_fdata()
     if xform:
