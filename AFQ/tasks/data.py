@@ -671,7 +671,7 @@ def get_data_plan(kwargs):
     data_tasks = with_name([
         get_data_gtab, b0, b0_mask, brain_mask,
         dti_fit, dki_fit, anisotropic_power_map,
-        dti_fa, dti_lt, dti_cfa, dti_pdd, dti_md, dki_kt, dki_kt, dki_fa,
+        dti_fa, dti_lt, dti_cfa, dti_pdd, dti_md, dki_kt, dki_lt, dki_fa,
         dki_md, dki_awf, dki_mk, dti_ga, dti_rd, dti_ad, dki_ga, dki_rd,
         dki_ad, dki_rk, dki_ak, dti_params, dki_params, csd_params,
         get_bundle_dict])
