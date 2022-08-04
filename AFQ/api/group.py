@@ -485,7 +485,7 @@ class GroupAFQ(object):
         self.logger.info(
             f"Time taken for export all: {str(time() - start_time)}")
 
-    def cmd_outputs(self, cmd="rm", dependent_on=None):
+    def cmd_outputs(self, cmd="rm", dependent_on=None, exceptions=[]):
         """
         Perform some command some or all outputs of pyafq.
         This is useful if you change a parameter and need
@@ -505,9 +505,12 @@ class GroupAFQ(object):
             If "recog", perform on all derivatives that depend on the
             bundle recognition.
             Default: None
+        exceptions : list of str
+            Name outputs that the command should not be applied to.
+            Default: []
         """
         for pAFQ in self.pAFQ_list:
-            pAFQ.cmd_outputs(cmd, dependent_on)
+            pAFQ.cmd_outputs(cmd, dependent_on, exceptions)
 
     def montage(self, bundle_name, size, view, slice_pos=None):
         """

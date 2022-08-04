@@ -181,7 +181,7 @@ class ParticipantAFQ(object):
         self.logger.info(
             f"Time taken for export all: {time() - start_time}")
 
-    def cmd_outputs(self, cmd="rm", dependent_on=None):
+    def cmd_outputs(self, cmd="rm", dependent_on=None, exceptions=[]):
         """
         Perform some command some or all outputs of pyafq.
         This is useful if you change a parameter and need
@@ -201,6 +201,9 @@ class ParticipantAFQ(object):
             If "recog", perform on all derivatives that depend on the
             bundle recognition.
             Default: None
+        exceptions : list of str
+            Name outputs that the command should not be applied to.
+            Default: []
         """
         if dependent_on is None:
             dependent_on_list = ["trk", "rec", "dwi"]
@@ -213,7 +216,19 @@ class ParticipantAFQ(object):
                 "dependent_on must be one of "
                 "None, 'track', or 'recog'."))
 
+        exception_file_names = []
+        for exception in exceptions:
+            file_name = self.export(exception)
+            if isinstance(file_name, str):
+                exception_file_names.append(file_name)
+            else:
+                self.logger.warn((
+                    f"The exception '{exception}' does not correspond"
+                    " to a filename and will be ignored."))
+
         for filename in os.listdir(self.output_dir):
+            if filename in exception_file_names:
+                continue
             full_path = os.path.join(self.output_dir, filename)
             if os.path.isfile(full_path) or os.path.islink(full_path):
                 if not filename.endswith("json"):
