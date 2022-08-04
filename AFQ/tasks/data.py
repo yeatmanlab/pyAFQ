@@ -368,31 +368,49 @@ def dti_ad(dti_tf):
 
 
 @pimms.calc(
-    "dki_lt0", "dki_lt1", "dki_lt2", "dki_lt3", "dki_lt4",
-    "dki_lt5", "dki_lt6", "dki_lt7", "dki_lt8", "dki_lt9",
-    "dki_lt10", "dki_lt11", "dki_lt12", "dki_lt13", "dki_lt14")
+    "dki_kt0", "dki_kt1", "dki_kt2", "dki_kt3", "dki_kt4",
+    "dki_kt5", "dki_kt6", "dki_kt7", "dki_kt8", "dki_kt9",
+    "dki_kt10", "dki_kt11", "dki_kt12", "dki_kt13", "dki_kt14")
+def dki_kt(dki_tf, dwi_affine):
+    """
+    Image of first element in the DKI kurtosis model,
+    Image of second element in the DKI kurtosis model,
+    Image of third element in the DKI kurtosis model,
+    Image of fourth element in the DKI kurtosis model,
+    Image of fifth element in the DKI kurtosis model,
+    Image of sixth element in the DKI kurtosis model,
+    Image of seventh element in the DKI kurtosis model,
+    Image of eighth element in the DKI kurtosis model,
+    Image of ninth element in the DKI kurtosis model,
+    Image of tenth element in the DKI kurtosis model,
+    Image of eleventh element in the DKI kurtosis model,
+    Image of twelf element in the DKI kurtosis model,
+    Image of thirteenth element in the DKI kurtosis model,
+    Image of fourteenth element in the DKI kurtosis model,
+    Image of fifteenth element in the DKI kurtosis model
+    """
+    dki_kt_dict = {}
+    for ii in range(15):
+        dki_kt_dict[f"dki_kt{ii}"] = nib.Nifti1Image(
+            dki_tf.kt[..., ii],
+            dwi_affine)
+    return dki_kt_dict
+
+
+@pimms.calc("dki_lt0", "dki_lt1", "dki_lt2", "dki_lt3", "dki_lt4", "dki_lt5")
 def dki_lt(dki_tf, dwi_affine):
     """
-    Image of first element in the DKI tensor,
-    Image of second element in the DKI tensor,
-    Image of third element in the DKI tensor,
-    Image of fourth element in the DKI tensor,
-    Image of fifth element in the DKI tensor,
-    Image of sixth element in the DKI tensor,
-    Image of seventh element in the DKI tensor,
-    Image of eighth element in the DKI tensor,
-    Image of ninth element in the DKI tensor,
-    Image of tenth element in the DKI tensor,
-    Image of eleventh element in the DKI tensor,
-    Image of twelf element in the DKI tensor,
-    Image of thirteenth element in the DKI tensor,
-    Image of fourteenth element in the DKI tensor,
-    Image of fifteenth element in the DKI tensor
+    Image of first element in the DTI tensor from DKI,
+    Image of second element in the DTI tensor from DKI,
+    Image of third element in the DTI tensor from DKI,
+    Image of fourth element in the DTI tensor from DKI,
+    Image of fifth element in the DTI tensor from DKI,
+    Image of sixth element in the DTI tensor from DKI
     """
     dki_lt_dict = {}
-    for ii in range(15):
+    for ii in range(6):
         dki_lt_dict[f"dki_lt{ii}"] = nib.Nifti1Image(
-            dki_tf.kt[..., ii],
+            dki_tf.lower_triangular()[..., ii],
             dwi_affine)
     return dki_lt_dict
 
@@ -653,9 +671,10 @@ def get_data_plan(kwargs):
     data_tasks = with_name([
         get_data_gtab, b0, b0_mask, brain_mask,
         dti_fit, dki_fit, anisotropic_power_map,
-        dti_fa, dti_lt, dti_cfa, dti_pdd, dti_md, dki_lt, dki_fa, dki_md,
-        dki_awf, dki_mk, dti_ga, dti_rd, dti_ad, dki_ga, dki_rd, dki_ad,
-        dki_rk, dki_ak, dti_params, dki_params, csd_params, get_bundle_dict])
+        dti_fa, dti_lt, dti_cfa, dti_pdd, dti_md, dki_kt, dki_kt, dki_fa,
+        dki_md, dki_awf, dki_mk, dti_ga, dti_rd, dti_ad, dki_ga, dki_rd,
+        dki_ad, dki_rk, dki_ak, dti_params, dki_params, csd_params,
+        get_bundle_dict])
 
     if "scalars" not in kwargs:
         kwargs["scalars"] = ["dti_fa", "dti_md"]
