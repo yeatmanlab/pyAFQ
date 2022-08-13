@@ -137,6 +137,8 @@ class GroupAFQ(object):
             raise TypeError("bids_layout_kwargs must be a dict")
 
         self.logger = logging.getLogger('AFQ.api')
+        self.logger.setLevel(logging.INFO)
+
         self.parallel_params = parallel_params
         self.wf_dict = {}
 

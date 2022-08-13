@@ -20,7 +20,7 @@ __all__ = ["as_file", "as_fit_deriv", "as_img"]
 
 
 logger = logging.getLogger('AFQ.api')
-logger.setLevel(10)
+logger.setLevel(logging.INFO)
 
 
 # get args and kwargs from function
