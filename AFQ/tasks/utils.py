@@ -11,12 +11,11 @@ def get_fname(base_fname, suffix,
         odf_model = tracking_params['odf_model']
         directions = tracking_params['directions']
         fname = fname + (
-            f'_space-RASMM_model-{odf_model}'
-            f'_desc-{directions}'
+            f'_space-RASMM_model-{directions+odf_model}'
         )
     if segmentation_params is not None and 'seg_algo' in segmentation_params:
         seg_algo = segmentation_params['seg_algo']
-        fname = f'{fname}-{seg_algo}'
+        fname = fname + f"_algo-{seg_algo}"
 
     return fname + suffix
 
@@ -32,3 +31,7 @@ def get_default_args(func):
         for k, v in inspect.signature(func).parameters.items()
         if v.default is not inspect.Parameter.empty
     }
+
+
+def str_to_desc(string):
+    return string.replace("-", "").replace("_", "")

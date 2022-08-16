@@ -1,5 +1,6 @@
 import nibabel as nib
 import os.path as op
+import os
 from time import time
 import logging
 
@@ -14,6 +15,7 @@ from AFQ.tasks.tractography import get_tractography_plan
 from AFQ.tasks.segmentation import get_segmentation_plan
 from AFQ.tasks.viz import get_viz_plan
 from AFQ.utils.path import drop_extension
+from AFQ.data.s3bids import read_json
 
 
 __all__ = ["ParticipantAFQ"]
@@ -87,6 +89,7 @@ class ParticipantAFQ(object):
                 "did you mean tracking_params ?"))
 
         self.logger = logging.getLogger('AFQ.api')
+        self.output_dir = output_dir
 
         kwargs = dict(
             dwi=dwi_data_file,
@@ -177,3 +180,65 @@ class ParticipantAFQ(object):
         export_all_helper(self, seg_algo, xforms, indiv, viz)
         self.logger.info(
             f"Time taken for export all: {time() - start_time}")
+
+    def cmd_outputs(self, cmd="rm", dependent_on=None, exceptions=[]):
+        """
+        Perform some command some or all outputs of pyafq.
+        This is useful if you change a parameter and need
+        to recalculate derivatives that depend on it.
+        Some examples: cp, mv, rm .
+        -r will be automtically added when necessary.
+
+        Parameters
+        ----------
+        cmd : str
+            Command to run on outputs. Default: 'rm'
+        dependent_on : str or None
+            Which derivatives to perform command on .
+            If None, perform on all.
+            If "track", perform on all derivatives that depend on the
+            tractography.
+            If "recog", perform on all derivatives that depend on the
+            bundle recognition.
+            Default: None
+        exceptions : list of str
+            Name outputs that the command should not be applied to.
+            Default: []
+        """
+        if dependent_on is None:
+            dependent_on_list = ["trk", "rec", "dwi"]
+        elif dependent_on.lower() == "track":
+            dependent_on_list = ["trk", "rec"]
+        elif dependent_on.lower() == "recog":
+            dependent_on_list = ["rec"]
+        else:
+            raise ValueError((
+                "dependent_on must be one of "
+                "None, 'track', or 'recog'."))
+
+        exception_file_names = []
+        for exception in exceptions:
+            file_name = self.export(exception)
+            if isinstance(file_name, str):
+                exception_file_names.append(file_name)
+            else:
+                self.logger.warn((
+                    f"The exception '{exception}' does not correspond"
+                    " to a filename and will be ignored."))
+
+        for filename in os.listdir(self.output_dir):
+            if filename in exception_file_names:
+                continue
+            full_path = os.path.join(self.output_dir, filename)
+            if os.path.isfile(full_path) or os.path.islink(full_path):
+                if not filename.endswith("json"):
+                    sidecar_file = f'{drop_extension(full_path)}.json'
+                    sidecar_info = read_json(sidecar_file)
+                    if "dependent" in sidecar_info\
+                            and sidecar_info["dependent"] in dependent_on_list:
+                        os.system(f"{cmd} {full_path}")
+                        os.system(f"{cmd} {sidecar_file}")
+            elif os.path.isdir(full_path):
+                # other than ROIs, folders are dependent on everything
+                if dependent_on is None or filename != "ROIs":
+                    os.system(f"{cmd} -r {full_path}")

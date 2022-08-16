@@ -77,7 +77,7 @@ def get_data_gtab(dwi, bval, bvec, min_bval=None,
 
 
 @pimms.calc("b0")
-@as_file('_b0.nii.gz')
+@as_file('_desc-b0_dwi.nii.gz')
 def b0(dwi, data, gtab, img):
     """
     full path to a nifti file containing the mean b0
@@ -90,7 +90,7 @@ def b0(dwi, data, gtab, img):
 
 
 @pimms.calc("masked_b0")
-@as_file('_maskedb0.nii.gz')
+@as_file('_desc-maskedb0_dwi.nii.gz')
 def b0_mask(base_fname, b0, brain_mask):
     """
     full path to a nifti file containing the
@@ -104,7 +104,7 @@ def b0_mask(base_fname, b0, brain_mask):
 
     masked_b0_img = nib.Nifti1Image(masked_data, img.affine)
     meta = dict(
-        source=get_fname(base_fname, '_b0.nii.gz'),
+        source=b0,
         masked=True)
     return masked_b0_img, meta
 
@@ -117,7 +117,7 @@ def dti_fit(dti_params, gtab):
     return dpy_dti.TensorFit(tm, dti_params)
 
 
-@as_file(suffix='_model-DTI_diffmodel.nii.gz')
+@as_file(suffix='_model-DTI_desc-diffmodel_dwi.nii.gz')
 @as_img
 def dti(brain_mask, data, gtab,
         bval, bvec, b0_threshold=50, robust_tensor_fitting=False):
@@ -167,7 +167,7 @@ def dki_fit(dki_params, gtab):
     return dpy_dki.DiffusionKurtosisFit(tm, dki_params)
 
 
-@as_file(suffix='_model-DKI_diffmodel.nii.gz')
+@as_file(suffix='_model-DKI_desc-diffmodel_dwi.nii.gz')
 @as_img
 def dki(brain_mask, gtab, data):
     """
@@ -190,7 +190,7 @@ def dki(brain_mask, gtab, data):
 dki_params = pimms.calc("dki_params")(dki)
 
 
-@as_file(suffix='_model-CSD_diffmodel.nii.gz')
+@as_file(suffix='_model-CSD_desc-diffmodel_dwi.nii.gz')
 @as_img
 def csd(dwi, brain_mask, gtab, data,
         csd_response=None, csd_sh_order=None,
@@ -257,7 +257,7 @@ csd_params = pimms.calc("csd_params")(csd)
 
 
 @pimms.calc("pmap")
-@as_file(suffix='_model-CSD_APM.nii.gz')
+@as_file(suffix='_model-CSD_desc-APM_dwi.nii.gz')
 def anisotropic_power_map(csd_params):
     """
     full path to a nifti file containing
@@ -270,7 +270,7 @@ def anisotropic_power_map(csd_params):
 
 
 @pimms.calc("dti_fa")
-@as_file(suffix='_model-DTI_FA.nii.gz')
+@as_file(suffix='_model-DTI_desc-FA_dwi.nii.gz')
 @as_fit_deriv('DTI')
 def dti_fa(dti_tf):
     """
@@ -299,7 +299,7 @@ def dti_lt(dti_tf, dwi_affine):
 
 
 @pimms.calc("dti_cfa")
-@as_file(suffix='_model-DTI_desc-DEC_FA.nii.gz')
+@as_file(suffix='_model-DTI_desc-CFA_dwi.nii.gz')
 @as_fit_deriv('DTI')
 def dti_cfa(dti_tf):
     """
@@ -310,7 +310,7 @@ def dti_cfa(dti_tf):
 
 
 @pimms.calc("dti_pdd")
-@as_file(suffix='_model-DTI_PDD.nii.gz')
+@as_file(suffix='_model-DTI_desc-PDD_dwi.nii.gz')
 @as_fit_deriv('DTI')
 def dti_pdd(dti_tf):
     """
@@ -324,7 +324,7 @@ def dti_pdd(dti_tf):
 
 
 @pimms.calc("dti_md")
-@as_file('_model-DTI_MD.nii.gz')
+@as_file('_model-DTI_desc-MD_dwi.nii.gz')
 @as_fit_deriv('DTI')
 def dti_md(dti_tf):
     """
@@ -335,7 +335,7 @@ def dti_md(dti_tf):
 
 
 @pimms.calc("dti_ga")
-@as_file(suffix='_model-DTI_GA.nii.gz')
+@as_file(suffix='_model-DTI_desc-GA_dwi.nii.gz')
 @as_fit_deriv('DTI')
 def dti_ga(dti_tf):
     """
@@ -346,7 +346,7 @@ def dti_ga(dti_tf):
 
 
 @pimms.calc("dti_rd")
-@as_file(suffix='_model-DTI_RD.nii.gz')
+@as_file(suffix='_model-DTI_desc-RD_dwi.nii.gz')
 @as_fit_deriv('DTI')
 def dti_rd(dti_tf):
     """
@@ -357,7 +357,7 @@ def dti_rd(dti_tf):
 
 
 @pimms.calc("dti_ad")
-@as_file(suffix='_model-DTI_AD.nii.gz')
+@as_file(suffix='_model-DTI_desc-AD_dwi.nii.gz')
 @as_fit_deriv('DTI')
 def dti_ad(dti_tf):
     """
@@ -416,7 +416,7 @@ def dki_lt(dki_tf, dwi_affine):
 
 
 @pimms.calc("dki_fa")
-@as_file('_model-DKI_FA.nii.gz')
+@as_file('_model-DKI_desc-FA_dwi.nii.gz')
 @as_fit_deriv('DKI')
 def dki_fa(dki_tf):
     """
@@ -427,7 +427,7 @@ def dki_fa(dki_tf):
 
 
 @pimms.calc("dki_md")
-@as_file('_model-DKI_MD.nii.gz')
+@as_file('_model-DKI_desc-MD_dwi.nii.gz')
 @as_fit_deriv('DKI')
 def dki_md(dki_tf):
     """
@@ -438,7 +438,7 @@ def dki_md(dki_tf):
 
 
 @pimms.calc("dki_awf")
-@as_file('_model-DKI_AWF.nii.gz')
+@as_file('_model-DKI_desc-AWF_dwi.nii.gz')
 @as_fit_deriv('DKI')
 def dki_awf(dki_params,
             sphere='repulsion100', gtol=1e-2):
@@ -466,7 +466,7 @@ def dki_awf(dki_params,
 
 
 @pimms.calc("dki_mk")
-@as_file('_model-DKI_MK.nii.gz')
+@as_file('_model-DKI_desc-MK_dwi.nii.gz')
 @as_fit_deriv('DKI')
 def dki_mk(dki_tf):
     """
@@ -477,7 +477,7 @@ def dki_mk(dki_tf):
 
 
 @pimms.calc("dki_ga")
-@as_file(suffix='_model-DKI_GA.nii.gz')
+@as_file(suffix='_model-DKI_desc-GA_dwi.nii.gz')
 @as_fit_deriv('DKI')
 def dki_ga(dki_tf):
     """
@@ -488,7 +488,7 @@ def dki_ga(dki_tf):
 
 
 @pimms.calc("dki_rd")
-@as_file(suffix='_model-DKI_RD.nii.gz')
+@as_file(suffix='_model-DKI_desc-RD_dwi.nii.gz')
 @as_fit_deriv('DKI')
 def dki_rd(dki_tf):
     """
@@ -499,7 +499,7 @@ def dki_rd(dki_tf):
 
 
 @pimms.calc("dki_ad")
-@as_file(suffix='_model-DKI_AD.nii.gz')
+@as_file(suffix='_model-DKI_desc-AD_dwi.nii.gz')
 @as_fit_deriv('DKI')
 def dki_ad(dki_tf):
     """
@@ -510,7 +510,7 @@ def dki_ad(dki_tf):
 
 
 @pimms.calc("dki_rk")
-@as_file(suffix='_model-DKI_RK.nii.gz')
+@as_file(suffix='_model-DKI_desc-RK_dwi.nii.gz')
 @as_fit_deriv('DKI')
 def dki_rk(dki_tf):
     """
@@ -521,7 +521,7 @@ def dki_rk(dki_tf):
 
 
 @pimms.calc("dki_ak")
-@as_file(suffix='_model-DKI_AK.nii.gz')
+@as_file(suffix='_model-DKI_desc-AK_dwi.nii.gz')
 @as_fit_deriv('DKI')
 def dki_ak(dki_tf):
     """
@@ -532,7 +532,7 @@ def dki_ak(dki_tf):
 
 
 @pimms.calc("brain_mask")
-@as_file('_brain_mask.nii.gz')
+@as_file('_desc-brain_mask.nii.gz')
 def brain_mask(base_fname, dwi, b0,
                bids_info, brain_mask_definition=None):
     """

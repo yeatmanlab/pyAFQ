@@ -241,6 +241,7 @@ class GroupAFQ(object):
 
         self.valid_sub_list = []
         self.valid_ses_list = []
+        self.pAFQ_list = []
         for subject in self.subjects:
             self.wf_dict[subject] = {}
             for session in self.sessions:
@@ -298,6 +299,7 @@ class GroupAFQ(object):
                         "session": session},
                     **this_kwargs)
                 self.wf_dict[subject][str(session)] = this_pAFQ.wf_dict
+                self.pAFQ_list.append(this_pAFQ)
 
     def combine_profiles(self):
         tract_profiles_dict = self.export("profiles")
@@ -482,6 +484,33 @@ class GroupAFQ(object):
             self.assemble_AFQ_browser()
         self.logger.info(
             f"Time taken for export all: {str(time() - start_time)}")
+
+    def cmd_outputs(self, cmd="rm", dependent_on=None, exceptions=[]):
+        """
+        Perform some command some or all outputs of pyafq.
+        This is useful if you change a parameter and need
+        to recalculate derivatives that depend on it.
+        Some examples: cp, mv, rm .
+        -r will be automtically added when necessary.
+
+        Parameters
+        ----------
+        cmd : str
+            Command to run on outputs. Default: 'rm'
+        dependent_on : str or None
+            Which derivatives to perform command on .
+            If None, perform on all.
+            If "track", perform on all derivatives that depend on the
+            tractography.
+            If "recog", perform on all derivatives that depend on the
+            bundle recognition.
+            Default: None
+        exceptions : list of str
+            Name outputs that the command should not be applied to.
+            Default: []
+        """
+        for pAFQ in self.pAFQ_list:
+            pAFQ.cmd_outputs(cmd, dependent_on, exceptions)
 
     def montage(self, bundle_name, size, view, slice_pos=None):
         """

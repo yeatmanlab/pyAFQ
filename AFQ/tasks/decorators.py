@@ -139,6 +139,14 @@ def as_file(suffix, include_track=False, include_seg=False):
                         img_trk_or_csv, this_file, bbox_valid_check=False)
                 else:
                     img_trk_or_csv.to_csv(this_file)
+
+                if include_seg:
+                    meta["dependent"] = "rec"
+                elif include_track:
+                    meta["dependent"] = "trk"
+                else:
+                    meta["dependent"] = "dwi"
+
                 meta_fname = get_fname(
                     base_fname, f"{drop_extension(suffix)}.json",
                     tracking_params=tracking_params,

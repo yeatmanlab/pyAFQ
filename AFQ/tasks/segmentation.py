@@ -9,7 +9,7 @@ import logging
 import pimms
 
 from AFQ.tasks.decorators import as_file
-from AFQ.tasks.utils import get_fname, with_name
+from AFQ.tasks.utils import get_fname, with_name, str_to_desc
 import AFQ.segmentation as seg
 from AFQ.utils.path import drop_extension
 import AFQ.utils.streamlines as aus
@@ -83,7 +83,7 @@ def segment(dwi, data_imap, mapping_imap,
 
 
 @pimms.calc("clean_bundles")
-@as_file('-clean_tractography.trk', include_track=True, include_seg=True)
+@as_file('_desc-clean_tractography.trk', include_track=True, include_seg=True)
 def clean_bundles(bundles, data_imap, clean_params=None):
     """
     full path to a trk file containting segmented
@@ -169,7 +169,7 @@ def export_bundles(base_fname, results_dir,
                 fname = op.split(
                     get_fname(
                         base_fname,
-                        f'-{bundle}'
+                        f'_desc-{str_to_desc(bundle)}'
                         f'_tractography.trk',
                         tracking_params=tracking_params,
                         segmentation_params=segmentation_params))
@@ -185,7 +185,7 @@ def export_bundles(base_fname, results_dir,
 
 
 @pimms.calc("sl_counts")
-@as_file('_sl_count.csv', include_track=True, include_seg=True)
+@as_file('_desc-slCount_dwi.csv', include_track=True, include_seg=True)
 def export_sl_counts(data_imap,
                      clean_bundles, bundles):
     """
@@ -218,7 +218,9 @@ def export_sl_counts(data_imap,
 
 
 @pimms.calc("median_bundle_lengths")
-@as_file('_medianBundleLengths.csv', include_track=True, include_seg=True)
+@as_file(
+    '_desc-medianBundleLengths_dwi.csv',
+    include_track=True, include_seg=True)
 def export_bundle_lengths(data_imap,
                           clean_bundles, bundles):
     """
@@ -258,7 +260,7 @@ def export_bundle_lengths(data_imap,
 
 
 @pimms.calc("profiles")
-@as_file('_profiles.csv', include_track=True, include_seg=True)
+@as_file('_desc-profiles_dwi.csv', include_track=True, include_seg=True)
 def tract_profiles(clean_bundles, data_imap,
                    scalar_dict, dwi_affine,
                    profile_weights="gauss"):

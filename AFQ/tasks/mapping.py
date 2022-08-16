@@ -6,7 +6,7 @@ import logging
 
 import pimms
 from AFQ.tasks.decorators import as_file
-from AFQ.tasks.utils import get_fname, with_name
+from AFQ.tasks.utils import get_fname, with_name, str_to_desc
 import AFQ.data.fetch as afd
 from AFQ.data.s3bids import write_json
 from AFQ.utils.path import drop_extension
@@ -23,7 +23,7 @@ logger = logging.getLogger('AFQ.api.mapping')
 
 
 @pimms.calc("b0_warped")
-@as_file('_b0_in_MNI.nii.gz')
+@as_file('_space-template_desc-b0_dwi.nii.gz')
 def export_registered_b0(data_imap, mapping):
     """
     full path to a nifti file containing
@@ -36,7 +36,7 @@ def export_registered_b0(data_imap, mapping):
 
 
 @pimms.calc("template_xform")
-@as_file('_template_xform.nii.gz')
+@as_file('_space-subject_desc-template_dwi.nii.gz')
 def template_xform(dwi_affine, mapping, data_imap):
     """
     full path to a nifti file containing
@@ -66,7 +66,9 @@ def export_rois(base_fname, results_dir, data_imap, mapping, dwi_affine):
                     fname = op.split(
                         get_fname(
                             base_fname,
-                            f'_desc-ROI-{bundle}-{ii + 1}-{roi_type}.nii.gz'))
+                            '_space-subject_desc-'
+                            f'{str_to_desc(bundle)}{ii + 1}{roi_type}'
+                            '_mask.nii.gz'))
 
                     fname = op.join(rois_dir, fname[1])
                     if not op.exists(fname):
@@ -256,8 +258,10 @@ def get_mapping_plan(kwargs, use_sls=False):
                 )
             mapping_tasks[f"{scalar.get_name()}_res"] =\
                 pimms.calc(f"{scalar.get_name()}")(
-                    as_file(f'-{scalar.get_name()}.nii.gz')(
-                        scalar.get_image_getter("mapping")))
+                    as_file((
+                        f'desc-{str_to_desc(scalar.get_name())}'
+                        '_dwi.nii.gz'))(
+                            scalar.get_image_getter("mapping")))
 
     if use_sls:
         mapping_tasks["mapping_res"] = sls_mapping
