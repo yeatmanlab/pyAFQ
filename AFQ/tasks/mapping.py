@@ -204,10 +204,10 @@ def get_reg_subject(data_imap, bids_info, base_fname, dwi,
             "reg_subject must be a str, ImageDefinition, or Nifti1Image")
 
     filename_dict = {
-        "b0": data_imap["b0"],
-        "power_map": data_imap["pmap"],
-        "dti_fa_subject": data_imap["dti_fa"],
-        "subject_sls": data_imap["b0"],
+        "b0": "b0",
+        "power_map": "pmap",
+        "dti_fa_subject": "dti_fa",
+        "subject_sls": "b0",
     }
     bm = nib.load(data_imap["brain_mask"])
 
@@ -222,7 +222,7 @@ def get_reg_subject(data_imap, bids_info, base_fname, dwi,
             data_imap=data_imap)
     else:
         if reg_subject_spec in filename_dict:
-            reg_subject_spec = filename_dict[reg_subject_spec]
+            reg_subject_spec = data_imap[filename_dict[reg_subject_spec]]
         img = nib.load(reg_subject_spec)
     bm = bm.get_fdata().astype(bool)
     masked_data = img.get_fdata()
