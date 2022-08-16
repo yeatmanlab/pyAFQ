@@ -218,7 +218,9 @@ def export_sl_counts(data_imap,
 
 
 @pimms.calc("median_bundle_lengths")
-@as_file('_desc-medianBundleLengths_dwi.csv', include_track=True, include_seg=True)
+@as_file(
+    '_desc-medianBundleLengths_dwi.csv',
+    include_track=True, include_seg=True)
 def export_bundle_lengths(data_imap,
                           clean_bundles, bundles):
     """

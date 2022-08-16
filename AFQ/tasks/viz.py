@@ -357,7 +357,8 @@ def plot_tract_profiles(base_fname, scalars, tracking_params,
     for scalar in scalars:
         this_scalar = scalar if isinstance(scalar, str) else scalar.get_name()
         fname = get_fname(
-            base_fname, f'_model-{str_to_desc(this_scalar)}_desc-vizprofile_dwi',
+            base_fname,
+            f'_model-{str_to_desc(this_scalar)}_desc-vizprofile_dwi',
             tracking_params=tracking_params,
             segmentation_params=segmentation_params)
         tract_profiles_folder = op.join(

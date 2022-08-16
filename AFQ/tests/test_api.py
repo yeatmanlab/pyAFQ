@@ -761,7 +761,7 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         myafq.export("results_dir"),
         'ROIs',
-        'sub-01_ses-01_dwi_desc-CSTR1include_mask.json'))
+        'sub-01_ses-01_dwi_space-subject_desc-CSTR1include_mask.json'))
 
     # Test bundles exporting:
     myafq.export("indiv_bundles")
@@ -785,7 +785,7 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         myafq.export("results_dir"),
         "viz_bundles",
-        'sub-01_ses-01_dwi_space-RASMM_model-probCSD_algo-AFQ_SLFLviz_dwi.html'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-probCSD_algo-AFQ_desc-SLFLviz_dwi.html'))  # noqa
 
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see
     # that the CLI generates them
@@ -853,7 +853,7 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         results_dir,
         'ROIs',
-        'sub-01_ses-01_dwi_desc-SLFL1include_mask.json'))
+        'sub-01_ses-01_dwi_space-subject_desc-SLFL1include_mask.json'))
 
     assert op.exists(op.join(
         results_dir,
