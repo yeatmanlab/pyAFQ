@@ -35,6 +35,7 @@ from PIL import Image
 
 from bids.layout import BIDSLayout, BIDSLayoutIndexer
 import bids.config as bids_config
+import warnings
 with contextlib.suppress(ValueError):
     bids_config.set_option('extension_initial_dot', True)
 try:

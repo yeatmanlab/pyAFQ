@@ -20,7 +20,9 @@ import logging
 import time
 
 import bids.config as bids_config
+import warnings
 try:
+    warnings.simplefilter(action='ignore', category=FutureWarning)
     bids_config.set_option('extension_initial_dot', True)
 except ValueError:
     pass
@@ -28,7 +30,6 @@ import nibabel as nib
 import boto3
 
 # capture templateflow resource warning and log
-import warnings
 default_warning_format = warnings.formatwarning
 try:
     warnings.formatwarning = lambda msg, *args, **kwargs: f'{msg}'
