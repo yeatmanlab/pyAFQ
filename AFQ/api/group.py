@@ -533,6 +533,10 @@ class GroupAFQ(object):
             If float, indicates the fractional position along the
             perpendicular axis to the slice. Currently only works with plotly.
             If None, no slice is displayed.
+
+        Returns
+        -------
+        list of filenames of montage images
         """
         if view not in ["Sagittal", "Coronal", "Axial"]:
             raise ValueError(
@@ -551,6 +555,7 @@ class GroupAFQ(object):
         clean_bundles_dict = self.export("clean_bundles", collapse=False)
         best_scalar_dict = self.export(best_scalar, collapse=False)
 
+        all_fnames = []
         self.logger.info("Generating Montage...")
         for ii in tqdm(range(len(self.valid_ses_list))):
             this_sub = self.valid_sub_list[ii]
@@ -648,10 +653,12 @@ class GroupAFQ(object):
                 window.snapshot(figure, fname=this_fname, size=(600, 600))
 
         def _save_file(curr_img, curr_file_num):
-            curr_img.save(op.abspath(op.join(
+            save_path = op.abspath(op.join(
                 self.afq_path,
                 (f"bundle-{bundle_name}_view-{view}"
-                    f"_idx-{curr_file_num}_montage.png"))))
+                    f"_idx-{curr_file_num}_montage.png")))
+            curr_img.save(save_path)
+            all_fnames.append(save_path)
 
         this_img_trimmed = {}
         max_height = 0
@@ -692,6 +699,7 @@ class GroupAFQ(object):
                 (x_pos * max_width, y_pos * max_height))
 
         _save_file(curr_img, curr_file_num)
+        return all_fnames
 
     def combine_bundle(self, bundle_name):
         """
