@@ -15,7 +15,7 @@ logger = logging.getLogger('AFQ.api')
 
 
 @pimms.calc("seed")
-@as_file('_seedMask.nii.gz')
+@as_file('_desc-seed_mask.nii.gz')
 @as_img
 def export_seed_mask(tracking_params):
     """
@@ -28,7 +28,7 @@ def export_seed_mask(tracking_params):
 
 
 @pimms.calc("stop")
-@as_file('_stopMask.nii.gz')
+@as_file('_desc-stop_mask.nii.gz')
 @as_img
 def export_stop_mask(tracking_params):
     """
@@ -242,12 +242,12 @@ def get_tractography_plan(kwargs):
             export_stop_mask_pft
     elif isinstance(stop_mask, Definition):
         tractography_tasks["export_stop_mask_res"] =\
-            pimms.calc("stop")(as_file('_stop_mask.nii.gz')(
+            pimms.calc("stop")(as_file('_desc-stop_mask.nii.gz')(
                 stop_mask.get_image_getter("tractography")))
 
     if isinstance(seed_mask, Definition):
         tractography_tasks["export_seed_mask_res"] = pimms.calc("seed")(
-            as_file('_seed_mask.nii.gz')(
+            as_file('_desc-seed_mask.nii.gz')(
                 seed_mask.get_image_getter("tractography")))
 
     return pimms.plan(**tractography_tasks)

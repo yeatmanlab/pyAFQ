@@ -10,7 +10,7 @@ import pimms
 
 from dipy.align import resample
 
-from AFQ.tasks.utils import get_fname, with_name
+from AFQ.tasks.utils import get_fname, with_name, str_to_desc
 import AFQ.utils.volume as auv
 from AFQ.data.s3bids import write_json
 from AFQ.viz.utils import Viz
@@ -119,20 +119,20 @@ def viz_bundles(base_fname,
     fname = None
     if "no_gif" not in viz_backend.backend:
         fname = get_fname(
-            base_fname, '_viz.gif',
+            base_fname, '_desc-viz_dwi.gif',
             tracking_params=tracking_params,
             segmentation_params=segmentation_params)
 
         viz_backend.create_gif(figure, fname)
     if "plotly" in viz_backend.backend:
         fname = get_fname(
-            base_fname, '_viz.html',
+            base_fname, '_desc-viz_dwi.html',
             tracking_params=tracking_params,
             segmentation_params=segmentation_params)
 
         figure.write_html(fname)
     meta_fname = get_fname(
-        base_fname, '_viz.json',
+        base_fname, '_desc-viz_dwi.json',
         tracking_params=tracking_params,
         segmentation_params=segmentation_params)
     meta = dict(Timing=time() - start_time)
@@ -266,8 +266,8 @@ def viz_indivBundle(base_fname,
             fname = op.split(
                 get_fname(
                     base_fname,
-                    f'_{bundle_name}'
-                    f'_viz.gif',
+                    f'_desc-{str_to_desc(bundle_name)}viz'
+                    f'_dwi.gif',
                     tracking_params=tracking_params,
                     segmentation_params=segmentation_params))
 
@@ -280,8 +280,8 @@ def viz_indivBundle(base_fname,
             fname = op.split(
                 get_fname(
                     base_fname,
-                    f'_{bundle_name}'
-                    f'_viz.html',
+                    f'_desc-{str_to_desc(bundle_name)}viz'
+                    f'_dwi.html',
                     tracking_params=tracking_params,
                     segmentation_params=segmentation_params))
 
@@ -298,8 +298,8 @@ def viz_indivBundle(base_fname,
                 fname = op.split(
                     get_fname(
                         base_fname,
-                        f'_{bundle_name}'
-                        f'_viz.html',
+                        f'_desc-{str_to_desc(bundle_name)}viz'
+                        f'_dwi.html',
                         tracking_params=tracking_params,
                         segmentation_params=segmentation_params))
                 fname = op.join(core_dir, fname[1])
@@ -336,7 +336,7 @@ def viz_indivBundle(base_fname,
                     include_profile=True)
                 core_fig.write_html(fname)
     meta_fname = get_fname(
-        base_fname, '_vizIndiv.json',
+        base_fname, f'_desc-{str_to_desc(bundle_name)}viz_dwi',
         tracking_params=tracking_params,
         segmentation_params=segmentation_params)
     meta = dict(Timing=time() - start_time)
@@ -357,7 +357,7 @@ def plot_tract_profiles(base_fname, scalars, tracking_params,
     for scalar in scalars:
         this_scalar = scalar if isinstance(scalar, str) else scalar.get_name()
         fname = get_fname(
-            base_fname, f'_{this_scalar}_profile_plots',
+            base_fname, f'_model-{str_to_desc(this_scalar)}_desc-vizprofile_dwi',
             tracking_params=tracking_params,
             segmentation_params=segmentation_params)
         tract_profiles_folder = op.join(
@@ -373,14 +373,10 @@ def plot_tract_profiles(base_fname, scalars, tracking_params,
             scalar=this_scalar,
             file_name=fname,
             n_boot=100)
-        fnames.append(fname)
-    meta_fname = get_fname(
-        base_fname, '_profile_plots.json',
-        tracking_params=tracking_params,
-        segmentation_params=segmentation_params)
-    meta = dict(Timing=time() - start_time)
-    write_json(meta_fname, meta)
-
+        fnames.append(fname + ".png")
+        meta_fname = fname + ".json"
+        meta = dict(Timing=time() - start_time)
+        write_json(meta_fname, meta)
     return fnames
 
 

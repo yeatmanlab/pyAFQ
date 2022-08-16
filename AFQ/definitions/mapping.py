@@ -287,15 +287,15 @@ class GeneratedMapMixin(object):
     def get_fnames(self, extension, base_fname):
         mapping_file = get_fname(
             base_fname,
-            '_mapping_from-DWI_to-MNI_xfm')
-        meta_fname = get_fname(base_fname, '_mapping_from-DWI_to-MNI_xfm')
+            '_desc-mapping_from-DWI_to-MNI_xform')
+        meta_fname = f'{mapping_file}.json'
         mapping_file = mapping_file + extension
-        meta_fname = f'{meta_fname}.json'
         return mapping_file, meta_fname
 
     def prealign(self, base_fname, reg_subject, reg_template, save=True):
+        prealign_file_desc = "_desc-prealign_from-DWI_to-MNI_xform"
         prealign_file = get_fname(
-            base_fname, '_prealign_from-DWI_to-MNI_xfm.npy')
+            base_fname, f'{prealign_file_desc}.npy')
         if not op.exists(prealign_file):
             start_time = time()
             _, aff = affine_registration(
@@ -311,7 +311,7 @@ class GeneratedMapMixin(object):
             logger.info(f"Saving {prealign_file}")
             np.save(prealign_file, aff)
             meta_fname = get_fname(
-                base_fname, '_prealign_from-DWI_to-MNI_xfm.json')
+                base_fname, f'{prealign_file_desc}.json')
             afs.write_json(meta_fname, meta)
         return prealign_file if save else np.load(prealign_file)
 

@@ -31,3 +31,7 @@ def get_default_args(func):
         for k, v in inspect.signature(func).parameters.items()
         if v.default is not inspect.Parameter.empty
     }
+
+
+def str_to_desc(string):
+    return string.replace("-", "").replace("_", "")
