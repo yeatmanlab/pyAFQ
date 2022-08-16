@@ -768,7 +768,7 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         myafq.export("results_dir"),
         'bundles',
-        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob_algo-AFQ-SLF_L_tractography.trk'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-probCSD_algo-AFQ-SLF_L_tractography.trk'))  # noqa
 
     tract_profile_fname = myafq.export("profiles")
     tract_profiles = pd.read_csv(tract_profile_fname)
@@ -780,12 +780,12 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         myafq.export("results_dir"),
         "viz_bundles",
-        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob_algo-AFQ_SLF_L_viz.html'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-probCSD_algo-AFQ_SLF_L_viz.html'))  # noqa
 
     assert op.exists(op.join(
         myafq.export("results_dir"),
         "viz_bundles",
-        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob_algo-AFQ_SLF_L_viz.html'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-probCSD_algo-AFQ_SLF_L_viz.html'))  # noqa
 
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see
     # that the CLI generates them
@@ -858,4 +858,4 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         results_dir,
         'bundles',
-        'sub-01_ses-01_dwi_space-RASMM_model-CSD_desc-prob_algo-AFQ-SLF_L_tractography.trk'))  # noqa
+        'sub-01_ses-01_dwi_space-RASMM_model-probCSD_algo-AFQ-SLF_L_tractography.trk'))  # noqa

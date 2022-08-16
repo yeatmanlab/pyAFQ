@@ -11,8 +11,7 @@ def get_fname(base_fname, suffix,
         odf_model = tracking_params['odf_model']
         directions = tracking_params['directions']
         fname = fname + (
-            f'_space-RASMM_model-{odf_model}'
-            f'_desc-{directions}'
+            f'_space-RASMM_model-{directions+odf_model}'
         )
     if segmentation_params is not None and 'seg_algo' in segmentation_params:
         seg_algo = segmentation_params['seg_algo']
