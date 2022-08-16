@@ -722,6 +722,8 @@ def to_bids_description(path, fname='dataset_description.json',
                         BIDSVersion="1.4.0", **kwargs):
     """Dumps a dict into a bids description at the given location"""
     kwargs.update({"BIDSVersion": BIDSVersion})
+    if "GeneratedBy" in kwargs and "DatasetType" not in kwargs:
+        kwargs["DatasetType"] = "derivative"
     desc_file = op.join(path, fname)
     with open(desc_file, 'w') as outfile:
         json.dump(kwargs, outfile)
@@ -763,7 +765,7 @@ def organize_cfin_data(path=None):
     to_bids_description(
         dmriprep_folder,
         **{"Name": "CFIN",
-           "PipelineDescription": {"Name": "dipy"}})
+           "GeneratedBy": [{"Name": "dipy"}]})
 
 
 def organize_stanford_data(path=None, clear_previous_afq=False):
@@ -851,10 +853,10 @@ def organize_stanford_data(path=None, clear_previous_afq=False):
     # And descriptions of the pipelines in the derivatives:
     to_bids_description(dmriprep_folder,
                         **{"Name": "Stanford HARDI",
-                           "PipelineDescription": {"Name": "vistasoft"}})
+                           "GeneratedBy": [{"Name": "vistasoft"}]})
     to_bids_description(freesurfer_folder,
                         **{"Name": "Stanford HARDI",
-                           "PipelineDescription": {"Name": "freesurfer"}})
+                           "GeneratedBy": [{"Name": "freesurfer"}]})
 
 
 fetch_hcp_atlas_16_bundles = _make_reusable_fetcher(
@@ -1460,6 +1462,6 @@ def fetch_hcp(subjects,
     to_bids_description(base_dir,
                         **{"Name": study,
                            "Acknowledgements": hcp_acknowledgements,
-                           "PipelineDescription": {'Name': 'dmriprep'}})
+                           "GeneratedBy": [{'Name': 'dmriprep'}]})
 
     return data_files, op.join(my_path, study)
