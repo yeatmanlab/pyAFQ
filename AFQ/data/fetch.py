@@ -19,13 +19,7 @@ import pandas as pd
 import logging
 import time
 
-import bids.config as bids_config
 import warnings
-try:
-    warnings.simplefilter(action='ignore', category=FutureWarning)
-    bids_config.set_option('extension_initial_dot', True)
-except ValueError:
-    pass
 import nibabel as nib
 import boto3
 

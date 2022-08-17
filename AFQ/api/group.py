@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-# -*- coding: utf-8 -*-
-import contextlib
 import warnings
 import tempfile
 
@@ -34,10 +33,6 @@ import nibabel as nib
 from PIL import Image
 
 from bids.layout import BIDSLayout, BIDSLayoutIndexer
-import bids.config as bids_config
-import warnings
-with contextlib.suppress(ValueError):
-    bids_config.set_option('extension_initial_dot', True)
 try:
     import afqbrowser as afqb
     using_afqb = True
