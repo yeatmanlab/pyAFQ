@@ -530,7 +530,7 @@ def test_AFQ_slr():
         n_seeds=1000,
         random_seeds=True,
         rng_seed=42)
-    
+
     myafq = GroupAFQ(
         bids_path=bids_path,
         preproc_pipeline='vistasoft',
