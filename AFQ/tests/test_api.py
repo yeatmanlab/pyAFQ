@@ -408,7 +408,7 @@ def test_AFQ_anisotropic():
     myafq.export("mapping")
     assert op.exists(op.join(
         myafq.export("results_dir")["01"],
-        'sub-01_ses-01_dwi_model-CSD_APM.nii.gz'))
+        'sub-01_ses-01_dwi_model-CSD_desc-APM_dwi.nii.gz'))
 
 
 @pytest.mark.nightly_slr
@@ -434,6 +434,7 @@ def test_API_type_checking():
                 " either a dict or a str")):
         myafq = GroupAFQ(
             bids_path,
+            preproc_pipeline='vistasoft',
             import_tract=["dwi"])
         myafq.export("streamlines")
     del myafq
@@ -443,6 +444,7 @@ def test_API_type_checking():
             match="brain_mask_definition must be a Definition"):
         myafq = GroupAFQ(
             bids_path,
+            preproc_pipeline='vistasoft',
             brain_mask_definition="not a brain mask")
         myafq.export("brain_mask")
     del myafq
@@ -452,6 +454,7 @@ def test_API_type_checking():
             match=r"No file found with these parameters:\n*"):
         myafq = GroupAFQ(
             bids_path,
+            preproc_pipeline='vistasoft',
             brain_mask_definition=ImageFile(
                 suffix='dne_dne',
                 filters={'scope': 'dne_dne'}))
@@ -463,7 +466,10 @@ def test_API_type_checking():
             match=(
                 "bundle_info must be a list of strings,"
                 " a dict, or a BundleDict")):
-        myafq = GroupAFQ(bids_path, bundle_info=[2, 3])
+        myafq = GroupAFQ(
+            bids_path,
+            preproc_pipeline='vistasoft',
+            bundle_info=[2, 3])
         myafq.export("bundle_dict")
     del myafq
 
@@ -473,6 +479,7 @@ def test_API_type_checking():
                 "Fatal: No bundles recognized.")):
         myafq = GroupAFQ(
             bids_path,
+            preproc_pipeline='vistasoft',
             mapping_definition=AffMap(
                 affine_kwargs={
                     "level_iters": [1, 1],
@@ -485,7 +492,10 @@ def test_API_type_checking():
     with pytest.raises(
             TypeError,
             match="viz_backend_spec must contain either 'fury' or 'plotly'"):
-        myafq = GroupAFQ(bids_path, viz_backend_spec="matplotlib")
+        myafq = GroupAFQ(
+            bids_path,
+            preproc_pipeline='vistasoft',
+            viz_backend_spec="matplotlib")
         myafq.export("viz_backend")
     del myafq
 
@@ -495,13 +505,44 @@ def test_AFQ_slr():
     """
     Test if API can run using slr map
     """
-    _, bids_path, _ = get_temp_hardi()
+    _, bids_path, sub_path = get_temp_hardi()
+    bd = BundleDict(["CST_L"])
+
+    # create rough seed mask registered to subject space
+    # this should save time in tractography
+    # cannot be mapped to subject space, because mapping
+    # requires the tractography
+    # this does not matter as this is just a smoke test
+    seed_mask_path = f"{bids_path}/my_rough_seed_mask.nii.gz"
+    dwi_img = nib.load(f"{sub_path}/sub-01_ses-01_dwi.nii.gz")
+    dwi_img = nib.Nifti1Image(
+        dwi_img.get_fdata()[..., 0],
+        affine=dwi_img.affine)
+    nib.save(
+        afd.read_resample_roi(
+            bd["CST_L"]["include"][0],
+            dwi_img),
+        seed_mask_path)
+
+    tracking_params = dict(
+        odf_model="csd",
+        seed_mask=ImageFile(path=seed_mask_path),
+        n_seeds=1000,
+        random_seeds=True,
+        rng_seed=42)
+
     myafq = GroupAFQ(
         bids_path=bids_path,
         preproc_pipeline='vistasoft',
         reg_subject_spec='subject_sls',
         reg_template_spec='hcp_atlas',
-        mapping_definition=SlrMap())
+        tracking_params=tracking_params,
+        segmentation_params={
+            "dist_to_waypoint": 10,
+            "filter_by_endpoints": False},
+        bundle_info=bd,
+        mapping_definition=SlrMap(slr_kwargs={
+            "rng": np.random.RandomState(42)}))
 
     seg_sft = aus.SegmentedSFT.fromfile(
         myafq.export("clean_bundles")["01"])
