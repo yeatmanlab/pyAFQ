@@ -1,5 +1,6 @@
 from io import BytesIO
 import gzip
+import tempfile
 
 import s3fs
 import boto3
@@ -83,8 +84,8 @@ def _ls_s3fs(s3_prefix, anon=True):
     site_files = fs.ls(s3_prefix, detail=False)
 
     # Just need BIDSLayout for the `parse_file_entities` method
-    # so we can pass dev/null as the argument
-    layout = BIDSLayout(os.devnull, validate=False)
+    dd = tempfile.TemporaryDirectory()
+    layout = BIDSLayout(dd.name, validate=False)
 
     entities = [
         layout.parse_file_entities(f) for f in site_files
@@ -807,8 +808,8 @@ class S3BIDSStudy:
                                 anon=self.anon)['subjects']
 
             # Just need BIDSLayout for the `parse_file_entities`
-            # method so we can pass dev/null as the argument
-            layout = BIDSLayout(os.devnull, validate=False)
+            dd = tempfile.TemporaryDirectory()
+            layout = BIDSLayout(dd.name, validate=False)
             subjects = []
             for key in sub_keys:
                 entities = layout.parse_file_entities(key)

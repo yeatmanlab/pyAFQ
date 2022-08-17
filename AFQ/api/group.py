@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-# -*- coding: utf-8 -*-
-import contextlib
 import warnings
 import tempfile
 
@@ -33,10 +32,7 @@ from time import time
 import nibabel as nib
 from PIL import Image
 
-from bids.layout import BIDSLayout
-import bids.config as bids_config
-with contextlib.suppress(ValueError):
-    bids_config.set_option('extension_initial_dot', True)
+from bids.layout import BIDSLayout, BIDSLayoutIndexer
 try:
     import afqbrowser as afqb
     using_afqb = True
@@ -159,8 +155,9 @@ class GroupAFQ(object):
         # Create it as needed:
         os.makedirs(self.afq_path, exist_ok=True)
 
+        bids_indexer = BIDSLayoutIndexer(**bids_layout_kwargs)
         bids_layout = BIDSLayout(
-            bids_path, derivatives=True, **bids_layout_kwargs)
+            bids_path, derivatives=True, indexer=bids_indexer)
         bids_description = bids_layout.description
 
         # check that any files exist in the derivatives folder,
