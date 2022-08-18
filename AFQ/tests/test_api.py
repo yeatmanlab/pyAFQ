@@ -530,7 +530,7 @@ def test_AFQ_slr():
         seed_mask=ImageFile(path=seed_mask_path),
         n_seeds=1000,
         random_seeds=True,
-        rng_seed=42)
+        rng_seed=seed)
 
     myafq = GroupAFQ(
         bids_path=bids_path,
@@ -543,7 +543,7 @@ def test_AFQ_slr():
             "filter_by_endpoints": False},
         bundle_info=bd,
         mapping_definition=SlrMap(slr_kwargs={
-            "rng": np.random.RandomState(42)}))
+            "rng": np.random.RandomState(seed)}))
 
     seg_sft = aus.SegmentedSFT.fromfile(
         myafq.export("clean_bundles")["01"])
