@@ -504,7 +504,7 @@ def test_AFQ_slr():
     """
     Test if API can run using slr map
     """
-    seed = 43
+    seed = 44
     np.random.seed(seed)
 
     _, bids_path, sub_path = get_temp_hardi()
@@ -529,7 +529,7 @@ def test_AFQ_slr():
     tracking_params = dict(
         odf_model="csd",
         seed_mask=ImageFile(path=seed_mask_path),
-        n_seeds=5000,
+        n_seeds=10000,
         random_seeds=True,
         rng_seed=seed)
 
