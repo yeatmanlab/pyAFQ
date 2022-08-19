@@ -11,7 +11,7 @@ from dipy.io.utils import (create_nifti_header, get_reference_info)
 from dipy.tracking.streamline import select_random_set_of_streamlines
 import dipy.tracking.utils as dtu
 
-logger = logging.getLogger('AFQ.utils.volume')
+logger = logging.getLogger('AFQ')
 
 
 def transform_inverse_roi(roi, mapping, bundle_name="ROI"):

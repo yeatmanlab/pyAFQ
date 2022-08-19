@@ -99,7 +99,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         Descoteaux, M. Towards quantitative connectivity analysis: reducing
         tractography biases. NeuroImage, 98, 266-278, 2014.
     """
-    logger = logging.getLogger('AFQ.tractography')
+    logger = logging.getLogger('AFQ')
 
     logger.info("Loading Image...")
     if isinstance(params_file, str):

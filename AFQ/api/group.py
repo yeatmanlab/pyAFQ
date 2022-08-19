@@ -136,7 +136,7 @@ class GroupAFQ(object):
         if not isinstance(bids_layout_kwargs, dict):
             raise TypeError("bids_layout_kwargs must be a dict")
 
-        self.logger = logging.getLogger('AFQ.api')
+        self.logger = logging.getLogger('AFQ')
         self.logger.setLevel(logging.INFO)
 
         self.parallel_params = parallel_params

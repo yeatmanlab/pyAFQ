@@ -19,7 +19,7 @@ from dipy.io.streamline import load_tractogram
 from dipy.io.stateful_tractogram import Space
 
 
-logger = logging.getLogger('AFQ.api.mapping')
+logger = logging.getLogger('AFQ')
 
 
 @pimms.calc("b0_warped")

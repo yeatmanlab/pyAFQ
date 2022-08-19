@@ -203,7 +203,7 @@ class Segmentation:
         matter anatomy and tract-specific quantification. Neuroimage 39:
         336-347
         """
-        self.logger = logging.getLogger('AFQ.Segmentation')
+        self.logger = logging.getLogger('AFQ')
         self.nb_points = nb_points
         self.nb_streamlines = nb_streamlines
 

@@ -168,7 +168,7 @@ class BundleDict(MutableMapping):
             for bundle_name in bundle_info:
                 self.bundle_names.append(bundle_name)
 
-        self.logger = logging.getLogger('AFQ.api')
+        self.logger = logging.getLogger('AFQ')
 
         if self.seg_algo == "afq":
             if "FP" in self.bundle_names\
