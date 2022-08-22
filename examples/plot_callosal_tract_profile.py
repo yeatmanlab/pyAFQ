@@ -50,8 +50,7 @@ import sys
 # Ensure segmentation logging information is included in this example's output
 root = logging.getLogger()
 root.setLevel(logging.ERROR)
-logging.getLogger('AFQ.Segmentation').setLevel(logging.INFO)
-logging.getLogger('AFQ.tractography').setLevel(logging.INFO)
+logging.getLogger('AFQ').setLevel(logging.INFO)
 handler = logging.StreamHandler(sys.stdout)
 handler.setLevel(logging.INFO)
 root.addHandler(handler)

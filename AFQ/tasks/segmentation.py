@@ -24,7 +24,7 @@ from dipy.stats.analysis import afq_profile, gaussian_weights
 from dipy.tracking.streamline import set_number_of_points, values_from_volume
 
 
-logger = logging.getLogger('AFQ.api.seg')
+logger = logging.getLogger('AFQ')
 
 
 @pimms.calc("bundles")

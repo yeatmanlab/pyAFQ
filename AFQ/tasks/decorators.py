@@ -19,7 +19,8 @@ from AFQ.utils.path import drop_extension
 __all__ = ["as_file", "as_fit_deriv", "as_img"]
 
 
-logger = logging.getLogger('AFQ.api')
+logger = logging.getLogger('AFQ')
+logger.setLevel(logging.INFO)
 
 
 # get args and kwargs from function

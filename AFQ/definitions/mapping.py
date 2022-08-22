@@ -29,7 +29,7 @@ except ModuleNotFoundError:
 __all__ = ["FnirtMap", "SynMap", "SlrMap", "AffMap", "ItkMap"]
 
 
-logger = logging.getLogger('AFQ.definitions.mapping')
+logger = logging.getLogger('AFQ')
 
 
 # For map defintions, get_for_subses should return only the mapping
