@@ -1183,6 +1183,23 @@ def _is_streamline_in_ROIs_parallel(indiv_args, tol, include_roi,
     return (sl_idx, bundle_idx, min_dist_coords_0, min_dist_coords_1,
             streamlines_in_bundles)
 
+def clean_by_orientation(streamlines, primary_axis):
+
+    """
+    Compute the cardinal orientation of each streamline
+    Parmaeters
+    __________
+    streamlines : sequence of 3XN_i arrays
+    """
+
+    axis_diff = np.zeros((len(streamlines),3))
+    for ii, sl in enumerate(streamlines):
+        axis_diff[ii,:] = np.abs(sl[0,:] - sl[-1,:])
+
+    orientation = np.argmax(axis_diff, axis=1)
+    cleaned_idx = orientation == primary_axis
+
+    return orientation, cleaned_idx
 
 def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
                        flip_sls=None):
