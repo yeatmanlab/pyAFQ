@@ -231,6 +231,8 @@ class ParticipantAFQ(object):
                 continue
             full_path = os.path.join(self.output_dir, filename)
             if os.path.isfile(full_path) or os.path.islink(full_path):
+                if not full_path.startswith(self.export("base_fname")):
+                    continue
                 if not filename.endswith("json"):
                     sidecar_file = f'{drop_extension(full_path)}.json'
                     sidecar_info = read_json(sidecar_file)
