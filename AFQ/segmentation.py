@@ -687,6 +687,29 @@ class Segmentation:
                  "streamlines selected with waypoint ROIs"))
 
             possible_fibers = streamlines_in_bundles[:, bundle_idx] > 0
+            possible_fibers = np.where(possible_fibers)[0]
+            og_possible_fibers = possible_fibers.copy()
+
+            if "primary_axis" in self.bundle_dict[bundle]:
+                self.logger.info((
+                    "Before filtering by orientation: "
+                    f"{len(possible_fibers)} streamlines"))
+
+                # get candidate streamlines
+                select_sl = tg.streamlines[possible_fibers]
+
+                # clean by orientation
+                _, cleaned_idx = clean_by_orientation(
+                    select_sl,
+                    self.bundle_dict[bundle]["primary_axis"])
+
+                # update candidate streamlines
+                possible_fibers = possible_fibers[cleaned_idx]
+
+                self.logger.info((
+                    "After filtering by orientation: "
+                    f"{len(possible_fibers)} streamlines"))
+
             if self.filter_by_endpoints:
                 self.logger.info("Filtering by endpoints")
                 select_sl = tg.streamlines[possible_fibers]
@@ -737,14 +760,15 @@ class Segmentation:
                     tol=dist_to_atlas,
                     flip_sls=np.greater(min_dist_sl[:, 0], min_dist_sl[:, 1]))
                 cleaned_idx = list(cleaned_idx)
+                possible_fibers = possible_fibers[cleaned_idx]
 
                 self.logger.info(
                     "After filtering by endpoints, "
                     f"{len(cleaned_idx)} streamlines")
 
-                removed_idx = list(set(range(len(select_sl))).difference(
-                    cleaned_idx))
-                removed_fibers = possible_fibers.nonzero()[0][removed_idx]
+            removed_fibers = list(set(og_possible_fibers).difference(
+                possible_fibers))
+            if len(removed_fibers) > 0:
                 streamlines_in_bundles[
                     removed_fibers, bundle_idx] = np.nan
                 min_dist_coords[
@@ -1183,8 +1207,8 @@ def _is_streamline_in_ROIs_parallel(indiv_args, tol, include_roi,
     return (sl_idx, bundle_idx, min_dist_coords_0, min_dist_coords_1,
             streamlines_in_bundles)
 
-def clean_by_orientation(streamlines, primary_axis):
 
+def clean_by_orientation(streamlines, primary_axis):
     """
     Compute the cardinal orientation of each streamline
     Parmaeters
@@ -1192,14 +1216,15 @@ def clean_by_orientation(streamlines, primary_axis):
     streamlines : sequence of 3XN_i arrays
     """
 
-    axis_diff = np.zeros((len(streamlines),3))
+    axis_diff = np.zeros((len(streamlines), 3))
     for ii, sl in enumerate(streamlines):
-        axis_diff[ii,:] = np.abs(sl[0,:] - sl[-1,:])
+        axis_diff[ii, :] = np.abs(sl[0, :] - sl[-1, :])
 
     orientation = np.argmax(axis_diff, axis=1)
     cleaned_idx = orientation == primary_axis
 
     return orientation, cleaned_idx
+
 
 def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
                        flip_sls=None):
