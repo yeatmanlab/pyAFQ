@@ -1098,31 +1098,32 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
 
     # Keep this around, so you can use it for indexing at the very end:
     idx = np.arange(len(fgarray))
-    # This calculates the Mahalanobis for each streamline/node:
-    w = gaussian_weights(fgarray, return_mahalnobis=True, stat=stat)
+    # get lengths of each streamline
     lengths = np.array([sl.shape[0] for sl in tg.streamlines])
     # We'll only do this for clean_rounds
     rounds_elapsed = 0
-    while ((np.any(w > distance_threshold)
-            or np.any(zscore(lengths) > length_threshold))
-           and rounds_elapsed < clean_rounds
-           and len(tg.streamlines) > min_sl):
+    while rounds_elapsed < clean_rounds and len(tg.streamlines) > min_sl:
+        # This calculates the Mahalanobis for each streamline/node:
+        w = gaussian_weights(fgarray, return_mahalnobis=True, stat=stat)
+        length_z = np.abs(zscore(lengths))
+        if not (
+                np.any(w > distance_threshold)
+                or np.any(length_z > length_threshold)):
+            break
         # Select the fibers that have Mahalanobis smaller than the
         # threshold for all their nodes:
         idx_dist = np.where(np.all(w < distance_threshold, axis=-1))[0]
-        idx_len = np.where(zscore(lengths) < length_threshold)[0]
+        idx_len = np.where(length_z < length_threshold)[0]
         idx_belong = np.intersect1d(idx_dist, idx_len)
 
         if len(idx_belong) < min_sl:
             # need to sort and return exactly min_sl:
             idx_belong = np.argsort(np.sum(w, axis=-1))[:min_sl]
 
-        idx = idx[idx_belong.astype(int)]
         # Update by selection:
+        idx = idx[idx_belong.astype(int)]
         fgarray = fgarray[idx_belong.astype(int)]
         lengths = lengths[idx_belong.astype(int)]
-        # Repeat:
-        w = gaussian_weights(fgarray, return_mahalnobis=True)
         rounds_elapsed += 1
 
     # Select based on the variable that was keeping track of things for us:
