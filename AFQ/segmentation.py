@@ -702,7 +702,7 @@ class Segmentation:
                 select_sl = tg.streamlines[possible_fibers]
 
                 # clean by orientation
-                _, cleaned_idx = clean_by_orientation(
+                cleaned_idx, _, _ = clean_by_orientation(
                     select_sl,
                     self.bundle_dict[bundle]["primary_axis"])
 
@@ -1108,7 +1108,7 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
     while rounds_elapsed < clean_rounds and len(tg.streamlines) > min_sl:
         # This calculates the Mahalanobis for each streamline/node:
         m_dist = gaussian_weights(fgarray, return_mahalnobis=True, stat=stat)
-        logger.debug(f"Shape of fgarray: {fgarray.shape}")
+        logger.debug(f"Shape of fgarray: {np.asarray(fgarray).shape}")
         logger.debug(f"Shape of m_dist: {m_dist.shape}")
         logger.debug(f"Maximum m_dist: {np.max(m_dist)}")
         logger.debug((
@@ -1119,8 +1119,8 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
         logger.debug(f"Shape of length_z: {length_z.shape}")
         logger.debug(f"Maximum length_z: {np.max(length_z)}")
         logger.debug((
-            "Maximum length_z for each fiber: "
-            f"{np.max(length_z, axis=1)}"))
+            "length_z for each fiber: "
+            f"{length_z}"))
 
         if not (
                 np.any(m_dist > distance_threshold)
@@ -1244,13 +1244,20 @@ def clean_by_orientation(streamlines, primary_axis):
     """
 
     axis_diff = np.zeros((len(streamlines), 3))
+    endpoint_diff = np.zeros((len(streamlines), 3))
     for ii, sl in enumerate(streamlines):
-        axis_diff[ii, :] = np.abs(sl[0, :] - sl[-1, :])
+        # endpoint diff is between first and last
+        endpoint_diff[ii, :] = np.abs(sl[0, :] - sl[-1, :])
+        # axis diff is difference between the nodes, along
+        axis_diff[ii, :] = np.sum(np.abs(sl[0:-1, :] - sl[1:, :]), axis=0)
 
-    orientation = np.argmax(axis_diff, axis=1)
-    cleaned_idx = orientation == primary_axis
+    orientation_along = np.argmax(axis_diff, axis=1)
+    orientation_end = np.argmax(endpoint_diff, axis=1)
+    cleaned_idx = np.logical_and(
+        orientation_along == primary_axis,
+        orientation_end == primary_axis)
 
-    return orientation, cleaned_idx
+    return cleaned_idx, orientation_along, orientation_end
 
 
 def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
