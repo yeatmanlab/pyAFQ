@@ -28,6 +28,9 @@ from dipy.utils.parallel import paramap
 __all__ = ["Segmentation", "clean_bundle", "clean_by_endpoints"]
 
 
+logger = logging.getLogger('AFQ')
+
+
 def _resample_tg(tg, n_points):
     # reformat for dipy's set_number_of_points
     if isinstance(tg, np.ndarray):
@@ -203,7 +206,7 @@ class Segmentation:
         matter anatomy and tract-specific quantification. Neuroimage 39:
         336-347
         """
-        self.logger = logging.getLogger('AFQ')
+        self.logger = logger
         self.nb_points = nb_points
         self.nb_streamlines = nb_streamlines
 
@@ -1104,26 +1107,49 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
     rounds_elapsed = 0
     while rounds_elapsed < clean_rounds and len(tg.streamlines) > min_sl:
         # This calculates the Mahalanobis for each streamline/node:
-        w = gaussian_weights(fgarray, return_mahalnobis=True, stat=stat)
-        length_z = np.abs(zscore(lengths))
+        m_dist = gaussian_weights(fgarray, return_mahalnobis=True, stat=stat)
+        logger.debug(f"Shape of fgarray: {fgarray.shape}")
+        logger.debug(f"Shape of m_dist: {m_dist.shape}")
+        logger.debug(f"Maximum m_dist: {np.max(m_dist)}")
+        logger.debug((
+            f"Maximum m_dist for each fiber: "
+            f"{np.max(m_dist, axis=1)}"))
+
+        length_z = zscore(lengths)
+        logger.debug(f"Shape of length_z: {length_z.shape}")
+        logger.debug(f"Maximum length_z: {np.max(length_z)}")
+        logger.debug((
+            "Maximum length_z for each fiber: "
+            f"{np.max(length_z, axis=1)}"))
+
         if not (
-                np.any(w > distance_threshold)
+                np.any(m_dist > distance_threshold)
                 or np.any(length_z > length_threshold)):
             break
         # Select the fibers that have Mahalanobis smaller than the
         # threshold for all their nodes:
-        idx_dist = np.where(np.all(w < distance_threshold, axis=-1))[0]
-        idx_len = np.where(length_z < length_threshold)[0]
-        idx_belong = np.intersect1d(idx_dist, idx_len)
+        idx_dist = np.all(m_dist < distance_threshold, axis=-1)
+        idx_len = length_z < length_threshold
+        idx_belong = np.logical_and(idx_dist, idx_len)
 
-        if len(idx_belong) < min_sl:
+        if np.sum(idx_belong) < min_sl:
             # need to sort and return exactly min_sl:
-            idx_belong = np.argsort(np.sum(w, axis=-1))[:min_sl]
+            idx_belong = np.argsort(np.sum(
+                m_dist, axis=-1))[:min_sl].astype(int)
+            logger.debug((
+                f"At rounds elapsed {rounds_elapsed}, "
+                "minimum streamlines reached"))
+        else:
+            idx_removed = idx_belong == 0
+            logger.debug((
+                f"Rounds elapsed: {rounds_elapsed}, "
+                f"num removed: {np.sum(idx_removed)}"))
+            logger.debug(f"Removed indicies: {np.where(idx_removed)[0]}")
 
         # Update by selection:
-        idx = idx[idx_belong.astype(int)]
-        fgarray = fgarray[idx_belong.astype(int)]
-        lengths = lengths[idx_belong.astype(int)]
+        idx = idx[idx_belong]
+        fgarray = fgarray[idx_belong]
+        lengths = lengths[idx_belong]
         rounds_elapsed += 1
 
     # Select based on the variable that was keeping track of things for us:
