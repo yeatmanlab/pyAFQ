@@ -43,6 +43,10 @@ except ImportError:
 __all__ = ["GroupAFQ"]
 
 
+logger = logging.getLogger('AFQ')
+logger.setLevel(logging.INFO)
+
+
 # get rid of unnecessary columns in df
 def clean_pandas_df(df):
     df = df.reset_index(drop=True)
@@ -136,8 +140,7 @@ class GroupAFQ(object):
         if not isinstance(bids_layout_kwargs, dict):
             raise TypeError("bids_layout_kwargs must be a dict")
 
-        self.logger = logging.getLogger('AFQ')
-        self.logger.setLevel(logging.INFO)
+        self.logger = logger
 
         self.parallel_params = parallel_params
         self.wf_dict = {}

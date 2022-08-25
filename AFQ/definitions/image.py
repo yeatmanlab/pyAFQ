@@ -229,7 +229,12 @@ class RoiImage(ImageDefinition):
     api.GroupAFQ(tracking_params={"seed_image": seed_image})
     """
 
-    def __init__(self, use_presegment=False, use_endpoints=False):
+    def __init__(self,
+                 use_waypoints=True,
+                 use_presegment=False,
+                 use_endpoints=False):
+        # TODO: assert at least one is true
+        self.use_waypoints = use_waypoints
         self.use_presegment = use_presegment
         self.use_endpoints = use_endpoints
 
@@ -251,12 +256,14 @@ class RoiImage(ImageDefinition):
                 bundle_dict = bundle_dict
 
             for bundle_name, bundle_info in bundle_dict.items():
+                rois = []
                 if self.use_endpoints:
-                    rois = [end_type for end_type in ["start", "end"]
-                            if end_type in bundle_info]
-                else:
-                    rois = bundle_info['include']\
-                        if 'include' in bundle_info else []
+                    rois.extend(
+                        [bundle_info[end_type] for end_type in
+                            ["start", "end"] if end_type in bundle_info])
+                if self.use_waypoints:
+                    rois.extend(bundle_info['include']
+                                if 'include' in bundle_info else [])
                 for roi in rois:
                     if "space" not in bundle_info\
                         or bundle_info[
