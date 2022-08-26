@@ -21,7 +21,7 @@ from AFQ._fixes import (VerboseLocalTracking, VerboseParticleFilteringTracking,
 def track(params_file, directions="prob", max_angle=30., sphere=None,
           seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False,
           rng_seed=None, stop_mask=None, stop_threshold=0, step_size=0.5,
-          min_length=10, max_length=1000, odf_model="CSD",
+          min_length=20, max_length=1000, odf_model="CSD",
           tracker="local"):
     """
     Tractography
@@ -79,7 +79,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
     step_size : float, optional.
         The size (in mm) of a step of tractography. Default: 0.5
     min_length: int, optional
-        The miminal length (mm) in a streamline. Default: 10
+        The miminal length (mm) in a streamline. Default: 20
     max_length: int, optional
         The miminal length (mm) in a streamline. Default: 1000
     odf_model : str, optional
@@ -221,7 +221,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
 
 
 def _tracking(tracker, seeds, dg, stopping_criterion, params_img,
-              step_size=0.5, min_length=10, max_length=1000,
+              step_size=0.5, min_length=20, max_length=1000,
               random_seed=None):
     """
     Helper function
