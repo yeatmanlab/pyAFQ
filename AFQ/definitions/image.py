@@ -233,10 +233,14 @@ class RoiImage(ImageDefinition):
                  use_waypoints=True,
                  use_presegment=False,
                  use_endpoints=False):
-        # TODO: assert at least one is true
         self.use_waypoints = use_waypoints
         self.use_presegment = use_presegment
         self.use_endpoints = use_endpoints
+        if not np.logical_or(self.use_waypoints, np.logical_or(
+                self.use_endpoints, self.use_presegment)):
+            raise ValueError((
+                "One of use_waypoints, use_presegment, "
+                "use_endpoints, must be True"))
 
     def find_path(self, bids_layout, from_path, subject, session):
         pass
