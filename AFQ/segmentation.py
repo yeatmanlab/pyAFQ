@@ -1246,11 +1246,22 @@ def _is_streamline_in_ROIs_parallel(indiv_args, tol, include_roi,
 def clean_by_orientation(streamlines, primary_axis, tol=None):
     """
     Compute the cardinal orientation of each streamline
-    Parmaeters
-    __________
-    streamlines : sequence of 3XN_i arrays
-    """
 
+    Parameters
+    ----------
+    streamlines : sequence of N by 3 arrays
+        Where N is number of nodes in the array, the collection of
+        streamlines to filter down to.
+
+    Returns
+    -------
+    cleaned_idx, indicies of streamlines that passed cleaning,
+        logical_and of other two returns
+    along_accepted_idx, indices of streamlines that passed
+        cleaning along the bundle
+    end_accepted_idx, indices of streamlines that passed
+        cleaning based on difference between endpoints of bundle
+    """
     axis_diff = np.zeros((len(streamlines), 3))
     endpoint_diff = np.zeros((len(streamlines), 3))
     for ii, sl in enumerate(streamlines):
@@ -1288,8 +1299,9 @@ def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
     the targets0 and ending points close to targets1
     Parameters
     ----------
-    streamlines : sequence of 3XN_i arrays The collection of streamlines to
-        filter down to.
+    streamlines : sequence of N by 3 arrays
+        Where N is number of nodes in the array, the collection of
+        streamlines to filter down to.
     targets0, target1: sequences or Nx3 arrays or None.
         The targets. Numerical values in the atlas array for targets for the
         first and last node in each streamline respectively, or NX3 arrays with

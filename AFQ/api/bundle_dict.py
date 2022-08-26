@@ -28,10 +28,8 @@ def append_l_r(bundle_list, no_lr_list):
 
 
 BUNDLES = ["ATR", "CGC", "CST", "IFO", "ILF", "SLF", "ARC", "UNC",
-           "FA", "FP"]
+           "FA", "FP", "pARC", "VOF"]
 BUNDLES = append_l_r(BUNDLES, ["FA", "FP"])
-
-READ_BUNDLES = append_l_r(["pARC", "VOF"], [])
 
 CALLOSUM_BUNDLES = ["AntFrontal", "Motor", "Occipital", "Orbital",
                     "PostParietal", "SupFrontal", "SupParietal",

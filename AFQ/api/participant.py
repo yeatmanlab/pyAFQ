@@ -255,4 +255,4 @@ class ParticipantAFQ(object):
         # after file operations
         self.make_workflow()
 
-    clobber = cmd_outputs
+    clobber = cmd_outputs  # alias for default of cmd_outputs

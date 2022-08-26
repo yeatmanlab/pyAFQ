@@ -260,6 +260,26 @@ def test_exclusion_ROI():
     npt.assert_equal(len(fiber_groups["SLF_L"]), 1)
 
 
+def test_segment_orientation():
+    cleaned_idx, along_accepted_idx, end_accepted_idx = \
+        seg.clean_by_orientation(streamlines, primary_axis=1)
+    npt.assert_equal(np.sum(cleaned_idx), 93)
+    npt.assert_equal(np.sum(along_accepted_idx), 104)
+    npt.assert_equal(np.sum(end_accepted_idx), 105)
+
+    _, along_accepted_idx_tol, end_accepted_idx_tol = \
+        seg.clean_by_orientation(streamlines, primary_axis=1, tol=50)
+    npt.assert_(np.sum(along_accepted_idx_tol) < np.sum(along_accepted_idx))
+    npt.assert_array_equal(end_accepted_idx_tol, end_accepted_idx)
+
+    _, along_accepted_idx, end_accepted_idx = \
+        seg.clean_by_orientation(streamlines, primary_axis=2)
+    _, along_accepted_idx_tol, end_accepted_idx_tol = \
+        seg.clean_by_orientation(streamlines, primary_axis=2, tol=33)
+    npt.assert_array_equal(along_accepted_idx_tol, along_accepted_idx)
+    npt.assert_array_equal(end_accepted_idx_tol, end_accepted_idx)
+
+
 def test_segment_sampled_streamlines():
 
     # default segmentation

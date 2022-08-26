@@ -3,7 +3,7 @@
 Finding only the ARC, pARC, VOF
 ===============================
 
-pyAFQ can generate the pARC and VOF, though they are not yet default bundles.
+pyAFQ generates the pARC and VOF as default bundles.
 This example shows how you can choose to track and recognize only
 certain bundles that you are interested in.
 """

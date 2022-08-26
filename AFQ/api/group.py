@@ -514,7 +514,7 @@ class GroupAFQ(object):
         for pAFQ in self.pAFQ_list:
             pAFQ.cmd_outputs(cmd, dependent_on, exceptions)
 
-    clobber = cmd_outputs
+    clobber = cmd_outputs  # alias for default of cmd_outputs
 
     def montage(self, bundle_name, size, view, slice_pos=None):
         """
