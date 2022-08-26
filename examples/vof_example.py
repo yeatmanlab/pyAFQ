@@ -3,7 +3,7 @@
 Finding only the ARC, pARC, VOF
 ===============================
 
-pyAFQ generates the pARC and VOF as a part of ourdefault bundles.
+pyAFQ can generate the pARC and VOF, though they are not yet default bundles.
 This example shows how you can choose to track and recognize only
 certain bundles that you are interested in.
 """
@@ -19,10 +19,15 @@ import os.path as op
 afd.organize_stanford_data(clear_previous_afq=False)
 
 bundle_names = ["ARC_L", "ARC_R", "pARC_L", "pARC_R", "VOF_L", "VOF_R"]
+bundle_dict = abd.BundleDict(bundle_names)
+
+# you can change these if you want
+bundle_dict["VOF_R"]["primary_axis_percentage"] = 50
+bundle_dict["VOF_L"]["primary_axis_percentage"] = 50
 
 myafq = GroupAFQ(
     op.join(afd.afq_home, 'stanford_hardi'),
-    bundle_info=abd.BundleDict(bundle_names),
+    bundle_info=bundle_dict,
     preproc_pipeline='vistasoft',
     tracking_params={
         "n_seeds": 50000,
