@@ -710,7 +710,9 @@ class Segmentation:
                 # clean by orientation
                 cleaned_idx, _, _ = clean_by_orientation(
                     select_sl,
-                    self.bundle_dict[bundle]["primary_axis"])
+                    self.bundle_dict[bundle]["primary_axis"],
+                    self.bundle_dict[bundle].get(
+                        "primary_axis_percentage", None))
 
                 # update candidate streamlines
                 possible_fibers = possible_fibers[cleaned_idx]
@@ -1241,7 +1243,7 @@ def _is_streamline_in_ROIs_parallel(indiv_args, tol, include_roi,
             streamlines_in_bundles)
 
 
-def clean_by_orientation(streamlines, primary_axis):
+def clean_by_orientation(streamlines, primary_axis, tol=None):
     """
     Compute the cardinal orientation of each streamline
     Parmaeters
@@ -1257,13 +1259,25 @@ def clean_by_orientation(streamlines, primary_axis):
         # axis diff is difference between the nodes, along
         axis_diff[ii, :] = np.sum(np.abs(sl[0:-1, :] - sl[1:, :]), axis=0)
 
-    orientation_along = np.argmax(axis_diff, axis=1)
-    orientation_end = np.argmax(endpoint_diff, axis=1)
-    cleaned_idx = np.logical_and(
-        orientation_along == primary_axis,
-        orientation_end == primary_axis)
+    if tol is None:
+        orientation_along = np.argmax(axis_diff, axis=1)
+        along_accepted_idx = orientation_along == primary_axis
+    else:
+        percentage_primary = 100 * axis_diff[:, primary_axis] / np.sum(
+            axis_diff, axis=1)
+        logger.debug((
+            "Maximum primary percentage found: "
+            f"{np.max(percentage_primary)}"))
+        along_accepted_idx = percentage_primary > tol
 
-    return cleaned_idx, orientation_along, orientation_end
+    orientation_end = np.argmax(endpoint_diff, axis=1)
+    end_accepted_idx = orientation_end == primary_axis
+
+    cleaned_idx = np.logical_and(
+        along_accepted_idx,
+        end_accepted_idx)
+
+    return cleaned_idx, along_accepted_idx, end_accepted_idx
 
 
 def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
