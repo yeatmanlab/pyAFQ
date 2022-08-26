@@ -60,9 +60,12 @@ def export_rois(base_fname, results_dir, data_imap, mapping, dwi_affine):
     roi_files = {}
     for bundle in bundle_dict:
         roi_files[bundle] = []
-        for roi_type in ['include', 'exclude']:
+        for roi_type in ['include', 'exclude', 'start', 'end']:
             if roi_type in bundle_dict[bundle]:
-                for ii, roi in enumerate(bundle_dict[bundle][roi_type]):
+                rois = bundle_dict[bundle][roi_type]
+                if not isinstance(rois, list):
+                    rois = [rois]
+                for ii, roi in enumerate(rois):
                     fname = op.split(
                         get_fname(
                             base_fname,
