@@ -1,3 +1,13 @@
+"""
+===============================
+Finding only the ARC, pARC, VOF
+===============================
+
+pyAFQ generates the pARC and VOF as a part of ourdefault bundles.
+This example shows how you can choose to track and recognize only
+certain bundles that you are interested in.
+"""
+
 import AFQ.api.bundle_dict as abd
 import AFQ.data.fetch as afd
 from AFQ.api.group import GroupAFQ
