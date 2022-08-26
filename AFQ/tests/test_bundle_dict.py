@@ -52,13 +52,12 @@ def test_BundleDict():
 
     assert len(afq_bundles) == 1
 
-    # Vertical Occipital Fasciculus
-    # not included and does not exist in afq templates
+    # mispelled bundle that does not exist in afq templates
     with pytest.raises(
             ValueError,
-            match="VOF_L is not in AFQ templates"):
-        afq_bundles = abd.BundleDict(["VOF_L", "VOF_R"])
-        afq_bundles["VOF_R"]
+            match=" is not in AFQ templates"):
+        afq_bundles = abd.BundleDict(["VOQ_L", "VOQ_R"])
+        afq_bundles["VOQ_R"]
 
     afq_bundles = abd.BundleDict(["VOF_L", "VOF_R"], seg_algo="reco80")
     assert len(afq_bundles) == 2
