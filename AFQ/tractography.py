@@ -6,7 +6,8 @@ import logging
 import dipy.data as dpd
 from dipy.align import resample
 from dipy.direction import (DeterministicMaximumDirectionGetter,
-                            ProbabilisticDirectionGetter)
+                            ProbabilisticDirectionGetter,
+                            BootDirectionGetter)
 import dipy.tracking.utils as dtu
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.tracking.stopping_criterion import (ThresholdStoppingCriterion,
@@ -138,6 +139,8 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         dg = DeterministicMaximumDirectionGetter
     elif directions == "prob":
         dg = ProbabilisticDirectionGetter
+    elif directions == "boot":
+        dg = BootDirectionGetter
 
     if odf_model == "DTI" or odf_model == "DKI":
         evals = model_params[..., :3]
