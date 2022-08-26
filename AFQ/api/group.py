@@ -776,6 +776,31 @@ class GroupAFQ(object):
         if op.exists(self.afqb_path):
             s3fs.put(self.afqb_path, remote_path, recursive=True)
 
+    def export_group_density(self):
+        """
+        Generate a group density map by combining single subject density maps.
+        """
+        densities = self.export("density_maps", collapse=False)
+        ex_density_img = densities[
+            self.valid_sub_list[0]][
+                self.valid_ses_list[0]]  # for shape and affine
+
+        group_density = np.zeros_like(ex_density_img.shape)
+        self.logger.info("Generating Group Density...")
+        for ii in tqdm(range(len(self.valid_ses_list))):
+            this_sub = self.valid_sub_list[ii]
+            this_ses = self.valid_ses_list[ii]
+            this_density = nib.load(densities[this_sub][this_ses]).get_fdata()
+
+            group_density = group_density + this_density  # TODO: more options here
+
+        out_fname = op.abspath(op.join(
+            self.afq_path,
+            f"desc-density_subjects-all_space-MNI_dwi.nii.gz"))
+        nib.save(nib.Nifti1Image(
+            group_density, ex_density_img.affine), out_fname)
+        return out_fname
+
     def assemble_AFQ_browser(self, output_path=None, metadata=None,
                              page_title="AFQ Browser", page_subtitle="",
                              page_title_link="", page_subtitle_link=""):

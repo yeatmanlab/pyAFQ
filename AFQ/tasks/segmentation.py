@@ -17,6 +17,7 @@ from AFQ.tasks.utils import get_default_args
 from AFQ.data.s3bids import write_json
 import AFQ.api.bundle_dict as abd
 import AFQ.utils.streamlines as aus
+import AFQ.utils.volume as auv
 
 from dipy.io.streamline import load_tractogram, save_tractogram
 from dipy.io.stateful_tractogram import Space
@@ -260,6 +261,26 @@ def export_bundle_lengths(data_imap,
     return counts_df, dict(sources=bundles_files)
 
 
+@pimms.calc("density_maps")
+@as_file('_desc-density_dwi.nii.gz', include_track=True, include_seg=True)
+def export_density_maps(clean_bundles, dwi, data_imap):
+    """
+    full path to 4d nifti file containing streamline counts per voxel
+    per bundle, where the 4th dimension encodes the bundle
+    """
+    bundle_dict = data_imap["bundle_dict"]
+    seg_sft = aus.SegmentedSFT.fromfile(
+        clean_bundles)
+    entire_density_map = np.zeros((*nib.load(dwi).shape, len(bundle_dict)))
+    for bundle_name in bundle_dict.keys():
+        bundle_sl = seg_sft.get_bundle(bundle_name)
+        bundle_density = auv.density_map(bundle_sl).get_fdata()
+        entire_density_map[..., :] = bundle_density
+
+    return entire_density_map, dict(
+        source=clean_bundles, bundles=list(bundle_dict.keys()))
+
+
 @pimms.calc("profiles")
 @as_file('_desc-profiles_dwi.csv', include_track=True, include_seg=True)
 def tract_profiles(clean_bundles, data_imap,
@@ -394,6 +415,7 @@ def get_segmentation_plan(kwargs):
         export_sl_counts,
         export_bundle_lengths,
         export_bundles,
+        export_density_maps,
         clean_bundles,
         segment,
         tract_profiles])

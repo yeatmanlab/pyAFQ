@@ -6,6 +6,8 @@ An example using the AFQ API to find callosal bundles using the templates from:
 http://hdl.handle.net/1773/34926
 """
 import os.path as op
+import matplotlib.pyplot as plt
+import nibabel as nib
 
 import plotly
 
@@ -72,6 +74,20 @@ myafq = GroupAFQ(
 # Calling export all produces all of the outputs of processing, including
 # tractography, scalar maps, tract profiles and visualizations:
 myafq.export_all()
+
+
+##########################################################################
+# Create Group Density Maps:
+# -------------------------
+#
+# pyAFQ can make density maps of streamline counts per subject/session
+# by doing myafq.export("density_map") . When using GroupAFQ, you can also
+# combine these into one file by doing myafq.export_group_density() .
+group_density = myafq.export_group_density()
+group_density = nib.load(group_density).get_fdata()
+fig, ax = plt.subplots(1)
+ax.matshow(group_density[:, :, group_density.shape[-1] // 2], cmap='viridis')
+ax.axis("off")
 
 
 ##########################################################################
