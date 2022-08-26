@@ -1259,16 +1259,16 @@ def clean_by_orientation(streamlines, primary_axis, tol=None):
         # axis diff is difference between the nodes, along
         axis_diff[ii, :] = np.sum(np.abs(sl[0:-1, :] - sl[1:, :]), axis=0)
 
-    if tol is None:
-        orientation_along = np.argmax(axis_diff, axis=1)
-        along_accepted_idx = orientation_along == primary_axis
-    else:
+    orientation_along = np.argmax(axis_diff, axis=1)
+    along_accepted_idx = orientation_along == primary_axis
+    if tol is not None:
         percentage_primary = 100 * axis_diff[:, primary_axis] / np.sum(
             axis_diff, axis=1)
         logger.debug((
             "Maximum primary percentage found: "
             f"{np.max(percentage_primary)}"))
-        along_accepted_idx = percentage_primary > tol
+        along_accepted_idx = np.logical_and(
+            along_accepted_idx, percentage_primary > tol)
 
     orientation_end = np.argmax(endpoint_diff, axis=1)
     end_accepted_idx = orientation_end == primary_axis
