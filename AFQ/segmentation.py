@@ -464,16 +464,22 @@ class Segmentation:
             if roi_type == 'exclude' and roi_type not in bundle_entry:
                 continue
             # if no include ROIs, use endpoint ROIs
-            if roi_type == 'include' and roi_type not in bundle_entry:
-                rois = []
-                for end_type in ["start", "end"]:
-                    if end_type in bundle_entry:
-                        rois.append(bundle_entry[end_type])
-                if len(rois) == 0:
+            if roi_type == 'include' and (
+                roi_type not in bundle_entry
+                    or len(bundle_entry[roi_type]) < 2):
+                if "include" in bundle_entry:
+                    rois = bundle_entry["include"]
+                else:
+                    rois = []
+                if "start" in bundle_entry:
+                    rois.insert(0, bundle_entry["start"])
+                if "end" in bundle_entry and len(rois) < 2:
+                    rois.append(bundle_entry["end"])
+                if len(rois) < 2:
                     raise ValueError((
-                        f"In bundle {bundle}, no include ROIs are found, "
-                        "and no start or endpoint ROIs are found. "
-                        "At least one of these is required"))
+                        f"In bundle {bundle}, of include ROIs, "
+                        "start or endpoint ROIs, less than two are found. "
+                        "At least two of these is required"))
             else:
                 rois = bundle_entry[roi_type]
             for roi_idx, roi in enumerate(rois):
@@ -564,7 +570,7 @@ class Segmentation:
         tg : StatefulTractogram class instance
         """
         tg = self._read_tg(tg=tg)
-        self.tg.to_vox()
+        tg.to_vox()
 
         # For expedience, we approximate each streamline as a 100 point curve.
         # This is only used in extracting the values from the probability map,
@@ -787,7 +793,7 @@ class Segmentation:
             get_reusable_executor().shutdown(wait=True)
             self.logger.info("Loky Cleaned up")
 
-        # Eliminate any fibers not selected using the waypoint ROIs:
+        # Eliminate any fibers not selected:
         possible_fibers = np.nansum(streamlines_in_bundles, -1) > 0
         tg = StatefulTractogram(tg.streamlines[possible_fibers],
                                 self.img,
