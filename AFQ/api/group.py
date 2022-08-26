@@ -776,9 +776,19 @@ class GroupAFQ(object):
         if op.exists(self.afqb_path):
             s3fs.put(self.afqb_path, remote_path, recursive=True)
 
-    def export_group_density(self):
+    def export_group_density(self, boolify=True):
         """
         Generate a group density map by combining single subject density maps.
+
+        Parameters
+        ----------
+        boolify : bool
+            Whether to turn subject streamline count images into booleans
+            before adding them into the group density map.
+
+        Return
+        ------
+        Path to density nifti file.
         """
         densities = self.export("density_maps", collapse=False)
         ex_density_img = densities[
@@ -791,8 +801,10 @@ class GroupAFQ(object):
             this_sub = self.valid_sub_list[ii]
             this_ses = self.valid_ses_list[ii]
             this_density = nib.load(densities[this_sub][this_ses]).get_fdata()
+            if boolify:
+                this_density = this_density.astype(bool)
 
-            group_density = group_density + this_density  # TODO: more options here
+            group_density = group_density + this_density
 
         out_fname = op.abspath(op.join(
             self.afq_path,
