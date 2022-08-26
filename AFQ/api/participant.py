@@ -248,3 +248,5 @@ class ParticipantAFQ(object):
                 # other than ROIs, folders are dependent on everything
                 if dependent_on is None or filename != "ROIs":
                     os.system(f"{cmd} -r {full_path}")
+
+    clobber = cmd_outputs

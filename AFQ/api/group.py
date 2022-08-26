@@ -514,6 +514,8 @@ class GroupAFQ(object):
         for pAFQ in self.pAFQ_list:
             pAFQ.cmd_outputs(cmd, dependent_on, exceptions)
 
+    clobber = cmd_outputs
+
     def montage(self, bundle_name, size, view, slice_pos=None):
         """
         Generate montage file(s) of a given bundle at a given angle.
