@@ -235,11 +235,15 @@ class ParticipantAFQ(object):
                     continue
                 if not filename.endswith("json"):
                     sidecar_file = f'{drop_extension(full_path)}.json'
-                    sidecar_info = read_json(sidecar_file)
-                    if "dependent" in sidecar_info\
-                            and sidecar_info["dependent"] in dependent_on_list:
+                    if op.exists(sidecar_file):
+                        sidecar_info = read_json(sidecar_file)
+                        if "dependent" in sidecar_info\
+                            and sidecar_info["dependent"]\
+                                in dependent_on_list:
+                            os.system(f"{cmd} {full_path}")
+                            os.system(f"{cmd} {sidecar_file}")
+                    else:
                         os.system(f"{cmd} {full_path}")
-                        os.system(f"{cmd} {sidecar_file}")
             elif os.path.isdir(full_path):
                 # other than ROIs, folders are dependent on everything
                 if dependent_on is None or filename != "ROIs":
