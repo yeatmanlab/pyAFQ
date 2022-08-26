@@ -259,7 +259,7 @@ class BundleDict(MutableMapping):
                 roi_dict['start'] = self.templates[bundle_name + "_start"]
                 roi_dict['end'] = self.templates[bundle_name + "_end"]
                 roi_dict['primary_axis'] = 2
-                roi_dict["primary_axis_percentage"] = 50
+                roi_dict["primary_axis_percentage"] = 40
                 self._dict[bundle_name] = roi_dict
             elif (roi_name1 in self.templates
                     and roi_name2 in self.templates):
