@@ -91,7 +91,7 @@ class ParticipantAFQ(object):
         self.logger = logging.getLogger('AFQ')
         self.output_dir = output_dir
 
-        kwargs = dict(
+        self.kwargs = dict(
             dwi=dwi_data_file,
             bval=bval_file,
             bvec=bvec_file,
@@ -102,29 +102,31 @@ class ParticipantAFQ(object):
                 output_dir,
                 drop_extension(op.basename(dwi_data_file))),
             **kwargs)
+        self.make_workflow()
 
+    def make_workflow(self):
         # construct pimms plans
-        if "mapping_definition" in kwargs and isinstance(
-                kwargs["mapping_definition"], SlrMap):
+        if "mapping_definition" in self.kwargs and isinstance(
+                self.kwargs["mapping_definition"], SlrMap):
             plans = {  # if using SLR map, do tractography first
-                "data": get_data_plan(kwargs),
-                "tractography": get_tractography_plan(kwargs),
-                "mapping": get_mapping_plan(kwargs, use_sls=True),
-                "segmentation": get_segmentation_plan(kwargs),
-                "viz": get_viz_plan(kwargs)}
+                "data": get_data_plan(self.kwargs),
+                "tractography": get_tractography_plan(self.kwargs),
+                "mapping": get_mapping_plan(self.kwargs, use_sls=True),
+                "segmentation": get_segmentation_plan(self.kwargs),
+                "viz": get_viz_plan(self.kwargs)}
         else:
             plans = {  # Otherwise, do mapping first
-                "data": get_data_plan(kwargs),
-                "mapping": get_mapping_plan(kwargs),
-                "tractography": get_tractography_plan(kwargs),
-                "segmentation": get_segmentation_plan(kwargs),
-                "viz": get_viz_plan(kwargs)}
+                "data": get_data_plan(self.kwargs),
+                "mapping": get_mapping_plan(self.kwargs),
+                "tractography": get_tractography_plan(self.kwargs),
+                "segmentation": get_segmentation_plan(self.kwargs),
+                "viz": get_viz_plan(self.kwargs)}
 
         # chain together a complete plan from individual plans
         previous_data = {}
         for name, plan in plans.items():
             previous_data[f"{name}_imap"] = plan(
-                **kwargs,
+                **self.kwargs,
                 **previous_data)
 
         self.wf_dict =\
@@ -235,12 +237,22 @@ class ParticipantAFQ(object):
                     continue
                 if not filename.endswith("json"):
                     sidecar_file = f'{drop_extension(full_path)}.json'
-                    sidecar_info = read_json(sidecar_file)
-                    if "dependent" in sidecar_info\
-                            and sidecar_info["dependent"] in dependent_on_list:
+                    if op.exists(sidecar_file):
+                        sidecar_info = read_json(sidecar_file)
+                        if "dependent" in sidecar_info\
+                            and sidecar_info["dependent"]\
+                                in dependent_on_list:
+                            os.system(f"{cmd} {full_path}")
+                            os.system(f"{cmd} {sidecar_file}")
+                    else:
                         os.system(f"{cmd} {full_path}")
-                        os.system(f"{cmd} {sidecar_file}")
             elif os.path.isdir(full_path):
                 # other than ROIs, folders are dependent on everything
                 if dependent_on is None or filename != "ROIs":
                     os.system(f"{cmd} -r {full_path}")
+
+        # do not assume previous calculations are still valid
+        # after file operations
+        self.make_workflow()
+
+    clobber = cmd_outputs  # alias for default of cmd_outputs

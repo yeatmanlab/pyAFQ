@@ -28,7 +28,7 @@ def append_l_r(bundle_list, no_lr_list):
 
 
 BUNDLES = ["ATR", "CGC", "CST", "IFO", "ILF", "SLF", "ARC", "UNC",
-           "FA", "FP"]
+           "FA", "FP", "pARC", "VOF"]
 BUNDLES = append_l_r(BUNDLES, ["FA", "FP"])
 
 CALLOSUM_BUNDLES = ["AntFrontal", "Motor", "Occipital", "Orbital",
@@ -242,9 +242,27 @@ class BundleDict(MutableMapping):
             else:
                 roi_name1 = name + '_roi1' + hemi
                 roi_name2 = name + '_roi2' + hemi
-            if (roi_name1 in self.templates
+
+            roi_dict = {}
+            if name == "pARC":
+                roi_dict['cross_midline'] = False
+                roi_dict['include'] = [self.templates["SLFt_roi2" + hemi]]
+                roi_dict['exclude'] = [self.templates["SLF_roi1" + hemi]]
+                roi_dict['space'] = 'template'
+                roi_dict['start'] = self.templates[bundle_name + "_start"]
+                roi_dict['primary_axis'] = 2
+                roi_dict["primary_axis_percentage"] = 40
+                self._dict[bundle_name] = roi_dict
+            elif name == "VOF":
+                roi_dict['cross_midline'] = False
+                roi_dict['space'] = 'template'
+                roi_dict['start'] = self.templates[bundle_name + "_start"]
+                roi_dict['end'] = self.templates[bundle_name + "_end"]
+                roi_dict['primary_axis'] = 2
+                roi_dict["primary_axis_percentage"] = 40
+                self._dict[bundle_name] = roi_dict
+            elif (roi_name1 in self.templates
                     and roi_name2 in self.templates):
-                roi_dict = {}
                 roi_dict['cross_midline'] = False
                 roi_dict['include'] = [
                     self.templates[roi_name1],

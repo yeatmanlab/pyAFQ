@@ -28,6 +28,9 @@ from dipy.utils.parallel import paramap
 __all__ = ["Segmentation", "clean_bundle", "clean_by_endpoints"]
 
 
+logger = logging.getLogger('AFQ')
+
+
 def _resample_tg(tg, n_points):
     # reformat for dipy's set_number_of_points
     if isinstance(tg, np.ndarray):
@@ -203,7 +206,7 @@ class Segmentation:
         matter anatomy and tract-specific quantification. Neuroimage 39:
         336-347
         """
-        self.logger = logging.getLogger('AFQ')
+        self.logger = logger
         self.nb_points = nb_points
         self.nb_streamlines = nb_streamlines
 
@@ -461,16 +464,22 @@ class Segmentation:
             if roi_type == 'exclude' and roi_type not in bundle_entry:
                 continue
             # if no include ROIs, use endpoint ROIs
-            if roi_type == 'include' and roi_type not in bundle_entry:
-                rois = []
-                for end_type in ["start", "end"]:
-                    if end_type in bundle_entry:
-                        rois.append(bundle_entry[end_type])
-                if len(rois) == 0:
+            if roi_type == 'include' and (
+                roi_type not in bundle_entry
+                    or len(bundle_entry[roi_type]) < 2):
+                if "include" in bundle_entry:
+                    rois = bundle_entry["include"]
+                else:
+                    rois = []
+                if "start" in bundle_entry:
+                    rois.insert(0, bundle_entry["start"])
+                if "end" in bundle_entry and len(rois) < 2:
+                    rois.append(bundle_entry["end"])
+                if len(rois) < 2:
                     raise ValueError((
-                        f"In bundle {bundle}, no include ROIs are found, "
-                        "and no start or endpoint ROIs are found. "
-                        "At least one of these is required"))
+                        f"In bundle {bundle}, of include ROIs, "
+                        "start or endpoint ROIs, less than two are found. "
+                        "At least two of these is required"))
             else:
                 rois = bundle_entry[roi_type]
             for roi_idx, roi in enumerate(rois):
@@ -561,7 +570,7 @@ class Segmentation:
         tg : StatefulTractogram class instance
         """
         tg = self._read_tg(tg=tg)
-        self.tg.to_vox()
+        tg.to_vox()
 
         # For expedience, we approximate each streamline as a 100 point curve.
         # This is only used in extracting the values from the probability map,
@@ -687,6 +696,31 @@ class Segmentation:
                  "streamlines selected with waypoint ROIs"))
 
             possible_fibers = streamlines_in_bundles[:, bundle_idx] > 0
+            possible_fibers = np.where(possible_fibers)[0]
+            og_possible_fibers = possible_fibers.copy()
+
+            if "primary_axis" in self.bundle_dict[bundle]:
+                self.logger.info((
+                    "Before filtering by orientation: "
+                    f"{len(possible_fibers)} streamlines"))
+
+                # get candidate streamlines
+                select_sl = tg.streamlines[possible_fibers]
+
+                # clean by orientation
+                cleaned_idx, _, _ = clean_by_orientation(
+                    select_sl,
+                    self.bundle_dict[bundle]["primary_axis"],
+                    self.bundle_dict[bundle].get(
+                        "primary_axis_percentage", None))
+
+                # update candidate streamlines
+                possible_fibers = possible_fibers[cleaned_idx]
+
+                self.logger.info((
+                    "After filtering by orientation: "
+                    f"{len(possible_fibers)} streamlines"))
+
             if self.filter_by_endpoints:
                 self.logger.info("Filtering by endpoints")
                 select_sl = tg.streamlines[possible_fibers]
@@ -737,14 +771,15 @@ class Segmentation:
                     tol=dist_to_atlas,
                     flip_sls=np.greater(min_dist_sl[:, 0], min_dist_sl[:, 1]))
                 cleaned_idx = list(cleaned_idx)
+                possible_fibers = possible_fibers[cleaned_idx]
 
                 self.logger.info(
                     "After filtering by endpoints, "
                     f"{len(cleaned_idx)} streamlines")
 
-                removed_idx = list(set(range(len(select_sl))).difference(
-                    cleaned_idx))
-                removed_fibers = possible_fibers.nonzero()[0][removed_idx]
+            removed_fibers = list(set(og_possible_fibers).difference(
+                possible_fibers))
+            if len(removed_fibers) > 0:
                 streamlines_in_bundles[
                     removed_fibers, bundle_idx] = np.nan
                 min_dist_coords[
@@ -760,7 +795,7 @@ class Segmentation:
             get_reusable_executor().shutdown(wait=True)
             self.logger.info("Loky Cleaned up")
 
-        # Eliminate any fibers not selected using the waypoint ROIs:
+        # Eliminate any fibers not selected:
         possible_fibers = np.nansum(streamlines_in_bundles, -1) > 0
         tg = StatefulTractogram(tg.streamlines[possible_fibers],
                                 self.img,
@@ -1074,31 +1109,55 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5,
 
     # Keep this around, so you can use it for indexing at the very end:
     idx = np.arange(len(fgarray))
-    # This calculates the Mahalanobis for each streamline/node:
-    w = gaussian_weights(fgarray, return_mahalnobis=True, stat=stat)
+    # get lengths of each streamline
     lengths = np.array([sl.shape[0] for sl in tg.streamlines])
     # We'll only do this for clean_rounds
     rounds_elapsed = 0
-    while ((np.any(w > distance_threshold)
-            or np.any(zscore(lengths) > length_threshold))
-           and rounds_elapsed < clean_rounds
-           and len(tg.streamlines) > min_sl):
+    while rounds_elapsed < clean_rounds and len(tg.streamlines) > min_sl:
+        # This calculates the Mahalanobis for each streamline/node:
+        m_dist = gaussian_weights(fgarray, return_mahalnobis=True, stat=stat)
+        logger.debug(f"Shape of fgarray: {np.asarray(fgarray).shape}")
+        logger.debug(f"Shape of m_dist: {m_dist.shape}")
+        logger.debug(f"Maximum m_dist: {np.max(m_dist)}")
+        logger.debug((
+            f"Maximum m_dist for each fiber: "
+            f"{np.max(m_dist, axis=1)}"))
+
+        length_z = zscore(lengths)
+        logger.debug(f"Shape of length_z: {length_z.shape}")
+        logger.debug(f"Maximum length_z: {np.max(length_z)}")
+        logger.debug((
+            "length_z for each fiber: "
+            f"{length_z}"))
+
+        if not (
+                np.any(m_dist > distance_threshold)
+                or np.any(length_z > length_threshold)):
+            break
         # Select the fibers that have Mahalanobis smaller than the
         # threshold for all their nodes:
-        idx_dist = np.where(np.all(w < distance_threshold, axis=-1))[0]
-        idx_len = np.where(zscore(lengths) < length_threshold)[0]
-        idx_belong = np.intersect1d(idx_dist, idx_len)
+        idx_dist = np.all(m_dist < distance_threshold, axis=-1)
+        idx_len = length_z < length_threshold
+        idx_belong = np.logical_and(idx_dist, idx_len)
 
-        if len(idx_belong) < min_sl:
+        if np.sum(idx_belong) < min_sl:
             # need to sort and return exactly min_sl:
-            idx_belong = np.argsort(np.sum(w, axis=-1))[:min_sl]
+            idx_belong = np.argsort(np.sum(
+                m_dist, axis=-1))[:min_sl].astype(int)
+            logger.debug((
+                f"At rounds elapsed {rounds_elapsed}, "
+                "minimum streamlines reached"))
+        else:
+            idx_removed = idx_belong == 0
+            logger.debug((
+                f"Rounds elapsed: {rounds_elapsed}, "
+                f"num removed: {np.sum(idx_removed)}"))
+            logger.debug(f"Removed indicies: {np.where(idx_removed)[0]}")
 
-        idx = idx[idx_belong.astype(int)]
         # Update by selection:
-        fgarray = fgarray[idx_belong.astype(int)]
-        lengths = lengths[idx_belong.astype(int)]
-        # Repeat:
-        w = gaussian_weights(fgarray, return_mahalnobis=True)
+        idx = idx[idx_belong]
+        fgarray = fgarray[idx_belong]
+        lengths = lengths[idx_belong]
         rounds_elapsed += 1
 
     # Select based on the variable that was keeping track of things for us:
@@ -1184,6 +1243,54 @@ def _is_streamline_in_ROIs_parallel(indiv_args, tol, include_roi,
             streamlines_in_bundles)
 
 
+def clean_by_orientation(streamlines, primary_axis, tol=None):
+    """
+    Compute the cardinal orientation of each streamline
+
+    Parameters
+    ----------
+    streamlines : sequence of N by 3 arrays
+        Where N is number of nodes in the array, the collection of
+        streamlines to filter down to.
+
+    Returns
+    -------
+    cleaned_idx, indicies of streamlines that passed cleaning,
+        logical_and of other two returns
+    along_accepted_idx, indices of streamlines that passed
+        cleaning along the bundle
+    end_accepted_idx, indices of streamlines that passed
+        cleaning based on difference between endpoints of bundle
+    """
+    axis_diff = np.zeros((len(streamlines), 3))
+    endpoint_diff = np.zeros((len(streamlines), 3))
+    for ii, sl in enumerate(streamlines):
+        # endpoint diff is between first and last
+        endpoint_diff[ii, :] = np.abs(sl[0, :] - sl[-1, :])
+        # axis diff is difference between the nodes, along
+        axis_diff[ii, :] = np.sum(np.abs(sl[0:-1, :] - sl[1:, :]), axis=0)
+
+    orientation_along = np.argmax(axis_diff, axis=1)
+    along_accepted_idx = orientation_along == primary_axis
+    if tol is not None:
+        percentage_primary = 100 * axis_diff[:, primary_axis] / np.sum(
+            axis_diff, axis=1)
+        logger.debug((
+            "Maximum primary percentage found: "
+            f"{np.max(percentage_primary)}"))
+        along_accepted_idx = np.logical_and(
+            along_accepted_idx, percentage_primary > tol)
+
+    orientation_end = np.argmax(endpoint_diff, axis=1)
+    end_accepted_idx = orientation_end == primary_axis
+
+    cleaned_idx = np.logical_and(
+        along_accepted_idx,
+        end_accepted_idx)
+
+    return cleaned_idx, along_accepted_idx, end_accepted_idx
+
+
 def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
                        flip_sls=None):
     """
@@ -1192,8 +1299,9 @@ def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
     the targets0 and ending points close to targets1
     Parameters
     ----------
-    streamlines : sequence of 3XN_i arrays The collection of streamlines to
-        filter down to.
+    streamlines : sequence of N by 3 arrays
+        Where N is number of nodes in the array, the collection of
+        streamlines to filter down to.
     targets0, target1: sequences or Nx3 arrays or None.
         The targets. Numerical values in the atlas array for targets for the
         first and last node in each streamline respectively, or NX3 arrays with

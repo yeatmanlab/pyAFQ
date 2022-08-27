@@ -742,6 +742,8 @@ def test_AFQ_data_waypoint():
 
     tracking_params = dict(odf_model="csd",
                            seed_mask=RoiImage(),
+                           min_length=10,
+                           max_length=1000,
                            n_seeds=100,
                            random_seeds=True,
                            rng_seed=42)
@@ -850,6 +852,8 @@ def test_AFQ_data_waypoint():
     tracking_params = dict(odf_model="CSD",
                            seed_mask="RoiImage()",
                            n_seeds=100,
+                           min_length=10,
+                           max_length=1000,
                            random_seeds=True,
                            rng_seed=42)
     config = dict(

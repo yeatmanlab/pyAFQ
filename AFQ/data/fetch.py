@@ -1069,6 +1069,9 @@ def aal_to_regions(regions, atlas=None):
                   'leftarcfrontal': np.array([1, 11, 13]),
                   'leftarctemp': np.array([79, 81, 85, 89]),
                   'leftthalamus': np.array([77]),
+                  'leftventral': np.array([47, 53, 55, 89]),
+                  'leftdorsal': np.array([49, 51, 59, 61, 63, 65]),
+                  'leftparietal': np.array([59, 61, 63, 65])
                   }
 
     # Right symmetrical is off by one:
@@ -1083,6 +1086,9 @@ def aal_to_regions(regions, atlas=None):
     atlas_vals['rightarcfrontal'] = atlas_vals['leftarcfrontal'] + 1
     atlas_vals['rightarctemp'] = atlas_vals['leftarctemp'] + 1
     atlas_vals['rightthalamus'] = atlas_vals['leftthalamus'] + 1
+    atlas_vals['rightventral'] = atlas_vals['leftventral'] + 1
+    atlas_vals['rightdorsal'] = atlas_vals['leftdorsal'] + 1
+    atlas_vals['rightparietal'] = atlas_vals['leftparietal'] + 1
 
     # Multiply named regions:
     atlas_vals['leftuncinatetemp'] = atlas_vals['leftilftemp'] =\
@@ -1168,7 +1174,11 @@ def bundles_to_aal(bundles, atlas=None):
         "PostParietal": [None, None],
         "SupFrontal": [None, None],
         "SupParietal": [None, None],
-        "Temporal": [None, None]}
+        "Temporal": [None, None],
+        "pARC_L": [['leftparietal'], None],
+        "pARC_R": [['rightparietal'], None],
+        "VOF_L": [['leftdorsal'], ['leftventral']],
+        "VOF_R": [['rightdorsal'], ['rightventral']]}
 
     targets = {}
 
