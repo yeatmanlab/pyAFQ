@@ -116,8 +116,8 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
     # from mm to voxel units:
     R = affine[0:3, 0:3]
     vox_dim = np.mean(np.diag(np.linalg.cholesky(R.T.dot(R))))
-    min_length = min_length / vox_dim
-    max_length = max_length / vox_dim
+    min_length = (min_length / vox_dim) / step_size
+    max_length = (max_length / vox_dim) / step_size
 
     logger.info("Generating Seeds...")
     if isinstance(n_seeds, int):
