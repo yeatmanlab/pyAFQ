@@ -1055,7 +1055,7 @@ class Segmentation:
         return fiber_groups
 
 
-def clean_bundle(tg, n_points=100, clean_rounds=20, distance_threshold=3,
+def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
                  length_threshold=4, min_sl=20, stat='mean',
                  return_idx=False):
     """
@@ -1071,7 +1071,7 @@ def clean_bundle(tg, n_points=100, clean_rounds=20, distance_threshold=3,
         Default: 100
     clean_rounds : int, optional.
         Number of rounds of cleaning based on the Mahalanobis distance from
-        the mean of extracted bundles. Default: 20
+        the mean of extracted bundles. Default: 5
     distance_threshold : float, optional.
         Threshold of cleaning based on the Mahalanobis distance (the units are
         standard deviations). Default: 3.
