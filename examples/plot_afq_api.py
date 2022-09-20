@@ -192,7 +192,7 @@ for ind in bundle_counts.index:
     if ind == "FP":
         threshold = 10  # smaller than default 20 mm ?
     else:
-        threshold = 100
+        threshold = 40
     if bundle_counts["n_streamlines_clean"][ind] < threshold:
         raise ValueError((
             "Small number of streamlines found "
