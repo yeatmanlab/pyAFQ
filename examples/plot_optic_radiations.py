@@ -50,8 +50,9 @@ bundles = abd.BundleDict({
     }
 })
 
-# combine custom ROIs with default BundleDict ROIs
-bundles = bundles + abd.BundleDict()
+# To combine custom ROIs with default BundleDict ROIs,
+# run this line:
+#     bundles = bundles + abd.BundleDict()
 
 brain_mask_definition = LabelledImageFile(
     suffix="seg",
