@@ -76,9 +76,7 @@ def _verbose_generate_tractogram(self):
             # move to the next streamline if only the seed position
             # and not return all
             len_sl = len(streamline)
-            if len_sl > self.min_length * self.step_size\
-                and len_sl < self.max_length * self.step_size\
-                    and len_sl > 1:
+            if len_sl > self.min_length:
                 if self.save_seeds:
                     yield streamline, s
                 else:

@@ -189,10 +189,10 @@ fig_files = myafq.export("tract_profile_plots")["01"]
 bundle_counts = pd.read_csv(myafq.export("sl_counts")["01"], index_col=[0])
 for ind in bundle_counts.index:
     #  few streamlines are found for these bundles in this subject
-    if ind in ["FA", "FP"]:
-        threshold = 25
+    if ind == "FP" or ind == "FA":
+        threshold = 10  # smaller than default 20 mm ?
     else:
-        threshold = 100
+        threshold = 40
     if bundle_counts["n_streamlines_clean"][ind] < threshold:
         raise ValueError((
             "Small number of streamlines found "

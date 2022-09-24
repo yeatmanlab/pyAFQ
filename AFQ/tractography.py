@@ -21,7 +21,7 @@ from AFQ._fixes import (VerboseLocalTracking, VerboseParticleFilteringTracking,
 def track(params_file, directions="prob", max_angle=30., sphere=None,
           seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False,
           rng_seed=None, stop_mask=None, stop_threshold=0, step_size=0.5,
-          min_length=40, max_length=200, odf_model="CSD",
+          min_length=20, max_length=250, odf_model="CSD",
           tracker="local"):
     """
     Tractography
@@ -77,11 +77,11 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         Defaults to 0 (this means that if no stop_mask is passed,
         we will stop only at the edge of the image).
     step_size : float, optional.
-        The size (in mm) of a step of tractography. Default: 0.5
+        The size of a step (in voxels) of tractography. Default: 0.5
     min_length: int, optional
-        The miminal length (mm) in a streamline. Default: 40
+        The miminal length (mm) in a streamline. Default: 20
     max_length: int, optional
-        The miminal length (mm) in a streamline. Default: 200
+        The miminal length (mm) in a streamline. Default: 250
     odf_model : str, optional
         One of {"DTI", "CSD", "DKI"}. Defaults to use "DTI"
     tracker : str, optional
@@ -111,6 +111,13 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
     affine = params_img.affine
     odf_model = odf_model.upper()
     directions = directions.lower()
+
+    # We need to calculate the size of a voxel, so we can transform
+    # from mm to voxel units:
+    R = affine[0:3, 0:3]
+    vox_dim = np.mean(np.diag(np.linalg.cholesky(R.T.dot(R))))
+    min_length = int((min_length / vox_dim) / step_size)
+    max_length = int((max_length / vox_dim) / step_size)
 
     logger.info("Generating Seeds...")
     if isinstance(n_seeds, int):
