@@ -114,7 +114,7 @@ def create_dummy_bids_path(n_subjects, n_sessions, share_sessions=True):
             afd.to_bids_description(
                 dmriprep_dir,
                 **{"Name": "Dummy",
-                   "PipelineDescription": {"Name": "synthetic"}})
+                   "GeneratedBy": {"Name": "synthetic"}})
 
             for subject in subjects:
                 for session in sessions:
@@ -140,7 +140,7 @@ def create_dummy_bids_path(n_subjects, n_sessions, share_sessions=True):
             afd.to_bids_description(
                 dmriprep_dir,
                 **{"Name": "Dummy",
-                   "PipelineDescription": {"Name": "synthetic"}})
+                   "GeneratedBy": {"Name": "synthetic"}})
 
             for d in range(n_subjects):
                 subject = subjects[d]
@@ -163,7 +163,7 @@ def create_dummy_bids_path(n_subjects, n_sessions, share_sessions=True):
         afd.to_bids_description(
             dmriprep_dir,
             **{"Name": "Dummy",
-               "PipelineDescription": {"Name": "synthetic"}})
+               "GeneratedBy": {"Name": "synthetic"}})
 
         for subject in subjects:
             for modality in ['anat', 'dwi']:
@@ -205,7 +205,7 @@ def test_AFQ_missing_files():
             "otherDeriv"),
         **{
             "Name": "Missing",
-            "PipelineDescription": {"Name": "otherDeriv"}})
+            "GeneratedBy": {"Name": "otherDeriv"}})
     touch(op.join(subses_folder, "sub-01_ses-01_dwi.nii.gz"))
 
     with pytest.raises(
@@ -218,7 +218,7 @@ def test_AFQ_missing_files():
     afd.to_bids_description(
         op.join(bids_path, "missingPipe"), **{
             "Name": "Missing",
-            "PipelineDescription": {"Name": "missingPipe"}})
+            "GeneratedBy": {"Name": "missingPipe"}})
     with pytest.raises(
             ValueError,
             match="No non-json files recognized by pyBIDS"
