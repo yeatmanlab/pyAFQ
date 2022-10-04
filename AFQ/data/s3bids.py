@@ -573,6 +573,20 @@ class S3BIDSStudy:
             to change it. If you do change it, you must provide a
             class that quacks like AFQ.data.S3BIDSSubject. Default:
             S3BIDSSubject
+
+        Examples
+        --------
+        Access data stored in a bucket using credentials:
+        >>> study = S3BIDSStudy('studyname',
+        ...                     'bucketname',
+        ...                     '/path/to/dataset/',
+        ...                     anon=False)
+
+        Access data stored in a publicly accessible bucket:
+        >>> study = S3BIDSStudy('hbn',
+        ...    'fcp-indi',
+        ...    'data/Projects/HBN/BIDS_curated/derivatives/qsiprep/')
+
         """
         logging.getLogger("botocore").setLevel(logging.WARNING)
 
