@@ -542,7 +542,8 @@ class S3BIDSStudy:
             The S3 bucket that contains the study data
 
         s3_prefix : str
-            The S3 prefix common to all of the study objects on S3
+            The S3 prefix common to all of the study objects on S3.
+            If at top level in the bucket, pass the empty string: `''`.
 
         subjects : str, sequence(str), int, or None
             If int, retrieve S3 keys for the first `subjects` subjects.
