@@ -8,6 +8,7 @@ visualize outputs of pyAFQ as publication-ready figures.
 
 """
 
+import os
 import os.path as op
 import nibabel as nib
 import numpy as np
@@ -121,6 +122,24 @@ arc_t1w = transform_streamlines(sft_arc.streamlines,
                                 np.linalg.inv(t1w_img.affine))
 cst_t1w = transform_streamlines(sft_cst.streamlines,
                                 np.linalg.inv(t1w_img.affine))
+
+
+#############################################################################
+#
+# .. note::
+#   A virtual frame buffer is needed if you are running this example on
+#   a machine that is not connected to a display ("headless"). If this is
+#   the case, you can either
+
+if os.environ["XVFB"]:
+    print("Initializing XVFB")
+    import xvfbwrapper
+    from xvfbwrapper import Xvfb
+
+    vdisplay = Xvfb()
+    vdisplay.start()
+
+
 
 
 #############################################################################
@@ -428,3 +447,13 @@ window.record(scene, out_path='arc_cst4.png', size=(2400, 2400))
 ##########################################################################
 # .. image:: ./arc_cst4
 #
+
+
+#############################################################################
+#
+# .. note::
+#   If a virtual buffer was started before, it's a good idea to stop it.
+
+if os.environ["XVFB"]:
+    print("Stopping XVFB")
+    vdisplay.stop()
