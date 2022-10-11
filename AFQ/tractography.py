@@ -21,7 +21,7 @@ from AFQ._fixes import (VerboseLocalTracking, VerboseParticleFilteringTracking,
 def track(params_file, directions="prob", max_angle=30., sphere=None,
           seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False,
           rng_seed=None, stop_mask=None, stop_threshold=0, step_size=0.5,
-          min_length=20, max_length=250, odf_model="CSD",
+          min_length=20, max_length=300, odf_model="CSD",
           tracker="local"):
     """
     Tractography
