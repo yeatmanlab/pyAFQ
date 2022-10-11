@@ -77,7 +77,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         Defaults to 0 (this means that if no stop_mask is passed,
         we will stop only at the edge of the image).
     step_size : float, optional.
-        The size of a step (in voxels) of tractography. Default: 0.5
+        The size of a step (in mm) of tractography. Default: 0.5
     min_length: int, optional
         The miminal length (mm) in a streamline. Default: 20
     max_length: int, optional
@@ -114,10 +114,8 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
 
     # We need to calculate the size of a voxel, so we can transform
     # from mm to voxel units:
-    R = affine[0:3, 0:3]
-    vox_dim = np.mean(np.diag(np.linalg.cholesky(R.T.dot(R))))
-    min_length = int((min_length / vox_dim) / step_size)
-    max_length = int((max_length / vox_dim) / step_size)
+    min_length = int(min_length / step_size)
+    max_length = int(max_length / step_size)
 
     logger.info("Generating Seeds...")
     if isinstance(n_seeds, int):
