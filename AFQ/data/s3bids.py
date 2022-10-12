@@ -528,7 +528,7 @@ class HBNSubject(S3BIDSSubject):
 class S3BIDSStudy:
     """A BIDS-compliant study hosted on AWS S3"""
 
-    def __init__(self, study_id, bucket, s3_prefix, subjects=None,
+    def __init__(self, study_id, bucket, s3_prefix='', subjects=None,
                  anon=True, use_participants_tsv=False, random_seed=None,
                  _subject_class=S3BIDSSubject):
         """Initialize an S3BIDSStudy instance
@@ -541,38 +541,54 @@ class S3BIDSStudy:
         bucket : str
             The S3 bucket that contains the study data
 
-        s3_prefix : str
-            The S3 prefix common to all of the study objects on S3
+        s3_prefix : str, optional
+            The S3 prefix common to all of the study objects on S3.
+            Default: the empty string, which indicates that the study
+            is at the top level of the bucket.
 
-        subjects : str, sequence(str), int, or None
+        subjects : str, sequence(str), int, or None, optional
             If int, retrieve S3 keys for the first `subjects` subjects.
             If "all", retrieve all subjects. If str or sequence of
             strings, retrieve S3 keys for the specified subjects. If sequence
             of ints, then for each int n retrieve S3 keys for the nth subject.
             If None, retrieve S3 keys for the first subject. Default: None
 
-        anon : bool
+        anon : bool, optional
             Whether to use anonymous connection (public buckets only).
             If False, uses the key/secret given, or boto’s credential
             resolver (client_kwargs, environment, variables, config
             files, EC2 IAM server, in that order). Default: True
 
-        use_participants_tsv : bool
+        use_participants_tsv : bool, optional
             If True, use the particpants tsv files to retrieve subject
             identifiers. This is faster but may not catch all subjects.
             Sometimes the tsv files are outdated. Default: False
 
-        random_seed : int or None
+        random_seed : int or None, optional
             Random seed for selection of subjects if `subjects` is an
             integer. Use the same random seed for reproducibility.
             Default: None
 
-        _subject_class : object
+        _subject_class : object, optional
             The subject class to be used for this study. This parameter
             has a leading underscore because you probably don't want
             to change it. If you do change it, you must provide a
             class that quacks like AFQ.data.S3BIDSSubject. Default:
             S3BIDSSubject
+
+        Examples
+        --------
+        Access data stored in a bucket using credentials:
+        >>> study = S3BIDSStudy('studyname',
+        ...                     'bucketname',
+        ...                     '/path/to/dataset/',
+        ...                     anon=False)
+
+        Access data stored in a publicly accessible bucket:
+        >>> study = S3BIDSStudy('hbn',
+        ...    'fcp-indi',
+        ...    'data/Projects/HBN/BIDS_curated/derivatives/qsiprep/')
+
         """
         logging.getLogger("botocore").setLevel(logging.WARNING)
 
@@ -585,6 +601,11 @@ class S3BIDSStudy:
         if not isinstance(s3_prefix, str):
             raise TypeError('`s3_prefix` must be a string.')
 
+        if s3_prefix == '/':
+            raise ValueError("If the study is at the top level "
+                             "of the s3 bucket, please pass the "
+                             "empty string as the s3 prefix"
+                             "(the default value)")
         if not (subjects is None
                 or isinstance(subjects, int)
                 or isinstance(subjects, str)
