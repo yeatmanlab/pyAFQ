@@ -271,11 +271,11 @@ def export_density_maps(clean_bundles, dwi, data_imap):
     bundle_dict = data_imap["bundle_dict"]
     seg_sft = aus.SegmentedSFT.fromfile(
         clean_bundles)
-    entire_density_map = np.zeros((*nib.load(dwi).shape, len(bundle_dict)))
-    for bundle_name in bundle_dict.keys():
+    entire_density_map = np.zeros((*nib.load(dwi).shape[:3], len(bundle_dict)))
+    for ii, bundle_name in enumerate(bundle_dict.keys()):
         bundle_sl = seg_sft.get_bundle(bundle_name)
         bundle_density = auv.density_map(bundle_sl).get_fdata()
-        entire_density_map[..., :] = bundle_density
+        entire_density_map[..., ii] = bundle_density
 
     return entire_density_map, dict(
         source=clean_bundles, bundles=list(bundle_dict.keys()))
