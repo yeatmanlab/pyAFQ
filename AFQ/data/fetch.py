@@ -1060,7 +1060,6 @@ def aal_to_regions(regions, atlas=None):
                   'lefttemporal': np.concatenate([np.arange(37, 42, 2),
                                                   np.array([55]),
                                                   np.arange(79, 90, 2)]),
-                  'leftparietal': np.array([57, 67, 2]),
                   'leftanttemporal': np.array([41, 83, 87]),
                   'leftuncinatefront': np.array([5, 9, 15, 25]),
                   'leftifoffront': np.array([3, 5, 7, 9, 13, 15, 25]),
@@ -1070,7 +1069,7 @@ def aal_to_regions(regions, atlas=None):
                   'leftarctemp': np.array([79, 81, 85, 89]),
                   'leftthalamus': np.array([77]),
                   'leftventral': np.array([47, 53, 55, 89]),
-                  'leftdorsal': np.array([49, 51, 59, 61, 63, 65]),
+                  'leftdorsal': np.array([49, 51]),
                   'leftparietal': np.array([59, 61, 63, 65])
                   }
 
@@ -1078,7 +1077,6 @@ def aal_to_regions(regions, atlas=None):
     atlas_vals['rightfrontal'] = atlas_vals['leftfrontal'] + 1
     atlas_vals['rightoccipital'] = atlas_vals['leftoccipital'] + 1
     atlas_vals['righttemporal'] = atlas_vals['lefttemporal'] + 1
-    atlas_vals['rightparietal'] = atlas_vals['leftparietal'] + 1
     atlas_vals['rightanttemporal'] = atlas_vals['leftanttemporal'] + 1
     atlas_vals['rightuncinatefront'] = atlas_vals['leftuncinatefront'] + 1
     atlas_vals['rightifoffront'] = atlas_vals['leftifoffront'] + 1
