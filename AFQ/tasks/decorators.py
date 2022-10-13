@@ -130,16 +130,18 @@ def as_file(suffix, include_track=False, include_seg=False):
                 tracking_params=tracking_params,
                 segmentation_params=segmentation_params)
             if not op.exists(this_file):
-                img_trk_or_csv, meta = func(*args[:og_arg_count], **kwargs)
+                img_trk_np_or_csv, meta = func(*args[:og_arg_count], **kwargs)
 
                 logger.info(f"Saving {this_file}")
-                if isinstance(img_trk_or_csv, nib.Nifti1Image):
-                    nib.save(img_trk_or_csv, this_file)
-                elif isinstance(img_trk_or_csv, StatefulTractogram):
+                if isinstance(img_trk_np_or_csv, nib.Nifti1Image):
+                    nib.save(img_trk_np_or_csv, this_file)
+                elif isinstance(img_trk_np_or_csv, StatefulTractogram):
                     save_tractogram(
-                        img_trk_or_csv, this_file, bbox_valid_check=False)
+                        img_trk_np_or_csv, this_file, bbox_valid_check=False)
+                elif isinstance(img_trk_np_or_csv, np.ndarray):
+                    np.save(this_file, img_trk_np_or_csv)
                 else:
-                    img_trk_or_csv.to_csv(this_file)
+                    img_trk_np_or_csv.to_csv(this_file)
 
                 if include_seg:
                     meta["dependent"] = "rec"
