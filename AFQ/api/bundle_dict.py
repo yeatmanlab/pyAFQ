@@ -66,7 +66,7 @@ class BundleDict(MutableMapping):
                  bundle_info=BUNDLES,
                  seg_algo="afq",
                  resample_to=None,
-                 resample_subject_to=None,
+                 resample_subject_to=False,
                  keep_in_memory=False):
         """
         Create a bundle dictionary, needed for the segmentation
@@ -100,8 +100,6 @@ class BundleDict(MutableMapping):
             If there are bundles in bundle_info with the 'space' attribute
             set to 'subject', their images (all ROIs and probability maps)
             will be resampled to the affine and shape of this image.
-            If None, the template will be overriden when passed to
-            an API class.
             If False, no resampling will be done.
             Default: None
 
@@ -520,7 +518,7 @@ class PediatricBundleDict(BundleDict):
                  bundle_info=PEDIATRIC_BUNDLES,
                  seg_algo="afq",
                  resample_to=None,
-                 resample_subject_to=None,
+                 resample_subject_to=False,
                  keep_in_memory=False):
         """
         Create a pediatric bundle dictionary, needed for the segmentation
@@ -548,8 +546,6 @@ class PediatricBundleDict(BundleDict):
             If there are ROIs with the 'space' attribute
             set to 'subject', those ROIs will be resampled to the affine
             and shape of this image.
-            If None, the template will be overriden when passed to
-            an API class.
             If False, no resampling will be done.
             Default: None
 
