@@ -291,14 +291,11 @@ def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
     default_arg_dict['pyAFQ']['version'] = __version__
     default_arg_dict['pyAFQ']['platform'] = platform.system()
 
-    afq_path = op.join(bids_path, 'derivatives', 'afq')
-    os.makedirs(afq_path, exist_ok=True)
+    myafq = GroupAFQ(bids_path, **kwargs)
 
-    afq_metadata_file = op.join(afq_path, 'afq_metadata.toml')
+    afq_metadata_file = op.join(myafq.afq_path, 'afq_metadata.toml')
     with open(afq_metadata_file, 'w') as ff:
         ff.write(dict_to_toml(default_arg_dict))
-
-    myafq = GroupAFQ(bids_path, **kwargs)
 
     # call user specified function:
     if to_call == "all":
