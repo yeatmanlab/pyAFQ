@@ -334,7 +334,7 @@ class GroupCSVComparison():
             Can be 'ICC1, 'ICC2', 'ICC3', 'ICC1k', 'ICC2k', 'ICC3k'.
             Default: "ICC2"
         """
-        self.logger = logging.getLogger('AFQ')
+        self.logger = logging.getLogger(__name__)
         self.ICC_func = ICC_func
         if "k" in self.ICC_func:
             self.ICC_func_name = f"ICC({self.ICC_func[3]},k)"

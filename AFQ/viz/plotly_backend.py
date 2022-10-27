@@ -21,7 +21,7 @@ except (ImportError, ModuleNotFoundError):
 
 
 scope = pio.kaleido.scope
-viz_logger = logging.getLogger("AFQ")
+viz_logger = logging.getLogger(__name__)
 
 
 def _inline_interact(figure, show, show_inline):

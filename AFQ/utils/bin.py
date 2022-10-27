@@ -3,6 +3,8 @@ import datetime
 import platform
 import os.path as op
 import os
+import logging
+logger = logging.getLogger(__name__)
 
 from argparse import ArgumentParser
 from funcargparse import FuncArgParser
@@ -298,6 +300,7 @@ def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
     with open(afq_metadata_file, 'w') as ff:
         ff.write(dict_to_toml(default_arg_dict))
 
+    logger.info("Starting to create the GroupAFQ object")
     myafq = GroupAFQ(bids_path, **kwargs)
 
     # call user specified function:

@@ -15,7 +15,7 @@ try:
 except (ImportError, ModuleNotFoundError):
     raise ImportError(vut.viz_import_msg_error("fury"))
 
-viz_logger = logging.getLogger("AFQ")
+viz_logger = logging.getLogger(__name__)
 
 
 def _inline_interact(scene, inline, interact):

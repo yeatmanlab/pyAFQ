@@ -1,21 +1,8 @@
 #!/usr/bin/env python
-
 import warnings
 import os.path as op
 from argparse import ArgumentParser
-
-
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-
-    print("Loading AFQ libraries...")
-
-    import AFQ
-    import AFQ.utils.bin as afb
-
-    import logging
-    logger = logging.getLogger('AFQ')
-    logger.setLevel(level=logging.INFO)
+import logging
 
 usage = \
     """pyAFQ /path/to/afq_config.toml
@@ -97,6 +84,10 @@ def parse_cli(arg_dict):
     cli_parser.add_argument(
         '-t', '--notrack', action="store_true", default=False,
         help="Disable the use of pyAFQ being recorded by Google Analytics. ")
+    
+    cli_parser.add_argument(
+        '-l', '--log', default=None,
+        help="Path to log file to save the outputs of pyAFQ.")
 
     opts = cli_parser.parse_args()
 
@@ -109,12 +100,34 @@ def parse_cli(arg_dict):
             "flag when using the pyAFQ CLI")
         import popylar
         popylar.track_event(AFQ._ga_id, "pyAFQ_cli", "CLI called")
+        
+    if opts.log is not None:
+        # Create handler
+        f_handler = logging.FileHandler(opts.log)
+        f_handler.setLevel(logging.INFO)
+        # Create formatter and add it to handler
+        f_format = logging.Formatter(
+            '%(asctime)s - %(name)s:%(levelname)s:%(message)s')
+        f_handler.setFormatter(f_format)
+        # Add handler to the logger
+        logger.addHandler(f_handler)
+        print(f'Logging to file: {opts.log}')
+        logger.info("Starting pyAFQ")
 
     return opts.config, opts.generate_toml, opts.overwrite,\
         opts.verbose, opts.dry_run, opts.to_call, opts.generate_json
 
 
 if __name__ == '__main__':
+    logger = logging.getLogger()
+    logger.setLevel(level=logging.INFO)
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        print("Loading AFQ libraries...")
+        # import AFQ
+        import AFQ.utils.bin as afb
+    
     arg_dict = afb.func_dict_to_arg_dict(logger=logger)
     config_file, generate_only, overwrite, verbose,\
         dry_run, to_call, generate_json =\

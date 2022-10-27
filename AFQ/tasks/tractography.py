@@ -11,7 +11,7 @@ import AFQ.tractography as aft
 from AFQ.tasks.utils import get_default_args
 from AFQ.definitions.image import ScalarImage
 
-logger = logging.getLogger('AFQ')
+logger = logging.getLogger(__name__)
 
 
 @pimms.calc("seed")

@@ -163,7 +163,7 @@ def read_callosum_templates(as_img=True, resample_to=False):
     dict with: keys: names of template ROIs and values: nibabel Nifti1Image
     objects from each of the ROI nifti files.
     """
-    logger = logging.getLogger('AFQ')
+    logger = logging.getLogger(__name__)
 
     logger.debug('loading callosum templates')
     tic = time.perf_counter()
@@ -555,7 +555,7 @@ def read_templates(as_img=True, resample_to=False):
     dict with: keys: names of template ROIs and values: nibabel Nifti1Image
     objects from each of the ROI nifti files.
     """
-    logger = logging.getLogger('AFQ')
+    logger = logging.getLogger(__name__)
     logger.debug('loading AFQ templates')
     tic = time.perf_counter()
 
@@ -649,7 +649,7 @@ def read_or_templates(as_img=True, resample_to=False):
     dict with: keys: names of template ROIs and values: nibabel Nifti1Image
     objects from each of the ROI nifti files.
     """
-    logger = logging.getLogger('AFQ')
+    logger = logging.getLogger(__name__)
 
     logger.debug('loading or templates')
     tic = time.perf_counter()
@@ -795,7 +795,7 @@ def organize_stanford_data(path=None, clear_previous_afq=False):
     If clear_previous_afq is True and there is an afq folder in derivatives,
     it will be removed.
     """
-    logger = logging.getLogger('AFQ')
+    logger = logging.getLogger(__name__)
 
     # fetches data for first subject and session
     logger.info('fetching Stanford HARDI data')
@@ -1196,7 +1196,7 @@ def bundles_to_aal(bundles, atlas=None):
                     targets[bundle + "_" + region_name] = nib.Nifti1Image(
                         aal_roi, atlas.affine)
         else:
-            logger = logging.getLogger('AFQ')
+            logger = logging.getLogger(__name__)
             logger.warning(f"Segmentation end points undefined for {bundle},"
                            + " continuing without end points")
             targets[bundle + "_start"] = None
@@ -1317,7 +1317,7 @@ def read_ukbb_fa_template(mask=True):
     )
 
     if not op.exists(fa_path):
-        logger = logging.getLogger('AFQ')
+        logger = logging.getLogger(__name__)
         logger.warning(
             "Downloading brain MRI group mean statistics from UK Biobank. "
             + "This download is approximately 1.1 GB. "

@@ -17,7 +17,7 @@ from AFQ.viz.utils import Viz
 
 from plotly.subplots import make_subplots
 
-logger = logging.getLogger('AFQ')
+logger = logging.getLogger(__name__)
 
 
 def _viz_prepare_vol(vol, xform, mapping, scalar_dict):

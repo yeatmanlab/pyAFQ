@@ -18,7 +18,7 @@ import AFQ.utils.streamlines as aus
 
 __all__ = ["Viz"]
 
-viz_logger = logging.getLogger("AFQ")
+viz_logger = logging.getLogger(__name__)
 tableau_20 = [
     (0.12156862745098039, 0.4666666666666667, 0.7058823529411765),
     (0.6823529411764706, 0.7803921568627451, 0.9098039215686274),

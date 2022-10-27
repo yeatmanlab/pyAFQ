@@ -28,7 +28,7 @@ from dipy.utils.parallel import paramap
 __all__ = ["Segmentation", "clean_bundle", "clean_by_endpoints"]
 
 
-logger = logging.getLogger('AFQ')
+logger = logging.getLogger(__name__)
 
 
 def _resample_tg(tg, n_points):

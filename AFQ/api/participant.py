@@ -88,7 +88,7 @@ class ParticipantAFQ(object):
                 "unrecognized parameter tractography_params, "
                 "did you mean tracking_params ?"))
 
-        self.logger = logging.getLogger('AFQ')
+        self.logger = logging.getLogger(__name__)
         self.output_dir = output_dir
 
         self.kwargs = dict(
