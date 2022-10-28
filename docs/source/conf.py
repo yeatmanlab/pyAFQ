@@ -13,6 +13,8 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
 from plotly.io._sg_scraper import plotly_sg_scraper
+from AFQ.utils.docs import PNGScraper
+
 import sys
 import os
 import AFQ
@@ -77,7 +79,7 @@ master_doc = 'index'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -212,7 +214,7 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3/', None),
                                 'https://dipy.org/documentation/1.4.1./objects.inv/')
                        }
 
-image_scrapers = ('matplotlib', plotly_sg_scraper,)
+image_scrapers = ('matplotlib', plotly_sg_scraper, PNGScraper())
 
 from _progressbars import reset_progressbars  # noqa
 

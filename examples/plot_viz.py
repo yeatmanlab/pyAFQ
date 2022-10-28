@@ -3,10 +3,11 @@
 Visualizing AFQ derivatives
 ============================
 
-In this set of examples, we will use the `fury <https://fury.gl/>`_ library to
-visualize outputs of pyAFQ as publication-ready figures.
-
 """
+
+#############################################################################
+# In this set of examples, we will use the `fury <https://fury.gl/>`_
+# library to visualize outputs of pyAFQ as publication-ready figures.
 
 import os
 import os.path as op
@@ -131,7 +132,7 @@ cst_t1w = transform_streamlines(sft_cst.streamlines,
 #   a machine that is not connected to a display ("headless"). If this is
 #   the case, you can either
 
-if os.environ["XVFB"]:
+if os.environ.get("XVFB", False):
     print("Initializing XVFB")
     import xvfbwrapper
     from xvfbwrapper import Xvfb
@@ -276,9 +277,6 @@ scene.set_camera(position=(238.04, 174.48, 143.04),
 
 window.record(scene, out_path='arc_cst1.png', size=(2400, 2400))
 
-##########################################################################
-# .. image:: ./arc_cst1
-
 
 ############################################################################
 # Setting bundle colors
@@ -309,9 +307,6 @@ for slicer in slicers:
     scene.add(slicer)
 
 window.record(scene, out_path='arc_cst2.png', size=(2400, 2400))
-
-##########################################################################
-# .. image:: ./arc_cst2
 
 
 #############################################################################
@@ -380,9 +375,6 @@ scene.add(core_cst_actor)
 
 window.record(scene, out_path='arc_cst3.png', size=(2400, 2400))
 
-##########################################################################
-# .. image:: ./arc_cst3
-#
 
 #############################################################################
 # Adding ROIs
@@ -444,16 +436,12 @@ scene.add(waypoint2_actor)
 
 window.record(scene, out_path='arc_cst4.png', size=(2400, 2400))
 
-##########################################################################
-# .. image:: ./arc_cst4
-#
-
 
 #############################################################################
 #
 # .. note::
 #   If a virtual buffer was started before, it's a good idea to stop it.
 
-if os.environ["XVFB"]:
+if os.environ.get("XVFB", False):
     print("Stopping XVFB")
     vdisplay.stop()
