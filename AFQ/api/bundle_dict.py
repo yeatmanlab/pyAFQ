@@ -581,7 +581,7 @@ class PediatricBundleDict(BundleDict):
         # pediatric probability maps
         prob_map_order = [
             "ATR_L", "ATR_R", "CST_L", "CST_R", "CGC_L", "CGC_R",
-            "HCC_L", "HCC_R", "FP", "FA", "IFO_L", "IFO_R", "ILF_L",
+            "FP", "FA", "IFO_L", "IFO_R", "ILF_L",
             "ILF_R", "SLF_L", "SLF_R", "UNC_L", "UNC_R",
             "ARC_L", "ARC_R", "MdLF_L", "MdLF_R"]
 
@@ -592,9 +592,10 @@ class PediatricBundleDict(BundleDict):
         self.templates["Callosum_midsag"] = self.templates["mid-saggital"]
 
         for bundle_name in PEDIATRIC_BUNDLES:
-            self.templates[bundle_name + "_prob_map"] = prob_map_data[
-                ...,
-                prob_map_order.index(bundle_name)]
+            self.templates[bundle_name + "_prob_map"] = nib.Nifti1Image(
+                prob_map_data[
+                    ...,
+                    prob_map_order.index(bundle_name)], prob_maps.affine)
 
         # reuse probability map from ILF
         self.templates["MdLF_L_prob_map"] = self.templates["ILF_L_prob_map"]
