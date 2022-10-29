@@ -585,7 +585,7 @@ class PediatricBundleDict(BundleDict):
             "ILF_R", "SLF_L", "SLF_R", "UNC_L", "UNC_R",
             "ARC_L", "ARC_R", "MdLF_L", "MdLF_R"]
 
-        prob_maps = self.pediatric_templates[
+        prob_maps = self.templates[
             'UNCNeo_JHU_tracts_prob-for-babyAFQ']
         prob_map_data = prob_maps.get_fdata()
 
