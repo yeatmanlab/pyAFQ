@@ -632,6 +632,9 @@ def get_bundle_dict(base_fname, dwi, segmentation_params,
             reg_template = afd.read_ukbb_fa_template(mask=use_brain_mask)
         elif img_l == "hcp_atlas":
             reg_template = afd.read_mni_template(mask=use_brain_mask)
+        elif img_l == "pediatric":
+            reg_template = afd.read_pediatric_templates()[
+                "UNCNeo-withCerebellum-for-babyAFQ"]
         else:
             reg_template = nib.load(reg_template_spec)
 
