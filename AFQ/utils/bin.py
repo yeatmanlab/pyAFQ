@@ -2,13 +2,13 @@ import toml
 import datetime
 import platform
 import os.path as op
-import os
 
 from argparse import ArgumentParser
 from funcargparse import FuncArgParser
 
 from AFQ.definitions.image import *  # interprets masks loaded from toml
 from AFQ.definitions.mapping import *  # interprets mappings loaded from toml
+from AFQ.api.bundle_dict import *  # interprets bundle_dicts loaded from toml
 from AFQ.definitions.utils import Definition
 from AFQ.api.utils import kwargs_descriptors
 
@@ -78,13 +78,15 @@ def toml_to_val(t):
         return eval(t)
     elif isinstance(t, str) and t[0] == '{':
         return eval(t)  # interpret as dictionary
-    elif isinstance(t, str) and ("Image" in t or "Map" in t):
+    elif isinstance(t, str) and ("Image" in t or "Map" in t or "Dict" in t):
         try:
-            definition = eval(t)
+            definition_or_dict = eval(t)
         except NameError:
             return t
-        if isinstance(definition, Definition):
-            return definition
+        if isinstance(definition_or_dict, Definition):
+            return definition_or_dict
+        elif isinstance(definition_or_dict, BundleDict):
+            return definition_or_dict
         else:
             return t
     else:
