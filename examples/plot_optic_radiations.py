@@ -13,15 +13,13 @@ the default waypoint ROIs.
 """
 
 import os.path as op
-from IPython.display import display, Image
+from IPython.display import Image
 
 from AFQ.api.group import GroupAFQ
 import AFQ.api.bundle_dict as abd
 import AFQ.data.fetch as afd
 from AFQ.definitions.image import LabelledImageFile, RoiImage
 import AFQ.utils.streamlines as aus
-
-import plotly
 
 afd.organize_stanford_data(clear_previous_afq=True)
 
@@ -82,10 +80,18 @@ if len(aus.SegmentedSFT.fromfile(my_afq.export("clean_bundles")[
     #  across subject/session in MNI
     montages = my_afq.montage("L_OR", (1, 1), "Axial")
     my_afq.combine_bundle("L_OR")
-    display(Image(filename=montages[0]))
+    montage_img = Image(filename=montages[0])
 else:
     raise ValueError("No L_OR found")
 
+##########################################################################
+# .. figure:: {{ montage_img }}
+#
+
 # open interactive bundle visualization
 bundle_html = my_afq.export("indiv_bundles_figures")
-plotly.io.show(bundle_html["01"]["L_OR"])
+bundle_figure = bundle_html["01"]["L_OR"]
+
+##########################################################################
+# .. figure:: {{ bundle_figure }}
+#
