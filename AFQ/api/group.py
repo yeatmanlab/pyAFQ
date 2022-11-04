@@ -791,11 +791,11 @@ class GroupAFQ(object):
         Path to density nifti file.
         """
         densities = self.export("density_maps", collapse=False)
-        ex_density_img = densities[
+        ex_density_img = nib.load(densities[
             self.valid_sub_list[0]][
-                self.valid_ses_list[0]]  # for shape and affine
+                self.valid_ses_list[0]])  # for shape and affine
 
-        group_density = np.zeros_like(ex_density_img.shape)
+        group_density = np.zeros_like(ex_density_img.get_fdata().shape)
         self.logger.info("Generating Group Density...")
         for ii in tqdm(range(len(self.valid_ses_list))):
             this_sub = self.valid_sub_list[ii]
