@@ -4,6 +4,7 @@ import os.path as op
 import shutil
 import subprocess
 import gc
+from requests import get
 
 import toml
 
@@ -31,7 +32,7 @@ import AFQ.utils.bin as afb
 from AFQ.definitions.image import RoiImage,\
     PFTImage, ImageFile
 from AFQ.definitions.mapping import SynMap, AffMap, SlrMap
-from AFQ.definitions.image import TemplateImage, ImageFile
+from AFQ.definitions.image import TemplateImage, ImageFile, LabelledImageFile
 
 
 def touch(fname, times=None):
@@ -735,10 +736,35 @@ def test_AFQ_data_waypoint():
         t1_path)
     shutil.copy(t1_path, t1_path_other)
 
+    vista_folder = op.join(
+        bids_path,
+        "derivatives/vistasoft/sub-01/ses-01/dwi")
+    freesurfer_folder = op.join(
+        bids_path,
+        "derivatives/freesurfer/sub-01/ses-01/anat")
+    lv1_fname = op.join(
+        freesurfer_folder,
+        "sub-01_ses-01_desc-LV1_anat.nii.gz")
+    if not op.exists(lv1_fname):
+        r = get(op.join(
+            "https://stacks.stanford.edu/file/druid:ng782rw8378/SUB1_LV1.nii.gz"))  # noqa
+        open(lv1_fname, 'wb').write(r.content)
+    seg_fname = op.join(
+        freesurfer_folder,
+        "sub-01_ses-01_seg.nii.gz")
     bundle_names = [
         "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"]
-    bundle_info = BundleDict(bundle_names)
+    bundle_info = BundleDict(
+        bundle_names,
+        resample_subject_to=nib.load(
+            op.join(vista_folder, "sub-01_ses-01_dwi.nii.gz")))
     del bundle_info["SLF_L"]["include"]  # test endpoint ROIs as include
+    bundle_info["LV1"] = {
+        "include": [
+            ImageFile(path=lv1_fname),
+            LabelledImageFile(path=seg_fname, inclusive_labels=[41])],
+        "space": "subject"
+    }
 
     tracking_params = dict(odf_model="csd",
                            seed_mask=RoiImage(),
@@ -753,9 +779,6 @@ def test_AFQ_data_waypoint():
 
     clean_params = dict(return_idx=True)
 
-    vista_folder = op.join(
-        bids_path,
-        "derivatives/vistasoft/sub-01/ses-01/dwi")
     afq_folder = op.join(bids_path, "derivatives/afq/sub-01/ses-01")
     os.makedirs(afq_folder, exist_ok=True)
     myafq = ParticipantAFQ(
@@ -817,7 +840,7 @@ def test_AFQ_data_waypoint():
     tract_profiles = pd.read_csv(tract_profile_fname)
 
     assert tract_profiles.select_dtypes(include=[np.number]).sum().sum() != 0
-    assert tract_profiles.shape == (500, 9)
+    assert tract_profiles.shape == (500, 10)
 
     myafq.export("indiv_bundles_figures")
     assert op.exists(op.join(
@@ -856,13 +879,15 @@ def test_AFQ_data_waypoint():
                            max_length=1000,
                            random_seeds=True,
                            rng_seed=42)
+    bundle_dict_as_str = '''
+    BundleDict("SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP")'''
     config = dict(
         BIDS_PARAMS=dict(
             bids_path=bids_path,
             preproc_pipeline='vistasoft'),
         DATA=dict(
             robust_tensor_fitting=True,
-            bundle_info=bundle_names),
+            bundle_info=bundle_dict_as_str),
         SEGMENTATION=dict(
             scalars=[
                 "dti_fa",
@@ -892,6 +917,8 @@ def test_AFQ_data_waypoint():
     from_file = pd.read_csv(tract_profile_fname)
 
     assert from_file.shape == (500, 9)
+    print(tract_profiles['dti_fa'].shape)
+    print(from_file['dti_fa'].shape)
     assert_series_equal(tract_profiles['dti_fa'], from_file['dti_fa'])
 
     # Make sure the CLI did indeed generate these:
