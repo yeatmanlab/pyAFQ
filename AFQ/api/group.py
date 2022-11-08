@@ -791,16 +791,16 @@ class GroupAFQ(object):
         Path to density nifti file.
         """
         densities = self.export("density_maps", collapse=False)
-        ex_density_img = nib.load(densities[
+        ex_density_init = np.load(densities[
             self.valid_sub_list[0]][
-                self.valid_ses_list[0]])  # for shape and affine
+                self.valid_ses_list[0]])  # for shape
 
-        group_density = np.zeros_like(ex_density_img.get_fdata().shape)
+        group_density = np.zeros_like(ex_density_init)
         self.logger.info("Generating Group Density...")
         for ii in tqdm(range(len(self.valid_ses_list))):
             this_sub = self.valid_sub_list[ii]
             this_ses = self.valid_ses_list[ii]
-            this_density = nib.load(densities[this_sub][this_ses]).get_fdata()
+            this_density = np.load(densities[this_sub][this_ses])
             if boolify:
                 this_density = this_density.astype(bool)
 
@@ -809,8 +809,7 @@ class GroupAFQ(object):
         out_fname = op.abspath(op.join(
             self.afq_path,
             f"desc-density_subjects-all_space-MNI_dwi.nii.gz"))
-        nib.save(nib.Nifti1Image(
-            group_density, ex_density_img.affine), out_fname)
+        np.save(out_fname, group_density)
         return out_fname
 
     def assemble_AFQ_browser(self, output_path=None, metadata=None,
