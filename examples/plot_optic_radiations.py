@@ -14,6 +14,7 @@ the default waypoint ROIs.
 
 import os.path as op
 from IPython.display import Image
+import plotly
 
 from AFQ.api.group import GroupAFQ
 import AFQ.api.bundle_dict as abd
@@ -84,14 +85,7 @@ if len(aus.SegmentedSFT.fromfile(my_afq.export("clean_bundles")[
 else:
     raise ValueError("No L_OR found")
 
-##########################################################################
-# .. figure:: {{ montage_img }}
-#
-
 # open interactive bundle visualization
 bundle_html = my_afq.export("indiv_bundles_figures")
 bundle_figure = bundle_html["01"]["L_OR"]
-
-##########################################################################
-# .. figure:: {{ bundle_figure }}
-#
+plotly.io.show(bundle_figure)
