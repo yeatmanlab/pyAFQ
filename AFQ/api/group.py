@@ -808,7 +808,7 @@ class GroupAFQ(object):
 
         out_fname = op.abspath(op.join(
             self.afq_path,
-            f"desc-density_subjects-all_space-MNI_dwi.nii.gz"))
+            f"desc-density_subjects-all_space-MNI_dwi.npy"))
         np.save(out_fname, group_density)
         return out_fname
 
