@@ -367,7 +367,7 @@ def read_resample_roi(roi, resample_to=None, threshold=False):
     if isinstance(resample_to, str):
         resample_to = nib.load(resample_to)
 
-    if np.allclose(resample_to.affine, roi.affine):
+    if resample_to is False or np.allclose(resample_to.affine, roi.affine):
         return roi
 
     as_array = resample(

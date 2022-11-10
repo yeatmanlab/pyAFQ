@@ -83,6 +83,10 @@ def export_rois(base_fname, results_dir, data_imap, mapping, dwi_affine):
                                 mapping,
                                 bundle_name=bundle)
                         else:
+                            if isinstance(roi, str):
+                                roi = nib.load(roi)
+                            if isinstance(roi, nib.Nifti1Image):
+                                roi = roi.get_fdata()
                             warped_roi = roi
 
                         # Cast to float32,
