@@ -762,7 +762,9 @@ def test_AFQ_data_waypoint():
     bundle_info["LV1"] = {
         "include": [
             ImageFile(path=lv1_fname),
-            LabelledImageFile(path=seg_fname, inclusive_labels=[41])],
+            LabelledImageFile(
+                path=seg_fname,
+                inclusive_labels=[71])],
         "space": "subject"
     }
 
@@ -879,8 +881,9 @@ def test_AFQ_data_waypoint():
                            max_length=1000,
                            random_seeds=True,
                            rng_seed=42)
-    bundle_dict_as_str = '''
-    BundleDict("SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP")'''
+    bundle_dict_as_str = (
+        'BundleDict(["SLF_L", "SLF_R", "ARC_L", '
+        '"ARC_R", "CST_L", "CST_R", "FP"])')
     config = dict(
         BIDS_PARAMS=dict(
             bids_path=bids_path,
