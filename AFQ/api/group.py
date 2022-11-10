@@ -514,6 +514,15 @@ class GroupAFQ(object):
         suffix : str
             Parts of command that are used after the filename.
             Default: ""
+
+        Example
+        -------
+        # This command would move all derivatives that are
+        # dependent on the tractography into 'my_other_folder'
+        myafq.cmd_outputs(
+            "cp",
+            dependent_on="track",
+            suffix="~/my_other_folder/")
         """
         for pAFQ in self.pAFQ_list:
             pAFQ.cmd_outputs(cmd, dependent_on, exceptions, suffix=suffix)

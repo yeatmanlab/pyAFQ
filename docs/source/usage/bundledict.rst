@@ -19,5 +19,11 @@ key-value pairs::
     transformed from template to subject space before being used.
     - 'prob_map' : path to a Nifti file which is the probability map,
       optional.
+    - 'inc_addtol' : List of floats describing how much tolerance to add or
+      subtract in mm from each of the inclusion ROIs. The list must be the
+      same length as 'include'. optional. 
+    - 'exc_addtol' : List of floats describing how much tolerance to add or
+      subtract in mm from each of the exclusion ROIs. The list must be the
+      same length as 'exclude'. optional. 
 
 For an example, see "Plotting the Optic Radiations" in :ref:`examples`.
