@@ -86,7 +86,9 @@ myafq.export_all()
 group_density = myafq.export_group_density()
 group_density = np.load(group_density)
 fig, ax = plt.subplots(1)
-ax.matshow(group_density[:, :, group_density.shape[-1] // 2], cmap='viridis')
+ax.matshow(
+    group_density[:, :, group_density.shape[-1] // 2, 0],
+    cmap='viridis')
 ax.axis("off")
 
 
