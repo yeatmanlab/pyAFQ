@@ -1,4 +1,5 @@
 import os.path as op
+import random
 import numpy as np
 import numpy.testing as npt
 import pytest
@@ -28,6 +29,7 @@ step_size = 0.5
 
 
 def test_csd_local_tracking():
+    random.seed(1234)
     for sh_order in [4, 8, 10]:
         fname = fit_csd(fdata, fbval, fbvec,
                         response=((0.0015, 0.0003, 0.0003), 100),
