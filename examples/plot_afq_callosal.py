@@ -7,7 +7,7 @@ http://hdl.handle.net/1773/34926
 """
 import os.path as op
 import matplotlib.pyplot as plt
-import numpy as np
+import nibabel as nib
 
 import plotly
 
@@ -84,7 +84,7 @@ myafq.export_all()
 # by doing myafq.export("density_map") . When using GroupAFQ, you can also
 # combine these into one file by doing myafq.export_group_density() .
 group_density = myafq.export_group_density()
-group_density = np.load(group_density)
+group_density = nib.load(group_density).get_fdata()
 fig, ax = plt.subplots(1)
 ax.matshow(
     group_density[:, :, group_density.shape[-1] // 2, 0],
