@@ -487,7 +487,8 @@ class GroupAFQ(object):
         self.logger.info(
             f"Time taken for export all: {str(time() - start_time)}")
 
-    def cmd_outputs(self, cmd="rm", dependent_on=None, exceptions=[]):
+    def cmd_outputs(self, cmd="rm", dependent_on=None, exceptions=[],
+                    suffix=""):
         """
         Perform some command some or all outputs of pyafq.
         This is useful if you change a parameter and need
@@ -510,9 +511,21 @@ class GroupAFQ(object):
         exceptions : list of str
             Name outputs that the command should not be applied to.
             Default: []
+        suffix : str
+            Parts of command that are used after the filename.
+            Default: ""
+
+        Example
+        -------
+        # This command would move all derivatives that are
+        # dependent on the tractography into 'my_other_folder'
+        myafq.cmd_outputs(
+            "cp",
+            dependent_on="track",
+            suffix="~/my_other_folder/")
         """
         for pAFQ in self.pAFQ_list:
-            pAFQ.cmd_outputs(cmd, dependent_on, exceptions)
+            pAFQ.cmd_outputs(cmd, dependent_on, exceptions, suffix=suffix)
 
     clobber = cmd_outputs  # alias for default of cmd_outputs
 

@@ -258,6 +258,7 @@ class BundleDict(MutableMapping):
                 roi_dict['space'] = 'template'
                 roi_dict['start'] = self.templates[bundle_name + "_start"]
                 roi_dict['end'] = self.templates[bundle_name + "_end"]
+                roi_dict["inc_addtol"] = [4, 0]
                 roi_dict['primary_axis'] = 2
                 roi_dict["primary_axis_percentage"] = 40
                 self._dict[bundle_name] = roi_dict

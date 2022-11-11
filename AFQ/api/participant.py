@@ -183,7 +183,8 @@ class ParticipantAFQ(object):
         self.logger.info(
             f"Time taken for export all: {time() - start_time}")
 
-    def cmd_outputs(self, cmd="rm", dependent_on=None, exceptions=[]):
+    def cmd_outputs(self, cmd="rm", dependent_on=None, exceptions=[],
+                    suffix=""):
         """
         Perform some command some or all outputs of pyafq.
         This is useful if you change a parameter and need
@@ -206,6 +207,9 @@ class ParticipantAFQ(object):
         exceptions : list of str
             Name outputs that the command should not be applied to.
             Default: []
+        suffix : str
+            Parts of command that are used after the filename.
+            Default: ""
         """
         if dependent_on is None:
             dependent_on_list = ["trk", "rec", "dwi"]
@@ -242,14 +246,14 @@ class ParticipantAFQ(object):
                         if "dependent" in sidecar_info\
                             and sidecar_info["dependent"]\
                                 in dependent_on_list:
-                            os.system(f"{cmd} {full_path}")
-                            os.system(f"{cmd} {sidecar_file}")
+                            os.system(f"{cmd} {full_path} {suffix}")
+                            os.system(f"{cmd} {sidecar_file} {suffix}")
                     else:
-                        os.system(f"{cmd} {full_path}")
+                        os.system(f"{cmd} {full_path} {suffix}")
             elif os.path.isdir(full_path):
                 # other than ROIs, folders are dependent on everything
                 if dependent_on is None or filename != "ROIs":
-                    os.system(f"{cmd} -r {full_path}")
+                    os.system(f"{cmd} -r {full_path} {suffix}")
 
         # do not assume previous calculations are still valid
         # after file operations
