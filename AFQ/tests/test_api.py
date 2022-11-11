@@ -505,7 +505,7 @@ def test_AFQ_slr():
     """
     Test if API can run using slr map
     """
-    seed = 44
+    seed = 1234
     np.random.seed(seed)
     random.seed(seed)
 
