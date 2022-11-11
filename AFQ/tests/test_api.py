@@ -4,6 +4,7 @@ import os.path as op
 import shutil
 import subprocess
 import gc
+import random
 
 import toml
 
@@ -506,6 +507,7 @@ def test_AFQ_slr():
     """
     seed = 44
     np.random.seed(seed)
+    random.seed(seed)
 
     _, bids_path, sub_path = get_temp_hardi()
     bd = BundleDict(["CST_L"])
