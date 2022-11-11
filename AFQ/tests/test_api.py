@@ -412,7 +412,6 @@ def test_AFQ_anisotropic():
         'sub-01_ses-01_dwi_model-CSD_desc-APM_dwi.nii.gz'))
 
 
-@pytest.mark.nightly_slr
 def test_API_type_checking():
     _, bids_path, _ = get_temp_hardi()
 
