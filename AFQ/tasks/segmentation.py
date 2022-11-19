@@ -8,7 +8,7 @@ import logging
 
 import pimms
 
-from AFQ.tasks.decorators import as_file
+from AFQ.tasks.decorators import as_file, as_img
 from AFQ.tasks.utils import get_fname, with_name, str_to_desc
 import AFQ.segmentation as seg
 from AFQ.utils.path import drop_extension
@@ -263,6 +263,7 @@ def export_bundle_lengths(data_imap,
 
 @pimms.calc("density_maps")
 @as_file('_desc-density_dwi.nii.gz', include_track=True, include_seg=True)
+@as_img
 def export_density_maps(clean_bundles, dwi, data_imap):
     """
     full path to 4d nifti file containing streamline counts per voxel
