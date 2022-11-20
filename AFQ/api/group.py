@@ -776,6 +776,48 @@ class GroupAFQ(object):
         if op.exists(self.afqb_path):
             s3fs.put(self.afqb_path, remote_path, recursive=True)
 
+    def export_group_density(self, boolify=True):
+        """
+        Generate a group density map by combining single subject density maps.
+
+        Parameters
+        ----------
+        boolify : bool
+            Whether to turn subject streamline count images into booleans
+            before adding them into the group density map.
+
+        Return
+        ------
+        Path to density nifti file.
+        """
+        densities = self.export("density_maps", collapse=False)
+        ex_density_init = nib.load(densities[
+            self.valid_sub_list[0]][
+                self.valid_ses_list[0]])  # for shape and header
+
+        group_density = np.zeros_like(ex_density_init.get_fdata())
+        self.logger.info("Generating Group Density...")
+        for ii in tqdm(range(len(self.valid_ses_list))):
+            this_sub = self.valid_sub_list[ii]
+            this_ses = self.valid_ses_list[ii]
+            this_density = nib.load(densities[this_sub][this_ses]).get_fdata()
+            if boolify:
+                this_density = this_density.astype(bool)
+
+            group_density = group_density + this_density
+        group_density = group_density / len(self.valid_sub_list)
+        group_density = nib.Nifti1Image(
+            group_density,
+            ex_density_init.affine,
+            header=ex_density_init.header
+        )
+
+        out_fname = op.abspath(op.join(
+            self.afq_path,
+            f"desc-density_subjects-all_space-MNI_dwi.nii.gz"))
+        nib.save(group_density, out_fname)
+        return out_fname
+
     def assemble_AFQ_browser(self, output_path=None, metadata=None,
                              page_title="AFQ Browser", page_subtitle="",
                              page_title_link="", page_subtitle_link=""):
