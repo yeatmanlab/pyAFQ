@@ -82,7 +82,7 @@ myafq.export_all()
 #
 # pyAFQ can make density maps of streamline counts per subject/session
 # by calling `myafq.export("density_map")`. When using `GroupAFQ`, you can also
-# combine these into one file by doing myafq.export_group_density() .
+# combine these into one file by calling `myafq.export_group_density()`.
 group_density = myafq.export_group_density()
 group_density = nib.load(group_density).get_fdata()
 fig, ax = plt.subplots(1)
