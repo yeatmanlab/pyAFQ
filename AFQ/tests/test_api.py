@@ -4,7 +4,6 @@ import os.path as op
 import shutil
 import subprocess
 import gc
-from requests import get
 
 import toml
 
@@ -742,13 +741,7 @@ def test_AFQ_data_waypoint():
     freesurfer_folder = op.join(
         bids_path,
         "derivatives/freesurfer/sub-01/ses-01/anat")
-    lv1_fname = op.join(
-        freesurfer_folder,
-        "sub-01_ses-01_desc-LV1_anat.nii.gz")
-    if not op.exists(lv1_fname):
-        r = get(op.join(
-            "https://stacks.stanford.edu/file/druid:ng782rw8378/SUB1_LV1.nii.gz"))  # noqa
-        open(lv1_fname, 'wb').write(r.content)
+    lv1_fname = afd.fetch_stanford_hardi_lv1()
     seg_fname = op.join(
         freesurfer_folder,
         "sub-01_ses-01_seg.nii.gz")
