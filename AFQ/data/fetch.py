@@ -65,10 +65,7 @@ def _make_reusable_fetcher(name, folder, baseurl, remote_fnames, local_fnames,
             if not op.exists(op.join(folder, fname)):
                 all_files_downloaded = False
         if all_files_downloaded:
-            if len(local_fnames) == 1:
-                return op.join(folder, local_fnames[0])
-            else:
-                return local_fnames, folder
+            return local_fnames, folder
         else:
             return _make_fetcher(
                 name, folder, baseurl, remote_fnames, local_fnames,
