@@ -48,7 +48,8 @@ __all__ = ["fetch_callosum_templates", "read_callosum_templates",
            "fetch_templates", "read_templates",
            "fetch_stanford_hardi_tractography",
            "read_stanford_hardi_tractography",
-           "organize_stanford_data"]
+           "organize_stanford_data",
+           "fetch_stanford_hardi_lv1"]
 
 
 afq_home = op.join(op.expanduser('~'), 'AFQ_data')
@@ -57,14 +58,18 @@ baseurl = "https://ndownloader.figshare.com/files/"
 
 
 def _make_reusable_fetcher(name, folder, baseurl, remote_fnames, local_fnames,
-                           doc="", **make_fetcher_kwargs):
+                           doc="", md5_list=None, **make_fetcher_kwargs):
     def fetcher():
         all_files_downloaded = True
         for fname in local_fnames:
             if not op.exists(op.join(folder, fname)):
                 all_files_downloaded = False
         if all_files_downloaded:
-            return local_fnames, folder
+            files = {}
+            for i, (f, n), in enumerate(zip(remote_fnames, local_fnames)):
+                files[n] = (baseurl + f, md5_list[i] if
+                            md5_list is not None else None)
+            return files, folder
         else:
             return _make_fetcher(
                 name, folder, baseurl, remote_fnames, local_fnames,
@@ -367,7 +372,7 @@ def read_resample_roi(roi, resample_to=None, threshold=False):
     if isinstance(resample_to, str):
         resample_to = nib.load(resample_to)
 
-    if np.allclose(resample_to.affine, roi.affine):
+    if resample_to is False or np.allclose(resample_to.affine, roi.affine):
         return roi
 
     as_array = resample(
@@ -855,6 +860,19 @@ def organize_stanford_data(path=None, clear_previous_afq=False):
     to_bids_description(freesurfer_folder,
                         **{"Name": "Stanford HARDI",
                            "PipelineDescription": {"Name": "freesurfer"}})
+
+
+fetch_stanford_hardi_lv1 = _make_reusable_fetcher(
+    "fetch_stanford_hardi_lv1",
+    op.join(afq_home,
+            'stanford_hardi',
+            'derivatives/freesurfer/sub-01/ses-01/anat'),
+    'https://stacks.stanford.edu/file/druid:ng782rw8378/',
+    ["SUB1_LV1.nii.gz"],
+    ["sub-01_ses-01_desc-LV1_anat.nii.gz"],
+    md5_list=["e403c602e53e5491414f86af5f08a913"],
+    doc="Download the LV1 segmentation for the Standord Hardi subject",
+    unzip=False)
 
 
 fetch_hcp_atlas_16_bundles = _make_reusable_fetcher(

@@ -66,7 +66,7 @@ class BundleDict(MutableMapping):
                  bundle_info=BUNDLES,
                  seg_algo="afq",
                  resample_to=None,
-                 resample_subject_to=None,
+                 resample_subject_to=False,
                  keep_in_memory=False):
         """
         Create a bundle dictionary, needed for the segmentation
@@ -100,8 +100,6 @@ class BundleDict(MutableMapping):
             If there are bundles in bundle_info with the 'space' attribute
             set to 'subject', their images (all ROIs and probability maps)
             will be resampled to the affine and shape of this image.
-            If None, the template will be overriden when passed to
-            an API class.
             If False, no resampling will be done.
             Default: None
 
@@ -326,17 +324,15 @@ class BundleDict(MutableMapping):
                 bbox_valid_check=False).streamlines
         if not self.keep_in_memory:
             old_vals = self.apply_to_rois(key, cond_load)
-            if self.resample_to:
-                self._resample_roi(key)
+            self._resample_roi(key)
         else:
             if "loaded" not in self._dict[key] or\
                     not self._dict[key]["loaded"]:
                 self.apply_to_rois(key, cond_load)
                 self._dict[key]["loaded"] = True
             old_vals = None
-            if self.resample_to and (
-                "resampled" not in self._dict[key] or not self._dict[
-                    key]["resampled"]):
+            if "resampled" not in self._dict[key] or not self._dict[
+                    key]["resampled"]:
                 self._resample_roi(key)
         _item = self._dict[key].copy()
         if old_vals is not None:
@@ -455,23 +451,24 @@ class BundleDict(MutableMapping):
         b_name : str
             Name of the bundle to be resampled.
         """
-        if self.resample_to and self.seg_algo == "afq":
+        if self.seg_algo == "afq":
             if "space" not in self._dict[b_name]\
                     or self._dict[b_name]["space"] == "template":
                 resample_to = self.resample_to
             else:
                 resample_to = self.resample_subject_to
-            try:
-                self.apply_to_rois(
-                    b_name,
-                    afd.read_resample_roi,
-                    resample_to=resample_to)
-                self._dict[b_name]["resampled"] = True
-            except AttributeError as e:
-                if "'ImageFile' object" in str(e):
-                    self._dict[b_name]["resampled"] = False
-                else:
-                    raise
+            if resample_to:
+                try:
+                    self.apply_to_rois(
+                        b_name,
+                        afd.read_resample_roi,
+                        resample_to=resample_to)
+                    self._dict[b_name]["resampled"] = True
+                except AttributeError as e:
+                    if "'ImageFile' object" in str(e):
+                        self._dict[b_name]["resampled"] = False
+                    else:
+                        raise
 
     def __add__(self, other):
         self.gen_all()
@@ -520,7 +517,7 @@ class PediatricBundleDict(BundleDict):
                  bundle_info=PEDIATRIC_BUNDLES,
                  seg_algo="afq",
                  resample_to=None,
-                 resample_subject_to=None,
+                 resample_subject_to=False,
                  keep_in_memory=False):
         """
         Create a pediatric bundle dictionary, needed for the segmentation
@@ -548,8 +545,6 @@ class PediatricBundleDict(BundleDict):
             If there are ROIs with the 'space' attribute
             set to 'subject', those ROIs will be resampled to the affine
             and shape of this image.
-            If None, the template will be overriden when passed to
-            an API class.
             If False, no resampling will be done.
             Default: None
 

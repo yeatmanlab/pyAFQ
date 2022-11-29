@@ -649,17 +649,19 @@ def get_bundle_dict(base_fname, dwi, segmentation_params,
     def roi_scalar_to_info(roi):
         if not isinstance(roi, ImageDefinition):
             return roi
-        roi.find_path(
-            bids_info["bids_layout"],
-            dwi,
-            bids_info["subject"],
-            bids_info["session"])
+        if bids_info is not None:
+            roi.find_path(
+                bids_info["bids_layout"],
+                dwi,
+                bids_info["subject"],
+                bids_info["session"])
         roi_img, _ = roi.get_image_direct(
             dwi, bids_info, b0, data_imap=None)
         return roi_img
     for b_name, b_info in bundle_dict._dict.items():
         if "space" in b_info and b_info["space"] == "subject":
             bundle_dict.apply_to_rois(b_name, roi_scalar_to_info)
+            bundle_dict._resample_roi(b_name)
     return bundle_dict, reg_template
 
 

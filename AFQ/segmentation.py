@@ -498,6 +498,10 @@ class Segmentation:
                         self.mapping,
                         bundle_name=bundle)
                 else:
+                    if isinstance(roi, str):
+                        roi = nib.load(roi)
+                    if isinstance(roi, nib.Nifti1Image):
+                        roi = roi.get_fdata()
                     warped_roi = roi
 
                 if roi_type == 'include':
@@ -526,10 +530,6 @@ class Segmentation:
 
         # The probability map if doesn't exist is all ones with the same
         # shape as the ROIs:
-        if isinstance(roi, str):
-            roi = nib.load(roi)
-        if isinstance(roi, nib.Nifti1Image):
-            roi = roi.get_fdata()
         prob_map = bundle_entry.get(
             'prob_map', np.ones(roi.shape))
 
@@ -543,7 +543,6 @@ class Segmentation:
                 self.mapping.transform_inverse(
                     prob_map.copy(),
                     interpolation='nearest')
-
         return warped_prob_map, include_rois, exclude_rois,\
             include_roi_tols, exclude_roi_tols
 
@@ -733,7 +732,6 @@ class Segmentation:
                 for end_type in ['start', 'end']:
                     if end_type in self.bundle_dict[bundle]:
                         warped_roi = self.bundle_dict[bundle][end_type]
-
                         # Create binary masks and warp these into subject's
                         # DWI space:
                         if "space" not in self.bundle_dict[bundle]\
@@ -758,7 +756,8 @@ class Segmentation:
                                         'endpoint_ROI',
                                         bundle,
                                         f'{end_type}point_as_used.nii.gz'))
-
+                        else:
+                            warped_roi = warped_roi.get_fdata()
                         atlas_idx.append(
                             np.array(np.where(warped_roi > 0)).T)
                     else:
