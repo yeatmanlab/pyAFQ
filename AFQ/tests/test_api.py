@@ -742,7 +742,9 @@ def test_AFQ_data_waypoint():
         bids_path,
         "derivatives/freesurfer/sub-01/ses-01/anat")
     lv1_files, lv1_folder = afd.fetch_stanford_hardi_lv1()
-    lv1_fname = op.join(lv1_folder, lv1_files[0])
+    lv1_fname = op.join(
+        lv1_folder,
+        list(lv1_files.keys())[0])
     seg_fname = op.join(
         freesurfer_folder,
         "sub-01_ses-01_seg.nii.gz")
