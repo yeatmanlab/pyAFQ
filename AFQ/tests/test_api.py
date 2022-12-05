@@ -505,6 +505,7 @@ def test_AFQ_slr():
     """
     Test if API can run using slr map
     """
+    np.random.seed(2022)
     _, bids_path, sub_path = get_temp_hardi()
     bd = BundleDict(["CST_L"])
 
