@@ -311,6 +311,36 @@ def anisotropic_power_map(csd_params):
     return pmap, dict(CSDParamsFile=csd_params)
 
 
+@pimms.calc("fwdti_fa")
+@as_file(suffix='_model-FWDTI_desc-FA_dwi.nii.gz')
+@as_fit_deriv('FWDTI')
+def fwdti_fa(fwdti_tf):
+    """
+    full path to a nifti file containing the Free-water DTI fractional
+    anisotropy
+    """
+    return fwdti_tf.fa
+
+@pimms.calc("fwdti_md")
+@as_file(suffix='_model-FWDTI_desc-MD_dwi.nii.gz')
+@as_fit_deriv('FWDTI')
+def fwdti_md(fwdti_tf):
+    """
+    full path to a nifti file containing the Free-water DTI mean diffusivity
+    """
+    return fwdti_tf.md
+
+
+@pimms.calc("fwdti_fwf")
+@as_file(suffix='_model-FWDTI_desc-FWF_dwi.nii.gz')
+@as_fit_deriv('FWDTI')
+def fwdti_fwf(fwdti_tf):
+    """
+    full path to a nifti file containing the Free-water DTI free water fraction
+    """
+    return fwdti_tf.f
+
+
 @pimms.calc("dti_fa")
 @as_file(suffix='_model-DTI_desc-FA_dwi.nii.gz')
 @as_fit_deriv('DTI')
@@ -719,9 +749,10 @@ def get_data_plan(kwargs):
         get_data_gtab, b0, b0_mask, brain_mask,
         dti_fit, dki_fit, anisotropic_power_map,
         dti_fa, dti_lt, dti_cfa, dti_pdd, dti_md, dki_kt, dki_lt, dki_fa,
+        fwdti_fa, fwdti_md, fwdti_fwf,
         dki_md, dki_awf, dki_mk, dti_ga, dti_rd, dti_ad, dki_ga, dki_rd,
-        dki_ad, dki_rk, dki_ak, dti_params, dki_params, csd_params,
-        get_bundle_dict])
+        dki_ad, dki_rk, dki_ak, dti_params, dki_params, fwdti_params,
+        csd_params, get_bundle_dict])
 
     if "scalars" not in kwargs:
         kwargs["scalars"] = ["dti_fa", "dti_md"]
