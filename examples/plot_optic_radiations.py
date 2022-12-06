@@ -15,6 +15,7 @@ the default waypoint ROIs.
 import os.path as op
 from IPython.display import Image
 import plotly
+import numpy as np
 
 from AFQ.api.group import GroupAFQ
 import AFQ.api.bundle_dict as abd
@@ -25,6 +26,7 @@ import AFQ.utils.streamlines as aus
 afd.organize_stanford_data(clear_previous_afq=True)
 
 or_rois = afd.read_or_templates()
+np.random.seed(1234)
 
 bundles = abd.BundleDict({
     "L_OR": {
