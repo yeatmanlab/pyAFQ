@@ -8,6 +8,7 @@ import pimms
 
 import dipy.reconst.dki as dpy_dki
 import dipy.reconst.dti as dpy_dti
+import dipy.reconst.fwdti as dpy_fwdti
 from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
 from AFQ.definitions.image import ImageDefinition
@@ -25,6 +26,7 @@ from AFQ.models.csd import _fit as csd_fit_model
 from AFQ.models.csd import CsdNanResponseError
 from AFQ.models.dki import _fit as dki_fit_model
 from AFQ.models.dti import _fit as dti_fit_model
+from AFQ.models.fwdti import _fit as fwdti_fit_model
 
 
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
@@ -151,12 +153,49 @@ def dti(brain_mask, data, gtab,
     meta = dict(
         Parameters=dict(
             FitMethod="WLS"),
-        OutlierRejection=False,
+        OutlierRejection=robust_tensor_fitting,
         ModelURL=f"{DIPY_GH}reconst/dti.py")
     return dtf.model_params, meta
 
 
-dti_params = pimms.calc("dti_params")(dti)
+@pimms.calc("fwdti_tf")
+def fwdti_fit(fwdti_params, gtab):
+    """Free-water DTI TensorFit object"""
+    fwdti_params = nib.load(fwdti_params).get_fdata()
+    fwtm = dpy_fwdti.FreeWaterTensorModel(gtab)
+    return dpy_fwdti.FreeWaterTensorFit(fwtm, fwdti_params)
+
+
+@as_file(suffix='_model-FWDTI_desc-diffmodel_dwi.nii.gz')
+@as_img
+def fwdti(brain_mask, data, gtab):
+    """
+    full path to a nifti file containing parameters
+    for the DTI fit
+
+    Parameters
+    ----------
+    robust_tensor_fitting : bool, optional
+        Whether to use robust_tensor_fitting when
+        doing dti. Only applies to dti.
+        Default: False
+    b0_threshold : int, optional
+        The value of b under which
+        it is considered to be b0. Default: 50.
+    """
+    mask =\
+        nib.load(brain_mask).get_fdata()
+    dtf = fwdti_fit_model(
+        gtab, data,
+        mask=mask)
+    meta = dict(
+        Parameters=dict(
+            FitMethod="NLS"),
+        ModelURL=f"{DIPY_GH}reconst/fwdti.py")
+    return dtf.model_params, meta
+
+
+fwdti_params = pimms.calc("fwdti_params")(fwdti)
 
 
 @pimms.calc("dki_tf")
