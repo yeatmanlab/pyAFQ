@@ -158,6 +158,9 @@ def dti(brain_mask, data, gtab,
     return dtf.model_params, meta
 
 
+dti_params = pimms.calc("dti_params")(dti)
+
+
 @pimms.calc("fwdti_tf")
 def fwdti_fit(fwdti_params, gtab):
     """Free-water DTI TensorFit object"""
