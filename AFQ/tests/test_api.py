@@ -414,7 +414,7 @@ def test_AFQ_anisotropic():
 @pytest.mark.nightly_slr
 def test_API_type_checking():
     _, bids_path, _ = get_temp_hardi()
-
+    np.random.seed(2022)
     # Note that the ordering of these "with pytest.raises"
     # statements is important. Later tests will use
     # the sucessful results of previous ones. IE,
