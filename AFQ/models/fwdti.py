@@ -12,7 +12,7 @@ import AFQ.utils.models as ut
 __all__ = ["fit_fwdti"]
 
 
-def _fit(data, gtab, mask)
+def _fit(data, gtab, mask):
     fwmodel = fwdti.FreeWaterTensorModel(gtab)
     fwfit = fwmodel.fit(data, mask=mask)
     return fwfit
