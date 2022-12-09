@@ -696,93 +696,95 @@ class Segmentation:
 
             possible_fibers = streamlines_in_bundles[:, bundle_idx] > 0
             possible_fibers = np.where(possible_fibers)[0]
-            og_possible_fibers = possible_fibers.copy()
+            if len(possible_fibers) > 0:
+                og_possible_fibers = possible_fibers.copy()
 
-            if "primary_axis" in self.bundle_dict[bundle]:
-                self.logger.info((
-                    "Before filtering by orientation: "
-                    f"{len(possible_fibers)} streamlines"))
+                if "primary_axis" in self.bundle_dict[bundle]:
+                    self.logger.info((
+                        "Before filtering by orientation: "
+                        f"{len(possible_fibers)} streamlines"))
 
-                # get candidate streamlines
-                select_sl = tg.streamlines[possible_fibers]
+                    # get candidate streamlines
+                    select_sl = tg.streamlines[possible_fibers]
 
-                # clean by orientation
-                cleaned_idx, _, _ = clean_by_orientation(
-                    select_sl,
-                    self.bundle_dict[bundle]["primary_axis"],
-                    self.bundle_dict[bundle].get(
-                        "primary_axis_percentage", None))
+                    # clean by orientation
+                    cleaned_idx, _, _ = clean_by_orientation(
+                        select_sl,
+                        self.bundle_dict[bundle]["primary_axis"],
+                        self.bundle_dict[bundle].get(
+                            "primary_axis_percentage", None))
 
-                # update candidate streamlines
-                possible_fibers = possible_fibers[cleaned_idx]
+                    # update candidate streamlines
+                    possible_fibers = possible_fibers[cleaned_idx]
 
-                self.logger.info((
-                    "After filtering by orientation: "
-                    f"{len(possible_fibers)} streamlines"))
+                    self.logger.info((
+                        "After filtering by orientation: "
+                        f"{len(possible_fibers)} streamlines"))
 
-            if self.filter_by_endpoints:
-                self.logger.info("Filtering by endpoints")
-                select_sl = tg.streamlines[possible_fibers]
-                min_dist_sl = min_dist_coords[possible_fibers, bundle_idx]
-                self.logger.info("Before filtering "
-                                 f"{len(select_sl)} streamlines")
-                # We use definitions of endpoints provided
-                # through this dict:
-                atlas_idx = []
-                for end_type in ['start', 'end']:
-                    if end_type in self.bundle_dict[bundle]:
-                        warped_roi = self.bundle_dict[bundle][end_type]
-                        # Create binary masks and warp these into subject's
-                        # DWI space:
-                        if "space" not in self.bundle_dict[bundle]\
-                                or self.bundle_dict[bundle][
-                                    "space"] == "template":
-                            warped_roi = self.mapping.transform_inverse(
-                                warped_roi.get_fdata(),
-                                interpolation='nearest')
+                if self.filter_by_endpoints:
+                    self.logger.info("Filtering by endpoints")
+                    select_sl = tg.streamlines[possible_fibers]
+                    min_dist_sl = min_dist_coords[possible_fibers, bundle_idx]
+                    self.logger.info("Before filtering "
+                                     f"{len(select_sl)} streamlines")
+                    # We use definitions of endpoints provided
+                    # through this dict:
+                    atlas_idx = []
+                    for end_type in ['start', 'end']:
+                        if end_type in self.bundle_dict[bundle]:
+                            warped_roi = self.bundle_dict[bundle][end_type]
+                            # Create binary masks and warp these into
+                            # subject's DWI space:
+                            if "space" not in self.bundle_dict[bundle]\
+                                    or self.bundle_dict[bundle][
+                                        "space"] == "template":
+                                warped_roi = self.mapping.transform_inverse(
+                                    warped_roi.get_fdata(),
+                                    interpolation='nearest')
 
-                            if self.save_intermediates is not None:
-                                os.makedirs(op.join(
-                                    self.save_intermediates,
-                                    'endpoint_ROI',
-                                    bundle), exist_ok=True)
-
-                                nib.save(
-                                    nib.Nifti1Image(
-                                        warped_roi,
-                                        self.img_affine),
-                                    op.join(
+                                if self.save_intermediates is not None:
+                                    os.makedirs(op.join(
                                         self.save_intermediates,
                                         'endpoint_ROI',
-                                        bundle,
-                                        f'{end_type}point_as_used.nii.gz'))
+                                        bundle), exist_ok=True)
+
+                                    nib.save(
+                                        nib.Nifti1Image(
+                                            warped_roi,
+                                            self.img_affine),
+                                        op.join(
+                                            self.save_intermediates,
+                                            'endpoint_ROI',
+                                            bundle,
+                                            f'{end_type}point_as_used.nii.gz'))
+                            else:
+                                warped_roi = warped_roi.get_fdata()
+                            atlas_idx.append(
+                                np.array(np.where(warped_roi > 0)).T)
                         else:
-                            warped_roi = warped_roi.get_fdata()
-                        atlas_idx.append(
-                            np.array(np.where(warped_roi > 0)).T)
-                    else:
-                        atlas_idx.append(None)
+                            atlas_idx.append(None)
 
-                cleaned_idx = clean_by_endpoints(
-                    select_sl,
-                    atlas_idx[0],
-                    atlas_idx[1],
-                    tol=dist_to_atlas,
-                    flip_sls=np.greater(min_dist_sl[:, 0], min_dist_sl[:, 1]))
-                cleaned_idx = list(cleaned_idx)
-                possible_fibers = possible_fibers[cleaned_idx]
+                    cleaned_idx = clean_by_endpoints(
+                        select_sl,
+                        atlas_idx[0],
+                        atlas_idx[1],
+                        tol=dist_to_atlas,
+                        flip_sls=np.greater(
+                            min_dist_sl[:, 0], min_dist_sl[:, 1]))
+                    cleaned_idx = list(cleaned_idx)
+                    possible_fibers = possible_fibers[cleaned_idx]
 
-                self.logger.info(
-                    "After filtering by endpoints, "
-                    f"{len(cleaned_idx)} streamlines")
+                    self.logger.info(
+                        "After filtering by endpoints, "
+                        f"{len(cleaned_idx)} streamlines")
 
-            removed_fibers = list(set(og_possible_fibers).difference(
-                possible_fibers))
-            if len(removed_fibers) > 0:
-                streamlines_in_bundles[
-                    removed_fibers, bundle_idx] = np.nan
-                min_dist_coords[
-                    removed_fibers, bundle_idx, :] = np.nan
+                removed_fibers = list(set(og_possible_fibers).difference(
+                    possible_fibers))
+                if len(removed_fibers) > 0:
+                    streamlines_in_bundles[
+                        removed_fibers, bundle_idx] = np.nan
+                    min_dist_coords[
+                        removed_fibers, bundle_idx, :] = np.nan
 
         # see https://github.com/joblib/joblib/issues/945
         if (
