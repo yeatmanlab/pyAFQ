@@ -217,7 +217,7 @@ bundle_info = [
 ##########################################################################
 # Now, we can define our GroupAFQ object, pointing to the derivatives of the
 # `'my_tractography'` pipeline as inputs. This is done by setting the
-# `custom_tractography_bids_filters` key-word argument. We pass the
+# `import_tract` key-word argument. We pass the
 # `bundle_info` defined above. We also point to the preprocessed
 # data that is in a `'dmriprep'` pipeline. Note that the pipeline name
 # is not necessarily the name of the folder it is in; the pipeline name is
@@ -236,7 +236,7 @@ my_afq = GroupAFQ(
     bids_path,
     preproc_pipeline='vistasoft',
     bundle_info=bundle_info,
-    custom_tractography_bids_filters={
+    import_tract={
         "suffix": "tractography",
         "scope": "my_tractography"
     },

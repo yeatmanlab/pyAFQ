@@ -1,17 +1,17 @@
 Tractography from other pipelines
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 pyAFQ can use tractography from other pipelines. To tell pyAFQ to use
-tractography from another pipeline, use the custom_tractography_bids_filters
+tractography from another pipeline, use the import_tract
 argument in the AFQ.api objects or in the configuration file. This argument expects
 a dictionary of BIDS filters. pyAFQ will use these BIDS filters to find the
 tractography for each subject in each session.
-Here is an example custom_tractography_bids_filters::
-    custom_tractography_bids_filters = {'scope': 'qsiprep', 'suffix': 'tractography'}
+Here is an example import_tract::
+    import_tract = {'scope': 'qsiprep', 'suffix': 'tractography'}
 This would look for a file with the suffix 'tractography' inside of the
 'qsiprep' pipeline. The name of the pipeline (in this case, 'qsiprep') should be
 specified in its dataset_description.json.
 
-There is an example usage of custom_tractography_bids_filters with the
+There is an example usage of import_tract with the
 :class:`AFQ.api.group.GroupAFQ` object in the 'How pyAFQ uses BIDS' example in :ref:`examples`.
 
 
