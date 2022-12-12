@@ -505,43 +505,26 @@ def test_AFQ_slr():
     """
     Test if API can run using slr map
     """
-    seed = 2023
+    seed = 2022
     random.seed(seed)
+
+    afd.read_stanford_hardi_tractography()
 
     _, bids_path, sub_path = get_temp_hardi()
     bd = BundleDict(["CST_L"])
-
-    # create rough seed mask registered to subject space
-    # this should save time in tractography
-    # cannot be mapped to subject space, because mapping
-    # requires the tractography
-    # this does not matter as this is just a smoke test
-    seed_mask_path = f"{bids_path}/my_rough_seed_mask.nii.gz"
-    dwi_img = nib.load(f"{sub_path}/sub-01_ses-01_dwi.nii.gz")
-    dwi_img = nib.Nifti1Image(
-        dwi_img.get_fdata()[..., 0],
-        affine=dwi_img.affine)
-    
-    rough_seed_mask = afd.read_resample_roi(
-            bd["CST_L"]["include"][0],
-            dwi_img)
-    nib.save(
-        rough_seed_mask,
-        seed_mask_path)
-
-    tracking_params = dict(
-        odf_model="csd",
-        seed_mask=ImageFile(path=seed_mask_path),
-        n_seeds=3)
 
     myafq = GroupAFQ(
         bids_path=bids_path,
         preproc_pipeline='vistasoft',
         reg_subject_spec='subject_sls',
         reg_template_spec='hcp_atlas',
-        tracking_params=tracking_params,
+        import_tract=op.join(
+            op.expanduser('~'),
+            'AFQ_data',
+            'stanford_hardi_tractography',
+            'full_segmented_cleaned_tractography.trk'),
         segmentation_params={
-            "dist_to_waypoint": 50,  # because of rough seed mask
+            "dist_to_waypoint": 10,
             "filter_by_endpoints": False},
         bundle_info=bd,
         mapping_definition=SlrMap(slr_kwargs={
