@@ -11,6 +11,7 @@ import toml
 import numpy as np
 import numpy.testing as npt
 import pytest
+from skimage.morphology import binary_dilation
 
 import pandas as pd
 from pandas.testing import assert_series_equal
@@ -22,8 +23,8 @@ import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 from dipy.data import get_fnames
 from dipy.testing.decorators import xvfb_it
-from AFQ.api.bundle_dict import BundleDict
 
+from AFQ.api.bundle_dict import BundleDict
 from AFQ.api.group import GroupAFQ
 from AFQ.api.participant import ParticipantAFQ
 import AFQ.data.fetch as afd
@@ -504,8 +505,7 @@ def test_AFQ_slr():
     """
     Test if API can run using slr map
     """
-    seed = 1234
-    np.random.seed(seed)
+    seed = 2022
     random.seed(seed)
 
     _, bids_path, sub_path = get_temp_hardi()
@@ -521,18 +521,18 @@ def test_AFQ_slr():
     dwi_img = nib.Nifti1Image(
         dwi_img.get_fdata()[..., 0],
         affine=dwi_img.affine)
-    nib.save(
-        afd.read_resample_roi(
+    
+    rough_seed_mask = afd.read_resample_roi(
             bd["CST_L"]["include"][0],
-            dwi_img),
+            dwi_img)
+    nib.save(
+        rough_seed_mask,
         seed_mask_path)
 
     tracking_params = dict(
         odf_model="csd",
         seed_mask=ImageFile(path=seed_mask_path),
-        n_seeds=10000,
-        random_seeds=True,
-        rng_seed=seed)
+        n_seeds=3)
 
     myafq = GroupAFQ(
         bids_path=bids_path,
@@ -541,7 +541,7 @@ def test_AFQ_slr():
         reg_template_spec='hcp_atlas',
         tracking_params=tracking_params,
         segmentation_params={
-            "dist_to_waypoint": 10,
+            "dist_to_waypoint": 50,  # because of rough seed mask
             "filter_by_endpoints": False},
         bundle_info=bd,
         mapping_definition=SlrMap(slr_kwargs={
