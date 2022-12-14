@@ -189,7 +189,7 @@ def fwdti(brain_mask, data, gtab):
     mask =\
         nib.load(brain_mask).get_fdata()
     dtf = fwdti_fit_model(
-        gtab, data,
+        data, gtab,
         mask=mask)
     meta = dict(
         Parameters=dict(
@@ -747,7 +747,7 @@ def get_data_plan(kwargs):
 
     data_tasks = with_name([
         get_data_gtab, b0, b0_mask, brain_mask,
-        dti_fit, dki_fit, anisotropic_power_map,
+        dti_fit, dki_fit, fwdti_fit, anisotropic_power_map,
         dti_fa, dti_lt, dti_cfa, dti_pdd, dti_md, dki_kt, dki_lt, dki_fa,
         fwdti_fa, fwdti_md, fwdti_fwf,
         dki_md, dki_awf, dki_mk, dti_ga, dti_rd, dti_ad, dki_ga, dki_rd,

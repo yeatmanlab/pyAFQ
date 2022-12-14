@@ -72,7 +72,7 @@ decorators would be useful. Here are descriptions of some useful decorators:
 Checklist for Adding Tasks to the pyAFQ Workflow
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This is what you must do each time you add a task to the workflow: 
+This is what you must do each time you add a task to the workflow:
 
 #. Add your task to the relevant tasks file with the pimms.calc decorator.
 
@@ -81,8 +81,8 @@ This is what you must do each time you add a task to the workflow:
 #. Add your task to the `get_{task filename}_plan` method.
 
 #. Add a docstring to describe the output, as well as any parameters that the
-user would input.
+   user would input.
 
-In most cases, you should only have to edit the tasks file which you are adding to.
-The API (:class:`AFQ.api.group.GroupAFQ`) automatically reads these files to construct its
-workflow.
+In most cases, you should only have to edit the tasks file which you are adding
+to. The API (:class:`AFQ.api.group.GroupAFQ`) automatically reads these files to
+construct its workflow.
