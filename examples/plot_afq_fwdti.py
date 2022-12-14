@@ -44,11 +44,11 @@ myafq = GroupAFQ(
 
 ##########################################################################
 
-FWFA_fname = myafq.export("fwdti_fa")["01"]
-FWFA_img = nib.load(FA_fname)
+FWFA_fname = myafq.export("fwdti_fa")["NDARAA948VFH"]
+FWFA_img = nib.load(FWFA_fname)
 FWFA = FWFA_img.get_fdata()
 
-FA_fname = myafq.export("dti_fa")["01"]
+FA_fname = myafq.export("dti_fa")["NDARAA948VFH"]
 FA_img = nib.load(FA_fname)
 FA = FA_img.get_fdata()
 
@@ -56,5 +56,5 @@ fig, ax = plt.subplots(1, 2)
 ax[0].matshow(FA[:, :, FA.shape[-1] // 2], cmap='gray')
 ax[0].axis("off")
 
-ax[0].matshow(FWFA[:, :, FWFA.shape[-1] // 2], cmap='gray')
-ax[0].axis("off")
+ax[1].matshow(FWFA[:, :, FWFA.shape[-1] // 2], cmap='gray')
+ax[1].axis("off")
