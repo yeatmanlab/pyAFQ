@@ -18,6 +18,7 @@ import numpy as np
 import pandas as pd
 import logging
 import time
+from tqdm import tqdm
 
 import warnings
 import nibabel as nib
@@ -1537,11 +1538,13 @@ def fetch_hbn_preproc(subjects, path=None):
         ses = initial_query['Contents'][0]["Key"].split('/')[5]
         query = client.list_objects(
             Bucket="fcp-indi",
-            Prefix=f"data/Projects/HBN/BIDS_curated/derivatives/qsiprep/sub-{subject}/{ses}/")  # noqa
+            Prefix=f"data/Projects/HBN/BIDS_curated/derivatives/qsiprep/sub-{subject}/")  # noqa
         file_list = [kk["Key"] for kk in query["Contents"]]
         sub_dir = op.join(base_dir, f'sub-{subject}')
         ses_dir = op.join(sub_dir, ses)
         if not os.path.exists(sub_dir):
+            os.makedirs(os.path.join(sub_dir, 'anat'), exist_ok=True)
+            os.makedirs(os.path.join(sub_dir, 'figures'), exist_ok=True)
             os.makedirs(os.path.join(ses_dir, 'dwi'), exist_ok=True)
             os.makedirs(os.path.join(ses_dir, 'anat'), exist_ok=True)
         for remote in file_list:
@@ -1549,9 +1552,12 @@ def fetch_hbn_preproc(subjects, path=None):
             local = op.join(afq_home, full)
             data_files[local] = remote
 
-    for k in data_files.keys():
-        if not op.exists(k):
-            bucket.download_file(data_files[k], k)
+    with tqdm(total=len(data_files.keys())) as pbar:
+        for k in data_files.keys():
+            pbar.set_description_str(f"Downloading {k}")
+            if not op.exists(k):
+                bucket.download_file(data_files[k], k)
+            pbar.update()
 
     # Create the BIDS dataset description file text
     hbn_acknowledgements = """ """,  # noqa
