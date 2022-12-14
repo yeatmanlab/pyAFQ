@@ -173,18 +173,8 @@ def fwdti_fit(fwdti_params, gtab):
 @as_img
 def fwdti(brain_mask, data, gtab):
     """
-    full path to a nifti file containing parameters
-    for the DTI fit
-
-    Parameters
-    ----------
-    robust_tensor_fitting : bool, optional
-        Whether to use robust_tensor_fitting when
-        doing dti. Only applies to dti.
-        Default: False
-    b0_threshold : int, optional
-        The value of b under which
-        it is considered to be b0. Default: 50.
+    Full path to a nifti file containing parameters
+    for the free-water DTI fit.
     """
     mask =\
         nib.load(brain_mask).get_fdata()
