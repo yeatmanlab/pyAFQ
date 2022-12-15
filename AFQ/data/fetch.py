@@ -1573,3 +1573,97 @@ def fetch_hbn_preproc(subjects, path=None):
                            "PipelineDescription": {'Name': 'qsiprep'}})
 
     return data_files, op.join(my_path, "HBN")
+
+
+def fetch_hbn_afq(subjects, path=None):
+    """
+    Fetches AFQ derivatives for Healthy Brain Network POD2 study [1, 2]_.
+
+    Parameters
+    ----------
+    subjects : list
+        Identifiers of the subjects to download.
+        For example: ["NDARAA112DMH", "NDARAA117NEJ"].
+    path : string, optional
+        Path to save files into. Default: '~/AFQ_data'
+
+    Returns
+    -------
+    dict with remote and local names of these files,
+    path to BIDS derivative dataset
+
+    Notes
+    -----
+
+    .. [1] Alexander LM, Escalera J, Ai L, et al. An open resource for
+        transdiagnostic research in pediatric mental health and learning
+        disorders. Sci Data. 2017;4:170181.
+
+    .. [2] Richie-Halford A, Cieslak M, Ai L, et al. An analysis-ready and
+        quality controlled resource for pediatric brain white-matter research.
+        Scientific Data. 2022;9(1):1-27.
+
+    """
+
+    s3 = boto3.resource('s3')
+    bucket = s3.Bucket("fcp-indi")
+    client = boto3.client('s3')
+    if path is None:
+        if not op.exists(afq_home):
+            os.mkdir(afq_home)
+        my_path = afq_home
+    else:
+        my_path = path
+
+    base_dir = op.join(my_path, "HBN", 'derivatives', 'afq')
+
+    if not os.path.exists(base_dir):
+        os.makedirs(base_dir, exist_ok=True)
+
+    data_files = {}
+
+    for subject in subjects:
+        initial_query = client.list_objects(
+            Bucket="fcp-indi",
+            Prefix=f"data/Projects/HBN/BIDS_curated/sub-{subject}/")
+        ses = initial_query['Contents'][0]["Key"].split('/')[5]
+        query = client.list_objects(
+            Bucket="fcp-indi",
+            Prefix=f"data/Projects/HBN/BIDS_curated/derivatives/afq/sub-{subject}/")  # noqa
+        file_list = [kk["Key"] for kk in query["Contents"]]
+        sub_dir = op.join(base_dir, f'sub-{subject}')
+        ses_dir = op.join(sub_dir, ses)
+
+        for deriv_dir in ["bundles",
+                        "clean_bundles",
+                        "ROIs",
+                        "tract_profile_plots",
+                        "viz_bundles"]:
+            this_deriv = os.path.join(ses_dir, deriv_dir)
+            if not os.path.exists(this_deriv):
+                os.makedirs(this_deriv, exist_ok=True)
+        for remote in file_list:
+            full = remote.split("Projects")[-1][1:].replace("/BIDS_curated", "")
+            local = op.join(afq_home, full)
+            data_files[local] = remote
+
+    with tqdm(total=len(data_files.keys())) as pbar:
+        for k in data_files.keys():
+            pbar.set_description_str(f"Downloading {k}")
+            if not op.exists(k):
+                bucket.download_file(data_files[k], k)
+            pbar.update()
+
+    # Create the BIDS dataset description file text
+    hbn_acknowledgements = """""",  # noqa
+    to_bids_description(op.join(my_path, "HBN"),
+                        **{"Name": "HBN",
+                           "Acknowledgements": hbn_acknowledgements,
+                           "Subjects": subjects})
+
+    # Create the BIDS derivatives description file text
+    to_bids_description(base_dir,
+                        **{"Name": "HBN",
+                           "PipelineDescription": {'Name': 'afq'}})
+
+    return data_files, op.join(my_path, "HBN")

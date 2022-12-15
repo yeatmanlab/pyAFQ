@@ -22,73 +22,37 @@ from dipy.tracking.streamline import transform_streamlines
 from fury import actor, window
 from fury.colormap import create_colormap
 
+import AFQ.data.fetch as afd
+
 #############################################################################
 # Get some data from HBN POD2
 # ----------------------------
 # The Healthy Brain Network Preprocessed Open Diffusion Derivatives (HBN POD2)
-# is a collection of resources based on the Healthy Brain Network dataset. HBN
-# POD2 includes data derivatives - including pyAFQ derivatives - from more than
-# 2,000 subjects. The data and the derivatives can be browsed at
+# is a collection of resources based on the Healthy Brain Network dataset
+# [1, 2]_. HBN POD2 includes data derivatives - including pyAFQ derivatives -
+# from more than 2,000 subjects. The data and the derivatives can be browsed at
 # https://fcp-indi.s3.amazonaws.com/index.html#data/Projects/HBN/BIDS_curated/
 #
 # Here, we will visualize the results from one subject, together with their
-# anatomy and using several variations. We start by downloading their data from
-# the FCP INDI AWS S3 bucket. We use s3fs to get the data files and save them
-# locally. We download a couple of bundles saved in trk files, as well as a
-# couple of anatomical images (FA, T1w) that we will use and visualize along the
-# way.
+# anatomy and using several variations. We start by downloading their
+# pyAFQ-processed data using fetcher functions that download both the
+# preprocessed data, as well as the pyAFQ-processed data (Note that this
+# will take up about 1.75 GB of disk space):
 
+afd.fetch_hbn_preproc(["NDARAA948VFH"])
+study_path = afd.fetch_hbn_afq(["NDARAA948VFH"])[1]
 
-fs = s3fs.S3FileSystem(anon=True)
-derivatives_path = op.join(
-    '/fcp-indi',
-    'data',
-    'Projects',
-    'HBN',
-    'BIDS_curated',
-    'derivatives')
-
+deriv_path = op.join(
+    study_path, "derivatives")
 
 afq_path = op.join(
-    derivatives_path,
+    deriv_path,
     'afq',
     'sub-NDARAA948VFH',
     'ses-HBNsiteRU')
 
 bundle_path = op.join(afq_path,
                       'clean_bundles')
-
-print("Please be patient while data is downloading from S3")
-
-fs.get(op.join(
-    bundle_path,
-    'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_space-RASMM_model-CSD_desc-prob-afq-ARC_L_tractography.trk'),
-       'ARC_L.trk')
-
-fs.get(op.join(
-    afq_path, "ROIs",
-   'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_desc-ROI-ARC_L-1-include.nii.gz'),
-       'ARC_L_ROI1.nii.gz')
-
-fs.get(op.join(
-    afq_path, "ROIs",
-   'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_desc-ROI-ARC_L-2-include.nii.gz'),
-       'ARC_L_ROI2.nii.gz')
-
-fs.get(op.join(
-    bundle_path,
-    'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_space-RASMM_model-CSD_desc-prob-afq-CST_L_tractography.trk'),
-       'CST_L.trk')
-
-fs.get(op.join(
-    afq_path,
-   'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_model-DKI_FA.nii.gz'),
-       'FA.nii.gz')
-
-fs.get(op.join(
-    derivatives_path,
-    'qsiprep/sub-NDARAA948VFH/anat/sub-NDARAA948VFH_desc-preproc_T1w.nii.gz'),
-       'T1w.nii.gz')
 
 
 #############################################################################
@@ -99,10 +63,13 @@ fs.get(op.join(
 # with the dMRI coordinates as a reference for loading the data (we could also
 # use `"same"` here).
 
-fa_img = nib.load("FA.nii.gz")
+fa_img = nib.load(op.join(afq_path,
+'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_model-DKI_FA.nii.gz'))
 fa = fa_img.get_fdata()
-sft_arc = load_trk("ARC_L.trk", fa_img)
-sft_cst = load_trk("CST_L.trk", fa_img)
+sft_arc = load_trk(op.join(bundle_path,
+     'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_space-RASMM_model-CSD_desc-prob-afq-ARC_L_tractography.trk'), fa_img)
+sft_cst = load_trk(op.join(bundle_path,
+     'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_space-RASMM_model-CSD_desc-prob-afq-CST_L_tractography.trk'), fa_img)
 
 #############################################################################
 # Transform into the T1w reference frame
@@ -115,7 +82,8 @@ sft_cst = load_trk("CST_L.trk", fa_img)
 # `nibabel documentation <https://nipy.org/nibabel/coordinate_systems.html>`_).
 
 
-t1w_img = nib.load("T1w.nii.gz")
+t1w_img = nib.load(op.join(deriv_path,
+'qsiprep/sub-NDARAA948VFH/anat/sub-NDARAA948VFH_desc-preproc_T1w.nii.gz'))
 t1w = t1w_img.get_fdata()
 sft_arc.to_rasmm()
 sft_cst.to_rasmm()
@@ -445,3 +413,15 @@ window.record(scene, out_path='arc_cst4.png', size=(2400, 2400))
 if os.environ.get("XVFB", False):
     print("Stopping XVFB")
     vdisplay.stop()
+
+#############################################################################
+# References
+# ----------
+#
+# .. [1] Alexander LM, Escalera J, Ai L, et al. An open resource for
+#     transdiagnostic research in pediatric mental health and learning
+#     disorders. Sci Data. 2017;4:170181.
+#
+# .. [2] Richie-Halford A, Cieslak M, Ai L, et al. An analysis-ready and
+#     quality controlled resource for pediatric brain white-matter research.
+#     Scientific Data. 2022;9(1):1-27.

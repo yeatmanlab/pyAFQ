@@ -170,7 +170,7 @@ for ii, bundle in enumerate(["ARC_L", "ARC_R"]):
 # .. [3] Alexander LM, Escalera J, Ai L, et al. An open resource for
 #     transdiagnostic research in pediatric mental health and learning
 #     disorders. Sci Data. 2017;4:170181.
-
+#
 # .. [4] Richie-Halford A, Cieslak M, Ai L, et al. An analysis-ready and
 #     quality controlled resource for pediatric brain white-matter research.
 #     Scientific Data. 2022;9(1):1-27.
