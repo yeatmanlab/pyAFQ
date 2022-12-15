@@ -23,6 +23,9 @@ from tqdm import tqdm
 import warnings
 import nibabel as nib
 import boto3
+from botocore import UNSIGNED
+from botocore.client import Config
+
 
 # capture templateflow resource warning and log
 default_warning_format = warnings.formatwarning
@@ -1607,7 +1610,8 @@ def fetch_hbn_afq(subjects, path=None):
 
     s3 = boto3.resource('s3')
     bucket = s3.Bucket("fcp-indi")
-    client = boto3.client('s3')
+    # Anonymous access:
+    client = boto3.client('s3', config=Config(signature_version=UNSIGNED))
     if path is None:
         if not op.exists(afq_home):
             os.mkdir(afq_home)
