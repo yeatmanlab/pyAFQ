@@ -791,7 +791,7 @@ def test_AFQ_data_waypoint():
             "dti_MD",
             "dti_GA",
             "dti_lt2",
-            "fwdti_FA"
+            "fwdti_FA",
             ImageFile(path=t1_path_other),
             TemplateImage(t1_path)],
         robust_tensor_fitting=True,
