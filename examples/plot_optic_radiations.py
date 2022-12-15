@@ -3,13 +3,12 @@
 Plotting the Optic Radiations
 =============================
 
-pyAFQ is designed to be customizable. This example shows how
-you can customize it to define a new bundle based
-on both waypoint ROIs of your design, as well as endpoint
-ROIs of your design.
+pyAFQ is designed to be customizable. This example shows how you can customize
+it to define a new bundle based on both waypoint ROIs of your design, as well as
+endpoint ROIs of your design.
 
-In these example, we run pyAFQ with both the custom ROIs and
-the default waypoint ROIs.
+In these example, we run pyAFQ with both the custom ROIs and the default
+waypoint ROIs.
 """
 
 import os.path as op
@@ -69,7 +68,7 @@ my_afq = GroupAFQ(
         afd.afq_home,
         'stanford_hardi'),
     brain_mask_definition=brain_mask_definition,
-    tracking_params={"n_seeds": 3,
+    tracking_params={"n_seeds": 4,
                      "directions": "prob",
                      "odf_model": "CSD",
                      "seed_mask": RoiImage()},
