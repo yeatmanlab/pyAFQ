@@ -1516,10 +1516,9 @@ def fetch_hbn_preproc(subjects, path=None):
         Scientific Data. 2022;9(1):1-27.
 
     """
+    # Anonymous access:
+    client = boto3.client('s3', config=Config(signature_version=UNSIGNED))
 
-    s3 = boto3.resource('s3')
-    bucket = s3.Bucket("fcp-indi")
-    client = boto3.client('s3')
     if path is None:
         if not op.exists(afq_home):
             os.mkdir(afq_home)
@@ -1559,11 +1558,11 @@ def fetch_hbn_preproc(subjects, path=None):
         for k in data_files.keys():
             pbar.set_description_str(f"Downloading {k}")
             if not op.exists(k):
-                bucket.download_file(data_files[k], k)
+                client.download_file("fcp-indi", data_files[k], k)
             pbar.update()
 
     # Create the BIDS dataset description file text
-    hbn_acknowledgements = """ """,  # noqa
+    hbn_acknowledgements = """XXX""",  # noqa
     to_bids_description(op.join(my_path, "HBN"),
                         **{"Name": "HBN",
                            "Acknowledgements": hbn_acknowledgements,
@@ -1607,17 +1606,16 @@ def fetch_hbn_afq(subjects, path=None):
         Scientific Data. 2022;9(1):1-27.
 
     """
-
-    s3 = boto3.resource('s3')
-    bucket = s3.Bucket("fcp-indi")
     # Anonymous access:
     client = boto3.client('s3', config=Config(signature_version=UNSIGNED))
+
     if path is None:
         if not op.exists(afq_home):
             os.mkdir(afq_home)
         my_path = afq_home
     else:
         my_path = path
+
 
     base_dir = op.join(my_path, "HBN", 'derivatives', 'afq')
 
@@ -1655,11 +1653,11 @@ def fetch_hbn_afq(subjects, path=None):
         for k in data_files.keys():
             pbar.set_description_str(f"Downloading {k}")
             if not op.exists(k):
-                bucket.download_file(data_files[k], k)
+                client.download_file("fcp-indi", data_files[k], k)
             pbar.update()
 
     # Create the BIDS dataset description file text
-    hbn_acknowledgements = """""",  # noqa
+    hbn_acknowledgements = """XXX""",  # noqa
     to_bids_description(op.join(my_path, "HBN"),
                         **{"Name": "HBN",
                            "Acknowledgements": hbn_acknowledgements,
