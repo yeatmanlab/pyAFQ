@@ -69,7 +69,7 @@ my_afq = GroupAFQ(
         'stanford_hardi'),
     brain_mask_definition=brain_mask_definition,
     tracking_params={"n_seeds": 4,
-                     "directions": "prob",
+                     "directions": "det",
                      "odf_model": "CSD",
                      "seed_mask": RoiImage()},
     bundle_info=bundles)
