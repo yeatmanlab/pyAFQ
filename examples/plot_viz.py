@@ -14,8 +14,6 @@ import os.path as op
 import nibabel as nib
 import numpy as np
 
-import s3fs
-
 from dipy.io.streamline import load_trk
 from dipy.tracking.streamline import transform_streamlines
 
@@ -370,8 +368,16 @@ window.record(scene, out_path='arc_cst3.png', size=(2400, 2400))
 
 from dipy.align import resample
 
-waypoint1 = nib.load("ARC_L_ROI1.nii.gz")
-waypoint2 = nib.load("ARC_L_ROI2.nii.gz")
+waypoint1 = nib.load(
+    op.join(
+        afq_path,
+        "ROIs", "sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_desc-ROI-ARC_L-1-include.nii.gz"))
+
+waypoint2 = nib.load(
+    op.join(
+        afq_path,
+        "ROIs", "sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_desc-ROI-ARC_L-1-include.nii.gz"))
+
 waypoint1_xform = resample(waypoint1, t1w_img)
 waypoint2_xform = resample(waypoint2, t1w_img)
 waypoint1_data = waypoint1_xform.get_fdata() > 0
