@@ -91,5 +91,5 @@ else:
 
 # open interactive bundle visualization
 bundle_html = my_afq.export("indiv_bundles_figures")
-bundle_figure = bundle_html["01"]["L_OR"]
+bundle_figure = bundle_html["NDARAA948VFH"]["L_OR"]
 plotly.io.show(bundle_figure)
