@@ -65,17 +65,10 @@ brain_mask_definition = ImageFile(
              'space': 'T1w',
              'scope': 'qsiprep'})
 
-mapping_definition = ItkMap(
-    warp_suffix='xfm',
-    warp_filters={'from': 'MNI152NLin2009cAsym',
-                  'to': 'T1w',
-                  'scope': 'qsiprep'})
-
 my_afq = GroupAFQ(
     bids_path=study_dir,
     preproc_pipeline="qsiprep",
     brain_mask_definition=brain_mask_definition,
-    mapping_definition=mapping_definition,
     tracking_params={"n_seeds": 4,
                      "directions": "prob",
                      "odf_model": "CSD",
