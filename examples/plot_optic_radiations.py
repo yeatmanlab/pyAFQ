@@ -73,18 +73,20 @@ mapping_definition = ItkMap(
 
 my_afq = GroupAFQ(
     bids_path=study_dir,
+    preproc_pipeline="qsiprep",
     brain_mask_definition=brain_mask_definition,
     mapping_definition=mapping_definition,
     tracking_params={"n_seeds": 4,
-                     "directions": "det",
+                     "directions": "prob",
                      "odf_model": "CSD",
                      "seed_mask": RoiImage()},
     bundle_info=bundles)
 
 my_afq.export_all()
 
-if len(aus.SegmentedSFT.fromfile(my_afq.export("clean_bundles")[
-        "01"]).get_bundle("L_OR").streamlines) > 1:
+if len(aus.SegmentedSFT.fromfile(
+    my_afq.export("clean_bundles")["NDARAA948VFH"]).get_bundle(
+        "L_OR").streamlines) > 1:
     #  create bundle montage and bundle combination
     #  across subject/session in MNI
     montages = my_afq.montage("L_OR", (1, 1), "Axial")
