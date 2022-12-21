@@ -19,10 +19,11 @@ import numpy as np
 from AFQ.api.group import GroupAFQ
 import AFQ.api.bundle_dict as abd
 import AFQ.data.fetch as afd
-from AFQ.definitions.image import LabelledImageFile, RoiImage
+from AFQ.definitions.mapping import ItkMap
+from AFQ.definitions.image import ImageFile, RoiImage
 import AFQ.utils.streamlines as aus
 
-afd.organize_stanford_data(clear_previous_afq=True)
+study_dir = afd.fetch_hbn_preproc(["NDARAA948VFH"])[1]
 
 or_rois = afd.read_or_templates()
 np.random.seed(1234)
@@ -58,16 +59,22 @@ bundles = abd.BundleDict({
 # run this line:
 #     bundles = bundles + abd.BundleDict()
 
-brain_mask_definition = LabelledImageFile(
-    suffix="seg",
-    filters={"scope": "freesurfer"},
-    exclusive_labels=[0])
+brain_mask_definition = ImageFile(
+    suffix="mask",
+    filters={'desc': 'brain',
+             'space': 'T1w',
+             'scope': 'qsiprep'})
+
+mapping_definition = ItkMap(
+    warp_suffix='xfm',
+    warp_filters={'from': 'MNI152NLin2009cAsym',
+                  'to': 'T1w',
+                  'scope': 'qsiprep'})
 
 my_afq = GroupAFQ(
-    bids_path=op.join(
-        afd.afq_home,
-        'stanford_hardi'),
+    bids_path=study_dir,
     brain_mask_definition=brain_mask_definition,
+    mapping_definition=mapping_definition,
     tracking_params={"n_seeds": 4,
                      "directions": "det",
                      "odf_model": "CSD",
