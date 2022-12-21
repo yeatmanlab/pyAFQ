@@ -68,6 +68,7 @@ brain_mask_definition = ImageFile(
 my_afq = GroupAFQ(
     bids_path=study_dir,
     preproc_pipeline="qsiprep",
+    output_dir=op.join(study_dir, "derivatives", "afq_or"),
     brain_mask_definition=brain_mask_definition,
     tracking_params={"n_seeds": 4,
                      "directions": "prob",

@@ -38,7 +38,7 @@ import pandas as pd
 # subjects in that study. The data gets organized into a BIDS-compatible
 # format in the `~/AFQ_data/HBN` folder.
 
-afd.fetch_hbn_preproc(["NDARAA948VFH"])
+study_dir = afd.fetch_hbn_preproc(["NDARAA948VFH"])[1]
 
 #############################################################################
 # Define an AFQ object
@@ -59,27 +59,28 @@ brain_mask_definition = ImageFile(
              'space': 'T1w',
              'scope': 'qsiprep'})
 
-mapping_definition=ItkMap(
-            warp_suffix='xfm',
-            warp_filters={'from': 'MNI152NLin2009cAsym',
-                          'to': 'T1w',
-                          'scope': 'qsiprep'})
+mapping_definition = ItkMap(
+    warp_suffix='xfm',
+    warp_filters={'from': 'MNI152NLin2009cAsym',
+                  'to': 'T1w',
+                  'scope': 'qsiprep'})
 
 
 bundle_names = ["ARC_L", "ARC_R"]
 bundle_dict = abd.BundleDict(bundle_names)
 
 myafq = GroupAFQ(
-    bids_path=op.join(afd.afq_home, 'HBN'),
+    bids_path=study_dir,
     preproc_pipeline='qsiprep',
+    output_dir=op.join(study_dir, "derivatives", "afq_fwdti"),
     bundle_info=bundle_dict,
     tracking_params={
         "n_seeds": 50000,
         "random_seeds": True,
         "seed_mask": RoiImage(use_waypoints=True, use_endpoints=True),
     },
-    mapping_definition = mapping_definition,
-    brain_mask_definition = brain_mask_definition,
+    mapping_definition=mapping_definition,
+    brain_mask_definition=brain_mask_definition,
     scalars=["fwdti_fa", "fwdti_md", "fwdti_fwf", "dti_fa", "dti_md"])
 
 #############################################################################
@@ -137,19 +138,19 @@ profiles = pd.read_csv(profiles_csv)
 
 fig, ax = plt.subplots(3, 2)
 for ii, bundle in enumerate(["ARC_L", "ARC_R"]):
-    ax[0, ii].plot(profiles[profiles["tractID"]== bundle]["fwdti_fa"],
+    ax[0, ii].plot(profiles[profiles["tractID"] == bundle]["fwdti_fa"],
                    label="fwDTI")
-    ax[0, ii].plot(profiles[profiles["tractID"]== bundle]["dti_fa"],
+    ax[0, ii].plot(profiles[profiles["tractID"] == bundle]["dti_fa"],
                    label="DTI")
     ax[0, ii].set_ylabel("FA")
     ax[0, ii].legend()
-    ax[1, ii].plot(profiles[profiles["tractID"]== bundle]["fwdti_md"],
+    ax[1, ii].plot(profiles[profiles["tractID"] == bundle]["fwdti_md"],
                    label="fwDTI")
-    ax[1, ii].plot(profiles[profiles["tractID"]== bundle]["dti_md"],
+    ax[1, ii].plot(profiles[profiles["tractID"] == bundle]["dti_md"],
                    label="DTI")
     ax[1, ii].set_ylabel("MD")
     ax[1, ii].legend()
-    ax[2, ii].plot(profiles[profiles["tractID"]== bundle]["fwdti_fwf"])
+    ax[2, ii].plot(profiles[profiles["tractID"] == bundle]["fwdti_fwf"])
     ax[2, ii].set_ylabel("Free water fraction")
     ax[2, ii].set_xlabel("Distance along the bundle (A => P)")
 
