@@ -31,7 +31,7 @@ import AFQ.utils.streamlines as aus
 import AFQ.utils.bin as afb
 from AFQ.definitions.image import RoiImage,\
     PFTImage, ImageFile
-from AFQ.definitions.mapping import SynMap, AffMap, SlrMap
+from AFQ.definitions.mapping import SynMap, AffMap, SlrMap, IdentityMap
 from AFQ.definitions.image import TemplateImage, ImageFile, LabelledImageFile
 
 
@@ -480,11 +480,14 @@ def test_API_type_checking():
         myafq = GroupAFQ(
             bids_path,
             preproc_pipeline='vistasoft',
-            mapping_definition=AffMap(
-                affine_kwargs={
-                    "level_iters": [1, 1],
-                    "pipeline": ["center_of_mass"]}),
-            tracking_params={"n_seeds": 10, "random_seeds": True},
+            mapping_definition=IdentityMap(),
+            tracking_params={
+                "n_seeds": 1,
+                "random_seeds": True,
+                "directions": "prob",
+                "odf_model": "CSD"},
+            csd_sh_order=2,  # reduce CSD fit time
+            csd_response=((1, 1, 1), 1),
             bundle_info=["ARC_L", "ARC_R"])
         myafq.export("bundles")
     del myafq
