@@ -138,21 +138,23 @@ my_afq.export_all()
 # of images of a particular bundle across a group of participants (or, in this
 # case, the one participant that was analyzed).
 #
-# To see whether this is doable, we first use our `SegmentedSFT` class to query
-# the "L_OR" bundle. After verifying that streamlines were found, we ask for a
-# montage with an axial view and display that. After creating the montage, we
-# can also ask for an interactive browser-based view of the bundles to be
-# displayed.
-#
 # .. note::
 #
-# The montage file is copied to the present working directory so that it gets
-# properly rendered into the web-page containing this example. It is not
-# necessary to do this when running this type of analysis.
+#   The montage file is copied to the present working directory so that it gets
+#   properly rendered into the web-page containing this example. It is not
+#   necessary to do this when running this type of analysis.
 
 my_afq.combine_bundle("L_OR")
 montage = my_afq.montage("L_OR", (1, 1), "Axial")
 shutil.copy(montage[0], op.split(montage[0])[-1])
+
+#############################################################################
+# Interactive bundle visualization
+# --------------------------------
+# Another way to examine the outputs is to export the individual bundle
+# figures, which show the streamlines, as well as the ROIs used to define the
+# bundle. This is an html file, which contains an interactive figure that can
+# be navigated, zoomed, rotated, etc.
 
 bundle_html = my_afq.export("indiv_bundles_figures")
 plotly.io.show(bundle_html["NDARAA948VFH"]["L_OR"])
