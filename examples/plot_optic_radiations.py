@@ -155,7 +155,7 @@ montage = my_afq.montage("L_OR", (1, 1), "Axial")
 shutil.copy(montage[0], op.split(montage[0])[-1])
 
 bundle_html = my_afq.export("indiv_bundles_figures")
-plotly.io.show(bundle_html["NDARAA948VFH"])
+plotly.io.show(bundle_html["NDARAA948VFH"]["L_OR"])
 
 #############################################################################
 # References
