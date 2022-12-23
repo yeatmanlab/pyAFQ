@@ -7,8 +7,8 @@ pyAFQ is designed to be customizable and extensible. This example shows how you
 can customize it to define a new bundle based on a definition of waypoint and
 endpoint ROIs of your design.
 
-In this case, we add the optic radiations, based on work by Caffara et al. [1,
-2]_. The optic radiations (OR) are the primary projection of visual information
+In this case, we add the optic radiations, based on work by Caffara et al. [1]_,
+[2]_. The optic radiations (OR) are the primary projection of visual information
 from the lateral geniculate nucleus of the thalamus to the primary visual
 cortex. Studying the optic radiations with dMRI provides a linkage between white
 matter tissue properties, visual perception and behavior, and physiological
@@ -20,9 +20,9 @@ fixing the random seed for reproducibility
 """
 
 import os.path as op
-from IPython.display import Image
 import plotly
 import numpy as np
+import shutil
 
 from AFQ.api.group import GroupAFQ
 import AFQ.api.bundle_dict as abd
@@ -36,9 +36,10 @@ np.random.seed(1234)
 # Get dMRI data
 # ---------------
 # We will analyze one subject from the Healthy Brain Network Processed Open
-# Diffusion Derivatives dataset (HBN-POD2) [3, 4]_. We'll use a fetcher to get
-# preprocessd dMRI data for one of the >2,000 subjects in that study. The data
-# gets organized into a BIDS-compatible format in the `~/AFQ_data/HBN` folder:
+# Diffusion Derivatives dataset (HBN-POD2) [3]_, [4]_. We'll use a fetcher to
+# get preprocessed dMRI data for one of the >2,000 subjects in that study. The
+# data gets organized into a BIDS-compatible format in the `~/AFQ_data/HBN`
+# folder:
 
 study_dir = afd.fetch_hbn_preproc(["NDARAA948VFH"])[1]
 
@@ -51,7 +52,7 @@ study_dir = afd.fetch_hbn_preproc(["NDARAA948VFH"])[1]
 # default template space in pyAFQ, but, in principle, other template spaces
 # could be used.
 #
-# The ROIs for th case can be downloaded using a custom fetcher, and then read
+# The ROIs for the case can be downloaded using a custom fetcher and then read
 # into a dict as follows:
 
 or_rois = afd.read_or_templates()
@@ -105,7 +106,7 @@ bundles = abd.BundleDict({
 # create a montage visualization.
 #
 # For tractography, we use CSD-based probabilistic tractography seeding
-# extensively (`n_seeds=4` means 81 seeds per voxel) but only within the ROIs
+# extensively (`n_seeds=4` means 81 seeds per voxel!), but only within the ROIs
 # and not throughout the white matter. This is controlled by passing
 # `"seed_mask": RoiImage()` in the `tracking_params` dict. The custom bundles
 # are passed as `bundle_info=bundles`. The call to `my_afq.export_all()`
@@ -137,24 +138,18 @@ my_afq.export_all()
 # of images of a particular bundle across a group of participants (or, in this
 # case, the one participant that was analyzed).
 #
-# To see whether this is doable, we first use our SegmentedSFT class to query
+# To see whether this is doable, we first use our `SegmentedSFT` class to query
 # the "L_OR" bundle. After verifying that streamlines were found, we ask for a
 # montage with an axial view and display that. After creating the montage, we
 # can also ask for an interactive browser-based view of the bundles to be
 # displayed.
 
-if len(aus.SegmentedSFT.fromfile(
-    my_afq.export("clean_bundles")["NDARAA948VFH"]).get_bundle(
-        "L_OR").streamlines) > 1:
-    montages = my_afq.montage("L_OR", (1, 1), "Axial")
-    my_afq.combine_bundle("L_OR")
-    montage_img = Image(filename=montages[0])
-else:
-    raise ValueError("No L_OR found")
+my_afq.combine_bundle("L_OR")
+montage = my_afq.montage("L_OR", (1, 1), "Axial")
+shutil.copy(montage, op.split(montage)[-1])
 
 bundle_html = my_afq.export("indiv_bundles_figures")
-bundle_figure = bundle_html["NDARAA948VFH"]["L_OR"]
-plotly.io.show(bundle_figure)
+plotly.io.show(bundle_html["NDARAA948VFH"])
 
 #############################################################################
 # References
