@@ -4,6 +4,7 @@ import os.path as op
 import shutil
 import subprocess
 import gc
+import random
 
 import toml
 
@@ -21,8 +22,8 @@ import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 from dipy.data import get_fnames
 from dipy.testing.decorators import xvfb_it
-from AFQ.api.bundle_dict import BundleDict
 
+from AFQ.api.bundle_dict import BundleDict
 from AFQ.api.group import GroupAFQ
 from AFQ.api.participant import ParticipantAFQ
 import AFQ.data.fetch as afd
@@ -30,7 +31,7 @@ import AFQ.utils.streamlines as aus
 import AFQ.utils.bin as afb
 from AFQ.definitions.image import RoiImage,\
     PFTImage, ImageFile
-from AFQ.definitions.mapping import SynMap, AffMap, SlrMap
+from AFQ.definitions.mapping import SynMap, AffMap, SlrMap, IdentityMap
 from AFQ.definitions.image import TemplateImage, ImageFile, LabelledImageFile
 
 
@@ -411,7 +412,6 @@ def test_AFQ_anisotropic():
         'sub-01_ses-01_dwi_model-CSD_desc-APM_dwi.nii.gz'))
 
 
-@pytest.mark.nightly_slr
 def test_API_type_checking():
     _, bids_path, _ = get_temp_hardi()
     np.random.seed(2022)
@@ -480,11 +480,14 @@ def test_API_type_checking():
         myafq = GroupAFQ(
             bids_path,
             preproc_pipeline='vistasoft',
-            mapping_definition=AffMap(
-                affine_kwargs={
-                    "level_iters": [1, 1],
-                    "pipeline": ["center_of_mass"]}),
-            tracking_params={"n_seeds": 1, "random_seeds": True},
+            mapping_definition=IdentityMap(),
+            tracking_params={
+                "n_seeds": 1,
+                "random_seeds": True,
+                "directions": "prob",
+                "odf_model": "CSD"},
+            csd_sh_order=2,  # reduce CSD fit time
+            csd_response=((1, 1, 1), 1),
             bundle_info=["ARC_L", "ARC_R"])
         myafq.export("bundles")
     del myafq
@@ -500,50 +503,34 @@ def test_API_type_checking():
     del myafq
 
 
-@pytest.mark.nightly_slr
 def test_AFQ_slr():
     """
     Test if API can run using slr map
     """
-    np.random.seed(2022)
+    seed = 2022
+    random.seed(seed)
+
+    afd.read_stanford_hardi_tractography()
+
     _, bids_path, sub_path = get_temp_hardi()
     bd = BundleDict(["CST_L"])
-
-    # create rough seed mask registered to subject space
-    # this should save time in tractography
-    # cannot be mapped to subject space, because mapping
-    # requires the tractography
-    # this does not matter as this is just a smoke test
-    seed_mask_path = f"{bids_path}/my_rough_seed_mask.nii.gz"
-    dwi_img = nib.load(f"{sub_path}/sub-01_ses-01_dwi.nii.gz")
-    dwi_img = nib.Nifti1Image(
-        dwi_img.get_fdata()[..., 0],
-        affine=dwi_img.affine)
-    nib.save(
-        afd.read_resample_roi(
-            bd["CST_L"]["include"][0],
-            dwi_img),
-        seed_mask_path)
-
-    tracking_params = dict(
-        odf_model="csd",
-        seed_mask=ImageFile(path=seed_mask_path),
-        n_seeds=1000,
-        random_seeds=True,
-        rng_seed=42)
 
     myafq = GroupAFQ(
         bids_path=bids_path,
         preproc_pipeline='vistasoft',
         reg_subject_spec='subject_sls',
         reg_template_spec='hcp_atlas',
-        tracking_params=tracking_params,
+        import_tract=op.join(
+            op.expanduser('~'),
+            'AFQ_data',
+            'stanford_hardi_tractography',
+            'full_segmented_cleaned_tractography.trk'),
         segmentation_params={
             "dist_to_waypoint": 10,
             "filter_by_endpoints": False},
         bundle_info=bd,
         mapping_definition=SlrMap(slr_kwargs={
-            "rng": np.random.RandomState(42)}))
+            "rng": np.random.RandomState(seed)}))
 
     seg_sft = aus.SegmentedSFT.fromfile(
         myafq.export("clean_bundles")["01"])
