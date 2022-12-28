@@ -8,6 +8,7 @@ import pimms
 
 import dipy.reconst.dki as dpy_dki
 import dipy.reconst.dti as dpy_dti
+import dipy.reconst.fwdti as dpy_fwdti
 from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
 from AFQ.definitions.image import ImageDefinition
@@ -25,6 +26,7 @@ from AFQ.models.csd import _fit as csd_fit_model
 from AFQ.models.csd import CsdNanResponseError
 from AFQ.models.dki import _fit as dki_fit_model
 from AFQ.models.dti import _fit as dti_fit_model
+from AFQ.models.fwdti import _fit as fwdti_fit_model
 
 
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
@@ -151,12 +153,42 @@ def dti(brain_mask, data, gtab,
     meta = dict(
         Parameters=dict(
             FitMethod="WLS"),
-        OutlierRejection=False,
+        OutlierRejection=robust_tensor_fitting,
         ModelURL=f"{DIPY_GH}reconst/dti.py")
     return dtf.model_params, meta
 
 
 dti_params = pimms.calc("dti_params")(dti)
+
+
+@pimms.calc("fwdti_tf")
+def fwdti_fit(fwdti_params, gtab):
+    """Free-water DTI TensorFit object"""
+    fwdti_params = nib.load(fwdti_params).get_fdata()
+    fwtm = dpy_fwdti.FreeWaterTensorModel(gtab)
+    return dpy_fwdti.FreeWaterTensorFit(fwtm, fwdti_params)
+
+
+@as_file(suffix='_model-FWDTI_desc-diffmodel_dwi.nii.gz')
+@as_img
+def fwdti(brain_mask, data, gtab):
+    """
+    Full path to a nifti file containing parameters
+    for the free-water DTI fit.
+    """
+    mask =\
+        nib.load(brain_mask).get_fdata()
+    dtf = fwdti_fit_model(
+        data, gtab,
+        mask=mask)
+    meta = dict(
+        Parameters=dict(
+            FitMethod="NLS"),
+        ModelURL=f"{DIPY_GH}reconst/fwdti.py")
+    return dtf.model_params, meta
+
+
+fwdti_params = pimms.calc("fwdti_params")(fwdti)
 
 
 @pimms.calc("dki_tf")
@@ -267,6 +299,36 @@ def anisotropic_power_map(csd_params):
     pmap = shm.anisotropic_power(sh_coeff.get_fdata())
     pmap = nib.Nifti1Image(pmap, sh_coeff.affine)
     return pmap, dict(CSDParamsFile=csd_params)
+
+
+@pimms.calc("fwdti_fa")
+@as_file(suffix='_model-FWDTI_desc-FA_dwi.nii.gz')
+@as_fit_deriv('FWDTI')
+def fwdti_fa(fwdti_tf):
+    """
+    full path to a nifti file containing the Free-water DTI fractional
+    anisotropy
+    """
+    return fwdti_tf.fa
+
+@pimms.calc("fwdti_md")
+@as_file(suffix='_model-FWDTI_desc-MD_dwi.nii.gz')
+@as_fit_deriv('FWDTI')
+def fwdti_md(fwdti_tf):
+    """
+    full path to a nifti file containing the Free-water DTI mean diffusivity
+    """
+    return fwdti_tf.md
+
+
+@pimms.calc("fwdti_fwf")
+@as_file(suffix='_model-FWDTI_desc-FWF_dwi.nii.gz')
+@as_fit_deriv('FWDTI')
+def fwdti_fwf(fwdti_tf):
+    """
+    full path to a nifti file containing the Free-water DTI free water fraction
+    """
+    return fwdti_tf.f
 
 
 @pimms.calc("dti_fa")
@@ -675,11 +737,12 @@ def get_data_plan(kwargs):
 
     data_tasks = with_name([
         get_data_gtab, b0, b0_mask, brain_mask,
-        dti_fit, dki_fit, anisotropic_power_map,
+        dti_fit, dki_fit, fwdti_fit, anisotropic_power_map,
         dti_fa, dti_lt, dti_cfa, dti_pdd, dti_md, dki_kt, dki_lt, dki_fa,
+        fwdti_fa, fwdti_md, fwdti_fwf,
         dki_md, dki_awf, dki_mk, dti_ga, dti_rd, dti_ad, dki_ga, dki_rd,
-        dki_ad, dki_rk, dki_ak, dti_params, dki_params, csd_params,
-        get_bundle_dict])
+        dki_ad, dki_rk, dki_ak, dti_params, dki_params, fwdti_params,
+        csd_params, get_bundle_dict])
 
     if "scalars" not in kwargs:
         kwargs["scalars"] = ["dti_fa", "dti_md"]

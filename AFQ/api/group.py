@@ -734,7 +734,7 @@ class GroupAFQ(object):
             if mapping_definition is not None and not isinstance(
                     mapping_definition, SynMap):
                 raise NotImplementedError((
-                    "combine_bundle not implemented for mapping_definition"
+                    "combine_bundle not implemented for mapping_definition "
                     "other than SynMap"))
 
         reg_template = self.export("reg_template", collapse=False)[

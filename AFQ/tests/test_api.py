@@ -679,9 +679,9 @@ def test_AFQ_FA():
 
 
 @pytest.mark.nightly
-def test_DKI_profile():
+def test_multib_profile():
     """
-    Test using API to profile dki
+    Test using API to profile DKI/fwDTI
     """
     tmpdir = nbtmp.InTemporaryDirectory()
     afd.organize_cfin_data(path=tmpdir.name)
@@ -689,6 +689,8 @@ def test_DKI_profile():
                     preproc_pipeline='dipy')
     myafq.export("dki_fa")
     myafq.export("dki_md")
+    myafq.export("fwdti_fa")
+    myafq.export("fwdti_md")
 
 
 def test_auto_cli():
