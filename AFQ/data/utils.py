@@ -1,3 +1,5 @@
+import json
+
 BUNDLE_RECO_2_AFQ = \
     {
         "AF_L": "ARC_L", "AF_R": "ARC_R",
