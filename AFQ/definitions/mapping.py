@@ -7,7 +7,7 @@ import os.path as op
 from AFQ.definitions.utils import Definition, find_file
 from dipy.align import syn_registration, affine_registration
 import AFQ.registration as reg
-import AFQ.data.s3bids as afs
+from AFQ.data.utils import write_json
 from AFQ.tasks.utils import get_fname
 
 from dipy.align.imaffine import AffineMap
@@ -320,7 +320,7 @@ class GeneratedMapMixin(object):
             np.save(prealign_file, aff)
             meta_fname = get_fname(
                 base_fname, f'{prealign_file_desc}.json')
-            afs.write_json(meta_fname, meta)
+            write_json(meta_fname, meta)
         return prealign_file if save else np.load(prealign_file)
 
     def get_for_subses(self, base_fname, dwi, bids_info, reg_subject,
@@ -350,7 +350,7 @@ class GeneratedMapMixin(object):
                 meta["dependent"] = "dwi"
             else:
                 meta["dependent"] = "trk"
-            afs.write_json(meta_fname, meta)
+            write_json(meta_fname, meta)
         reg_prealign_inv = np.linalg.inv(reg_prealign) if self.use_prealign\
             else None
         mapping = reg.read_mapping(

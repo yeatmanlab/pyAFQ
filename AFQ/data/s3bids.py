@@ -1222,44 +1222,6 @@ def s3fs_nifti_read(fname, fs=None, anon=False):
     return img
 
 
-def write_json(fname, data):
-    """
-    Write data to JSON file.
-
-    Parameters
-    ----------
-    fname : str
-        Full path to the file to write.
-
-    data : dict
-        A dict containing the data to write.
-
-    Returns
-    -------
-    None
-    """
-    with open(fname, 'w') as ff:
-        json.dump(data, ff, default=lambda obj: "Not Serializable")
-
-
-def read_json(fname):
-    """
-    Read data from a JSON file.
-
-    Parameters
-    ----------
-    fname : str
-        Full path to the data-containing file
-
-    Returns
-    -------
-    dict
-    """
-    with open(fname, 'r') as ff:
-        out = json.load(ff)
-    return out
-
-
 def s3fs_json_read(fname, fs=None, anon=False):
     """
     Reads json directly from S3
