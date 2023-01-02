@@ -24,9 +24,10 @@ from bids import BIDSLayout
 from AFQ.data.fetch import to_bids_description
 
 import warnings
-msg = "The `s3bids` module will be deprecated "
+msg = "The `s3bids` module will be removed "
 msg += " in a future version of pyAFQ."
 warnings.warn(msg, DeprecationWarning, stacklevel=2)
+
 
 # +----------------------------------------------------+
 # | Begin S3BIDSStudy classes and supporting functions |
