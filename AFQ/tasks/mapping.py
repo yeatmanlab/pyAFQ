@@ -266,7 +266,7 @@ def get_mapping_plan(kwargs, use_sls=False):
             mapping_tasks[f"{scalar.get_name()}_res"] =\
                 pimms.calc(f"{scalar.get_name()}")(
                     as_file((
-                        f'desc-{str_to_desc(scalar.get_name())}'
+                        f'_desc-{str_to_desc(scalar.get_name())}'
                         '_dwi.nii.gz'))(
                             scalar.get_image_getter("mapping")))
 
