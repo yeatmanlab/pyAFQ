@@ -24,14 +24,40 @@ from bids import BIDSLayout
 from AFQ.data.fetch import to_bids_description
 
 import warnings
-msg = "The `s3bids` module will be removed "
-msg += " in a future version of pyAFQ."
-warnings.warn(msg, DeprecationWarning, stacklevel=2)
+import functools
+
+
+# +---------------------+
+# | Deprecation helpers |
+# +---------------------+
+def deprecate_function(func):
+    @functools.wraps(func)
+    def new_func(*args, **kwargs):
+        msg = f"The function {func.__name__} is part of the "
+        msg += "AFQ.data.s3bids module, which will be removed "
+        msg += "in version 2.0 of pyAFQ."
+        warnings.warn(msg, DeprecationWarning, stacklevel=2)
+        return func(*args, **kwargs)
+
+    return new_func
+
+
+def deprecate_class(klass):
+    class new_klass(klass):
+        def __init__(self, *args, **kwargs):
+            msg = f"The class {klass.__name__} is part of the "
+            msg += "AFQ.data.s3bids module, which will be removed "
+            msg += "in version 2.0 of pyAFQ."
+            warnings.warn(msg, DeprecationWarning, stacklevel=2)
+
+            return klass.__init__(*args, **kwargs)
+    return new_klass
 
 
 # +----------------------------------------------------+
 # | Begin S3BIDSStudy classes and supporting functions |
 # +----------------------------------------------------+
+@deprecate_function
 def get_s3_client(anon=True):
     """Return a boto3 s3 client
 
@@ -197,6 +223,7 @@ def _download_from_s3(fname, bucket, key, overwrite=False, anon=True):
         fs.get("/".join([bucket, key]), fname)
 
 
+@deprecate_class
 class S3BIDSSubject:
     """A single study subject hosted on AWS S3"""
 
@@ -446,6 +473,7 @@ class S3BIDSSubject:
             progress.close()
 
 
+@deprecate_class
 class HBNSubject(S3BIDSSubject):
     """A subject in the HBN study
 
@@ -529,6 +557,7 @@ class HBNSubject(S3BIDSSubject):
         self._s3_keys = s3_keys
 
 
+@deprecate_class
 class S3BIDSStudy:
     """A BIDS-compliant study hosted on AWS S3"""
 
@@ -957,6 +986,7 @@ class S3BIDSStudy:
         compute(*results, scheduler='threads')
 
 
+@deprecate_class
 class HBNSite(S3BIDSStudy):
     """An HBN study site
 
@@ -1188,6 +1218,7 @@ def s3fs_nifti_write(img, fname, fs=None):
         ff.write(data)
 
 
+@deprecate_function
 def s3fs_nifti_read(fname, fs=None, anon=False):
     """
     Lazily reads a nifti image from S3.
@@ -1226,6 +1257,7 @@ def s3fs_nifti_read(fname, fs=None, anon=False):
     return img
 
 
+@deprecate_function
 def s3fs_json_read(fname, fs=None, anon=False):
     """
     Reads json directly from S3
@@ -1249,6 +1281,7 @@ def s3fs_json_read(fname, fs=None, anon=False):
     return data
 
 
+@deprecate_function
 def s3fs_json_write(data, fname, fs=None):
     """
     Writes json from a dict directly into S3
