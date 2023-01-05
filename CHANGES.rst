@@ -1,3 +1,46 @@
+1.0 (January 05, 2023)
+======================
+This is the first major release of pyAFQ. The API should be stable
+from here until the next major release of pyAFQ.
+Adds freewater DTI, fiber density maps, VOF and pAF bundles,
+and montage and combine bundle visualizations, as well as other
+minor additions, fixes, and documentation updates.
+  * [FIX] Missing underscore in custom tissue property filenames (#944)
+  * [FIX] finally finish this SLR PR (#937)
+  * Add fwDTI (#931)
+  * [FIX] Import tract docs (#936)
+  * TST: Fixes another failing nightly test by setting the seed. (#932)
+  * DOC: Fix the random seed for the OR example. (#930)
+  * TST: Fix a random seed for this test. (#929)
+  * [FIX] don't resample subject-space ROIs unless user provides something (#919)
+  * [ENH] Density task (#900)
+  * Increase inclusion tolerance for pAF; add suffix for cmd_outputs (#921)
+  * [DOC] add interactive bundle viz to OR example (#861)
+  * [ENH] Allow pediatric bundledict and template to be accessed from config file. (#923)
+  * [FIX] Some pediatric bundle dict fixes (#922)
+  * DOC: Adds an example of visualizations using FURY. (#910)
+  * [FIX] put afq_metadata.toml in the correct spot (#913)
+  * [FIX] Updating DIPY tracking params (#911)
+  * [ENH] VOF endpoints don't include pAF endpoints (#912)
+  * DOC: Document S3BIDS access examples. (#909)
+  * [FIX] correctly calculate min / max sl length, update step_size docs (#905)
+  * Added streamline filtering by primary orientation; other bundle definition fixes (#898)
+  * [FIX] cmd output only run on our files (#881)
+  * Set logger levels to INFO (#867)
+  * [DOC] add pyafq overview desciption (#875)
+  * Fix nightly tests (#873)
+  * Upgrade pybids. (#869)
+  * [ENH] Apply arbitrary command to some/all pyAFQ outputs, more BIDSy names (#853)
+  * [FIX] only calc subject registration images when necessary (#862)
+  * RF: Removes key-word argument that is not being used. (#868)
+  * ENH: add DKI kurtosis fit elements as scalars (#865)
+  * ENH: add lower triangular scalars from DTI (could be useful for ML)? (#863)
+  * FIX: Reorder endpoint (#858)
+  * [FIX] Some ITK map fixes for running with groupAFQ and in CLI (#855)
+  * [ENH] Add montage and combine bundle to GroupAFQ (#849)
+  * [DOC] add fatal error when no bundles found at all (#851)
+  * [ENH] add median bundle len function (#852)
+
 0.12.2 (July 21, 2022)
 ======================
 This release fixes a critical bug introduced in version 0.11, which
