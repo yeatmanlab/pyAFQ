@@ -15,7 +15,7 @@ from AFQ.tasks.tractography import get_tractography_plan
 from AFQ.tasks.segmentation import get_segmentation_plan
 from AFQ.tasks.viz import get_viz_plan
 from AFQ.utils.path import drop_extension
-from AFQ.data.s3bids import read_json
+from AFQ.data.utils import read_json
 
 
 __all__ = ["ParticipantAFQ"]

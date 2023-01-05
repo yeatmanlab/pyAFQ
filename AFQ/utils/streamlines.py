@@ -2,7 +2,7 @@ import gc
 from dipy.io.streamline import load_tractogram
 import numpy as np
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
-from AFQ.data.s3bids import read_json
+from AFQ.data.utils import read_json
 import os.path as op
 
 from AFQ.utils.path import drop_extension
