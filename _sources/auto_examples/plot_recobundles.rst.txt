@@ -275,8 +275,6 @@ the AFQ waypoint ROI approach.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Calculating DTI...
@@ -291,18 +289,18 @@ the AFQ waypoint ROI approach.
     Optimizing level 1 [max iter: 1000]
     Optimizing level 0 [max iter: 100]
     Tracking...
-    16383
+    13823
     Segmenting fiber groups...
-    CST_L 73
-    CST_R 192
+    CST_L 60
+    CST_R 165
     UF_L 14
     UF_R 6
-    CC_ForcepsMajor 224
-    CC_ForcepsMinor 702
+    CC_ForcepsMajor 292
+    CC_ForcepsMinor 724
     OR_L 21
-    OR_R 11
-    VOF_L 132
-    VOF_R 79
+    OR_R 14
+    VOF_L 128
+    VOF_R 80
     Extracting tract profiles...
 
 
@@ -322,28 +320,23 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 17 minutes  16.868 seconds)
+   **Total running time of the script:** ( 17 minutes  23.067 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_recobundles.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_recobundles.py <plot_recobundles.py>`
 
-     :download:`Download Python source code: plot_recobundles.py <plot_recobundles.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_recobundles.ipynb <plot_recobundles.ipynb>`
+      :download:`Download Jupyter notebook: plot_recobundles.ipynb <plot_recobundles.ipynb>`
 
 
 .. only:: html

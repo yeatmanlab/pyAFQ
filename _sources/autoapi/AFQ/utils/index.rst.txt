@@ -3,28 +3,6 @@
 
 .. py:module:: AFQ.utils
 
-.. autoapi-nested-parse::
-
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
 
 Submodules
 ----------
@@ -33,6 +11,7 @@ Submodules
    :maxdepth: 1
 
    bin/index.rst
+   docs/index.rst
    models/index.rst
    path/index.rst
    stats/index.rst

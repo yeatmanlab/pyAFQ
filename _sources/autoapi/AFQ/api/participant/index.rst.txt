@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.api.participant
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------
@@ -27,26 +21,15 @@ Classes
 
    Bases: :py:obj:`object`
 
-   
+   .. py:attribute:: clobber
+      
+
+      
+
+   .. py:method:: make_workflow()
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-   .. py:method:: export(self, attr_name='help')
+   .. py:method:: export(attr_name='help')
 
       
       Export a specific output. To print a list of available outputs,
@@ -78,11 +61,40 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: export_all(self, viz=True, xforms=True, indiv=True)
+   .. py:method:: export_all(viz=True, xforms=True, indiv=True)
+
+
+   .. py:method:: cmd_outputs(cmd='rm', dependent_on=None, exceptions=[], suffix='')
 
       
+      Perform some command some or all outputs of pyafq.
+      This is useful if you change a parameter and need
+      to recalculate derivatives that depend on it.
+      Some examples: cp, mv, rm .
+      -r will be automtically added when necessary.
 
 
+      :Parameters:
+
+          **cmd** : str
+              Command to run on outputs. Default: 'rm'
+
+          **dependent_on** : str or None
+              Which derivatives to perform command on .
+              If None, perform on all.
+              If "track", perform on all derivatives that depend on the
+              tractography.
+              If "recog", perform on all derivatives that depend on the
+              bundle recognition.
+              Default: None
+
+          **exceptions** : list of str
+              Name outputs that the command should not be applied to.
+              Default: []
+
+          **suffix** : str
+              Parts of command that are used after the filename.
+              Default: ""
 
 
 

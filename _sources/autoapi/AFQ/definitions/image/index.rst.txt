@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.definitions.image
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------
@@ -80,137 +74,23 @@ Classes
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
+   .. py:method:: find_path(bids_layout, from_path, subject, session)
 
-      
 
+   .. py:method:: get_path_data_affine(bids_info)
 
 
+   .. py:method:: apply_conditions(image_data_orig, image_file)
 
 
+   .. py:method:: get_name()
 
 
+   .. py:method:: get_image_getter(task_name)
 
 
+   .. py:method:: get_image_direct(dwi, bids_info, b0_file, data_imap=None)
 
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_path_data_affine(self, bids_info)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: apply_conditions(self, image_data_orig, image_file)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_name(self)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_image_getter(self, task_name)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_image_direct(self, dwi, bids_info, b0_file, data_imap=None)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
 
 
 .. py:class:: FullImage
@@ -240,96 +120,20 @@ Classes
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
+   .. py:method:: find_path(bids_layout, from_path, subject, session)
 
-      
 
+   .. py:method:: get_name()
 
 
+   .. py:method:: get_image_getter(task_name)
 
 
+   .. py:method:: get_image_direct(dwi, bids_info, b0_file, data_imap=None)
 
 
 
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_name(self)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_image_getter(self, task_name)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_image_direct(self, dwi, bids_info, b0_file, data_imap=None)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-
-.. py:class:: RoiImage(use_presegment=False, use_endpoints=False)
+.. py:class:: RoiImage(use_waypoints=True, use_presegment=False, use_endpoints=False)
 
    Bases: :py:obj:`ImageDefinition`
 
@@ -366,93 +170,17 @@ Classes
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
+   .. py:method:: find_path(bids_layout, from_path, subject, session)
 
-      
 
+   .. py:method:: get_name()
 
 
+   .. py:method:: get_image_getter(task_name)
 
 
+   .. py:method:: get_image_direct(dwi, bids_info, b0_file, data_imap=None)
 
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_name(self)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_image_getter(self, task_name)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_image_direct(self, dwi, bids_info, b0_file, data_imap=None)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
 
 
 .. py:class:: B0Image(median_otsu_kwargs={})
@@ -488,93 +216,17 @@ Classes
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
+   .. py:method:: find_path(bids_layout, from_path, subject, session)
 
-      
 
+   .. py:method:: get_name()
 
 
+   .. py:method:: get_image_getter(task_name)
 
 
+   .. py:method:: get_image_direct(dwi, bids_info, b0_file, data_imap=None)
 
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_name(self)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_image_getter(self, task_name)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_image_direct(self, dwi, bids_info, b0_file, data_imap=None)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
 
 
 .. py:class:: LabelledImageFile(path=None, suffix=None, filters={}, inclusive_labels=None, exclusive_labels=None, combine='or')
@@ -640,27 +292,8 @@ Classes
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: apply_conditions(self, image_data_orig, image_file)
+   .. py:method:: apply_conditions(image_data_orig, image_file)
 
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
 
 
 .. py:class:: ThresholdedImageFile(path=None, suffix=None, filters={}, lower_bound=None, upper_bound=None, combine='and')
@@ -727,27 +360,8 @@ Classes
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: apply_conditions(self, image_data_orig, image_file)
+   .. py:method:: apply_conditions(image_data_orig, image_file)
 
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
 
 
 .. py:class:: ScalarImage(scalar)
@@ -790,93 +404,17 @@ Classes
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
+   .. py:method:: find_path(bids_layout, from_path, subject, session)
 
-      
 
+   .. py:method:: get_name()
 
 
+   .. py:method:: get_image_getter(task_name)
 
 
+   .. py:method:: get_image_direct(dwi, bids_info, b0_file, data_imap=None)
 
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_name(self)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_image_getter(self, task_name)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_image_direct(self, dwi, bids_info, b0_file, data_imap=None)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
 
 
 .. py:class:: ThresholdedScalarImage(scalar, lower_bound=None, upper_bound=None, combine='and')
@@ -968,92 +506,16 @@ Classes
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
+   .. py:method:: find_path(bids_layout, from_path, subject, session)
 
-      
 
+   .. py:method:: get_name()
 
 
+   .. py:method:: get_image_getter(task_name)
 
 
+   .. py:method:: get_image_direct(dwi, bids_info, b0_file, data_imap=None)
 
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_name(self)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_image_getter(self, task_name)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_image_direct(self, dwi, bids_info, b0_file, data_imap=None)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
 
 

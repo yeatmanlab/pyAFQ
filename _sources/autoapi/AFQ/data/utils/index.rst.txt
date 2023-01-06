@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.data.utils
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------
@@ -18,44 +12,8 @@ Module Contents
 
    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
 .. py:data:: BUNDLE_MAT_2_PYTHON
    
 
    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 

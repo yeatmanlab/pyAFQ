@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.tasks.mapping
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------
@@ -41,24 +35,6 @@ Attributes
    
 
    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:function:: export_registered_b0(data_imap, mapping)
 
@@ -232,23 +208,4 @@ Attributes
 
 .. py:function:: get_mapping_plan(kwargs, use_sls=False)
 
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 

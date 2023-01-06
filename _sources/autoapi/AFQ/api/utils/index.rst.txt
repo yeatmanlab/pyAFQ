@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.api.utils
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------
@@ -18,90 +12,18 @@ Module Contents
 
    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
 .. py:data:: kwargs_descriptors
    
 
    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:data:: AFQclass_doc
    :annotation: = Here are the arguments you can pass to kwargs, to customize the tractometry pipeline. They are...
 
    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
 .. py:data:: AFQclass_doc
    
 
    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 

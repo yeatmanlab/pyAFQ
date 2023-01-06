@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.models.dti
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------

@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.utils.volume
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------
@@ -38,24 +32,6 @@ Attributes
    
 
    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:function:: transform_inverse_roi(roi, mapping, bundle_name='ROI')
 
@@ -141,7 +117,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: density_map(tractogram, n_sls=None, to_vox=False, normalize=False)
+.. py:function:: density_map(tractogram, n_sls=None, normalize=False)
 
    
    Create a streamline density map.
@@ -159,11 +135,6 @@ Attributes
            n_sls to randomly select to make the density map.
            If None, all streamlines are used.
            Default: None
-
-       **to_vox** : bool, optional
-           Whether to put the stateful tractogram in VOX space before making
-           the density map.
-           Default: False
 
        **normalize** : bool, optional
            Whether to normalize maximum values to 1.

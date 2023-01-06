@@ -121,14 +121,14 @@ See an example configuration file below::
     # we will stop only at the edge of the image).
     stop_threshold = 0
     
-    # The size (in mm) of a step of tractography. Default: 0.5
+    # The size of a step (in mm) of tractography. Default: 0.5
     step_size = 0.5
     
-    # The miminal length (mm) in a streamline. Default: 10
-    min_length = 10
+    # The miminal length (mm) in a streamline. Default: 20
+    min_length = 50
     
-    # The miminal length (mm) in a streamline. Default: 1000
-    max_length = 1000
+    # The miminal length (mm) in a streamline. Default: 250
+    max_length = 250
     
     # One of {"DTI", "CSD", "DKI"}. Defaults to use "DTI"
     odf_model = "CSD"
@@ -297,8 +297,8 @@ See an example configuration file below::
     clean_rounds = 5
     
     # Threshold of cleaning based on the Mahalanobis distance (the units are
-    # standard deviations). Default: 5.
-    distance_threshold = 5
+    # standard deviations). Default: 3.
+    distance_threshold = 3
     
     # Threshold for cleaning based on length (in standard deviations). Length
     # of any streamline should not be *more* than this number of stdevs from
@@ -446,7 +446,8 @@ See an example configuration file below::
     [TRACTOGRAPHY]
     
     # BIDS filters for inputing a user made tractography file,
-    # or a path to the tractography file.
+    # or a path to the tractography file. If None, DIPY is used
+    # to generate the tractography.
     # Default: None
     import_tract = ""
     

@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.tasks.segmentation
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------
@@ -23,6 +17,8 @@ Functions
    AFQ.tasks.segmentation.clean_bundles
    AFQ.tasks.segmentation.export_bundles
    AFQ.tasks.segmentation.export_sl_counts
+   AFQ.tasks.segmentation.export_bundle_lengths
+   AFQ.tasks.segmentation.export_density_maps
    AFQ.tasks.segmentation.tract_profiles
    AFQ.tasks.segmentation.get_scalar_dict
    AFQ.tasks.segmentation.get_segmentation_plan
@@ -41,24 +37,6 @@ Attributes
    
 
    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:function:: segment(dwi, data_imap, mapping_imap, tractography_imap, segmentation_params)
 
@@ -168,6 +146,53 @@ Attributes
    ..
        !! processed by numpydoc !!
 
+.. py:function:: export_bundle_lengths(data_imap, clean_bundles, bundles)
+
+   
+   full path to a JSON file containing median bundle lengths
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: export_density_maps(clean_bundles, dwi, data_imap)
+
+   
+   full path to 4d nifti file containing streamline counts per voxel
+   per bundle, where the 4th dimension encodes the bundle
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
 .. py:function:: tract_profiles(clean_bundles, data_imap, scalar_dict, dwi_affine, profile_weights='gauss')
 
    
@@ -234,23 +259,4 @@ Attributes
 
 .. py:function:: get_segmentation_plan(kwargs)
 
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 

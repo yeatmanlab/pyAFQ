@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.api.bundle_dict
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------
@@ -24,30 +18,11 @@ Classes
 
 
 
-.. py:class:: BundleDict(bundle_info=BUNDLES, seg_algo='afq', resample_to=None, resample_subject_to=None, keep_in_memory=False)
+.. py:class:: BundleDict(bundle_info=BUNDLES, seg_algo='afq', resample_to=None, resample_subject_to=False, keep_in_memory=False)
 
    Bases: :py:obj:`collections.abc.MutableMapping`
 
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-   .. py:method:: load_templates(self)
+   .. py:method:: load_templates()
 
       
       Loads templates for generating bundle dictionaries
@@ -71,7 +46,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: _gen(self, bundle_name)
+   .. py:method:: _gen(bundle_name)
 
       
       Given a bundle name, load its
@@ -95,7 +70,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: gen_all(self)
+   .. py:method:: gen_all()
 
       
       If bundle_info is a list of names, this will load
@@ -119,117 +94,22 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: __getitem__(self, key)
+   .. py:method:: __getitem__(key)
 
-      
 
+   .. py:method:: __setitem__(key, item)
 
 
+   .. py:method:: __len__()
 
 
+   .. py:method:: __delitem__(key)
 
 
+   .. py:method:: __iter__()
 
 
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: __setitem__(self, key, item)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: __len__(self)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: __delitem__(self, key)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: __iter__(self)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: copy(self)
+   .. py:method:: copy()
 
       
       Generates a copy of this BundleDict where the internal dictionary
@@ -259,7 +139,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: apply_to_rois(self, b_name, func, *args, **kwargs)
+   .. py:method:: apply_to_rois(b_name, func, *args, **kwargs)
 
       
       Applies some transformation to all ROIs (include, exclude, end, start)
@@ -301,7 +181,7 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: _resample_roi(self, b_name)
+   .. py:method:: _resample_roi(b_name)
 
       
       Given a bundle name, resample all ROIs and prob maps
@@ -330,53 +210,15 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: __add__(self, other)
-
-      
+   .. py:method:: __add__(other)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-
-.. py:class:: PediatricBundleDict(bundle_info=PEDIATRIC_BUNDLES, seg_algo='afq', resample_to=None, resample_subject_to=None, keep_in_memory=False)
+.. py:class:: PediatricBundleDict(bundle_info=PEDIATRIC_BUNDLES, seg_algo='afq', resample_to=None, resample_subject_to=False, keep_in_memory=False)
 
    Bases: :py:obj:`BundleDict`
 
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-   .. py:method:: load_templates(self)
+   .. py:method:: load_templates()
 
       
       Loads templates for generating bundle dictionaries

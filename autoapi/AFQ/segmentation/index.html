@@ -5,23 +5,25 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.segmentation &#8212; AFQ 0.12.1 documentation</title>
-<script>
-  document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-  document.documentElement.dataset.theme = localStorage.getItem("theme") || "light"
-</script>
-
+    <title>AFQ.segmentation &#8212; AFQ 1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=92025949c220c2e29695" rel="stylesheet">
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+  <link href="../../../_static/styles/theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../../../_static/styles/bootstrap.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
 
-
-  <link rel="stylesheet"
-    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2">
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
@@ -30,33 +32,59 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
-
+  
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695">
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'autoapi/AFQ/segmentation/index';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="AFQ.tractography" href="../tractography/index.html" />
     <link rel="prev" title="AFQ.registration" href="../registration/index.html" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="docsearch:language" content="en">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
   </head>
   
   
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
-    <div class="bd-header-announcement container-fluid" id="banner">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
       
-
+<form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
     </div>
+  </div>
 
-    
-    <nav class="bd-header navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="bd-header__inner container-xl">
-
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fa-solid fa-bars"></span>
+  </label>
   <div id="navbar-start">
     
     
@@ -64,9 +92,15 @@
 
 
 <a class="navbar-brand logo" href="../../../index.html">
+
   
   
   
+  
+  
+  
+  
+
   
     <img src="../../../_static/logo.png" class="logo__image only-light" alt="Logo image">
     <img src="../../../_static/logo.png" class="logo__image only-dark" alt="Logo image">
@@ -76,86 +110,108 @@
     
   </div>
 
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="fas fa-bars"></span>
-  </button>
-
   
-  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+  <div class="col-lg-9 navbar-header-items">
     <div id="navbar-center" class="mr-auto">
       
       <div class="navbar-center-item">
-        <ul id="navbar-main-elements" class="navbar-nav">
-    <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../../installation_guide.html">
-  Installing
-  <code class="docutils literal notranslate">
-   <span class="pre">
-    pyAFQ
-   </span>
-  </code>
- </a>
-</li>
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation_guide.html">
+                        Installing pyAFQ
+                      </a>
+                    </li>
+                
 
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../../usage/index.html">
-  Using pyAFQ
- </a>
-</li>
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../usage/index.html">
+                        Using pyAFQ
+                      </a>
+                    </li>
+                
 
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../../auto_examples/index.html">
-  Examples
- </a>
-</li>
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../auto_examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
 
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../../getting_help.html">
-  Getting help using pyAFQ
- </a>
-</li>
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../getting_help.html">
+                        Getting help using pyAFQ
+                      </a>
+                    </li>
+                
 
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../../contributing.html">
-  Contributing to pyAFQ
- </a>
-</li>
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../contributing.html">
+                        Contributing to pyAFQ
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../../index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
 
-<li class="toctree-l1 current active nav-item">
- <a class="reference internal nav-link" href="../../index.html">
-  API Reference
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../../developing/index.html">
-  Developing
-  <cite>
-   pyAFQ
-  </cite>
- </a>
-</li>
-
-    
-</ul>
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../developing/index.html">
+                        Developing pyAFQ
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
       </div>
       
     </div>
 
     <div id="navbar-end">
       
+        <div class="navbar-end-item navbar-persistent--container">
+          
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+        </div>
+      
+      
       <div class="navbar-end-item">
-        <span id="theme-switch" class="btn btn-sm btn-outline-primary navbar-btn rounded-circle">
-    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
-    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
-    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
-</span>
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
       </div>
       
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/yeatmanlab/pyAFQ" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fab fa-github-square"></i></span>
             <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
@@ -163,470 +219,576 @@
       
     </div>
   </div>
+
+
+  
+  
+    <div class="navbar-persistent--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+    </div>
+  
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+  </label>
+  
+
 </div>
-    </nav>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation_guide.html">
+                        Installing pyAFQ
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../usage/index.html">
+                        Using pyAFQ
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../auto_examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../getting_help.html">
+                        Getting help using pyAFQ
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../contributing.html">
+                        Contributing to pyAFQ
+                      </a>
+                    </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../../index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../developing/index.html">
+                        Developing pyAFQ
+                      </a>
+                    </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
+      </div>
+      
+      </div>
     
 
-    <div class="bd-container container-xl">
-      <div class="bd-container__inner row">
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
           
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
 
-<!-- Only show if we have sidebars configured, else just a small margin  -->
-<div class="bd-sidebar-primary col-12 col-md-3 bd-sidebar">
-  <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
-</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
-  <div class="bd-toc-item active">
+  
+  <div class="sidebar-start-items sidebar-primary__section">
+    <div class="sidebar-start-items__item">
+<form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+    <div class="sidebar-start-items__item"><nav class="bd-links" id="bd-docs-nav" aria-label="Section navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">
+    Section Navigation
+  </p>
+  <div class="bd-toc-item navbar-nav">
     <ul class="current nav bd-sidenav">
- <li class="toctree-l1 current active has-children">
-  <a class="reference internal" href="../index.html">
-   <code class="xref py py-mod docutils literal notranslate">
-    <span class="pre">
-     AFQ
-    </span>
-   </code>
-  </a>
-  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
-  <label for="toctree-checkbox-1">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul class="current">
-   <li class="toctree-l2 has-children">
-    <a class="reference internal" href="../api/index.html">
-     <code class="xref py py-mod docutils literal notranslate">
-      <span class="pre">
-       AFQ.api
-      </span>
-     </code>
-    </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
-    <label for="toctree-checkbox-2">
-     <i class="fas fa-chevron-down">
-     </i>
-    </label>
-    <ul>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../api/bundle_dict/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.api.bundle_dict
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../api/group/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.api.group
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../api/participant/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.api.participant
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../api/utils/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.api.utils
-        </span>
-       </code>
-      </a>
-     </li>
-    </ul>
-   </li>
-   <li class="toctree-l2 has-children">
-    <a class="reference internal" href="../data/index.html">
-     <code class="xref py py-mod docutils literal notranslate">
-      <span class="pre">
-       AFQ.data
-      </span>
-     </code>
-    </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
-    <label for="toctree-checkbox-3">
-     <i class="fas fa-chevron-down">
-     </i>
-    </label>
-    <ul>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../data/fetch/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.data.fetch
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../data/s3bids/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.data.s3bids
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../data/utils/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.data.utils
-        </span>
-       </code>
-      </a>
-     </li>
-    </ul>
-   </li>
-   <li class="toctree-l2 has-children">
-    <a class="reference internal" href="../definitions/index.html">
-     <code class="xref py py-mod docutils literal notranslate">
-      <span class="pre">
-       AFQ.definitions
-      </span>
-     </code>
-    </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
-    <label for="toctree-checkbox-4">
-     <i class="fas fa-chevron-down">
-     </i>
-    </label>
-    <ul>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../definitions/image/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.definitions.image
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../definitions/mapping/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.definitions.mapping
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../definitions/utils/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.definitions.utils
-        </span>
-       </code>
-      </a>
-     </li>
-    </ul>
-   </li>
-   <li class="toctree-l2 has-children">
-    <a class="reference internal" href="../models/index.html">
-     <code class="xref py py-mod docutils literal notranslate">
-      <span class="pre">
-       AFQ.models
-      </span>
-     </code>
-    </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
-    <label for="toctree-checkbox-5">
-     <i class="fas fa-chevron-down">
-     </i>
-    </label>
-    <ul>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../models/csd/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.models.csd
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../models/dki/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.models.dki
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../models/dti/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.models.dti
-        </span>
-       </code>
-      </a>
-     </li>
-    </ul>
-   </li>
-   <li class="toctree-l2 has-children">
-    <a class="reference internal" href="../tasks/index.html">
-     <code class="xref py py-mod docutils literal notranslate">
-      <span class="pre">
-       AFQ.tasks
-      </span>
-     </code>
-    </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
-    <label for="toctree-checkbox-6">
-     <i class="fas fa-chevron-down">
-     </i>
-    </label>
-    <ul>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../tasks/data/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.tasks.data
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../tasks/decorators/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.tasks.decorators
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../tasks/mapping/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.tasks.mapping
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../tasks/segmentation/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.tasks.segmentation
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../tasks/tractography/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.tasks.tractography
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../tasks/utils/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.tasks.utils
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../tasks/viz/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.tasks.viz
-        </span>
-       </code>
-      </a>
-     </li>
-    </ul>
-   </li>
-   <li class="toctree-l2 has-children">
-    <a class="reference internal" href="../utils/index.html">
-     <code class="xref py py-mod docutils literal notranslate">
-      <span class="pre">
-       AFQ.utils
-      </span>
-     </code>
-    </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
-    <label for="toctree-checkbox-7">
-     <i class="fas fa-chevron-down">
-     </i>
-    </label>
-    <ul>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../utils/bin/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.utils.bin
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../utils/models/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.utils.models
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../utils/path/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.utils.path
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../utils/stats/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.utils.stats
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../utils/streamlines/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.utils.streamlines
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../utils/volume/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.utils.volume
-        </span>
-       </code>
-      </a>
-     </li>
-    </ul>
-   </li>
-   <li class="toctree-l2 has-children">
-    <a class="reference internal" href="../viz/index.html">
-     <code class="xref py py-mod docutils literal notranslate">
-      <span class="pre">
-       AFQ.viz
-      </span>
-     </code>
-    </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
-    <label for="toctree-checkbox-8">
-     <i class="fas fa-chevron-down">
-     </i>
-    </label>
-    <ul>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../viz/fury_backend/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.viz.fury_backend
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../viz/plot/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.viz.plot
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../viz/plotly_backend/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.viz.plotly_backend
-        </span>
-       </code>
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../viz/utils/index.html">
-       <code class="xref py py-mod docutils literal notranslate">
-        <span class="pre">
-         AFQ.viz.utils
-        </span>
-       </code>
-      </a>
-     </li>
-    </ul>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../registration/index.html">
-     <code class="xref py py-mod docutils literal notranslate">
-      <span class="pre">
-       AFQ.registration
-      </span>
-     </code>
-    </a>
-   </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
-     <code class="xref py py-mod docutils literal notranslate">
-      <span class="pre">
-       AFQ.segmentation
-      </span>
-     </code>
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../tractography/index.html">
-     <code class="xref py py-mod docutils literal notranslate">
-      <span class="pre">
-       AFQ.tractography
-      </span>
-     </code>
-    </a>
-   </li>
-  </ul>
- </li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/bundle_dict/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.bundle_dict</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/group/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.group</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/participant/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.participant</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.utils</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../data/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../data/fetch/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data.fetch</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data/s3bids/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data.s3bids</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data.utils</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../definitions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../definitions/image/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.image</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../definitions/mapping/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.mapping</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../definitions/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.utils</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../models/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../models/csd/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.csd</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../models/dki/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.dki</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../models/dti/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.dti</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../models/fwdti/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.fwdti</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tasks/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tasks/data/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.data</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tasks/decorators/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.decorators</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tasks/mapping/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.mapping</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tasks/segmentation/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.segmentation</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tasks/tractography/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.tractography</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tasks/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.utils</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tasks/viz/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.viz</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../utils/bin/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.bin</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/docs/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.docs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/models/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.models</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/path/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/stats/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.stats</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/streamlines/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.streamlines</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../utils/volume/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.volume</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../viz/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../viz/fury_backend/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.fury_backend</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../viz/plot/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.plot</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../viz/plotly_backend/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.plotly_backend</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../viz/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.utils</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../registration/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.registration</span></code></a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.segmentation</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tractography/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography</span></code></a></li>
+</ul>
+</li>
 </ul>
 
   </div>
 </nav>
+    </div>
   </div>
-  <div class="sidebar-end-items">
-  </div>
-</div>
-
-
-          
-
-
-<div class="bd-sidebar-secondary d-none d-xl-block col-xl-2 bd-toc">
   
-    
-    <div class="toc-item">
-      
-<div class="tocsection onthispage mt-5 pt-1 pb-3">
-    <i class="fas fa-list"></i> On this page
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+  
+  <div id="rtd-footer-container"></div>
+
+      </div>
+      <main id="main-content" class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+  <div class="section" id="module-AFQ.segmentation">
+<span id="afq-segmentation"></span><h1><a class="reference internal" href="#module-AFQ.segmentation" title="AFQ.segmentation"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.segmentation</span></code></a><a class="headerlink" href="#module-AFQ.segmentation" title="Permalink to this heading">#</a></h1>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">#</a></h2>
+<div class="section" id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">#</a></h3>
+<table class="autosummary longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.segmentation.Segmentation" title="AFQ.segmentation.Segmentation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Segmentation</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading">#</a></h3>
+<table class="autosummary longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.segmentation.clean_bundle" title="AFQ.segmentation.clean_bundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clean_bundle</span></code></a>(tg[, n_points, clean_rounds, ...])</p></td>
+<td><p>Clean a segmented fiber group based on the Mahalnobis distance of</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.segmentation.clean_by_endpoints" title="AFQ.segmentation.clean_by_endpoints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clean_by_endpoints</span></code></a>(streamlines, targets0, targets1[, ...])</p></td>
+<td><p>Clean a collection of streamlines based on their two endpoints</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.segmentation.</span></span><span class="sig-name descname"><span class="pre">Segmentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nb_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nb_streamlines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seg_algo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'AFQ'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_algo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel_segmentation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'n_jobs':</span> <span class="pre">-1,</span> <span class="pre">'engine':</span> <span class="pre">'joblib',</span> <span class="pre">'backend':</span> <span class="pre">'loky'}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progressive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">greater_than</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rm_small_clusters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_clust_thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction_thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pruning_thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi_dist_tie_break</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_to_waypoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">presegment_bundle_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">presegment_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_by_endpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_to_atlas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_intermediates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation" title="Permalink to this definition">#</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation._read_tg">
+<span class="sig-name descname"><span class="pre">_read_tg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation._read_tg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation._read_tg" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation.segment">
+<span class="sig-name descname"><span class="pre">segment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bundle_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fdata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fbval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fbvec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_prealign</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_affine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_tg_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.segment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.segment" title="Permalink to this definition">#</a></dt>
+<dd><p>Segment streamlines into bundles based on either waypoint ROIs
+<a class="reference internal" href="#r03e71c6d7dc6-yeatman2012" id="id1">[Yeatman2012]</a> or RecoBundles <a class="reference internal" href="../../../auto_examples/plot_recobundles.html#garyfallidis2017" id="id2"><span>[Garyfallidis2017]</span></a>.
+Parameters
+———-
+bundle_dict: dict or AFQ.api.BundleDict</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Meta-data for the segmentation. The format is something like::</dt><dd><dl class="simple">
+<dt>{‘bundle_name’: {</dt><dd><p>‘include’:[img1, img2],
+‘prob_map’: img3,
+‘cross_midline’: False,
+‘start’: img4,
+‘end’: img5}}</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="simple">
+<dt>tg<span class="classifier">StatefulTractogram</span></dt><dd><p>Bundles to segment</p>
+</dd>
+<dt>fdata, fbval, fbvec<span class="classifier">str</span></dt><dd><p>Full path to data, bvals, bvecs</p>
+</dd>
+<dt>mapping<span class="classifier">DiffeomorphicMap object, str or nib.Nifti1Image, optional.</span></dt><dd><p>A mapping between DWI space and a template. If None, mapping will
+be registered from data used in prepare_img. Default: None.</p>
+</dd>
+<dt>reg_prealign<span class="classifier">array, optional.</span></dt><dd><p>The linear transformation to be applied to align input images to
+the reference space before warping under the deformation field.
+Default: None.</p>
+</dd>
+<dt>reg_template<span class="classifier">str or nib.Nifti1Image, optional.</span></dt><dd><p>Template to use for registration. Default: MNI T2.</p>
+</dd>
+<dt>img_affine<span class="classifier">array, optional.</span></dt><dd><p>The spatial transformation from the measurement to the scanner
+space.</p>
+</dd>
+<dt>reset_tg_space<span class="classifier">bool, optional</span></dt><dd><p>Whether to reset the space of the input tractogram after
+segmentation is complete. Default: False.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dict</strong><span class="classifier">Where keys are bundle names, values are tractograms of</span></dt><dd><p>these bundles.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="citation">
+<dt class="label" id="r03e71c6d7dc6-yeatman2012"><span class="brackets"><a class="fn-backref" href="#id1">Yeatman2012</a></span></dt>
+<dd><p>Yeatman, Jason D., Robert F. Dougherty, Nathaniel J.</p>
+</dd>
+</dl>
+<p>Myall, Brian A. Wandell, and Heidi M. Feldman. 2012. “Tract Profiles of
+White Matter Properties: Automating Fiber-Tract Quantification”
+PloS One 7 (11): e49790.
+.. [R03e71c6d7dc6-Garyfallidis17] Garyfallidis et al. Recognition of white matter
+bundles using local and global streamline-based registration and
+clustering, Neuroimage, 2017.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation.prepare_img">
+<span class="sig-name descname"><span class="pre">prepare_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fdata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fbval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fbvec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.prepare_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.prepare_img" title="Permalink to this definition">#</a></dt>
+<dd><p>Prepare image data from DWI data.
+Parameters
+———-
+fdata, fbval, fbvec : str</p>
+<blockquote>
+<div><p>Full path to data, bvals, bvecs</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation.prepare_map">
+<span class="sig-name descname"><span class="pre">prepare_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_prealign</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.prepare_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.prepare_map" title="Permalink to this definition">#</a></dt>
+<dd><p>Set mapping between DWI space and a template.
+Parameters
+———-
+mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.</p>
+<blockquote>
+<div><p>A mapping between DWI space and a template.
+If None, mapping will be registered from data used in prepare_img.
+Default: None.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>reg_template<span class="classifier">str or nib.Nifti1Image, optional.</span></dt><dd><p>Template to use for registration (defaults to the MNI T2)
+Default: None.</p>
+</dd>
+<dt>reg_prealign<span class="classifier">array, optional.</span></dt><dd><p>The linear transformation to be applied to align input images to
+the reference space before warping under the deformation field.
+Default: None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation.cross_streamlines">
+<span class="sig-name descname"><span class="pre">cross_streamlines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low_coord</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.cross_streamlines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.cross_streamlines" title="Permalink to this definition">#</a></dt>
+<dd><p>Classify the streamlines by whether they cross the midline.
+Creates a crosses attribute which is an array of booleans. Each boolean
+corresponds to a streamline, and is whether or not that streamline
+crosses the midline.
+Parameters
+———-
+tg : StatefulTractogram class instance.
+template : nibabel.Nifti1Image class instance</p>
+<blockquote>
+<div><p>An affine transformation into a template space.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation._get_bundle_info">
+<span class="sig-name descname"><span class="pre">_get_bundle_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bundle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vox_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation._get_bundle_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation._get_bundle_info" title="Permalink to this definition">#</a></dt>
+<dd><p>Get fiber probabilites and ROIs for a given bundle.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation._return_empty">
+<span class="sig-name descname"><span class="pre">_return_empty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bundle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation._return_empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation._return_empty" title="Permalink to this definition">#</a></dt>
+<dd><p>Helper function for segment_afq, to return an empty dict under
+some conditions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation.segment_afq">
+<span class="sig-name descname"><span class="pre">segment_afq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.segment_afq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.segment_afq" title="Permalink to this definition">#</a></dt>
+<dd><p>Assign streamlines to bundles using the waypoint ROI approach
+Parameters
+———-
+tg : StatefulTractogram class instance</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation.move_streamlines">
+<span class="sig-name descname"><span class="pre">move_streamlines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_algo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'slr'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.move_streamlines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.move_streamlines" title="Permalink to this definition">#</a></dt>
+<dd><p>Streamline-based registration of a whole-brain tractogram to
+the MNI whole-brain atlas.</p>
+<dl class="simple">
+<dt>registration_algo<span class="classifier">str</span></dt><dd><p>“slr” or “syn”</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation.segment_reco">
+<span class="sig-name descname"><span class="pre">segment_reco</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.segment_reco"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.segment_reco" title="Permalink to this definition">#</a></dt>
+<dd><p>Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
+Parameters
+———-
+tg : StatefulTractogram class instance</p>
+<blockquote>
+<div><p>A whole-brain tractogram to be segmented.</p>
+</div></blockquote>
+<div class="section" id="returns">
+<h4>Returns<a class="headerlink" href="#returns" title="Permalink to this heading">#</a></h4>
+<dl class="simple">
+<dt>fiber_groups<span class="classifier">dict</span></dt><dd><p>Keys are names of the bundles, values are Streamline objects.
+The streamlines in each object have all been oriented to have the
+same orientation (using <cite>dts.orient_by_streamline</cite>).</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AFQ.segmentation.clean_bundle">
+<span class="sig-prename descclassname"><span class="pre">AFQ.segmentation.</span></span><span class="sig-name descname"><span class="pre">clean_bundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_rounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#clean_bundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.clean_bundle" title="Permalink to this definition">#</a></dt>
+<dd><p>Clean a segmented fiber group based on the Mahalnobis distance of
+each streamline</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tg</strong><span class="classifier">StatefulTractogram class instance</span></dt><dd><p>A whole-brain tractogram to be segmented.</p>
+</dd>
+<dt><strong>n_points</strong><span class="classifier">int, optional</span></dt><dd><p>Number of points to resample streamlines to.
+Default: 100</p>
+</dd>
+<dt><strong>clean_rounds</strong><span class="classifier">int, optional.</span></dt><dd><p>Number of rounds of cleaning based on the Mahalanobis distance from
+the mean of extracted bundles. Default: 5</p>
+</dd>
+<dt><strong>distance_threshold</strong><span class="classifier">float, optional.</span></dt><dd><p>Threshold of cleaning based on the Mahalanobis distance (the units are
+standard deviations). Default: 3.</p>
+</dd>
+<dt><strong>length_threshold: float, optional</strong></dt><dd><p>Threshold for cleaning based on length (in standard deviations). Length
+of any streamline should not be <em>more</em> than this number of stdevs from
+the mean length.</p>
+</dd>
+<dt><strong>min_sl</strong><span class="classifier">int, optional.</span></dt><dd><p>Number of streamlines in a bundle under which we will
+not bother with cleaning outliers. Default: 20.</p>
+</dd>
+<dt><strong>stat</strong><span class="classifier">callable or str, optional.</span></dt><dd><p>The statistic of each node relative to which the Mahalanobis is
+calculated. Default: <cite>np.mean</cite> (but can also use median, etc.)</p>
+</dd>
+<dt><strong>return_idx</strong><span class="classifier">bool</span></dt><dd><p>Whether to return indices in the original streamlines.
+Default: False.</p>
+</dd>
+<dt><strong>Returns</strong></dt><dd></dd>
+<dt><strong>——-</strong></dt><dd></dd>
+<dt><strong>A StatefulTractogram class instance containing only the streamlines</strong></dt><dd></dd>
+<dt><strong>that have a Mahalanobis distance smaller than `clean_threshold` from</strong></dt><dd></dd>
+<dt><strong>the mean of each one of the nodes.</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AFQ.segmentation.clean_by_endpoints">
+<span class="sig-prename descclassname"><span class="pre">AFQ.segmentation.</span></span><span class="sig-name descname"><span class="pre">clean_by_endpoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">streamlines</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atlas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flip_sls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#clean_by_endpoints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.clean_by_endpoints" title="Permalink to this definition">#</a></dt>
+<dd><p>Clean a collection of streamlines based on their two endpoints
+Filters down to only include items that have their starting points close to
+the targets0 and ending points close to targets1
+Parameters
+———-
+streamlines : sequence of N by 3 arrays</p>
+<blockquote>
+<div><p>Where N is number of nodes in the array, the collection of
+streamlines to filter down to.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>targets0, target1: sequences or Nx3 arrays or None.</dt><dd><p>The targets. Numerical values in the atlas array for targets for the
+first and last node in each streamline respectively, or NX3 arrays with
+each row containing the indices for these locations in the atlas.
+If provided a None, this means no restriction on that end.</p>
+</dd>
+<dt>tol<span class="classifier">float, optional A distance tolerance (in units that the coordinates</span></dt><dd><p>of the streamlines are represented in). Default: 0, which means that
+the endpoint is exactly in the coordinate of the target ROI.</p>
+</dd>
+<dt>atlas<span class="classifier">3D array or Nifti1Image class instance with a 3D array, optional.</span></dt><dd><p>Contains numerical values for ROIs. Default: if not provided, assume
+that targets0 and targets1 are both arrays of indices, and this
+information is not needed.</p>
+</dd>
+<dt>flip_sls<span class="classifier">1d array, optional</span></dt><dd><p>Length is len(streamlines), whether to flip the streamline.</p>
+</dd>
+</dl>
+<div class="section" id="yields">
+<h4>Yields<a class="headerlink" href="#yields" title="Permalink to this heading">#</a></h4>
+<p>Generator of the indicies into streamlines that survive cleaning.</p>
+</div>
+</dd></dl>
+
+</div>
+</div>
 </div>
 
-<nav id="bd-toc-nav">
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="../registration/index.html" title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.registration</span></code></p>
+      </div>
+  </a>
+  <a class='right-next' id="next-link" href="../tractography/index.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography</span></code></p>
+  </div>
+  <i class="fa-solid fa-angle-right"></i>
+  </a>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+<div class="tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
     <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#module-contents">
@@ -643,6 +805,125 @@
      Functions
     </a>
     <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.segmentation.Segmentation">
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         Segmentation
+        </span>
+       </code>
+      </a>
+      <ul class="nav section-nav flex-column">
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.segmentation.Segmentation._read_tg">
+         <code class="docutils literal notranslate">
+          <span class="pre">
+           Segmentation._read_tg()
+          </span>
+         </code>
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.segmentation.Segmentation.segment">
+         <code class="docutils literal notranslate">
+          <span class="pre">
+           Segmentation.segment()
+          </span>
+         </code>
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.segmentation.Segmentation.prepare_img">
+         <code class="docutils literal notranslate">
+          <span class="pre">
+           Segmentation.prepare_img()
+          </span>
+         </code>
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.segmentation.Segmentation.prepare_map">
+         <code class="docutils literal notranslate">
+          <span class="pre">
+           Segmentation.prepare_map()
+          </span>
+         </code>
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.segmentation.Segmentation.cross_streamlines">
+         <code class="docutils literal notranslate">
+          <span class="pre">
+           Segmentation.cross_streamlines()
+          </span>
+         </code>
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.segmentation.Segmentation._get_bundle_info">
+         <code class="docutils literal notranslate">
+          <span class="pre">
+           Segmentation._get_bundle_info()
+          </span>
+         </code>
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.segmentation.Segmentation._return_empty">
+         <code class="docutils literal notranslate">
+          <span class="pre">
+           Segmentation._return_empty()
+          </span>
+         </code>
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.segmentation.Segmentation.segment_afq">
+         <code class="docutils literal notranslate">
+          <span class="pre">
+           Segmentation.segment_afq()
+          </span>
+         </code>
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.segmentation.Segmentation.move_streamlines">
+         <code class="docutils literal notranslate">
+          <span class="pre">
+           Segmentation.move_streamlines()
+          </span>
+         </code>
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#AFQ.segmentation.Segmentation.segment_reco">
+         <code class="docutils literal notranslate">
+          <span class="pre">
+           Segmentation.segment_reco()
+          </span>
+         </code>
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.segmentation.clean_bundle">
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         clean_bundle()
+        </span>
+       </code>
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#AFQ.segmentation.clean_by_endpoints">
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         clean_by_endpoints()
+        </span>
+       </code>
+      </a>
+     </li>
      <li class="toc-h4 nav-item toc-entry">
       <a class="reference internal nav-link" href="#AFQ.segmentation.Segmentation">
        Segmentation
@@ -717,366 +998,87 @@
 </ul>
 
 </nav>
-    </div>
-    
-    <div class="toc-item">
-      
+</div>
+
+<div class="toc-item">
+  
+<div id="searchbox"></div>
+</div>
+
+<div class="toc-item">
+  
 
 <div class="tocsection editthispage">
     <a href="https://github.com/yeatmanlab/pyAFQ/edit/master/docs/source/autoapi/AFQ/segmentation/index.rst">
-        <i class="fas fa-pencil-alt"></i> Edit this page
+        <i class="fa-solid fa-pencil"></i> Edit this page
     </a>
 </div>
 
-    </div>
-    
+</div>
+
+<div class="toc-item">
   
+<div class="tocsection sourcelink">
+    <a href="../../../_sources/autoapi/AFQ/segmentation/index.rst.txt">
+        <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
 </div>
 
+</div>
 
+            </div>
           
           
-          <div class="bd-content col-12 col-md-9 col-xl-7">
-              
-              <article class="bd-article" role="main">
-                
-  <div class="section" id="module-AFQ.segmentation">
-<span id="afq-segmentation"></span><h1><a class="reference internal" href="#module-AFQ.segmentation" title="AFQ.segmentation"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.segmentation</span></code></a><a class="headerlink" href="#module-AFQ.segmentation" title="Permalink to this heading">#</a></h1>
-<div class="section" id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">#</a></h2>
-<div class="section" id="classes">
-<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">#</a></h3>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.segmentation.Segmentation" title="AFQ.segmentation.Segmentation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Segmentation</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section" id="functions">
-<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading">#</a></h3>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.segmentation.clean_bundle" title="AFQ.segmentation.clean_bundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clean_bundle</span></code></a>(tg, n_points=100, clean_rounds=5, distance_threshold=5, length_threshold=4, min_sl=20, stat='mean', return_idx=False)</p></td>
-<td><p>Clean a segmented fiber group based on the Mahalnobis distance of</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.segmentation.clean_by_endpoints" title="AFQ.segmentation.clean_by_endpoints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clean_by_endpoints</span></code></a>(streamlines, targets0, targets1, tol=None, atlas=None, return_idx=False)</p></td>
-<td><p>Clean a collection of streamlines based on their two endpoints</p></td>
-</tr>
-</tbody>
-</table>
-<dl class="py class">
-<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.segmentation.</span></span><span class="sig-name descname"><span class="pre">Segmentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nb_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nb_streamlines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seg_algo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'AFQ'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_algo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel_segmentation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'n_jobs':</span> <span class="pre">-</span> <span class="pre">1,</span> <span class="pre">'engine':</span> <span class="pre">'joblib',</span> <span class="pre">'backend':</span> <span class="pre">'loky'}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progressive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">greater_than</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rm_small_clusters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_clust_thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction_thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pruning_thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi_dist_tie_break</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_to_waypoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">presegment_bundle_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">presegment_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_by_endpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_to_atlas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_intermediates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation" title="Permalink to this definition">#</a></dt>
-<dd><dl class="py method">
-<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation._read_tg">
-<span class="sig-name descname"><span class="pre">_read_tg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation._read_tg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation._read_tg" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation.segment">
-<span class="sig-name descname"><span class="pre">segment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fdata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fbval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fbvec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_prealign</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_affine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_tg_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.segment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.segment" title="Permalink to this definition">#</a></dt>
-<dd><p>Segment streamlines into bundles based on either waypoint ROIs
-<a class="reference internal" href="#r03e71c6d7dc6-yeatman2012" id="id1">[Yeatman2012]</a> or RecoBundles <a class="reference internal" href="../../../auto_examples/plot_recobundles.html#garyfallidis2017" id="id2"><span>[Garyfallidis2017]</span></a>.
-Parameters
-———-
-bundle_dict: dict or AFQ.api.BundleDict</p>
-<blockquote>
-<div><dl class="simple">
-<dt>Meta-data for the segmentation. The format is something like::</dt><dd><dl class="simple">
-<dt>{‘bundle_name’: {</dt><dd><p>‘include’:[img1, img2],
-‘prob_map’: img3,
-‘cross_midline’: False,
-‘start’: img4,
-‘end’: img5}}</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</div></blockquote>
-<dl class="simple">
-<dt>tg<span class="classifier">StatefulTractogram</span></dt><dd><p>Bundles to segment</p>
-</dd>
-<dt>fdata, fbval, fbvec<span class="classifier">str</span></dt><dd><p>Full path to data, bvals, bvecs</p>
-</dd>
-<dt>mapping<span class="classifier">DiffeomorphicMap object, str or nib.Nifti1Image, optional.</span></dt><dd><p>A mapping between DWI space and a template. If None, mapping will
-be registered from data used in prepare_img. Default: None.</p>
-</dd>
-<dt>reg_prealign<span class="classifier">array, optional.</span></dt><dd><p>The linear transformation to be applied to align input images to
-the reference space before warping under the deformation field.
-Default: None.</p>
-</dd>
-<dt>reg_template<span class="classifier">str or nib.Nifti1Image, optional.</span></dt><dd><p>Template to use for registration. Default: MNI T2.</p>
-</dd>
-<dt>img_affine<span class="classifier">array, optional.</span></dt><dd><p>The spatial transformation from the measurement to the scanner
-space.</p>
-</dd>
-<dt>reset_tg_space<span class="classifier">bool, optional</span></dt><dd><p>Whether to reset the space of the input tractogram after
-segmentation is complete. Default: False.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>dict</strong><span class="classifier">Where keys are bundle names, values are tractograms of</span></dt><dd><p>these bundles.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<p class="rubric">References</p>
-<dl class="citation">
-<dt class="label" id="r03e71c6d7dc6-yeatman2012"><span class="brackets"><a class="fn-backref" href="#id1">Yeatman2012</a></span></dt>
-<dd><p>Yeatman, Jason D., Robert F. Dougherty, Nathaniel J.</p>
-</dd>
-</dl>
-<p>Myall, Brian A. Wandell, and Heidi M. Feldman. 2012. “Tract Profiles of
-White Matter Properties: Automating Fiber-Tract Quantification”
-PloS One 7 (11): e49790.
-.. [R03e71c6d7dc6-Garyfallidis17] Garyfallidis et al. Recognition of white matter
-bundles using local and global streamline-based registration and
-clustering, Neuroimage, 2017.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation.prepare_img">
-<span class="sig-name descname"><span class="pre">prepare_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fdata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fbval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fbvec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.prepare_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.prepare_img" title="Permalink to this definition">#</a></dt>
-<dd><p>Prepare image data from DWI data.
-Parameters
-———-
-fdata, fbval, fbvec : str</p>
-<blockquote>
-<div><p>Full path to data, bvals, bvecs</p>
-</div></blockquote>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation.prepare_map">
-<span class="sig-name descname"><span class="pre">prepare_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_prealign</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.prepare_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.prepare_map" title="Permalink to this definition">#</a></dt>
-<dd><p>Set mapping between DWI space and a template.
-Parameters
-———-
-mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.</p>
-<blockquote>
-<div><p>A mapping between DWI space and a template.
-If None, mapping will be registered from data used in prepare_img.
-Default: None.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>reg_template<span class="classifier">str or nib.Nifti1Image, optional.</span></dt><dd><p>Template to use for registration (defaults to the MNI T2)
-Default: None.</p>
-</dd>
-<dt>reg_prealign<span class="classifier">array, optional.</span></dt><dd><p>The linear transformation to be applied to align input images to
-the reference space before warping under the deformation field.
-Default: None.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation.cross_streamlines">
-<span class="sig-name descname"><span class="pre">cross_streamlines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low_coord</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.cross_streamlines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.cross_streamlines" title="Permalink to this definition">#</a></dt>
-<dd><p>Classify the streamlines by whether they cross the midline.
-Creates a crosses attribute which is an array of booleans. Each boolean
-corresponds to a streamline, and is whether or not that streamline
-crosses the midline.
-Parameters
-———-
-tg : StatefulTractogram class instance.
-template : nibabel.Nifti1Image class instance</p>
-<blockquote>
-<div><p>An affine transformation into a template space.</p>
-</div></blockquote>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation._get_bundle_info">
-<span class="sig-name descname"><span class="pre">_get_bundle_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vox_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation._get_bundle_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation._get_bundle_info" title="Permalink to this definition">#</a></dt>
-<dd><p>Get fiber probabilites and ROIs for a given bundle.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation._return_empty">
-<span class="sig-name descname"><span class="pre">_return_empty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation._return_empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation._return_empty" title="Permalink to this definition">#</a></dt>
-<dd><p>Helper function for segment_afq, to return an empty dict under
-some conditions.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation.segment_afq">
-<span class="sig-name descname"><span class="pre">segment_afq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.segment_afq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.segment_afq" title="Permalink to this definition">#</a></dt>
-<dd><p>Assign streamlines to bundles using the waypoint ROI approach
-Parameters
-———-
-tg : StatefulTractogram class instance</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation.move_streamlines">
-<span class="sig-name descname"><span class="pre">move_streamlines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_algo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'slr'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.move_streamlines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.move_streamlines" title="Permalink to this definition">#</a></dt>
-<dd><p>Streamline-based registration of a whole-brain tractogram to
-the MNI whole-brain atlas.</p>
-<dl class="simple">
-<dt>registration_algo<span class="classifier">str</span></dt><dd><p>“slr” or “syn”</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="AFQ.segmentation.Segmentation.segment_reco">
-<span class="sig-name descname"><span class="pre">segment_reco</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#Segmentation.segment_reco"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation.segment_reco" title="Permalink to this definition">#</a></dt>
-<dd><p>Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
-Parameters
-———-
-tg : StatefulTractogram class instance</p>
-<blockquote>
-<div><p>A whole-brain tractogram to be segmented.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>fiber_groups<span class="classifier">dict</span></dt><dd><p>Keys are names of the bundles, values are Streamline objects.
-The streamlines in each object have all been oriented to have the
-same orientation (using <cite>dts.orient_by_streamline</cite>).</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="AFQ.segmentation.clean_bundle">
-<span class="sig-prename descclassname"><span class="pre">AFQ.segmentation.</span></span><span class="sig-name descname"><span class="pre">clean_bundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_rounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#clean_bundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.clean_bundle" title="Permalink to this definition">#</a></dt>
-<dd><p>Clean a segmented fiber group based on the Mahalnobis distance of
-each streamline</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>tg</strong><span class="classifier">StatefulTractogram class instance</span></dt><dd><p>A whole-brain tractogram to be segmented.</p>
-</dd>
-<dt><strong>n_points</strong><span class="classifier">int, optional</span></dt><dd><p>Number of points to resample streamlines to.
-Default: 100</p>
-</dd>
-<dt><strong>clean_rounds</strong><span class="classifier">int, optional.</span></dt><dd><p>Number of rounds of cleaning based on the Mahalanobis distance from
-the mean of extracted bundles. Default: 5</p>
-</dd>
-<dt><strong>distance_threshold</strong><span class="classifier">float, optional.</span></dt><dd><p>Threshold of cleaning based on the Mahalanobis distance (the units are
-standard deviations). Default: 5.</p>
-</dd>
-<dt><strong>length_threshold: float, optional</strong></dt><dd><p>Threshold for cleaning based on length (in standard deviations). Length
-of any streamline should not be <em>more</em> than this number of stdevs from
-the mean length.</p>
-</dd>
-<dt><strong>min_sl</strong><span class="classifier">int, optional.</span></dt><dd><p>Number of streamlines in a bundle under which we will
-not bother with cleaning outliers. Default: 20.</p>
-</dd>
-<dt><strong>stat</strong><span class="classifier">callable or str, optional.</span></dt><dd><p>The statistic of each node relative to which the Mahalanobis is
-calculated. Default: <cite>np.mean</cite> (but can also use median, etc.)</p>
-</dd>
-<dt><strong>return_idx</strong><span class="classifier">bool</span></dt><dd><p>Whether to return indices in the original streamlines.
-Default: False.</p>
-</dd>
-<dt><strong>Returns</strong></dt><dd></dd>
-<dt><strong>——-</strong></dt><dd></dd>
-<dt><strong>A StatefulTractogram class instance containing only the streamlines</strong></dt><dd></dd>
-<dt><strong>that have a Mahalanobis distance smaller than `clean_threshold` from</strong></dt><dd></dd>
-<dt><strong>the mean of each one of the nodes.</strong></dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="AFQ.segmentation.clean_by_endpoints">
-<span class="sig-prename descclassname"><span class="pre">AFQ.segmentation.</span></span><span class="sig-name descname"><span class="pre">clean_by_endpoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">streamlines</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atlas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/AFQ/segmentation.html#clean_by_endpoints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.clean_by_endpoints" title="Permalink to this definition">#</a></dt>
-<dd><p>Clean a collection of streamlines based on their two endpoints
-Filters down to only include items that have their starting points close to
-the targets0 and ending points close to targets1
-Parameters
-———-
-streamlines : sequence of 3XN_i arrays The collection of streamlines to</p>
-<blockquote>
-<div><p>filter down to.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>targets0, target1: sequences or Nx3 arrays or None.</dt><dd><p>The targets. Numerical values in the atlas array for targets for the
-first and last node in each streamline respectively, or NX3 arrays with
-each row containing the indices for these locations in the atlas.
-If provided a None, this means no restriction on that end.</p>
-</dd>
-<dt>tol<span class="classifier">float, optional A distance tolerance (in units that the coordinates</span></dt><dd><p>of the streamlines are represented in). Default: 0, which means that
-the endpoint is exactly in the coordinate of the target ROI.</p>
-</dd>
-<dt>atlas<span class="classifier">3D array or Nifti1Image class instance with a 3D array, optional.</span></dt><dd><p>Contains numerical values for ROIs. Default: if not provided, assume
-that targets0 and targets1 are both arrays of indices, and this
-information is not needed.</p>
-</dd>
-</dl>
-<p>Generator of the filtered collection</p>
-</dd></dl>
-
-</div>
-</div>
-</div>
-
-
-              </article>
-              
-
-              
-              <footer class="bd-footer-article">
-                  <!-- Previous / next buttons -->
-<div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="../registration/index.html" title="previous page">
-      <i class="fas fa-angle-left"></i>
-      <div class="prev-next-info">
-          <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.registration</span></code></p>
-      </div>
-  </a>
-  <a class='right-next' id="next-link" href="../tractography/index.html" title="next page">
-  <div class="prev-next-info">
-      <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography</span></code></p>
-  </div>
-  <i class="fas fa-angle-right"></i>
-  </a>
-</div>
-              </footer>
-              
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
           </div>
-          
-      </div>
+        </footer>
+        
+      </main>
     </div>
+  </div>
 
   
-  
+    
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695"></script>
+  <script src="../../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94"></script>
 
 
-<footer class="bd-footer"><div class="bd-footer__inner container">
+  <footer class="bd-footer"><div class="bd-footer__inner container">
   
   <div class="footer-item">
-    <p class="copyright">
+    
+<p class="copyright">
+
     &copy; Copyright 2018--, The pyAFQ Contributors.<br>
+
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="theme-version">
+    Built with the
+    <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">
+        PyData Sphinx Theme
+    </a>
+    0.12.0.
 </p>
   </div>
   
   <div class="footer-item">
-    <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.2.<br>
+    
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
 </p>
+
   </div>
   
 </div>
-</footer>
+  </footer>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));

@@ -39,6 +39,14 @@ dti_params:
     full path to a nifti file containing parameters for the DTI fit
 
 
+fwdti_tf:
+    Free-water DTI TensorFit object
+
+
+fwdti_params:
+    Full path to a nifti file containing parameters for the free-water DTI fit.
+
+
 dki_tf:
     DKI DiffusionKurtosisFit object
 
@@ -55,8 +63,44 @@ pmap:
     full path to a nifti file containing the anisotropic power map
 
 
+fwdti_fa:
+    full path to a nifti file containing the Free-water DTI fractional anisotropy
+
+
+fwdti_md:
+    full path to a nifti file containing the Free-water DTI mean diffusivity
+
+
+fwdti_fwf:
+    full path to a nifti file containing the Free-water DTI free water fraction
+
+
 dti_fa:
     full path to a nifti file containing the DTI fractional anisotropy
+
+
+dti_lt0:
+    Image of first element in the DTI tensor
+
+
+dti_lt1:
+    Image of second element in the DTI tensor
+
+
+dti_lt2:
+    Image of third element in the DTI tensor
+
+
+dti_lt3:
+    Image of fourth element in the DTI tensor
+
+
+dti_lt4:
+    Image of fifth element in the DTI tensor
+
+
+dti_lt5:
+    Image of sixth element in the DTI tensor
 
 
 dti_cfa:
@@ -81,6 +125,90 @@ dti_rd:
 
 dti_ad:
     full path to a nifti file containing the DTI axial diffusivity
+
+
+dki_kt0:
+    Image of first element in the DKI kurtosis model
+
+
+dki_kt1:
+    Image of second element in the DKI kurtosis model
+
+
+dki_kt2:
+    Image of third element in the DKI kurtosis model
+
+
+dki_kt3:
+    Image of fourth element in the DKI kurtosis model
+
+
+dki_kt4:
+    Image of fifth element in the DKI kurtosis model
+
+
+dki_kt5:
+    Image of sixth element in the DKI kurtosis model
+
+
+dki_kt6:
+    Image of seventh element in the DKI kurtosis model
+
+
+dki_kt7:
+    Image of eighth element in the DKI kurtosis model
+
+
+dki_kt8:
+    Image of ninth element in the DKI kurtosis model
+
+
+dki_kt9:
+    Image of tenth element in the DKI kurtosis model
+
+
+dki_kt10:
+    Image of eleventh element in the DKI kurtosis model
+
+
+dki_kt11:
+    Image of twelf element in the DKI kurtosis model
+
+
+dki_kt12:
+    Image of thirteenth element in the DKI kurtosis model
+
+
+dki_kt13:
+    Image of fourteenth element in the DKI kurtosis model
+
+
+dki_kt14:
+    Image of fifteenth element in the DKI kurtosis model
+
+
+dki_lt0:
+    Image of first element in the DTI tensor from DKI
+
+
+dki_lt1:
+    Image of second element in the DTI tensor from DKI
+
+
+dki_lt2:
+    Image of third element in the DTI tensor from DKI
+
+
+dki_lt3:
+    Image of fourth element in the DTI tensor from DKI
+
+
+dki_lt4:
+    Image of fifth element in the DTI tensor from DKI
+
+
+dki_lt5:
+    Image of sixth element in the DTI tensor from DKI
 
 
 dki_fa:
@@ -165,6 +293,14 @@ indiv_bundles:
 
 sl_counts:
     full path to a JSON file containing streamline counts
+
+
+median_bundle_lengths:
+    full path to a JSON file containing median bundle lengths
+
+
+density_maps:
+    full path to 4d nifti file containing streamline counts per voxel per bundle, where the 4th dimension encodes the bundle
 
 
 profiles:

@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.definitions.utils
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------
@@ -63,30 +57,11 @@ Functions
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
+   .. py:method:: find_path(bids_layout, from_path, subject, session)
       :abstractmethod:
 
-      
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: str_for_toml(self)
+   .. py:method:: str_for_toml()
 
       
       Uses __init__ in str_for_toml to make string that will instantiate
@@ -115,25 +90,6 @@ Functions
 
 .. py:function:: name_from_path(path)
 
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:function:: find_file(bids_layout, path, filters, suffix, session, subject, extension='.nii.gz')
 

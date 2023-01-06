@@ -1,9 +1,5 @@
 :orphan:
 
-
-
-.. _sphx_glr_auto_examples:
-
 .. _general_examples:
 
 Examples
@@ -15,14 +11,229 @@ Introductory examples.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="An example using the AFQ API to run recobundles with the `80 bundle atlas &lt;https://figshare.com...">
 
 .. only:: html
 
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_afq_reco80_thumb.png
-     :alt: RecoBundles80 using AFQ API
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_afq_reco80_thumb.png
+    :alt: RecoBundles80 using AFQ API
 
-     :ref:`sphx_glr_auto_examples_plot_afq_reco80.py`
+  :ref:`sphx_glr_auto_examples_plot_afq_reco80.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">RecoBundles80 using AFQ API</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="pyAFQ generates the pARC and VOF as default bundles. This example shows how you can choose to t...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_vof_example_thumb.png
+    :alt: Finding only the ARC, pARC, VOF
+
+  :ref:`sphx_glr_auto_examples_vof_example.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Finding only the ARC, pARC, VOF</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="An example using the AFQ API">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_afq_api_thumb.png
+    :alt: AFQ API
+
+  :ref:`sphx_glr_auto_examples_plot_afq_api.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">AFQ API</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Callosal bundles using AFQ API">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_afq_callosal_thumb.png
+    :alt: Callosal bundles using AFQ API
+
+  :ref:`sphx_glr_auto_examples_plot_afq_callosal.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Callosal bundles using AFQ API</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The pyAFQ API relies heavily on the `Brain Imaging Data Standard (BIDS) &lt;https://bids-specifica...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_bids_layout_thumb.png
+    :alt: How pyAFQ uses BIDS
+
+  :ref:`sphx_glr_auto_examples_plot_bids_layout.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">How pyAFQ uses BIDS</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="pyAFQ is designed to be customizable and extensible. This example shows how you can customize i...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_optic_radiations_thumb.png
+    :alt: Plotting the Optic Radiations
+
+  :ref:`sphx_glr_auto_examples_plot_optic_radiations.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Plotting the Optic Radiations</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="To analyze these datasets, large amounts of compute are needed. One way to gain access to massi...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_cloudknot_example_thumb.png
+    :alt: Using cloudknot to run pyAFQ on AWS batch:
+
+  :ref:`sphx_glr_auto_examples_cloudknot_example.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Using cloudknot to run pyAFQ on AWS batch:</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The free-water DTI model [1, 2]_ fits a two compartment model to dMRI data with more than one n...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_afq_fwdti_thumb.png
+    :alt: Free water DTI
+
+  :ref:`sphx_glr_auto_examples_plot_afq_fwdti.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Free water DTI</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="AFQ with HCP data">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_cloudknot_hcp_example_thumb.png
+    :alt: AFQ with HCP data
+
+  :ref:`sphx_glr_auto_examples_cloudknot_hcp_example.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">AFQ with HCP data</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="An example of tracking and segmenting two tracts, and plotting their tract profiles for FA (cal...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_tract_profile_thumb.png
+    :alt: Plotting tract profiles
+
+  :ref:`sphx_glr_auto_examples_plot_tract_profile.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Plotting tract profiles</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="An example of tracking and segmenting two tracts with RecoBundles [Garyfallidis2017]_, and plot...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_recobundles_thumb.png
+    :alt: Plotting tract profiles using RecoBundles
+
+  :ref:`sphx_glr_auto_examples_plot_recobundles.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Plotting tract profiles using RecoBundles</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Visualizing AFQ derivatives">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_viz_thumb.png
+    :alt: Visualizing AFQ derivatives
+
+  :ref:`sphx_glr_auto_examples_plot_viz.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Visualizing AFQ derivatives</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The following is an example of tractometry for a novel bundle and plotting the resulting FA tra...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_callosal_tract_profile_thumb.png
+    :alt: Plotting Novel Tract Profiles:
+
+  :ref:`sphx_glr_auto_examples_plot_callosal_tract_profile.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Plotting Novel Tract Profiles:</div>
+    </div>
+
 
 .. raw:: html
 
@@ -33,216 +244,31 @@ Introductory examples.
    :hidden:
 
    /auto_examples/plot_afq_reco80
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="An example using the AFQ API">
-
-.. only:: html
-
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_afq_api_thumb.png
-     :alt: AFQ API
-
-     :ref:`sphx_glr_auto_examples_plot_afq_api.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
+   /auto_examples/vof_example
    /auto_examples/plot_afq_api
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="Callosal bundles using AFQ API">
-
-.. only:: html
-
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_afq_callosal_thumb.png
-     :alt: Callosal bundles using AFQ API
-
-     :ref:`sphx_glr_auto_examples_plot_afq_callosal.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
    /auto_examples/plot_afq_callosal
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="pyAFQ is designed to be customizable. This example shows how you can customize it to define a n...">
-
-.. only:: html
-
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_optic_radiations_thumb.png
-     :alt: Plotting the Optic Radiations
-
-     :ref:`sphx_glr_auto_examples_plot_optic_radiations.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_examples/plot_optic_radiations
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="The pyAFQ API relies heavily on the `Brain Imaging Data Standard (BIDS) &lt;https://bids-specifica...">
-
-.. only:: html
-
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_bids_layout_thumb.png
-     :alt: How pyAFQ uses BIDS
-
-     :ref:`sphx_glr_auto_examples_plot_bids_layout.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
    /auto_examples/plot_bids_layout
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="To analyze these datasets, large amounts of compute are needed. One way to gain access to massi...">
-
-.. only:: html
-
- .. figure:: /auto_examples/images/thumb/sphx_glr_cloudknot_example_thumb.png
-     :alt: Using cloudknot to run pyAFQ on AWS batch:
-
-     :ref:`sphx_glr_auto_examples_cloudknot_example.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
+   /auto_examples/plot_optic_radiations
    /auto_examples/cloudknot_example
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="AFQ with HCP data">
-
-.. only:: html
-
- .. figure:: /auto_examples/images/thumb/sphx_glr_cloudknot_hcp_example_thumb.png
-     :alt: AFQ with HCP data
-
-     :ref:`sphx_glr_auto_examples_cloudknot_hcp_example.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
+   /auto_examples/plot_afq_fwdti
    /auto_examples/cloudknot_hcp_example
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="An example of tracking and segmenting two tracts, and plotting their tract profiles for FA (cal...">
-
-.. only:: html
-
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_tract_profile_thumb.png
-     :alt: Plotting tract profiles
-
-     :ref:`sphx_glr_auto_examples_plot_tract_profile.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
    /auto_examples/plot_tract_profile
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="An example of tracking and segmenting two tracts with RecoBundles [Garyfallidis2017]_, and plot...">
-
-.. only:: html
-
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_recobundles_thumb.png
-     :alt: Plotting tract profiles using RecoBundles
-
-     :ref:`sphx_glr_auto_examples_plot_recobundles.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
    /auto_examples/plot_recobundles
+   /auto_examples/plot_viz
+   /auto_examples/plot_callosal_tract_profile
 
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="The following is an example of tractometry for a novel bundle and plotting the resulting FA tra...">
 
 .. only:: html
 
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_callosal_tract_profile_thumb.png
-     :alt: Plotting Novel Tract Profiles:
+  .. container:: sphx-glr-footer sphx-glr-footer-gallery
 
-     :ref:`sphx_glr_auto_examples_plot_callosal_tract_profile.py`
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-.. raw:: html
+      :download:`Download all examples in Python source code: auto_examples_python.zip </auto_examples/auto_examples_python.zip>`
 
-    </div>
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-.. toctree::
-   :hidden:
-
-   /auto_examples/plot_callosal_tract_profile
-.. raw:: html
-
-    <div class="sphx-glr-clear"></div>
-
-
-
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-gallery
-
-
-  .. container:: sphx-glr-download sphx-glr-download-python
-
-    :download:`Download all examples in Python source code: auto_examples_python.zip </auto_examples/auto_examples_python.zip>`
-
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip </auto_examples/auto_examples_jupyter.zip>`
+      :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip </auto_examples/auto_examples_jupyter.zip>`
 
 
 .. only:: html

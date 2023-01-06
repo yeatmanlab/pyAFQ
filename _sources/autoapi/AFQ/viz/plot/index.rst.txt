@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.viz.plot
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------

@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.tasks.data
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------
@@ -24,17 +18,25 @@ Functions
    AFQ.tasks.data.b0_mask
    AFQ.tasks.data.dti_fit
    AFQ.tasks.data.dti
+   AFQ.tasks.data.fwdti_fit
+   AFQ.tasks.data.fwdti
    AFQ.tasks.data.dki_fit
    AFQ.tasks.data.dki
    AFQ.tasks.data.csd
    AFQ.tasks.data.anisotropic_power_map
+   AFQ.tasks.data.fwdti_fa
+   AFQ.tasks.data.fwdti_md
+   AFQ.tasks.data.fwdti_fwf
    AFQ.tasks.data.dti_fa
+   AFQ.tasks.data.dti_lt
    AFQ.tasks.data.dti_cfa
    AFQ.tasks.data.dti_pdd
    AFQ.tasks.data.dti_md
    AFQ.tasks.data.dti_ga
    AFQ.tasks.data.dti_rd
    AFQ.tasks.data.dti_ad
+   AFQ.tasks.data.dki_kt
+   AFQ.tasks.data.dki_lt
    AFQ.tasks.data.dki_fa
    AFQ.tasks.data.dki_md
    AFQ.tasks.data.dki_awf
@@ -57,6 +59,7 @@ Attributes
 
    AFQ.tasks.data.DIPY_GH
    AFQ.tasks.data.dti_params
+   AFQ.tasks.data.fwdti_params
    AFQ.tasks.data.dki_params
    AFQ.tasks.data.csd_params
 
@@ -65,24 +68,6 @@ Attributes
    :annotation: = https://github.com/dipy/dipy/blob/master/dipy/
 
    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:function:: get_data_gtab(dwi, bval, bvec, min_bval=None, max_bval=None, filter_b=True, b0_threshold=50)
 
@@ -237,6 +222,11 @@ Attributes
 
    
 
+.. py:function:: fwdti_fit(fwdti_params, gtab)
+
+   
+   Free-water DTI TensorFit object
+
 
 
 
@@ -254,6 +244,35 @@ Attributes
 
    ..
        !! processed by numpydoc !!
+
+.. py:function:: fwdti(brain_mask, data, gtab)
+
+   
+   Full path to a nifti file containing parameters
+   for the free-water DTI fit.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:data:: fwdti_params
+   
+
+   
 
 .. py:function:: dki_fit(dki_params, gtab)
 
@@ -306,24 +325,6 @@ Attributes
    
 
    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:function:: csd(dwi, brain_mask, gtab, data, csd_response=None, csd_sh_order=None, csd_lambda_=1, csd_tau=0.1)
 
@@ -390,24 +391,6 @@ Attributes
 
    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
 .. py:function:: anisotropic_power_map(csd_params)
 
    
@@ -432,11 +415,109 @@ Attributes
    ..
        !! processed by numpydoc !!
 
+.. py:function:: fwdti_fa(fwdti_tf)
+
+   
+   full path to a nifti file containing the Free-water DTI fractional
+   anisotropy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: fwdti_md(fwdti_tf)
+
+   
+   full path to a nifti file containing the Free-water DTI mean diffusivity
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: fwdti_fwf(fwdti_tf)
+
+   
+   full path to a nifti file containing the Free-water DTI free water fraction
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
 .. py:function:: dti_fa(dti_tf)
 
    
    full path to a nifti file containing
    the DTI fractional anisotropy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dti_lt(dti_tf, dwi_affine)
+
+   
+   Image of first element in the DTI tensor,
+   Image of second element in the DTI tensor,
+   Image of third element in the DTI tensor,
+   Image of fourth element in the DTI tensor,
+   Image of fifth element in the DTI tensor,
+   Image of sixth element in the DTI tensor
 
 
 
@@ -581,6 +662,71 @@ Attributes
    
    full path to a nifti file containing
    the DTI axial diffusivity
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_kt(dki_tf, dwi_affine)
+
+   
+   Image of first element in the DKI kurtosis model,
+   Image of second element in the DKI kurtosis model,
+   Image of third element in the DKI kurtosis model,
+   Image of fourth element in the DKI kurtosis model,
+   Image of fifth element in the DKI kurtosis model,
+   Image of sixth element in the DKI kurtosis model,
+   Image of seventh element in the DKI kurtosis model,
+   Image of eighth element in the DKI kurtosis model,
+   Image of ninth element in the DKI kurtosis model,
+   Image of tenth element in the DKI kurtosis model,
+   Image of eleventh element in the DKI kurtosis model,
+   Image of twelf element in the DKI kurtosis model,
+   Image of thirteenth element in the DKI kurtosis model,
+   Image of fourteenth element in the DKI kurtosis model,
+   Image of fifteenth element in the DKI kurtosis model
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_lt(dki_tf, dwi_affine)
+
+   
+   Image of first element in the DTI tensor from DKI,
+   Image of second element in the DTI tensor from DKI,
+   Image of third element in the DTI tensor from DKI,
+   Image of fourth element in the DTI tensor from DKI,
+   Image of fifth element in the DTI tensor from DKI,
+   Image of sixth element in the DTI tensor from DKI
 
 
 
@@ -909,23 +1055,4 @@ Attributes
 
 .. py:function:: get_data_plan(kwargs)
 
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 

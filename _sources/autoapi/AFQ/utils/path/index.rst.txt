@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.utils.path
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------
@@ -25,23 +19,4 @@ Functions
 
 .. py:function:: drop_extension(path)
 
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 

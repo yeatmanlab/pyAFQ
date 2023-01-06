@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.api.group
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------
@@ -27,92 +21,21 @@ Classes
 
    Bases: :py:obj:`object`
 
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-   .. py:method:: combine_profiles(self)
+   .. py:attribute:: clobber
+      
 
       
 
+   .. py:method:: combine_profiles()
 
 
+   .. py:method:: get_streamlines_json()
 
 
+   .. py:method:: export(attr_name='help', collapse=True)
 
 
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_streamlines_json(self)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: export(self, attr_name='help')
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: export_all(self, viz=True, afqbrowser=True, xforms=True, indiv=True)
+   .. py:method:: export_all(viz=True, afqbrowser=True, xforms=True, indiv=True)
 
       
       Exports all the possible outputs
@@ -159,7 +82,134 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: upload_to_s3(self, s3fs, remote_path)
+   .. py:method:: cmd_outputs(cmd='rm', dependent_on=None, exceptions=[], suffix='')
+
+      
+      Perform some command some or all outputs of pyafq.
+      This is useful if you change a parameter and need
+      to recalculate derivatives that depend on it.
+      Some examples: cp, mv, rm .
+      -r will be automtically added when necessary.
+
+
+      :Parameters:
+
+          **cmd** : str
+              Command to run on outputs. Default: 'rm'
+
+          **dependent_on** : str or None
+              Which derivatives to perform command on .
+              If None, perform on all.
+              If "track", perform on all derivatives that depend on the
+              tractography.
+              If "recog", perform on all derivatives that depend on the
+              bundle recognition.
+              Default: None
+
+          **exceptions** : list of str
+              Name outputs that the command should not be applied to.
+              Default: []
+
+          **suffix** : str
+              Parts of command that are used after the filename.
+              Default: ""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: montage(bundle_name, size, view, slice_pos=None)
+
+      
+      Generate montage file(s) of a given bundle at a given angle.
+
+
+      :Parameters:
+
+          **bundle_name** : str
+              Name of bundle to visualize, should be the same as in the
+              bundle dictionary.
+
+          **size** : tuple of int
+              The number of columns and rows for each file.
+
+          **view** : str
+              Which view to display. Can be one of Sagittal, Coronal, or Axial.
+
+          **slice_pos** : float, or None
+              If float, indicates the fractional position along the
+              perpendicular axis to the slice. Currently only works with plotly.
+              If None, no slice is displayed.
+
+      :Returns:
+
+          list of filenames of montage images
+              ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: combine_bundle(bundle_name)
+
+      
+      Transforms a given bundle to reg_template space for all subjects
+      then merges them to one trk file.
+      Useful for visualizing the variability in the bundle across subjects.
+      Note: currently only implemented using built-in SynMap
+
+
+      :Parameters:
+
+          **bundle_name** : str
+              ..
+
+          **Name of the bundle to transform, should be one of the bundles in**
+              ..
+
+          **bundle_dict.**
+              ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: upload_to_s3(s3fs, remote_path)
 
       
       Upload entire AFQ derivatives folder to S3
@@ -182,7 +232,35 @@ Classes
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: assemble_AFQ_browser(self, output_path=None, metadata=None, page_title='AFQ Browser', page_subtitle='', page_title_link='', page_subtitle_link='')
+   .. py:method:: export_group_density(boolify=True)
+
+      
+      Generate a group density map by combining single subject density maps.
+
+
+      :Parameters:
+
+          **boolify** : bool
+              Whether to turn subject streamline count images into booleans
+              before adding them into the group density map.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: assemble_AFQ_browser(output_path=None, metadata=None, page_title='AFQ Browser', page_subtitle='', page_title_link='', page_subtitle_link='')
 
       
       Assembles an instance of the AFQ-Browser from this AFQ instance.

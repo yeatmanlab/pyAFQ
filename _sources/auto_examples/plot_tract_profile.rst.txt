@@ -27,7 +27,13 @@ profiles for FA (calculated with DTI). This example uses the Yeatman et al.
 waypoint ROI approach, first described in [Yeatman2012]_ and further elaborated
 in [Yeatman2014]_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 12-38
+This example goes into the nitty gritty of the underlying methods. This example
+is provided as a way to understand what goes on under the hood, but for most
+practical uses of pyAFQ, we recommend against using the methods directly,
+instead directing users to use the `GroupAFQ` API, demonstrated in other
+examples.
+
+.. GENERATED FROM PYTHON SOURCE LINES 18-44
 
 .. code-block:: default
 
@@ -64,12 +70,12 @@ in [Yeatman2014]_.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 39-41
+.. GENERATED FROM PYTHON SOURCE LINES 45-47
 
 Get example data:
 -------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-49
+.. GENERATED FROM PYTHON SOURCE LINES 47-55
 
 .. code-block:: default
 
@@ -88,12 +94,12 @@ Get example data:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-52
+.. GENERATED FROM PYTHON SOURCE LINES 56-58
 
 Calculate DTI:
 -------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-64
+.. GENERATED FROM PYTHON SOURCE LINES 58-70
 
 .. code-block:: default
 
@@ -115,8 +121,6 @@ Calculate DTI:
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Calculating DTI...
@@ -124,7 +128,7 @@ Calculate DTI:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 65-79
+.. GENERATED FROM PYTHON SOURCE LINES 71-85
 
 Register the individual data to a template:
 -------------------------------------------
@@ -141,7 +145,7 @@ fulfill the segmentation criteria.
     Before calculating this non-linear warping, we perform a pre-alignment
     using an affine transformation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-104
+.. GENERATED FROM PYTHON SOURCE LINES 85-110
 
 .. code-block:: default
 
@@ -176,8 +180,6 @@ fulfill the segmentation criteria.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Registering to template...
@@ -194,7 +196,7 @@ fulfill the segmentation criteria.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-111
+.. GENERATED FROM PYTHON SOURCE LINES 111-117
 
 Read in bundle specification
 -------------------------------------------
@@ -203,7 +205,7 @@ data structure. The templates are first resampled into the MNI space, before
 they are brought into the subject's individual native space.
 For speed, we only segment two bundles here.
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-117
+.. GENERATED FROM PYTHON SOURCE LINES 117-123
 
 .. code-block:: default
 
@@ -220,14 +222,14 @@ For speed, we only segment two bundles here.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 118-122
+.. GENERATED FROM PYTHON SOURCE LINES 124-128
 
 Tracking
 --------
 Streamlines are generate using DTI and a deterministic tractography
 algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-151
+.. GENERATED FROM PYTHON SOURCE LINES 128-157
 
 .. code-block:: default
 
@@ -266,8 +268,6 @@ algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Tracking...
@@ -275,7 +275,7 @@ algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 152-158
+.. GENERATED FROM PYTHON SOURCE LINES 158-164
 
 Segmentation
 --------
@@ -284,7 +284,7 @@ probability that they belong to a bundle is larger than a threshold (set to
 0,per default), whether they pass through inclusion ROIs and whether they do
 not pass through exclusion ROIs.
 
-.. GENERATED FROM PYTHON SOURCE LINES 158-172
+.. GENERATED FROM PYTHON SOURCE LINES 164-178
 
 .. code-block:: default
 
@@ -308,27 +308,25 @@ not pass through exclusion ROIs.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Segmenting fiber groups...
-      0%|          | 0/247 [00:00<?, ?it/s]      1%|          | 2/247 [00:00<00:12, 19.09it/s]      2%|1         | 4/247 [00:03<04:11,  1.03s/it]      7%|7         | 18/247 [00:03<00:35,  6.39it/s]    100%|##########| 247/247 [00:03<00:00, 67.14it/s]
-      0%|          | 0/380 [00:00<?, ?it/s]     12%|#1        | 44/380 [00:00<00:00, 420.94it/s]    100%|##########| 380/380 [00:00<00:00, 2599.64it/s]
-      0%|          | 0/392 [00:00<?, ?it/s]     32%|###1      | 124/392 [00:00<00:00, 1195.28it/s]    100%|##########| 392/392 [00:00<00:00, 2362.38it/s]
-      0%|          | 0/382 [00:00<?, ?it/s]      7%|7         | 28/382 [00:00<00:01, 266.84it/s]    100%|##########| 382/382 [00:00<00:00, 2153.10it/s]
+      0%|          | 0/241 [00:00<?, ?it/s]      2%|1         | 4/241 [00:05<05:17,  1.34s/it]      3%|3         | 8/241 [00:05<02:11,  1.77it/s]    100%|##########| 241/241 [00:05<00:00, 43.84it/s]
+      0%|          | 0/244 [00:00<?, ?it/s]     51%|#####     | 124/244 [00:00<00:00, 1157.86it/s]    100%|##########| 244/244 [00:00<00:00, 2130.09it/s]
+      0%|          | 0/360 [00:00<?, ?it/s]     26%|##5       | 92/360 [00:00<00:00, 884.22it/s]    100%|##########| 360/360 [00:00<00:00, 2183.72it/s]
+      0%|          | 0/336 [00:00<?, ?it/s]     13%|#3        | 44/336 [00:00<00:00, 435.50it/s]    100%|##########| 336/336 [00:00<00:00, 2193.83it/s]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 173-177
+.. GENERATED FROM PYTHON SOURCE LINES 179-183
 
 Cleaning
 --------
 Each fiber group is cleaned to exclude streamlines that are outliers in terms
 of their trajector and/or length.
 
-.. GENERATED FROM PYTHON SOURCE LINES 177-197
+.. GENERATED FROM PYTHON SOURCE LINES 183-203
 
 .. code-block:: default
 
@@ -358,20 +356,18 @@ of their trajector and/or length.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Cleaning fiber groups...
     Cleaning CST_L
-    Before cleaning: 23 streamlines
-    Afer cleaning: 23 streamlines
+    Before cleaning: 31 streamlines
+    Afer cleaning: 24 streamlines
     Cleaning CST_R
-    Before cleaning: 17 streamlines
-    Afer cleaning: 17 streamlines
+    Before cleaning: 18 streamlines
+    Afer cleaning: 18 streamlines
     Cleaning ARC_L
-    Before cleaning: 1 streamlines
-    Afer cleaning: 1 streamlines
+    Before cleaning: 9 streamlines
+    Afer cleaning: 9 streamlines
     Cleaning ARC_R
     Before cleaning: 4 streamlines
     Afer cleaning: 4 streamlines
@@ -379,7 +375,7 @@ of their trajector and/or length.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 198-204
+.. GENERATED FROM PYTHON SOURCE LINES 204-210
 
 Bundle profiles
 ---------------
@@ -388,7 +384,7 @@ scalar properties along the length of each bundle are queried from this
 scalar data. Here, the contribution of each streamline is weighted according
 to how representative this streamline is of the bundle overall.
 
-.. GENERATED FROM PYTHON SOURCE LINES 204-218
+.. GENERATED FROM PYTHON SOURCE LINES 210-224
 
 .. code-block:: default
 
@@ -443,8 +439,6 @@ to how representative this streamline is of the bundle overall.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Extracting tract profiles...
@@ -452,7 +446,7 @@ to how representative this streamline is of the bundle overall.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 219-229
+.. GENERATED FROM PYTHON SOURCE LINES 225-235
 
 References:
 -------------------------
@@ -468,28 +462,23 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 14 minutes  47.362 seconds)
+   **Total running time of the script:** ( 17 minutes  53.864 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_tract_profile.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_tract_profile.py <plot_tract_profile.py>`
 
-     :download:`Download Python source code: plot_tract_profile.py <plot_tract_profile.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_tract_profile.ipynb <plot_tract_profile.ipynb>`
+      :download:`Download Jupyter notebook: plot_tract_profile.ipynb <plot_tract_profile.ipynb>`
 
 
 .. only:: html

@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.viz.utils
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------
@@ -25,23 +19,4 @@ Classes
 
 .. py:class:: Viz(backend='fury')
 
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 

@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.viz.plotly_backend
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------
@@ -59,46 +53,10 @@ Attributes
 
    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
 .. py:data:: viz_logger
    
 
    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:function:: _inline_interact(figure, show, show_inline)
 
@@ -125,113 +83,18 @@ Attributes
 
 .. py:function:: _to_color_range(num)
 
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:function:: _color_arr2str(color_arr, opacity=1.0)
 
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:function:: set_layout(figure, color=None)
 
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:function:: _draw_streamlines(figure, sls, dimensions, color, name, cbv=None, cbs=None, sbv_lims=[None, None], flip_axes=[False, False, False], opacity=1.0)
 
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:function:: _plot_profiles(profiles, bundle_name, color, fig, scalar)
 
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:function:: visualize_bundles(sft, n_points=None, bundle_dict=None, bundle=None, colors=None, shade_by_volume=None, color_by_streamline=None, sbv_lims=[None, None], include_profiles=(None, None), flip_axes=[False, False, False], opacity=1.0, figure=None, background=(1, 1, 1), interact=False, inline=False)
 
@@ -391,25 +254,6 @@ Attributes
 
 .. py:function:: _draw_roi(figure, roi, name, color, opacity, dimensions, flip_axes)
 
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:function:: visualize_roi(roi, affine_or_mapping=None, static_img=None, roi_affine=None, static_affine=None, reg_template=None, name='ROI', figure=None, flip_axes=[False, False, False], color=np.array([0.9999, 0, 0]), opacity=1.0, interact=False, inline=False)
 
@@ -519,46 +363,10 @@ Attributes
 
       
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
    .. py:attribute:: Y
       :annotation: = 1
 
       
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
 
    .. py:attribute:: Z
       :annotation: = 2
@@ -566,67 +374,11 @@ Attributes
       
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-
 .. py:function:: _draw_slice(figure, axis, volume, opacity=0.3, pos=0.5, colorscale='greys', invert_colorscale=False)
 
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:function:: _name_from_enum(axis)
 
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:function:: visualize_volume(volume, figure=None, x_pos=0.5, y_pos=0.5, z_pos=0.5, interact=False, inline=False, opacity=0.3, colorscale='gray', invert_colorscale=False, flip_axes=[False, False, False])
 
@@ -712,25 +464,6 @@ Attributes
 
 .. py:function:: _draw_core(sls, n_points, figure, bundle_name, indiv_profile, labelled_points, dimensions, flip_axes)
 
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:function:: single_bundle_viz(indiv_profile, sft, bundle, scalar_name, bundle_dict=None, flip_axes=[False, False, False], labelled_nodes=[0, -1], figure=None, include_profile=False)
 

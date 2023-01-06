@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.data.s3bids
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------
@@ -227,8 +221,7 @@ Functions
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: subject_id(self)
-      :property:
+   .. py:property:: subject_id
 
       
       An identifier string for the subject
@@ -251,8 +244,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: study(self)
-      :property:
+   .. py:property:: study
 
       
       The study in which this subject participated
@@ -275,8 +267,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: s3_keys(self)
-      :property:
+   .. py:property:: s3_keys
 
       
       A dict of S3 keys for this subject's data
@@ -300,8 +291,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: files(self)
-      :property:
+   .. py:property:: files
 
       
       Local files for this subject's dMRI data
@@ -328,7 +318,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: __repr__(self)
+   .. py:method:: __repr__()
 
       
       Return repr(self).
@@ -351,7 +341,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: _get_s3_keys(self)
+   .. py:method:: _get_s3_keys()
 
       
       Get all required S3 keys for this subject
@@ -378,7 +368,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: download(self, directory, include_derivs=False, overwrite=False, suffix=None, pbar=True, pbar_idx=0)
+   .. py:method:: download(directory, include_derivs=False, overwrite=False, suffix=None, pbar=True, pbar_idx=0)
 
       
       Download files from S3
@@ -454,8 +444,7 @@ Functions
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: site(self)
-      :property:
+   .. py:property:: site
 
       
       The site at which this subject was a participant
@@ -478,7 +467,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: __repr__(self)
+   .. py:method:: __repr__()
 
       
       Return repr(self).
@@ -501,7 +490,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: _get_s3_keys(self)
+   .. py:method:: _get_s3_keys()
 
       
       Get all required S3 keys for this subject
@@ -529,7 +518,7 @@ Functions
           !! processed by numpydoc !!
 
 
-.. py:class:: S3BIDSStudy(study_id, bucket, s3_prefix, subjects=None, anon=True, use_participants_tsv=False, random_seed=None, _subject_class=S3BIDSSubject)
+.. py:class:: S3BIDSStudy(study_id, bucket, s3_prefix='', subjects=None, anon=True, use_participants_tsv=False, random_seed=None, _subject_class=S3BIDSSubject)
 
    
    A BIDS-compliant study hosted on AWS S3
@@ -551,8 +540,7 @@ Functions
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: study_id(self)
-      :property:
+   .. py:property:: study_id
 
       
       An identifier string for the study
@@ -575,8 +563,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: bucket(self)
-      :property:
+   .. py:property:: bucket
 
       
       The S3 bucket that contains the study data
@@ -599,8 +586,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: s3_prefix(self)
-      :property:
+   .. py:property:: s3_prefix
 
       
       The S3 prefix common to all of the study objects on S3
@@ -623,8 +609,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: subjects(self)
-      :property:
+   .. py:property:: subjects
 
       
       A list of Subject instances for each requested subject
@@ -647,8 +632,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: anon(self)
-      :property:
+   .. py:property:: anon
 
       
       Is this study using an anonymous S3 connection?
@@ -671,8 +655,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: derivative_types(self)
-      :property:
+   .. py:property:: derivative_types
 
       
       A list of derivative pipelines available in this study
@@ -695,8 +678,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: non_sub_s3_keys(self)
-      :property:
+   .. py:property:: non_sub_s3_keys
 
       
       A dict of S3 keys that are not in subject directories
@@ -719,8 +701,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: local_directories(self)
-      :property:
+   .. py:property:: local_directories
 
       
       A list of local directories where this study has been downloaded
@@ -743,8 +724,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: use_participants_tsv(self)
-      :property:
+   .. py:property:: use_participants_tsv
 
       
       Did we use a participants.tsv file to populate the list of
@@ -768,8 +748,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: random_seed(self)
-      :property:
+   .. py:property:: random_seed
 
       
       The random seed used to retrieve study subjects
@@ -792,7 +771,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: __repr__(self)
+   .. py:method:: __repr__()
 
       
       Return repr(self).
@@ -815,7 +794,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: _get_subject(self, subject_id)
+   .. py:method:: _get_subject(subject_id)
 
       
       Return a Subject instance from a subject-ID
@@ -838,7 +817,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: _get_derivative_types(self)
+   .. py:method:: _get_derivative_types()
 
       
       Return a list of available derivatives pipelines
@@ -865,7 +844,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: _get_non_subject_s3_keys(self)
+   .. py:method:: _get_non_subject_s3_keys()
 
       
       Return a list of 'non-subject' files
@@ -895,7 +874,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: _list_all_subjects(self)
+   .. py:method:: _list_all_subjects()
 
       
       Return list of subjects
@@ -922,51 +901,13 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: _download_non_sub_keys(self, directory, select=('dataset_description.json', ), filenames=None)
-
-      
+   .. py:method:: _download_non_sub_keys(directory, select=('dataset_description.json', ), filenames=None)
 
 
+   .. py:method:: _download_derivative_descriptions(include_derivs, directory)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: _download_derivative_descriptions(self, include_derivs, directory)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: download(self, directory, include_modality_agnostic=('dataset_description.json', ), include_derivs=False, include_derivs_dataset_description=True, suffix=None, overwrite=False, pbar=True)
+   .. py:method:: download(directory, include_modality_agnostic=('dataset_description.json', ), include_derivs=False, include_derivs_dataset_description=True, suffix=None, overwrite=False, pbar=True)
 
       
       Download files for each subject in the study
@@ -1057,8 +998,7 @@ Functions
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: site(self)
-      :property:
+   .. py:property:: site
 
       
       The HBN site
@@ -1081,7 +1021,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: _get_subject(self, subject_id)
+   .. py:method:: _get_subject(subject_id)
 
       
       Return a Subject instance from a subject-ID
@@ -1104,7 +1044,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: _get_derivative_types(self)
+   .. py:method:: _get_derivative_types()
 
       
       Return a list of available derivatives pipelines
@@ -1134,7 +1074,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: _get_non_subject_s3_keys(self)
+   .. py:method:: _get_non_subject_s3_keys()
 
       
       Return a list of 'non-subject' files
@@ -1171,7 +1111,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: download(self, directory, include_modality_agnostic=False, include_derivs=False, overwrite=False, pbar=True)
+   .. py:method:: download(directory, include_modality_agnostic=False, include_derivs=False, overwrite=False, pbar=True)
 
       
       Download files for each subject in the study

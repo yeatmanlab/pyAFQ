@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.segmentation
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------
@@ -34,48 +28,10 @@ Functions
 
 .. py:class:: Segmentation(nb_points=False, nb_streamlines=False, seg_algo='AFQ', reg_algo=None, clip_edges=False, parallel_segmentation={'n_jobs': -1, 'engine': 'joblib', 'backend': 'loky'}, progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=1.25, reduction_thr=25, refine=False, pruning_thr=12, b0_threshold=50, prob_threshold=0, roi_dist_tie_break=False, dist_to_waypoint=None, rng=None, return_idx=False, presegment_bundle_dict=None, presegment_kwargs={}, filter_by_endpoints=True, dist_to_atlas=4, save_intermediates=None)
 
-   
+   .. py:method:: _read_tg(tg=None)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-   .. py:method:: _read_tg(self, tg=None)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: segment(self, bundle_dict, tg, fdata=None, fbval=None, fbvec=None, mapping=None, reg_prealign=None, reg_template=None, b0_threshold=50, img_affine=None, reset_tg_space=False)
+   .. py:method:: segment(bundle_dict, tg, fdata=None, fbval=None, fbvec=None, mapping=None, reg_prealign=None, reg_template=None, img_affine=None, reset_tg_space=False)
 
       
       Segment streamlines into bundles based on either waypoint ROIs
@@ -145,7 +101,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: prepare_img(self, fdata, fbval, fbvec)
+   .. py:method:: prepare_img(fdata, fbval, fbvec)
 
       
       Prepare image data from DWI data.
@@ -172,7 +128,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: prepare_map(self, mapping=None, reg_prealign=None, reg_template=None)
+   .. py:method:: prepare_map(mapping=None, reg_prealign=None, reg_template=None)
 
       
       Set mapping between DWI space and a template.
@@ -208,7 +164,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: cross_streamlines(self, tg=None, template=None, low_coord=10)
+   .. py:method:: cross_streamlines(tg=None, template=None, low_coord=10)
 
       
       Classify the streamlines by whether they cross the midline.
@@ -239,7 +195,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: _get_bundle_info(self, bundle, vox_dim, tol)
+   .. py:method:: _get_bundle_info(bundle, vox_dim, tol)
 
       
       Get fiber probabilites and ROIs for a given bundle.
@@ -262,7 +218,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: _return_empty(self, bundle)
+   .. py:method:: _return_empty(bundle)
 
       
       Helper function for segment_afq, to return an empty dict under
@@ -286,7 +242,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: segment_afq(self, tg=None)
+   .. py:method:: segment_afq(tg=None)
 
       
       Assign streamlines to bundles using the waypoint ROI approach
@@ -312,7 +268,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: move_streamlines(self, tg, reg_algo='slr')
+   .. py:method:: move_streamlines(tg, reg_algo='slr')
 
       
       Streamline-based registration of a whole-brain tractogram to
@@ -338,7 +294,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: segment_reco(self, tg=None)
+   .. py:method:: segment_reco(tg=None)
 
       
       Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
@@ -372,7 +328,7 @@ Functions
           !! processed by numpydoc !!
 
 
-.. py:function:: clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=5, length_threshold=4, min_sl=20, stat='mean', return_idx=False)
+.. py:function:: clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3, length_threshold=4, min_sl=20, stat='mean', return_idx=False)
 
    
    Clean a segmented fiber group based on the Mahalnobis distance of
@@ -394,7 +350,7 @@ Functions
 
        **distance_threshold** : float, optional.
            Threshold of cleaning based on the Mahalanobis distance (the units are
-           standard deviations). Default: 5.
+           standard deviations). Default: 3.
 
        **length_threshold: float, optional**
            Threshold for cleaning based on length (in standard deviations). Length
@@ -444,7 +400,7 @@ Functions
    ..
        !! processed by numpydoc !!
 
-.. py:function:: clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None, return_idx=False)
+.. py:function:: clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None, flip_sls=None)
 
    
    Clean a collection of streamlines based on their two endpoints
@@ -452,8 +408,9 @@ Functions
    the targets0 and ending points close to targets1
    Parameters
    ----------
-   streamlines : sequence of 3XN_i arrays The collection of streamlines to
-       filter down to.
+   streamlines : sequence of N by 3 arrays
+       Where N is number of nodes in the array, the collection of
+       streamlines to filter down to.
    targets0, target1: sequences or Nx3 arrays or None.
        The targets. Numerical values in the atlas array for targets for the
        first and last node in each streamline respectively, or NX3 arrays with
@@ -466,9 +423,11 @@ Functions
        Contains numerical values for ROIs. Default: if not provided, assume
        that targets0 and targets1 are both arrays of indices, and this
        information is not needed.
+   flip_sls : 1d array, optional
+       Length is len(streamlines), whether to flip the streamline.
    Yields
    -------
-   Generator of the filtered collection
+   Generator of the indicies into streamlines that survive cleaning.
 
 
 

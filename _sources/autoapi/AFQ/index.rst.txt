@@ -3,28 +3,6 @@
 
 .. py:module:: AFQ
 
-.. autoapi-nested-parse::
-
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
 
 Subpackages
 -----------
@@ -59,22 +37,4 @@ Package Contents
    :annotation: = UA-156363454-3
 
    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 

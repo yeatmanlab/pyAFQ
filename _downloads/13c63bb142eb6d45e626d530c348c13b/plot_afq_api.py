@@ -12,6 +12,7 @@ import os.path as op
 import matplotlib.pyplot as plt
 import nibabel as nib
 import plotly
+import pandas as pd
 
 from AFQ.api.group import GroupAFQ
 import AFQ.data.fetch as afd
@@ -180,3 +181,19 @@ fig_files = myafq.export("tract_profile_plots")["01"]
 ##########################################################################
 # .. figure:: {{ fig_files[0] }}
 #
+
+##########################################################################
+# We can check the number of streamlines per bundle, to make sure
+# every bundle is found with a reasonable amount of streamlines.
+
+bundle_counts = pd.read_csv(myafq.export("sl_counts")["01"], index_col=[0])
+for ind in bundle_counts.index:
+    #  few streamlines are found for these bundles in this subject
+    if ind == "FP" or ind == "FA" or "VOF" in ind:
+        threshold = 20
+    else:
+        threshold = 40
+    if bundle_counts["n_streamlines_clean"][ind] < threshold:
+        raise ValueError((
+            "Small number of streamlines found "
+            f"for bundle(s):\n{bundle_counts}"))

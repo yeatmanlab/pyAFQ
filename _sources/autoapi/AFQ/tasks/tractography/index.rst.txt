@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.tasks.tractography
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------
@@ -40,24 +34,6 @@ Attributes
    
 
    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:function:: export_seed_mask(tracking_params)
 
@@ -172,9 +148,10 @@ Attributes
 
    :Parameters:
 
-       **import_tract** : dict or str, optional
+       **import_tract** : dict or str or None, optional
            BIDS filters for inputing a user made tractography file,
-           or a path to the tractography file.
+           or a path to the tractography file. If None, DIPY is used
+           to generate the tractography.
            Default: None
 
 
@@ -195,23 +172,4 @@ Attributes
 
 .. py:function:: get_tractography_plan(kwargs)
 
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 

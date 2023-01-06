@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.utils.streamlines
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------
@@ -33,91 +27,15 @@ Functions
 
 .. py:class:: SegmentedSFT(bundles, space)
 
-   
+   .. py:method:: get_sft_and_sidecar()
 
 
+   .. py:method:: get_bundle(b_name)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-   .. py:method:: get_sft_and_sidecar(self)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_bundle(self, b_name)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: fromfile(cls, trk_file, reference='same', sidecar_file=None)
+   .. py:method:: fromfile(trk_file, reference='same', sidecar_file=None)
       :classmethod:
 
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
 
 
 .. py:function:: split_streamline(streamlines, sl_to_split, split_idx)

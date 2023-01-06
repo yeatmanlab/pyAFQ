@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.data.fetch
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------
@@ -36,30 +30,13 @@ Attributes
    AFQ.data.fetch.fetch_templates
    AFQ.data.fetch.fetch_or_templates
    AFQ.data.fetch.fetch_stanford_hardi_tractography
+   AFQ.data.fetch.fetch_stanford_hardi_lv1
 
 
 .. py:data:: fetch_callosum_templates
    
 
    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:function:: read_callosum_templates(as_img=True, resample_to=False)
 
@@ -106,24 +83,6 @@ Attributes
 
    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
 .. py:function:: read_templates(as_img=True, resample_to=False)
 
    
@@ -169,24 +128,6 @@ Attributes
 
    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
 .. py:function:: read_or_templates(as_img=True, resample_to=False)
 
    
@@ -231,24 +172,6 @@ Attributes
    
 
    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
 
 .. py:function:: read_stanford_hardi_tractography()
 
@@ -318,4 +241,9 @@ Attributes
 
    ..
        !! processed by numpydoc !!
+
+.. py:data:: fetch_stanford_hardi_lv1
+   
+
+   
 

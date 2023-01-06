@@ -325,23 +325,18 @@ the arguments to this call to :meth:`map` are all the different configurations o
 
 .. _sphx_glr_download_auto_examples_cloudknot_hcp_example.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: cloudknot_hcp_example.py <cloudknot_hcp_example.py>`
 
-     :download:`Download Python source code: cloudknot_hcp_example.py <cloudknot_hcp_example.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: cloudknot_hcp_example.ipynb <cloudknot_hcp_example.ipynb>`
+      :download:`Download Jupyter notebook: cloudknot_hcp_example.ipynb <cloudknot_hcp_example.ipynb>`
 
 
 .. only:: html

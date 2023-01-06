@@ -50,8 +50,7 @@ import sys
 # Ensure segmentation logging information is included in this example's output
 root = logging.getLogger()
 root.setLevel(logging.ERROR)
-logging.getLogger('AFQ.Segmentation').setLevel(logging.INFO)
-logging.getLogger('AFQ.tractography').setLevel(logging.INFO)
+logging.getLogger('AFQ').setLevel(logging.INFO)
 handler = logging.StreamHandler(sys.stdout)
 handler.setLevel(logging.INFO)
 root.addHandler(handler)
@@ -332,7 +331,7 @@ if not op.exists(op.join(working_dir, 'dti_streamlines.trk')):
     save_tractogram(tractogram, op.join(working_dir, 'dti_streamlines.trk'),
                     bbox_valid_check=False)
 
-    tractogram_img = density_map(tractogram, n_sls=1000, to_vox=True)
+    tractogram_img = density_map(tractogram, n_sls=1000)
     nib.save(tractogram_img, op.join(working_dir,
                                      'afq_dti_density_map.nii.gz'))
 else:
@@ -403,7 +402,7 @@ for bundle in bundles:
     save_tractogram(tractogram, op.join(working_dir, f'afq_{bundle}_seg.trk'),
                     bbox_valid_check=False)
 
-    tractogram_img = density_map(tractogram, n_sls=1000, to_vox=True)
+    tractogram_img = density_map(tractogram, n_sls=1000)
     nib.save(tractogram_img, op.join(working_dir,
                                      f'afq_{bundle}_seg_density_map.nii.gz'))
     show_anatomical_slices(tractogram_img.get_fdata(),
@@ -449,7 +448,7 @@ for bundle in bundles:
     save_tractogram(tractogram, op.join(working_dir, f'afq_{bundle}.trk'),
                     bbox_valid_check=False)
 
-    tractogram_img = density_map(tractogram, n_sls=1000, to_vox=True)
+    tractogram_img = density_map(tractogram, n_sls=1000)
     nib.save(tractogram_img, op.join(working_dir,
                                      f'afq_{bundle}_density_map.nii.gz'))
     show_anatomical_slices(tractogram_img.get_fdata(),

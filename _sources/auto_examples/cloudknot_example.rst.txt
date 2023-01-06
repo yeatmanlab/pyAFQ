@@ -253,23 +253,18 @@ array of jobs.
 
 .. _sphx_glr_download_auto_examples_cloudknot_example.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: cloudknot_example.py <cloudknot_example.py>`
 
-     :download:`Download Python source code: cloudknot_example.py <cloudknot_example.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: cloudknot_example.ipynb <cloudknot_example.ipynb>`
+      :download:`Download Jupyter notebook: cloudknot_example.ipynb <cloudknot_example.ipynb>`
 
 
 .. only:: html

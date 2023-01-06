@@ -3,12 +3,6 @@
 
 .. py:module:: AFQ.definitions.mapping
 
-.. autoapi-nested-parse::
-
-   
-   ..
-       !! processed by numpydoc !!
-
 
 Module Contents
 ---------------
@@ -19,6 +13,7 @@ Classes
 .. autoapisummary::
 
    AFQ.definitions.mapping.FnirtMap
+   AFQ.definitions.mapping.ItkMap
    AFQ.definitions.mapping.SynMap
    AFQ.definitions.mapping.SlrMap
    AFQ.definitions.mapping.AffMap
@@ -87,37 +82,35 @@ Classes
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
-
-      
+   .. py:method:: find_path(bids_layout, from_path, subject, session)
 
 
-
+   .. py:method:: get_for_subses(base_fname, dwi, bids_info, reg_subject, reg_template)
 
 
 
+.. py:class:: ItkMap(warp_path=None, warp_suffix=None, warp_filters={})
+
+   Bases: :py:obj:`AFQ.definitions.utils.Definition`
+
+   
+   Use an existing Itk map (e.g., from ANTS). Expects the warp file
+   from MNI to T1.
 
 
+   :Parameters:
 
+       **warp_path** : str, optional
+           path to file to get warp from. Use this or warp_suffix.
+           Default: None
 
+       **warp_suffix** : str, optional
+           suffix to pass to bids_layout.get() to identify the warp file.
 
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: get_for_subses(self, base_fname, dwi, bids_info, reg_subject, reg_template)
-
-      
-
-
-
-
-
-
+       **warp_filters** : str, optional
+           Additional filters to pass to bids_layout.get() to identify
+           the warp file.
+           Default: {}
 
 
 
@@ -128,8 +121,26 @@ Classes
 
 
 
-      ..
-          !! processed by numpydoc !!
+
+   .. rubric:: Examples
+
+   itk_map = ItkMap(
+       warp_suffix="xfm",
+       warp_filters={
+           "scope": "qsiprep",
+           "from": "MNI152NLin2009cAsym",
+           "to": "T1w"})
+   api.GroupAFQ(mapping=itk_map)
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: find_path(bids_layout, from_path, subject, session)
+
+
+   .. py:method:: get_for_subses(base_fname, dwi, bids_info, reg_subject, reg_template)
+
 
 
 .. py:class:: SynMap(use_prealign=True, affine_kwargs={}, syn_kwargs={})
@@ -182,49 +193,11 @@ Classes
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
-
-      
+   .. py:method:: find_path(bids_layout, from_path, subject, session)
 
 
+   .. py:method:: gen_mapping(base_fname, reg_subject, reg_template, subject_sls, template_sls, reg_prealign)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: gen_mapping(self, base_fname, reg_subject, reg_template, subject_sls, template_sls, reg_prealign)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
 
 
 .. py:class:: SlrMap(slr_kwargs={})
@@ -259,49 +232,11 @@ Classes
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
-
-      
+   .. py:method:: find_path(bids_layout, from_path, subject, session)
 
 
+   .. py:method:: gen_mapping(base_fname, reg_template, reg_subject, subject_sls, template_sls, reg_prealign)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: gen_mapping(self, base_fname, reg_template, reg_subject, subject_sls, template_sls, reg_prealign)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
 
 
 .. py:class:: AffMap(affine_kwargs={})
@@ -336,48 +271,10 @@ Classes
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: find_path(self, bids_layout, from_path, subject, session)
-
-      
+   .. py:method:: find_path(bids_layout, from_path, subject, session)
 
 
+   .. py:method:: gen_mapping(base_fname, reg_subject, reg_template, subject_sls, template_sls, reg_prealign)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: gen_mapping(self, base_fname, reg_subject, reg_template, subject_sls, template_sls, reg_prealign)
-
-      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
 
 

@@ -3,28 +3,6 @@
 
 .. py:module:: AFQ.models
 
-.. autoapi-nested-parse::
-
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
 
 Submodules
 ----------
@@ -35,5 +13,6 @@ Submodules
    csd/index.rst
    dki/index.rst
    dti/index.rst
+   fwdti/index.rst
 
 

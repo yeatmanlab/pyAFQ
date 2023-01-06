@@ -3,28 +3,6 @@
 
 .. py:module:: AFQ.viz
 
-.. autoapi-nested-parse::
-
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   ..
-       !! processed by numpydoc !!
-
 
 Submodules
 ----------

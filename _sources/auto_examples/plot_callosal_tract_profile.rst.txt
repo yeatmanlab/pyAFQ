@@ -39,7 +39,7 @@ using waypoint ROIs.
 
     https://figshare.com/articles/Templates_for_Automated_Fiber_Quantification_of_corpus_callosum_from_Diffusion_MRI_data/3381523
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-63
+.. GENERATED FROM PYTHON SOURCE LINES 24-62
 
 .. code-block:: default
 
@@ -72,8 +72,7 @@ using waypoint ROIs.
     # Ensure segmentation logging information is included in this example's output
     root = logging.getLogger()
     root.setLevel(logging.ERROR)
-    logging.getLogger('AFQ.Segmentation').setLevel(logging.INFO)
-    logging.getLogger('AFQ.tractography').setLevel(logging.INFO)
+    logging.getLogger('AFQ').setLevel(logging.INFO)
     handler = logging.StreamHandler(sys.stdout)
     handler.setLevel(logging.INFO)
     root.addHandler(handler)
@@ -89,7 +88,7 @@ using waypoint ROIs.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-73
+.. GENERATED FROM PYTHON SOURCE LINES 63-72
 
 Get example data:
 -----------------
@@ -101,7 +100,7 @@ Get example data:
 
     https://purl.stanford.edu/ng782rw8378
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-102
+.. GENERATED FROM PYTHON SOURCE LINES 72-101
 
 .. code-block:: default
 
@@ -144,8 +143,6 @@ Get example data:
 
 
 .. rst-class:: sphx-glr-script-out
-
- Out:
 
  .. code-block:: none
 
@@ -250,7 +247,7 @@ Get example data:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-130
+.. GENERATED FROM PYTHON SOURCE LINES 102-129
 
 Calculate DTI:
 --------------
@@ -280,7 +277,7 @@ In this example we will only use FA.
   The diffusion tensor imaging parameters contain the associated eigenvalues
   and eigenvectors from eigen decomposition on the diffusion tensor.
 
-.. GENERATED FROM PYTHON SOURCE LINES 130-147
+.. GENERATED FROM PYTHON SOURCE LINES 129-146
 
 .. code-block:: default
 
@@ -312,8 +309,6 @@ In this example we will only use FA.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Calculating DTI...
@@ -322,7 +317,7 @@ In this example we will only use FA.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-160
+.. GENERATED FROM PYTHON SOURCE LINES 147-159
 
 Register the individual data to a template:
 -------------------------------------------
@@ -337,7 +332,7 @@ fulfill the segmentation criteria.
     Before calculating this non-linear warping, we perform a pre-alignment
     using an affine transformation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 160-201
+.. GENERATED FROM PYTHON SOURCE LINES 159-200
 
 .. code-block:: default
 
@@ -405,8 +400,6 @@ fulfill the segmentation criteria.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Registering to template...
@@ -423,7 +416,7 @@ fulfill the segmentation criteria.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 202-250
+.. GENERATED FROM PYTHON SOURCE LINES 201-249
 
 Create novel bundle specification:
 ----------------------------------
@@ -474,7 +467,7 @@ waypoint ROI templates:
 The templates are first resampled into the MNI space, before
 they are brought into the subject's individual native space.
 
-.. GENERATED FROM PYTHON SOURCE LINES 250-277
+.. GENERATED FROM PYTHON SOURCE LINES 249-276
 
 .. code-block:: default
 
@@ -535,8 +528,6 @@ they are brought into the subject's individual native space.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Fetching callosum ROI templates...
@@ -545,7 +536,7 @@ they are brought into the subject's individual native space.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 278-297
+.. GENERATED FROM PYTHON SOURCE LINES 277-296
 
 Tracking:
 ---------
@@ -567,7 +558,7 @@ algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
   streamlines for the anterior forceps, but not many streamlines anywhere
   else.
 
-.. GENERATED FROM PYTHON SOURCE LINES 297-344
+.. GENERATED FROM PYTHON SOURCE LINES 296-343
 
 .. code-block:: default
 
@@ -609,7 +600,7 @@ algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
         save_tractogram(tractogram, op.join(working_dir, 'dti_streamlines.trk'),
                         bbox_valid_check=False)
 
-        tractogram_img = density_map(tractogram, n_sls=1000, to_vox=True)
+        tractogram_img = density_map(tractogram, n_sls=1000)
         nib.save(tractogram_img, op.join(working_dir,
                                          'afq_dti_density_map.nii.gz'))
     else:
@@ -655,8 +646,6 @@ algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Tracking...
@@ -668,7 +657,7 @@ algorithm. For speed, we seed only within the waypoint ROIs for each bundle.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 345-378
+.. GENERATED FROM PYTHON SOURCE LINES 344-377
 
 Segmentation:
 -------------
@@ -704,7 +693,7 @@ contains the following keys:
    segmentation by ignoring endpoint filters. This means that additional
    streamlines may be included that would otherwise be excluded.
 
-.. GENERATED FROM PYTHON SOURCE LINES 378-412
+.. GENERATED FROM PYTHON SOURCE LINES 377-411
 
 .. code-block:: default
 
@@ -736,7 +725,7 @@ contains the following keys:
         save_tractogram(tractogram, op.join(working_dir, f'afq_{bundle}_seg.trk'),
                         bbox_valid_check=False)
 
-        tractogram_img = density_map(tractogram, n_sls=1000, to_vox=True)
+        tractogram_img = density_map(tractogram, n_sls=1000)
         nib.save(tractogram_img, op.join(working_dir,
                                          f'afq_{bundle}_seg_density_map.nii.gz'))
         show_anatomical_slices(tractogram_img.get_fdata(),
@@ -765,8 +754,6 @@ contains the following keys:
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Segmenting fiber groups...
@@ -774,9 +761,9 @@ contains the following keys:
     Preprocessing Streamlines
     Assigning Streamlines to Bundles
     Finding Streamlines for AntFrontal
-    1020 streamlines exceed the probability threshold.
-      0%|          | 0/1020 [00:00<?, ?it/s]      0%|          | 4/1020 [00:03<16:35,  1.02it/s]      3%|2         | 26/1020 [00:04<01:53,  8.72it/s]     52%|#####1    | 526/1020 [00:04<00:02, 244.70it/s]    100%|##########| 1020/1020 [00:04<00:00, 243.24it/s]
-    129 streamlines selected with waypoint ROIs
+    585 streamlines exceed the probability threshold.
+      0%|          | 0/585 [00:00<?, ?it/s]      1%|          | 4/585 [00:05<14:28,  1.49s/it]      1%|1         | 6/585 [00:06<08:37,  1.12it/s]     46%|####6     | 272/585 [00:06<00:03, 85.60it/s]    100%|##########| 585/585 [00:06<00:00, 92.58it/s]
+    136 streamlines selected with waypoint ROIs
     Cleaning up Loky...
     Loky Cleaned up
     Re-orienting streamlines to consistent directions
@@ -785,7 +772,7 @@ contains the following keys:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 413-431
+.. GENERATED FROM PYTHON SOURCE LINES 412-430
 
 Cleaning:
 ---------
@@ -806,7 +793,7 @@ of their trajectory and/or length.
      - greather than 4 standard deviations from the mean length
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 431-458
+.. GENERATED FROM PYTHON SOURCE LINES 430-457
 
 .. code-block:: default
 
@@ -831,7 +818,7 @@ of their trajectory and/or length.
         save_tractogram(tractogram, op.join(working_dir, f'afq_{bundle}.trk'),
                         bbox_valid_check=False)
 
-        tractogram_img = density_map(tractogram, n_sls=1000, to_vox=True)
+        tractogram_img = density_map(tractogram, n_sls=1000)
         nib.save(tractogram_img, op.join(working_dir,
                                          f'afq_{bundle}_density_map.nii.gz'))
         show_anatomical_slices(tractogram_img.get_fdata(),
@@ -848,24 +835,22 @@ of their trajectory and/or length.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Cleaning fiber groups...
     Cleaning AntFrontal...
-    Before cleaning: 129 streamlines
-    After cleaning: 126 streamlines
+    Before cleaning: 136 streamlines
+    After cleaning: 63 streamlines
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 459-461
+.. GENERATED FROM PYTHON SOURCE LINES 458-460
 
 Visualizing a bundle and tract profile:
 ---------------------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 461-471
+.. GENERATED FROM PYTHON SOURCE LINES 460-470
 
 .. code-block:: default
 
@@ -886,10 +871,19 @@ Visualizing a bundle and tract profile:
     :file: images/sphx_glr_plot_callosal_tract_profile_015.html
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    Loading Volume...
+    Loading Volume...
+    Loading Stateful Tractogram...
+    Generating colorful lines from tractography...
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 472-482
+
+.. GENERATED FROM PYTHON SOURCE LINES 471-481
 
 Bundle profiles:
 ----------------
@@ -902,7 +896,7 @@ to how representative this streamline is of the bundle overall.
   As a sanity check the anterior forceps the tract profile is relatively
   symmetric?
 
-.. GENERATED FROM PYTHON SOURCE LINES 482-498
+.. GENERATED FROM PYTHON SOURCE LINES 481-497
 
 .. code-block:: default
 
@@ -933,8 +927,6 @@ to how representative this streamline is of the bundle overall.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
     Extracting tract profiles...
@@ -943,7 +935,7 @@ to how representative this streamline is of the bundle overall.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 499-509
+.. GENERATED FROM PYTHON SOURCE LINES 498-508
 
 References:
 -------------------------
@@ -959,28 +951,23 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 15 minutes  0.734 seconds)
+   **Total running time of the script:** ( 15 minutes  0.472 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_callosal_tract_profile.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_callosal_tract_profile.py <plot_callosal_tract_profile.py>`
 
-     :download:`Download Python source code: plot_callosal_tract_profile.py <plot_callosal_tract_profile.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_callosal_tract_profile.ipynb <plot_callosal_tract_profile.ipynb>`
+      :download:`Download Jupyter notebook: plot_callosal_tract_profile.ipynb <plot_callosal_tract_profile.ipynb>`
 
 
 .. only:: html
