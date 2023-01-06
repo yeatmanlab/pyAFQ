@@ -5,28 +5,28 @@
 
 Computation times
 =================
-**221:24.789** total execution time for **auto_examples** files:
+**221:35.655** total execution time for **auto_examples** files:
 
 +---------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_afq_api.py` (``plot_afq_api.py``)                               | 46:49.910 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_afq_api.py` (``plot_afq_api.py``)                               | 46:44.451 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_afq_reco80.py` (``plot_afq_reco80.py``)                         | 41:35.303 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_afq_reco80.py` (``plot_afq_reco80.py``)                         | 41:10.792 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_bids_layout.py` (``plot_bids_layout.py``)                       | 26:01.910 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_bids_layout.py` (``plot_bids_layout.py``)                       | 26:48.450 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_optic_radiations.py` (``plot_optic_radiations.py``)             | 23:23.213 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_optic_radiations.py` (``plot_optic_radiations.py``)             | 23:26.090 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_afq_callosal.py` (``plot_afq_callosal.py``)                     | 19:49.430 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_afq_callosal.py` (``plot_afq_callosal.py``)                     | 20:02.366 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_tract_profile.py` (``plot_tract_profile.py``)                   | 17:53.864 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_tract_profile.py` (``plot_tract_profile.py``)                   | 17:34.254 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_recobundles.py` (``plot_recobundles.py``)                       | 17:23.067 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_recobundles.py` (``plot_recobundles.py``)                       | 17:15.578 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_callosal_tract_profile.py` (``plot_callosal_tract_profile.py``) | 15:00.472 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_callosal_tract_profile.py` (``plot_callosal_tract_profile.py``) | 14:49.788 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_afq_fwdti.py` (``plot_afq_fwdti.py``)                           | 12:35.043 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_afq_fwdti.py` (``plot_afq_fwdti.py``)                           | 13:02.072 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_viz.py` (``plot_viz.py``)                                       | 00:52.575 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_viz.py` (``plot_viz.py``)                                       | 00:41.814 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------+-----------+--------+
 | :ref:`sphx_glr_auto_examples_cloudknot_example.py` (``cloudknot_example.py``)                     | 00:00.000 | 0.0 MB |
 +---------------------------------------------------------------------------------------------------+-----------+--------+
