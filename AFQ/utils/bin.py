@@ -330,6 +330,8 @@ def generate_json(json_folder, overwrite=False,
                   logger=None):
     json_file_our_trk = op.join(json_folder, "pyafq.json")
     json_file_their_trk = op.join(json_folder, "pyafq_input_trk.json")
+    json_file_babyafq = op.join(json_folder, "pyafq_babyafq.json")
+
     if not overwrite and (
             op.exists(json_file_our_trk) or op.exists(json_file_their_trk)):
         raise FileExistsError(
@@ -406,6 +408,59 @@ def generate_json(json_folder, overwrite=False,
                 "use_external_tracking": true,
                 "export": "all",
 """  # noqa
+
+    qsi_spec_intro_babyafq = """{
+        "description": "Use pyAFQ to perform the babyAFQ pipeline",
+        "space": "T1w",
+        "name": "pyAFQ_babyAFQ",
+        "atlases": [],
+        "nodes": [
+            {
+                "name": "msmt_csd",
+                "software": "MRTrix3",
+                "action": "csd",
+                "output_suffix": "msmtcsd",
+                "input": "qsiprep",
+                "parameters": {
+                    "mtnormalize": true,
+                    "response": {
+                    "algorithm": "dhollander"
+                    },
+                    "fod": {
+                    "algorithm": "msmt_csd",
+                    "max_sh": [8, 8, 8]
+                    }
+                }
+            },
+            {
+                "name": "track_ifod2",
+                "software": "MRTrix3",
+                "action": "tractography",
+                "output_suffix": "ifod2",
+                "input": "msmt_csd",
+                "parameters": {
+                    "use_5tt": false,
+                    "use_sift2": true,
+                    "tckgen":{
+                    "algorithm": "iFOD2",
+                    "select": 1e6,
+                    "max_length": 250,
+                    "min_length": 30,
+                    "power":0.33
+                    },
+                    "sift2":{}
+                }
+            },
+            {
+                "name": "pyAFQ_full",
+                "software": "pyAFQ",
+                "action": "pyAFQ_full",
+                "input": "track_ifod2",
+                "output_suffix": "PYAFQ_FULL_BA",
+                "parameters": {
+                    "use_external_tracking": true,
+"""  # noqa
+
     qsi_spec_outro = """
             }
         }
@@ -432,3 +487,5 @@ def generate_json(json_folder, overwrite=False,
     json_file.write(dict_to_json(arg_dict))
     json_file.write(qsi_spec_outro)
     json_file.close()
+
+    arg_dict
