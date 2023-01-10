@@ -5,7 +5,7 @@ import numpy.testing as npt
 import pytest
 
 import nibabel as nib
-import nibabel.tmpdirs as nbtmp
+import tempfile
 
 from AFQ.models.csd import fit_csd
 from AFQ.models.dti import fit_dti
@@ -18,7 +18,7 @@ seeds = np.array([[-80., -120., -60.],
                   [-81, -120, -60]])
 
 
-tmpdir = nbtmp.InTemporaryDirectory()
+tmpdir = tempfile.TemporaryDirectory()
 fbval = op.join(tmpdir.name, 'dti.bval')
 fbvec = op.join(tmpdir.name, 'dti.bvec')
 fdata = op.join(tmpdir.name, 'dti.nii.gz')
