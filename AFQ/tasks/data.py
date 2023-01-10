@@ -596,7 +596,7 @@ def dki_ak(dki_tf):
 
 @pimms.calc("brain_mask")
 @as_file('_desc-brain_mask.nii.gz')
-def brain_mask(base_fname, dwi, b0,
+def brain_mask(base_fname, dwi, gtab, b0,
                bids_info, brain_mask_definition=None):
     """
     full path to a nifti file containing
@@ -624,11 +624,11 @@ def brain_mask(base_fname, dwi, b0,
             bids_info["subject"],
             bids_info["session"])
     return brain_mask_definition.get_image_direct(
-        dwi, bids_info, b0, data_imap=None)
+        dwi, gtab, bids_info, b0, data_imap=None)
 
 
 @pimms.calc("bundle_dict", "reg_template")
-def get_bundle_dict(base_fname, dwi, segmentation_params,
+def get_bundle_dict(base_fname, dwi, gtab, segmentation_params,
                     brain_mask, bids_info, b0,
                     bundle_info=None, reg_template_spec="mni_T1"):
     """
@@ -719,7 +719,7 @@ def get_bundle_dict(base_fname, dwi, segmentation_params,
                 bids_info["subject"],
                 bids_info["session"])
         roi_img, _ = roi.get_image_direct(
-            dwi, bids_info, b0, data_imap=None)
+            dwi, gtab, bids_info, b0, data_imap=None)
         return roi_img
     for b_name, b_info in bundle_dict._dict.items():
         if "space" in b_info and b_info["space"] == "subject":

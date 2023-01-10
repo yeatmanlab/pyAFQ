@@ -78,7 +78,7 @@ def viz_bundles(base_fname,
     bundle_dict = data_imap["bundle_dict"]
     scalar_dict = segmentation_imap["scalar_dict"]
     profiles_file = segmentation_imap["profiles"]
-    volume = data_imap["b0"]
+    volume = data_imap["masked_b0"]
     shade_by_volume = data_imap[best_scalar]
     start_time = time()
     volume = _viz_prepare_vol(volume, False, mapping, scalar_dict)
@@ -182,7 +182,7 @@ def viz_indivBundle(base_fname,
     bundle_dict = data_imap["bundle_dict"]
     reg_template = data_imap["reg_template"]
     scalar_dict = segmentation_imap["scalar_dict"]
-    volume = data_imap["b0"]
+    volume = data_imap["masked_b0"]
     shade_by_volume = data_imap[best_scalar]
     profiles = pd.read_csv(segmentation_imap["profiles"])
 

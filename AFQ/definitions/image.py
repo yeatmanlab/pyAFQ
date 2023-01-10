@@ -48,7 +48,7 @@ class ImageDefinition(Definition):
         raise NotImplementedError(
             "Please implement a get_image_getter method")
 
-    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
+    def get_image_direct(self, dwi, gtab, bids_info, b0_file, data_imap=None):
         raise NotImplementedError(
             "Please implement a get_image_direct method")
 
@@ -179,7 +179,7 @@ class ImageFile(ImageDefinition):
                 dwi_img.affine), meta
         return image_getter
 
-    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
+    def get_image_direct(self, dwi, gtab, bids_info, b0_file, data_imap=None):
         return self.get_image_getter("direct")(
             dwi, bids_info)
 
@@ -210,7 +210,7 @@ class FullImage(ImageDefinition):
                 dwi_img.affine), dict(source="Entire Volume")
         return image_getter
 
-    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
+    def get_image_direct(self, dwi, gtab, bids_info, b0_file, data_imap=None):
         return self.get_image_getter("direct")(dwi)
 
 
@@ -308,10 +308,74 @@ class RoiImage(ImageDefinition):
                     data_imap, segmentation_params)
         return image_getter
 
-    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
+    def get_image_direct(self, dwi, gtab, bids_info, b0_file, data_imap=None):
         raise ValueError((
             "RoiImage cannot be used in this context, as they"
             "require later derivatives to be calculated"))
+
+
+class ExperimentalBrainMask(ImageDefinition):
+    """
+    """
+
+    def __init__(self):
+        pass
+
+    def find_path(self, bids_layout, from_path, subject, session):
+        pass
+
+    def get_name(self):
+        return "EBM"
+
+    def get_image_getter(self, task_name):
+        def image_getter_helper(gtab, data, b0):
+            from AFQ.models.dti import _fit as dti_fit_model
+            import dipy.reconst.dti as dpy_dti
+            from skimage.morphology import convex_hull_image, remove_small_objects
+
+            # Calculate MD, FA without brain mask
+            dtf = dti_fit_model(
+                gtab, nib.load(data).get_fdata(),
+                mask=None, sigma=None)
+            dti_params = dtf.model_params
+            tm = dpy_dti.TensorModel(gtab)
+            tf = dpy_dti.TensorFit(tm, dti_params)
+            # create a "white matter" mask that may include
+            # areas outside the brain
+            famd_mask = np.logical_and(
+                tf.fa > 0.2, np.logical_and(tf.md > 0.0004, tf.md < 0.001))
+
+            # Create brain mask with OTSU
+            mean_b0_img = nib.load(b0)
+            mean_b0 = mean_b0_img.get_fdata()
+            _, otsu_result = median_otsu(mean_b0)
+
+            # Logical or the brain and white matter mask,
+            # then remove all objects not connected to the
+            # OTSU brain mask
+            famd_mask = np.logical_or(otsu_result, famd_mask)
+            famd_mask = remove_small_objects(
+                famd_mask,
+                min_size=np.sum(otsu_result))
+
+            # Finally, make a convex hull
+            famd_mask = convex_hull_image(famd_mask)
+            return nib.Nifti1Image(
+                famd_mask.astype(np.float32),
+                nib.load(data).affine), dict(
+                    source=data,
+                    technique="FA/MD thresholded maps")
+
+        if task_name == "data" or task_name == "direct":
+            return image_getter_helper
+        else:
+            return lambda data_imap: image_getter_helper(
+                data_imap["gtab"],
+                data_imap["data"],
+                data_imap["b0"])
+
+    def get_image_direct(self, dwi, gtab, bids_info, b0_file, data_imap=None):
+        return self.get_image_getter("direct")(gtab, dwi, b0_file)
 
 
 class B0Image(ImageDefinition):
@@ -361,7 +425,7 @@ class B0Image(ImageDefinition):
         else:
             return lambda data_imap: image_getter_helper(data_imap["b0"])
 
-    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
+    def get_image_direct(self, dwi, gtab, bids_info, b0_file, data_imap=None):
         return self.get_image_getter("direct")(b0_file)
 
 
@@ -536,7 +600,7 @@ class ScalarImage(ImageDefinition):
                 FromScalar=self.scalar)
         return image_getter
 
-    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
+    def get_image_direct(self, dwi, gtab, bids_info, b0_file, data_imap=None):
         if data_imap is not None:
             return self.get_image_getter("direct")(data_imap)
         else:
@@ -627,7 +691,7 @@ class PFTImage(ImageDefinition):
         return [probseg.get_image_getter(task_name)
                 for probseg in self.probsegs]
 
-    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
+    def get_image_direct(self, dwi, gtab, bids_info, b0_file, data_imap=None):
         raise ValueError("PFTImage cannot be used in this context")
 
 
@@ -682,7 +746,7 @@ class TemplateImage(ImageDefinition):
                     mapping_imap["mapping"], data_imap["reg_template"])
         return image_getter
 
-    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
+    def get_image_direct(self, dwi, gtab, bids_info, b0_file, data_imap=None):
         raise ValueError((
             "ScalarImage cannot be used in this context, as they"
             "require later derivatives to be calculated"))

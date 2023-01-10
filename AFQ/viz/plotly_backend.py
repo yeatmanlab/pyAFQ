@@ -225,7 +225,7 @@ def _plot_profiles(profiles, bundle_name, color, fig, scalar):
 
 def visualize_bundles(sft, n_points=None, bundle_dict=None,
                       bundle=None, colors=None, shade_by_volume=None,
-                      color_by_streamline=None,
+                      color_by_streamline=None, n_sls_viz=3600,
                       sbv_lims=[None, None], include_profiles=(None, None),
                       flip_axes=[False, False, False], opacity=1.0,
                       figure=None, background=(1, 1, 1), interact=False,
@@ -275,6 +275,12 @@ def visualize_bundles(sft, n_points=None, bundle_dict=None,
         of the dict if passing a  dict, or for all streamlines if using
         ndarray.
         Default: None
+
+    n_sls_viz : int
+        Number of streamlines to randomly select if plotting
+        all bundles. Selections will be proportional to the original number of
+        streamlines per bundle.
+        Default: 3600
 
     sbv_lims : ndarray
         Of the form (lower bound, upper bound). Shading based on
@@ -341,7 +347,8 @@ def visualize_bundles(sft, n_points=None, bundle_dict=None,
     set_layout(figure, color=_color_arr2str(background))
 
     for (sls, color, name, dimensions) in vut.tract_generator(
-            sft, bundle, bundle_dict, colors, n_points):
+            sft, bundle, bundle_dict, colors, n_points,
+            n_sls_viz=n_sls_viz):
         if isinstance(color_by_streamline, dict):
             if name in color_by_streamline:
                 cbs = color_by_streamline[name]
