@@ -488,4 +488,13 @@ def generate_json(json_folder, overwrite=False,
     json_file.write(qsi_spec_outro)
     json_file.close()
 
-    arg_dict
+    arg_dict["DATA"]["reg_template_spec"]['default'] = "pediatric"
+    arg_dict["DATA"]["bundle_info"]['default'] = "PediatricBundleDict()"
+    arg_dict["MAPPING"]["reg_subject_spec"]['default'] = "b0"
+    arg_dict["SEGMENTATION_PARAMS"]["filter_by_endpoints"]['default'] = False
+    arg_dict["CLEANING_PARAMS"]["distance_threshold"]['default'] = 4
+    json_file = open(json_file_babyafq, 'w')
+    json_file.write(qsi_spec_intro_babyafq)
+    json_file.write(dict_to_json(arg_dict))
+    json_file.write(qsi_spec_outro)
+    json_file.close()
