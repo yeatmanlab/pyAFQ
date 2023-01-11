@@ -295,8 +295,12 @@ def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
 
     afq_path = op.join(bids_path, 'derivatives', 'afq')
     os.makedirs(afq_path, exist_ok=True)
-
-    afq_metadata_file = op.join(afq_path, 'afq_metadata.toml')
+    if kwargs['output_dir'] != '':
+        output_dir = kwargs['output_dir']
+        os.makedirs(output_dir, exist_ok=True)
+    else:
+        output_dir = afq_path
+    afq_metadata_file = op.join(output_dir, 'afq_metadata.toml')
     with open(afq_metadata_file, 'w') as ff:
         ff.write(dict_to_toml(default_arg_dict))
 
