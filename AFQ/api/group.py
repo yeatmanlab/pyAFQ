@@ -42,9 +42,7 @@ except ImportError:
 
 __all__ = ["GroupAFQ"]
 
-
-logger = logging.getLogger('AFQ')
-logger.setLevel(logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 # get rid of unnecessary columns in df
@@ -65,6 +63,7 @@ class GroupAFQ(object):
                  output_dir=None,
                  parallel_params={"engine": "serial"},
                  bids_layout_kwargs={},
+                 log_level=logging.INFO,
                  **kwargs):
         '''
         Initialize a GroupAFQ object from a BIDS dataset.
@@ -117,6 +116,7 @@ class GroupAFQ(object):
             my_path,
             reg_template_spec="mni_t2", reg_subject_spec="b0")
         '''
+        logger.setLevel(log_level)
         if not isinstance(bids_path, str):
             raise TypeError("bids_path must be a string")
         if not op.exists(bids_path):
