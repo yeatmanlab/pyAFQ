@@ -40,9 +40,9 @@ def touch(fname, times=None):
 
 
 def get_temp_hardi():
-    tmpdir = tempfile.TemporaryDirectory()
-    bids_path = op.join(tmpdir.name, "stanford_hardi")
-    afd.organize_stanford_data(path=tmpdir.name)
+    tmpdir = tempfile.mkdtemp()
+    bids_path = op.join(tmpdir, "stanford_hardi")
+    afd.organize_stanford_data(path=tmpdir)
 
     sub_path = op.join(
         bids_path,
