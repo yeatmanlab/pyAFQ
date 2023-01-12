@@ -718,8 +718,8 @@ def test_AFQ_data_waypoint():
     Test with some actual data again, this time for track segmentation
     """
     tmpdir, bids_path, _ = get_temp_hardi()
-    t1_path = op.join(tmpdir.name, "T1.nii.gz")
-    t1_path_other = op.join(tmpdir.name, "T1-untransformed.nii.gz")
+    t1_path = op.join(tmpdir, "T1.nii.gz")
+    t1_path_other = op.join(tmpdir, "T1-untransformed.nii.gz")
     nib.save(
         afd.read_mni_template(mask=True, weight="T1w"),
         t1_path)
