@@ -891,7 +891,7 @@ def test_AFQ_data_waypoint():
         SEGMENTATION_PARAMS=segmentation_params,
         CLEANING_PARAMS=clean_params)
 
-    config_file = op.join(tmpdir.name, "afq_config.toml")
+    config_file = op.join(tmpdir, "afq_config.toml")
     with open(config_file, 'w') as ff:
         toml.dump(config, ff)
 
