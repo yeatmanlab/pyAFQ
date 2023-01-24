@@ -58,6 +58,14 @@ Tractometry
   include detailed page that distguished tractometry versus tractography
   and benefits
 
+.. toctree::
+    :maxdepth: 2
+
+    howto/index
+    tutorials/index
+    explanations/index
+    reference/index
+
 Citing our work
 ~~~~~~~~~~~~~~~
 
@@ -96,10 +104,4 @@ R01EB027585) to Eleftherios Garyfallidis and to Ariel Rokem , and by `NSF grant 
    :figclass: align-center
    :target: http://brainandeducation.com
 
-.. toctree::
-    :maxdepth: 2
 
-    howto/index
-    tutorials/index
-    explanations/index
-    reference/index
