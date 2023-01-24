@@ -99,10 +99,7 @@ R01EB027585) to Eleftherios Garyfallidis and to Ariel Rokem , and by `NSF grant 
 .. toctree::
     :maxdepth: 2
 
-    installation_guide
-    usage/index
-    auto_examples/index
-    getting_help
-    contributing
-    autoapi/index
-    developing/index
+    howto/index
+    tutorials/index
+    explanations/index
+    reference/index
