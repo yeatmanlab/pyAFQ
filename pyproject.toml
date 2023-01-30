@@ -1,3 +1,15 @@
 [build-system]
 requires = ["setuptools>=42", "wheel", "setuptools_scm[toml]>=3.4"]
 build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+markers = [
+    "nightly",
+    "nightly_basic",
+    "nightly_anisotropic",
+    "nightly_reco",
+    "nightly_reco80",
+    "nightly_pft",
+    "nightly_custom",
+    "nightly",
+]

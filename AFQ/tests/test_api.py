@@ -16,7 +16,7 @@ import pandas as pd
 from pandas.testing import assert_series_equal
 
 import nibabel as nib
-import nibabel.tmpdirs as nbtmp
+import tempfile
 
 import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
@@ -29,10 +29,9 @@ from AFQ.api.participant import ParticipantAFQ
 import AFQ.data.fetch as afd
 import AFQ.utils.streamlines as aus
 import AFQ.utils.bin as afb
-from AFQ.definitions.image import RoiImage,\
-    PFTImage, ImageFile
 from AFQ.definitions.mapping import SynMap, AffMap, SlrMap, IdentityMap
-from AFQ.definitions.image import TemplateImage, ImageFile, LabelledImageFile
+from AFQ.definitions.image import (RoiImage, PFTImage, ImageFile,
+                                   TemplateImage, LabelledImageFile)
 
 
 def touch(fname, times=None):
@@ -41,13 +40,12 @@ def touch(fname, times=None):
 
 
 def get_temp_hardi():
-    tmpdir = nbtmp.InTemporaryDirectory()
-    afd.organize_stanford_data(path=tmpdir.name)
-    bids_path = op.join(tmpdir.name, 'stanford_hardi')
+    tmpdir = tempfile.mkdtemp()
+    bids_path = op.join(tmpdir, "stanford_hardi")
+    afd.organize_stanford_data(path=tmpdir)
 
     sub_path = op.join(
-        tmpdir.name,
-        'stanford_hardi',
+        bids_path,
         'derivatives',
         'vistasoft',
         'sub-01',
@@ -176,7 +174,7 @@ def create_dummy_bids_path(n_subjects, n_sessions, share_sessions=True):
 
 
 def test_AFQ_missing_files():
-    tmpdir = nbtmp.InTemporaryDirectory()
+    tmpdir = tempfile.TemporaryDirectory()
     bids_path = tmpdir.name
 
     with pytest.raises(
@@ -291,7 +289,9 @@ def test_AFQ_no_derivs():
 @pytest.mark.nightly_custom
 @xvfb_it
 def test_AFQ_fury():
-    _, bids_path, _ = get_temp_hardi()
+    tmpdir = tempfile.TemporaryDirectory()
+    bids_path = op.join(tmpdir.name, "stanford_hardi")
+    afd.organize_stanford_data(path=tmpdir.name)
 
     myafq = GroupAFQ(
         bids_path=bids_path,
@@ -603,19 +603,19 @@ def test_AFQ_pft():
         ImageFile(suffix="WMprobseg"),
         ImageFile(suffix="GMprobseg"),
         ImageFile(suffix="CSFprobseg"))
+    t_output_dir = tempfile.TemporaryDirectory()
 
-    with nbtmp.InTemporaryDirectory() as t_output_dir:
-        myafq = GroupAFQ(
-            bids_path,
-            preproc_pipeline='vistasoft',
-            bundle_info=bundle_names,
-            output_dir=t_output_dir,
-            tracking_params={
-                "stop_mask": stop_mask,
-                "stop_threshold": "CMC",
-                "tracker": "pft"
-            })
-        myafq.export("streamlines")
+    myafq = GroupAFQ(
+        bids_path,
+        preproc_pipeline='vistasoft',
+        bundle_info=bundle_names,
+        output_dir=t_output_dir.name,
+        tracking_params={
+            "stop_mask": stop_mask,
+            "stop_threshold": "CMC",
+            "tracker": "pft"
+        })
+    myafq.export("streamlines")
 
 
 @pytest.mark.nightly_custom
@@ -670,7 +670,7 @@ def test_multib_profile():
     """
     Test using API to profile DKI/fwDTI
     """
-    tmpdir = nbtmp.InTemporaryDirectory()
+    tmpdir = tempfile.TemporaryDirectory()
     afd.organize_cfin_data(path=tmpdir.name)
     myafq = GroupAFQ(bids_path=op.join(tmpdir.name, 'cfin_multib'),
                     preproc_pipeline='dipy')
@@ -681,7 +681,7 @@ def test_multib_profile():
 
 
 def test_auto_cli():
-    tmpdir = nbtmp.InTemporaryDirectory()
+    tmpdir = tempfile.TemporaryDirectory()
     config_file = op.join(tmpdir.name, 'test.toml')
 
     arg_dict = afb.func_dict_to_arg_dict()
@@ -718,8 +718,8 @@ def test_AFQ_data_waypoint():
     Test with some actual data again, this time for track segmentation
     """
     tmpdir, bids_path, _ = get_temp_hardi()
-    t1_path = op.join(tmpdir.name, "T1.nii.gz")
-    t1_path_other = op.join(tmpdir.name, "T1-untransformed.nii.gz")
+    t1_path = op.join(tmpdir, "T1.nii.gz")
+    t1_path_other = op.join(tmpdir, "T1-untransformed.nii.gz")
     nib.save(
         afd.read_mni_template(mask=True, weight="T1w"),
         t1_path)
@@ -891,7 +891,7 @@ def test_AFQ_data_waypoint():
         SEGMENTATION_PARAMS=segmentation_params,
         CLEANING_PARAMS=clean_params)
 
-    config_file = op.join(tmpdir.name, "afq_config.toml")
+    config_file = op.join(tmpdir, "afq_config.toml")
     with open(config_file, 'w') as ff:
         toml.dump(config, ff)
 
