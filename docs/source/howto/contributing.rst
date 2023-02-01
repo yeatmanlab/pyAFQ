@@ -1,6 +1,6 @@
 .. _contributing:
 
-Contributing to pyAFQ
+How to contribute to pyAFQ
 ~~~~~~~~~~~~~~~~~~~~~
 
 pyAFQ is an open-source software project. This means that you are welcome

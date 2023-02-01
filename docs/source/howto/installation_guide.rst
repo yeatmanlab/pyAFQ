@@ -1,12 +1,12 @@
 .. _installation_guide:
 
 
-Installing ``pyAFQ``
+How to install ``pyAFQ``
 ==========================
 
 The ``pyAFQ`` software works (at least) on Python 3.9 and 3.8.
 
-Installing the release version
+How to install the release version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The released version of the software is the one that is officially
@@ -18,7 +18,7 @@ To install it, in a shell or command line, issue the following::
   pip install pyAFQ
 
 
-Installing the development version
+How to install the development version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The development version is probably less stable, but might include new
@@ -51,7 +51,7 @@ See :ref:`contributing`
   package mangagement tools and begin with a clean environment.
 
 
-Installing using Docker
+How to install using Docker
 ~~~~~~~~~~~~~~~~~~~~~~~
 pyAFQ automatically builds and pushes a Docker image with pyAFQ installed for every commit.
 The images can be found here: https://github.com/orgs/nrdg/packages/container/package/pyafq

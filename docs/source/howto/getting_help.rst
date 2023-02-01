@@ -1,4 +1,4 @@
-Getting help using pyAFQ
+How to get help using pyAFQ
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you run into any bugs or issues using pyAFQ, please contact us using
