@@ -104,4 +104,74 @@ R01EB027585) to Eleftherios Garyfallidis and to Ariel Rokem , and by `NSF grant 
    :figclass: align-center
    :target: http://brainandeducation.com
 
+  
 
+.. grid:: 2
+
+    .. grid-item-card::
+        :img-top: ../source/_static/index-images/getting_started.svg
+
+        How To
+        ^^^^^^
+
+        XXX
+
+        +++
+
+        .. button-ref:: howto
+            :expand:
+            :color: secondary
+            :click-parent:
+
+            XXX
+
+    .. grid-item-card::
+        :img-top: ../source/_static/index-images/user_guide.svg
+
+        Tutorials
+        ^^^^^^^^^
+
+        XXX
+
+        +++
+
+        .. button-ref:: tutorials
+            :expand:
+            :color: secondary
+            :click-parent:
+
+            XXX
+
+    .. grid-item-card::
+        :img-top: ../source/_static/index-images/api.svg
+
+        API Reference
+        ^^^^^^^^^^^^^
+
+        XXX
+
+        +++
+
+        .. button-ref:: reference
+            :expand:
+            :color: secondary
+            :click-parent:
+
+            XXX
+
+    .. grid-item-card::
+        :img-top: ../source/_static/index-images/contributor.svg
+
+        Explanations
+        ^^^^^^^^^^^^
+
+        XXX
+
+        +++
+
+        .. button-ref:: explanations
+            :expand:
+            :color: secondary
+            :click-parent:
+
+            XXX
