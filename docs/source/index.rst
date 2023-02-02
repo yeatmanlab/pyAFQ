@@ -107,7 +107,7 @@ R01EB027585) to Eleftherios Garyfallidis and to Ariel Rokem , and by `NSF grant 
   
 
 .. grid:: 2
-
+  
     .. grid-item-card::
         :img-top: ../source/_static/index-images/getting_started.svg
 
