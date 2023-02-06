@@ -85,7 +85,7 @@ def _fit(gtab, data, mask=None, sigma=None):
 def fit_dti(data_files, bval_files, bvec_files, mask=None,
             out_dir=None, file_prefix=None, b0_threshold=50):
     """
-    Fit the DTI model using default settings, save files with derived maps
+    Fit the DTI model using default settings, save files with derived maps.
 
     Parameters
     ----------
@@ -107,11 +107,12 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None,
 
     Returns
     -------
-    file_paths : a dict with the derived maps that were computed and full-paths
-    to the files containing these maps.
+    file_paths : dict
+        A dict with the derived maps that were computed and full-paths
+        to the files containing these maps.
 
-    Note
-    ----
+    Notes
+    -----
     Maps that are calculated: FA, MD, AD, RD
     """
     img, data, gtab, mask = ut.prepare_data(data_files, bval_files,
@@ -147,8 +148,10 @@ def fit_dti(data_files, bval_files, bvec_files, mask=None,
 
 def predict(params_file, gtab, S0_file=None, out_dir=None):
     """
-    Create a signal prediction from DTI params
+    Create a signal prediction from DTI params.
 
+    Parameters
+    ----------
     params_file : str
         Full path to a file with parameters saved from a DKI fit
 
@@ -159,6 +162,12 @@ def predict(params_file, gtab, S0_file=None, out_dir=None):
         Full path to a nifti file that contains S0 measurements to incorporate
         into the prediction. If the file contains 4D data, the volumes that
         contain the S0 data must be the same as the gtab.b0s_mask.
+
+    Returns
+    -------
+    fname : str
+        The name of the nifti file with saved predictions.
+
     """
     if out_dir is None:
         out_dir = op.join(op.split(params_file)[0])

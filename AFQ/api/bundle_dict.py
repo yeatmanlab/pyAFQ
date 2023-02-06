@@ -62,88 +62,89 @@ DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
 
 class BundleDict(MutableMapping):
+    """
+    Create a bundle dictionary, needed for the segmentation.
+
+    Parameters
+    ----------
+    bundle_info : list or dict, optional
+        A list of the bundles to be used, or a dictionary defining
+        custom bundles. See `Defining Custom Bundle Dictionaries`
+        in the `usage` section of pyAFQ's documentation for details.
+        Default: AFQ.api.bundle_dict.BUNDLES
+
+    seg_algo: One of {"afq", "reco", "reco16", "reco80"}
+        The bundle segmentation algorithm to use.
+            "afq" : Use waypoint ROIs + probability maps, as described
+            in [Yeatman2012]_
+            "reco" / "reco16" : Use Recobundles [Garyfallidis2017]_
+            with a 16-bundle set.
+            "reco80": Use Recobundles with an 80-bundle set.
+
+    resample_to : Nifti1Image or bool, optional
+        If there are bundles in bundle_info with the 'space' attribute
+        set to 'template', or with no 'space' attribute,
+        their images (all ROIs and probability maps)
+        will be resampled to the affine and shape of this image.
+        If None, the MNI template will be used.
+        If False, no resampling will be done.
+        Default: None
+
+    resample_subject_to : Nifti1Image or bool, optional
+        If there are bundles in bundle_info with the 'space' attribute
+        set to 'subject', their images (all ROIs and probability maps)
+        will be resampled to the affine and shape of this image.
+        If False, no resampling will be done.
+        Default: None
+
+    keep_in_memory : bool, optional
+        Whether, once loaded, all ROIs and probability maps will stay
+        loaded in memory within this object. By default, ROIs are loaded
+        into memory on demand and no references to ROIs are kept, other
+        than their paths. The default 18 bundles use ~6GB when all loaded.
+        Default: False
+
+    Examples
+    --------
+    # import OR ROIs and create a custom bundle dict
+    # from them
+    import AFQ.data.fetch as afd
+    or_rois = afd.read_or_templates()
+
+    bundles = BundleDict({
+        "L_OR": {
+            "include": [
+                or_rois["left_OR_1"],  # these can be paths to Nifti files
+                or_rois["left_OR_2"]],  # or they can Nifti images
+            "exclude": [
+                or_rois["left_OP_MNI"],
+                or_rois["left_TP_MNI"],
+                or_rois["left_pos_thal_MNI"]],
+            "start": or_rois['left_thal_MNI'],
+            "end": or_rois['left_V1_MNI'],
+            "cross_midline": False,
+        },
+        "R_OR": {
+            "include": [
+                or_rois["right_OR_1"],
+                or_rois["right_OR_2"]],
+            "exclude": [
+                or_rois["right_OP_MNI"],
+                or_rois["right_TP_MNI"],
+                or_rois["right_pos_thal_MNI"]],
+            "start": or_rois['right_thal_MNI'],
+            "end": or_rois['right_V1_MNI'],
+            "cross_midline": False
+        }
+    })
+    """
+
     def __init__(self,
                  bundle_info=BUNDLES,
                  seg_algo="afq",
                  resample_to=None,
                  resample_subject_to=False,
                  keep_in_memory=False):
-        """
-        Create a bundle dictionary, needed for the segmentation
-
-        Parameters
-        ----------
-        bundle_info : list or dict, optional
-            A list of the bundles to be used, or a dictionary defining
-            custom bundles. See `Defining Custom Bundle Dictionaries`
-            in the `usage` section of pyAFQ's documentation for details.
-            Default: AFQ.api.bundle_dict.BUNDLES
-
-        seg_algo: One of {"afq", "reco", "reco16", "reco80"}
-            The bundle segmentation algorithm to use.
-                "afq" : Use waypoint ROIs + probability maps, as described
-                in [Yeatman2012]_
-                "reco" / "reco16" : Use Recobundles [Garyfallidis2017]_
-                with a 16-bundle set.
-                "reco80": Use Recobundles with an 80-bundle set.
-
-        resample_to : Nifti1Image or bool, optional
-            If there are bundles in bundle_info with the 'space' attribute
-            set to 'template', or with no 'space' attribute,
-            their images (all ROIs and probability maps)
-            will be resampled to the affine and shape of this image.
-            If None, the MNI template will be used.
-            If False, no resampling will be done.
-            Default: None
-
-        resample_subject_to : Nifti1Image or bool, optional
-            If there are bundles in bundle_info with the 'space' attribute
-            set to 'subject', their images (all ROIs and probability maps)
-            will be resampled to the affine and shape of this image.
-            If False, no resampling will be done.
-            Default: None
-
-        keep_in_memory : bool, optional
-            Whether, once loaded, all ROIs and probability maps will stay
-            loaded in memory within this object. By default, ROIs are loaded
-            into memory on demand and no references to ROIs are kept, other
-            than their paths. The default 18 bundles use ~6GB when all loaded.
-            Default: False
-
-        Examples
-        --------
-        # import OR ROIs and create a custom bundle dict
-        # from them
-        import AFQ.data.fetch as afd
-        or_rois = afd.read_or_templates()
-
-        bundles = BundleDict({
-            "L_OR": {
-                "include": [
-                    or_rois["left_OR_1"],  # these can be paths to Nifti files
-                    or_rois["left_OR_2"]],  # or they can Nifti images
-                "exclude": [
-                    or_rois["left_OP_MNI"],
-                    or_rois["left_TP_MNI"],
-                    or_rois["left_pos_thal_MNI"]],
-                "start": or_rois['left_thal_MNI'],
-                "end": or_rois['left_V1_MNI'],
-                "cross_midline": False,
-            },
-            "R_OR": {
-                "include": [
-                    or_rois["right_OR_1"],
-                    or_rois["right_OR_2"]],
-                "exclude": [
-                    or_rois["right_OP_MNI"],
-                    or_rois["right_TP_MNI"],
-                    or_rois["right_pos_thal_MNI"]],
-                "start": or_rois['right_thal_MNI'],
-                "end": or_rois['right_V1_MNI'],
-                "cross_midline": False
-            }
-        })
-        """
         if not (isinstance(bundle_info, dict)
                 or isinstance(bundle_info, list)):
             raise TypeError((
