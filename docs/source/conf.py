@@ -233,3 +233,4 @@ sphinx_gallery_conf = {
 autoapi_type = 'python'
 autoapi_dirs = ['../../AFQ']
 autoapi_ignore = ['*test*', '*_fixes*', '*version*', 'pyAFQ', 'License']
+autoapi_root = 'reference/api'

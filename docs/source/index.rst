@@ -33,7 +33,6 @@ For further statistical analysis of pyAFQ results, see `AFQ-Insight <https://git
   (believe this includes both dti and dki? fa, md, cfa?, and pdd?)
 
 
-
 Tractometry
 ~~~~~~~~~~~
 
@@ -105,73 +104,55 @@ R01EB027585) to Eleftherios Garyfallidis and to Ariel Rokem , and by `NSF grant 
    :target: http://brainandeducation.com
 
   
-
 .. grid:: 2
   
     .. grid-item-card::
-        :img-top: ../source/_static/index-images/getting_started.svg
+        :link: howto/index.html
 
-        How To
-        ^^^^^^
+        :octicon:`rocket;10em;sd-text-center`
 
-        XXX
+        Beginner's guide to pyAFQ. This guide introduces pyAFQ'S
+        main concepts.
 
         +++
 
-        .. button-ref:: howto
-            :expand:
-            :color: secondary
-            :click-parent:
-
-            XXX
 
     .. grid-item-card::
-        :img-top: ../source/_static/index-images/user_guide.svg
+        :img-top: ../source/_static/noun-reading-5493785.svg
+        :link: tutorials/index.html
 
         Tutorials
         ^^^^^^^^^
 
-        XXX
+        Tutorials...
 
         +++
 
-        .. button-ref:: tutorials
-            :expand:
-            :color: secondary
-            :click-parent:
-
-            XXX
 
     .. grid-item-card::
-        :img-top: ../source/_static/index-images/api.svg
-
-        API Reference
-        ^^^^^^^^^^^^^
-
-        XXX
-
-        +++
-
-        .. button-ref:: reference
-            :expand:
-            :color: secondary
-            :click-parent:
-
-            XXX
-
-    .. grid-item-card::
-        :img-top: ../source/_static/index-images/contributor.svg
+        :img-top: ../source/_static/noun-explanation-2261661.svg
+        :link: explanations/index.html
 
         Explanations
         ^^^^^^^^^^^^
 
-        XXX
+        For more experienced users. This guide contains in depth 
+        explanations on how to use pyAFQ methods. It includes how to
+        create detailed visualizations and analyses.
+
+        +++
+        
+    .. grid-item-card::
+        :img-top: ../source/_static/noun-reference-5481643.svg
+        :link: reference/index.html
+
+        API Reference
+        ^^^^^^^^^^^^^
+
+        The API Reference contains useful descriptions of methods
+        and objects used in pyAFQ. It also contains descriptions
+        of how methods work and parameters used for each method.
 
         +++
 
-        .. button-ref:: explanations
-            :expand:
-            :color: secondary
-            :click-parent:
 
-            XXX
