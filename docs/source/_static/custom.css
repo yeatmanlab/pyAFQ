@@ -2,3 +2,17 @@ tbody, tr, td
 {
     border: 0 !important;
 }
+  
+.sd-card-header {
+    text-align: center;
+    border: none;
+    background-color: white;
+    color: #150458 !important;
+    font-size: var(--pst-font-size-h5);
+    font-weight: bold;
+    margin: 10px 0px;
+}
+
+.sd-card-footer {
+    display: none;
+}
