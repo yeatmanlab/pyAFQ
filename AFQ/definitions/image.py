@@ -329,42 +329,31 @@ class ExperimentalBrainMask(ImageDefinition):
 
     def get_image_getter(self, task_name):
         def image_getter_helper(gtab, data, b0):
-            from AFQ.models.dti import _fit as dti_fit_model
-            import dipy.reconst.dti as dpy_dti
-            from skimage.morphology import convex_hull_image, remove_small_objects
+            from dipy.reconst import shm
+            from AFQ.models.csd import _fit as csd_fit_model
+            from skimage.morphology import convex_hull_image
 
-            # Calculate MD, FA without brain mask
-            dtf = dti_fit_model(
-                gtab, nib.load(data).get_fdata(),
-                mask=None, sigma=None)
-            dti_params = dtf.model_params
-            tm = dpy_dti.TensorModel(gtab)
-            tf = dpy_dti.TensorFit(tm, dti_params)
-            # create a "white matter" mask that may include
-            # areas outside the brain
-            famd_mask = np.logical_and(
-                tf.fa > 0.2, np.logical_and(tf.md > 0.0004, tf.md < 0.001))
+            data_img = nib.load(data)
+            data_arr = data_img.get_fdata()
 
-            # Create brain mask with OTSU
-            mean_b0_img = nib.load(b0)
-            mean_b0 = mean_b0_img.get_fdata()
-            _, otsu_result = median_otsu(mean_b0)
+            # Fit CSD model and extract APM scalar
+            csdf = csd_fit_model(
+                gtab, data_arr, mask=np.ones(data_arr.shape[:3]))
+            pmap = shm.anisotropic_power(csdf.shm_coeff)
 
-            # Logical or the brain and white matter mask,
-            # then remove all objects not connected to the
-            # OTSU brain mask
-            famd_mask = np.logical_or(otsu_result, famd_mask)
-            famd_mask = remove_small_objects(
-                famd_mask,
-                min_size=np.sum(otsu_result))
+            # Harmonize APM background
+            # pmap_cutoff = np.percentile(pmap[pmap!=0], 15)
+            # pmap_norm = (pmap - pmap_cutoff)/(pmap.max()-pmap_cutoff)
+            # pmap_norm[pmap_norm<0] = 0
 
-            # Finally, make a convex hull
-            famd_mask = convex_hull_image(famd_mask)
+            # Fit OTSU mask
+            # _, otsu_data = median_otsu(pmap_norm)
+
             return nib.Nifti1Image(
-                famd_mask.astype(np.float32),
-                nib.load(data).affine), dict(
+                convex_hull_image(pmap > 6.5).astype(np.float32),
+                data_img.affine), dict(
                     source=data,
-                    technique="FA/MD thresholded maps")
+                    technique="APM thresholded maps")
 
         if task_name == "data" or task_name == "direct":
             return image_getter_helper
