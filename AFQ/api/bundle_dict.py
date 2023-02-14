@@ -393,7 +393,9 @@ class BundleDict(MutableMapping):
             resample_subject_to=self.resample_subject_to,
             keep_in_memory=self.keep_in_memory)
 
-    def apply_to_rois(self, b_name, func, *args, **kwargs):
+    def apply_to_rois(self, b_name, func, *args,
+                      pass_roi_names=False, has_return=True,
+                      **kwargs):
         """
         Applies some transformation to all ROIs (include, exclude, end, start)
         and the prob_map in a given bundle.
@@ -405,6 +407,12 @@ class BundleDict(MutableMapping):
         func : function
             function whose first argument must be a Nifti1Image and which
             returns a Nifti1Image
+        pass_roi_names : bool
+            Whether to also pass the name of the roi (eg, include0 or start)
+            as the second argument to the function.
+        has_return : bool
+            Whether the function returns a Nifti1Image which will replace the
+            current Nifti.
         *args :
             Additional arguments for func
         **kwargs
@@ -414,32 +422,59 @@ class BundleDict(MutableMapping):
         -------
         Dictionary containing the old values of all ROIs and prob_map
         """
-        old_vals = {}
+        if has_return:
+            old_vals = {}
         if self.seg_algo == "afq":
             for roi_type in ["include", "exclude", "start", "end", "prob_map"]:
                 if roi_type in self._dict[b_name]:
                     roi = self._dict[b_name][roi_type]
-                    old_vals[roi_type] = roi
+                    if has_return:
+                        old_vals[roi_type] = roi
                     if roi_type in ["start", "end", "prob_map"]:
-                        self._dict[b_name][roi_type] = func(
-                            roi, *args, **kwargs)
+                        if pass_roi_names:
+                            return_v = func(
+                                roi, roi_type, *args, **kwargs)
+                        else:
+                            return_v = func(
+                                roi, *args, **kwargs)
+                        if has_return:
+                            self._dict[b_name][roi_type] = return_v
                     else:
                         changed_rois = []
-                        for _roi in roi:
-                            changed_rois.append(func(_roi, *args, **kwargs))
-                        self._dict[b_name][roi_type] = changed_rois
+                        for ii, _roi in enumerate(roi):
+                            if pass_roi_names:
+                                return_v = func(
+                                    _roi, f"{roi_type}_{ii}", *args, **kwargs)
+                            else:
+                                return_v = func(
+                                    _roi, *args, **kwargs)
+                            changed_rois.append(return_v)
+                        if has_return:
+                            self._dict[b_name][roi_type] = changed_rois
         elif self.seg_algo.startswith("reco"):
             if b_name == "whole_brain":
-                old_vals = self._dict[b_name]
-                self._dict[b_name] = func(
+                return_v = func(
                     self._dict[b_name], *args, **kwargs)
+                if has_return:
+                    old_vals = self._dict[b_name]
+                    self._dict[b_name] = return_v
             else:
                 for sl_type in ["sl", "centroid"]:
-                    sl = self._dict[b_name][sl_type]
-                    old_vals[sl_type] = sl
-                    self._dict[b_name][sl_type] = func(
-                        sl, *args, **kwargs)
-        return old_vals
+                    if pass_roi_names:
+                        return_v = func(
+                            self._dict[b_name][sl_type], sl_type,
+                            *args, **kwargs)
+                    else:
+                        return_v = func(
+                            self._dict[b_name][sl_type],
+                            *args, **kwargs)
+                    if has_return:
+                        old_vals[sl_type] = self._dict[b_name][sl_type]
+                        self._dict[b_name][sl_type] = return_v
+        if has_return:
+            return old_vals
+        else:
+            return None
 
     def _resample_roi(self, b_name):
         """

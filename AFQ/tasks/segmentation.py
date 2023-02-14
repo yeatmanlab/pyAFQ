@@ -16,7 +16,6 @@ import AFQ.utils.streamlines as aus
 from AFQ.tasks.utils import get_default_args
 from AFQ.data.s3bids import write_json
 import AFQ.api.bundle_dict as abd
-import AFQ.utils.streamlines as aus
 import AFQ.utils.volume as auv
 
 from dipy.io.streamline import load_tractogram, save_tractogram
