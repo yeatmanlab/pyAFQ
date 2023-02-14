@@ -7,7 +7,6 @@ import dipy.data as dpd
 from dipy.align import resample
 from dipy.direction import (DeterministicMaximumDirectionGetter,
                             ProbabilisticDirectionGetter,
-                            BootDirectionGetter,
                             PTTDirectionGetter)
 import dipy.tracking.utils as dtu
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
