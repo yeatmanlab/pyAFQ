@@ -53,7 +53,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
-    #'sphinx_gallery.gen_gallery',
+    'sphinx_gallery.gen_gallery',
     'sphinx_design',
     'sphinx.ext.autosummary',
     'autoapi.extension',
@@ -223,9 +223,9 @@ from _progressbars import reset_progressbars  # noqa
 
 sphinx_gallery_conf = {
     # path to your examples scripts
-    'examples_dirs': '../../examples',
+    'examples_dirs': ['../../examples/howto_examples', '../../examples/tutorial_examples'],
     # path where to save gallery generated examples
-    'gallery_dirs': 'auto_examples',
+    'gallery_dirs': ['auto_examples', 'howto_examples', 'tutorial_examples'],
     'ignore_pattern': 'plot_baby_afq.py',
     'image_scrapers': image_scrapers,
     'reset_modules': (reset_progressbars),
