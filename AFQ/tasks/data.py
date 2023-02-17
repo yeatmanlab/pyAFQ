@@ -84,7 +84,7 @@ def b0(dwi, data, gtab, img):
     """
     full path to a nifti file containing the mean b0
     """
-    mean_b0 = np.mean(data[..., ~gtab.b0s_mask], -1)
+    mean_b0 = np.mean(data[..., gtab.b0s_mask], -1)
     mean_b0_img = nib.Nifti1Image(mean_b0, img.affine)
     meta = dict(b0_threshold=gtab.b0_threshold,
                 source=dwi)
@@ -310,6 +310,7 @@ def fwdti_fa(fwdti_tf):
     anisotropy
     """
     return fwdti_tf.fa
+
 
 @pimms.calc("fwdti_md")
 @as_file(suffix='_model-FWDTI_desc-MD_dwi.nii.gz')
