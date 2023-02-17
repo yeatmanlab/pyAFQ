@@ -1,18 +1,18 @@
-# """
-# ==========================
-# AFQ with HCP data
-# ==========================
-# This example demonstrates how to use the AFQ API to analyze HCP data.
-# For this example to run properly, you will need to gain access to the HCP data.
-# This can be done by following this instructions on the webpage
-# `here <https://wiki.humanconnectome.org/display/PublicData/How+To+Connect+to+Connectome+Data+via+AWS>`_.
-# We will use the ``Cloudknot`` library to run our AFQ analysis in the AWS 
-# Batch service (see also 
-# `this example <http://yeatmanlab.github.io/pyAFQ/auto_examples/cloudknot_example.html>`_).
-# In the following we will use ``Cloudknot`` to run multiple
-# configurations of pyAFQ on the HCP dataset. Specifically, here we will run
-# pyAFQ with different tractography seeding strategies. 
-# """
+"""
+==========================
+AFQ with HCP data
+==========================
+This example demonstrates how to use the AFQ API to analyze HCP data.
+For this example to run properly, you will need to gain access to the HCP data.
+This can be done by following this instructions on the webpage
+`here <https://wiki.humanconnectome.org/display/PublicData/How+To+Connect+to+Connectome+Data+via+AWS>`_.
+We will use the ``Cloudknot`` library to run our AFQ analysis in the AWS 
+Batch service (see also 
+`this example <http://yeatmanlab.github.io/pyAFQ/auto_examples/cloudknot_example.html>`_).
+In the following we will use ``Cloudknot`` to run multiple
+configurations of pyAFQ on the HCP dataset. Specifically, here we will run
+pyAFQ with different tractography seeding strategies. 
+"""
 
 # ##########################################################################
 # # Import cloudknot and set the correct region. The HCP data is stored in `us-east-1`, so it's best

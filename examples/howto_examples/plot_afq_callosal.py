@@ -1,10 +1,10 @@
-# """
-# ==========================
-# Callosal bundles using AFQ API
-# ==========================
-# An example using the AFQ API to find callosal bundles using the templates from:
-# http://hdl.handle.net/1773/34926
-# """
+"""
+==========================
+Callosal bundles using AFQ API
+==========================
+An example using the AFQ API to find callosal bundles using the templates from:
+http://hdl.handle.net/1773/34926
+"""
 # import os.path as op
 # import matplotlib.pyplot as plt
 # import nibabel as nib

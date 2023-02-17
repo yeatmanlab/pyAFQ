@@ -1,19 +1,19 @@
-# """
-# ==============================
-# Pediatric Profiles:
-# ==============================
+"""
+==============================
+Pediatric Profiles:
+==============================
 
-# The following is an example of tractometry for pediatric bundles.
+The following is an example of tractometry for pediatric bundles.
 
-# .. note::
+.. note::
 
-#   This example and resulting pyAFQ support for pediatric bundles was
-#   inspired by and largely due to the work of Grotheer et al. [Grotheer2021]_.
+  This example and resulting pyAFQ support for pediatric bundles was
+  inspired by and largely due to the work of Grotheer et al. [Grotheer2021]_.
 
-#   This example uses the Yeatman et al. waypoint ROI approach, first
-#   described in [Yeatman2012]_ and further elaborated in [Yeatman2014]_.
+  This example uses the Yeatman et al. waypoint ROI approach, first
+  described in [Yeatman2012]_ and further elaborated in [Yeatman2014]_.
 
-# """
+"""
 # import os.path as op
 # import plotly
 

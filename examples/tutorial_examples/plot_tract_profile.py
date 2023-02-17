@@ -1,20 +1,20 @@
-# """
-# ==========================
-# Plotting tract profiles
-# ==========================
+"""
+==========================
+Plotting tract profiles
+==========================
 
-# An example of tracking and segmenting two tracts, and plotting their tract
-# profiles for FA (calculated with DTI). This example uses the Yeatman et al.
-# waypoint ROI approach, first described in [Yeatman2012]_ and further elaborated
-# in [Yeatman2014]_.
+An example of tracking and segmenting two tracts, and plotting their tract
+profiles for FA (calculated with DTI). This example uses the Yeatman et al.
+waypoint ROI approach, first described in [Yeatman2012]_ and further elaborated
+in [Yeatman2014]_.
 
-# This example goes into the nitty gritty of the underlying methods. This example
-# is provided as a way to understand what goes on under the hood, but for most
-# practical uses of pyAFQ, we recommend against using the methods directly,
-# instead directing users to use the `GroupAFQ` API, demonstrated in other
-# examples.
+This example goes into the nitty gritty of the underlying methods. This example
+is provided as a way to understand what goes on under the hood, but for most
+practical uses of pyAFQ, we recommend against using the methods directly,
+instead directing users to use the `GroupAFQ` API, demonstrated in other
+examples.
 
-# """
+"""
 # import os.path as op
 # import matplotlib.pyplot as plt
 # import numpy as np

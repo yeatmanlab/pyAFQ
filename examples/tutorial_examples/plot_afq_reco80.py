@@ -1,12 +1,12 @@
-# """
-# ==========================
-# RecoBundles80 using AFQ API
-# ==========================
+"""
+==========================
+RecoBundles80 using AFQ API
+==========================
 
-# An example using the AFQ API to run recobundles with the
-# `80 bundle atlas <https://figshare.com/articles/Advanced_Atlas_of_80_Bundles_in_MNI_space/7375883>`_.
+An example using the AFQ API to run recobundles with the
+`80 bundle atlas <https://figshare.com/articles/Advanced_Atlas_of_80_Bundles_in_MNI_space/7375883>`_.
 
-# """
+"""
 # import os.path as op
 
 # import plotly

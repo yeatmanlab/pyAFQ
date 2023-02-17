@@ -1,26 +1,26 @@
-# """
-# ====================
-# How pyAFQ uses BIDS
-# ====================
+"""
+====================
+How pyAFQ uses BIDS
+====================
 
-# The pyAFQ API relies heavily on the
-# `Brain Imaging Data Standard (BIDS) <https://bids-specification.readthedocs.io/en/stable/>`_. This means that the software assumes that its inputs are organized
-# according to the BIDS spec and its outputs conform where possible with the
-# BIDS spec.
+The pyAFQ API relies heavily on the
+`Brain Imaging Data Standard (BIDS) <https://bids-specification.readthedocs.io/en/stable/>`_. This means that the software assumes that its inputs are organized
+according to the BIDS spec and its outputs conform where possible with the
+BIDS spec.
 
-# .. note::
+.. note::
 
-#     Derivatives of processing diffusion MRI are not currently fully
-#     described in the existing BIDS specification, but describing these
-#     is part of an ongoing effort. Wherever possible, we conform with
-#     the draft implementation of the BIDS DWI derivatives available
-#     `here <https://bids-specification.readthedocs.io/en/wip-derivatives/05-derivatives/05-diffusion-derivatives.html>`_
+    Derivatives of processing diffusion MRI are not currently fully
+    described in the existing BIDS specification, but describing these
+    is part of an ongoing effort. Wherever possible, we conform with
+    the draft implementation of the BIDS DWI derivatives available
+    `here <https://bids-specification.readthedocs.io/en/wip-derivatives/05-derivatives/05-diffusion-derivatives.html>`_
 
-# In this example, we will explore the use of BIDS in pyAFQ and see
-# how BIDS allows us to extend and provide flexibility to the users
-# of the software.
+In this example, we will explore the use of BIDS in pyAFQ and see
+how BIDS allows us to extend and provide flexibility to the users
+of the software.
 
-# """
+"""
 
 # import os
 # import os.path as op

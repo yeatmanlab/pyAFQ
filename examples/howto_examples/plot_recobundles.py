@@ -1,17 +1,17 @@
-# """
-# =========================================
-# Plotting tract profiles using RecoBundles
-# =========================================
+"""
+=========================================
+Plotting tract profiles using RecoBundles
+=========================================
 
-# An example of tracking and segmenting two tracts with RecoBundles
-# [Garyfallidis2017]_, and plotting their tract profiles for FA (calculated with
-# DTI).
+An example of tracking and segmenting two tracts with RecoBundles
+[Garyfallidis2017]_, and plotting their tract profiles for FA (calculated with
+DTI).
 
-# See `plot_tract_profile` for explanations of each stage here. The main
-# difference here is that segmentation uses the RecoBundles algorithm, instead of
-# the AFQ waypoint ROI approach.
+See `plot_tract_profile` for explanations of each stage here. The main
+difference here is that segmentation uses the RecoBundles algorithm, instead of
+the AFQ waypoint ROI approach.
 
-# """
+"""
 
 # import os.path as op
 # import matplotlib.pyplot as plt

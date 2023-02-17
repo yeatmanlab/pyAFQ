@@ -1,51 +1,51 @@
-# """
-# ==============================
-# Plotting Novel Tract Profiles:
-# ==============================
+"""
+==============================
+Plotting Novel Tract Profiles:
+==============================
 
-# The following is an example of tractometry for a novel bundle and plotting the
-# resulting FA tract profile. We will run tractometry for the *anterior forceps*
-# using waypoint ROIs.
+The following is an example of tractometry for a novel bundle and plotting the
+resulting FA tract profile. We will run tractometry for the *anterior forceps*
+using waypoint ROIs.
 
-# **AFQ Waypoint ROI Tractometry:**
+**AFQ Waypoint ROI Tractometry:**
 
-# .. note::
+.. note::
 
-#   This example uses the Yeatman et al. waypoint ROI approach, first
-#   described in [Yeatman2012]_ and further elaborated in [Yeatman2014]_.
+  This example uses the Yeatman et al. waypoint ROI approach, first
+  described in [Yeatman2012]_ and further elaborated in [Yeatman2014]_.
 
-#   The waypoint ROIs used in this example are from the anterior frontal lobe of
-#   the corpus callosum (AntFrontal). The waypoint ROIs are from the human corpus
-#   callosum templates:
+  The waypoint ROIs used in this example are from the anterior frontal lobe of
+  the corpus callosum (AntFrontal). The waypoint ROIs are from the human corpus
+  callosum templates:
 
-#     https://figshare.com/articles/Templates_for_Automated_Fiber_Quantification_of_corpus_callosum_from_Diffusion_MRI_data/3381523
+    https://figshare.com/articles/Templates_for_Automated_Fiber_Quantification_of_corpus_callosum_from_Diffusion_MRI_data/3381523
 
-# """
-# import os.path as op
-# import matplotlib.pyplot as plt
-# import plotly
-# import numpy as np
-# import nibabel as nib
-# import dipy.data as dpd
-# from dipy.data import fetcher
-# from dipy.io.streamline import save_tractogram, load_tractogram
-# from dipy.stats.analysis import afq_profile, gaussian_weights
-# from dipy.io.stateful_tractogram import StatefulTractogram
-# from dipy.io.stateful_tractogram import Space
-# from dipy.align import affine_registration
+"""
+import os.path as op
+import matplotlib.pyplot as plt
+import plotly
+import numpy as np
+import nibabel as nib
+import dipy.data as dpd
+from dipy.data import fetcher
+from dipy.io.streamline import save_tractogram, load_tractogram
+from dipy.stats.analysis import afq_profile, gaussian_weights
+from dipy.io.stateful_tractogram import StatefulTractogram
+from dipy.io.stateful_tractogram import Space
+from dipy.align import affine_registration
 
-# import AFQ.data.fetch as afd
-# import AFQ.tractography as aft
-# import AFQ.registration as reg
-# import AFQ.models.dti as dti
-# import AFQ.segmentation as seg
-# from AFQ.utils.streamlines import SegmentedSFT
-# from AFQ.utils.volume import transform_inverse_roi, density_map
-# from AFQ.viz.plot import show_anatomical_slices
-# from AFQ.viz.plotly_backend import visualize_bundles, visualize_volume
+import AFQ.data.fetch as afd
+import AFQ.tractography as aft
+import AFQ.registration as reg
+import AFQ.models.dti as dti
+import AFQ.segmentation as seg
+from AFQ.utils.streamlines import SegmentedSFT
+from AFQ.utils.volume import transform_inverse_roi, density_map
+from AFQ.viz.plot import show_anatomical_slices
+from AFQ.viz.plotly_backend import visualize_bundles, visualize_volume
 
-# import logging
-# import sys
+import logging
+import sys
 
 # # Ensure segmentation logging information is included in this example's output
 # root = logging.getLogger()

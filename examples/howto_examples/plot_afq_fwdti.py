@@ -1,16 +1,16 @@
-# """
-# ==========================
-# Free water DTI
-# ==========================
+"""
+==========================
+Free water DTI
+==========================
 
-# The free-water DTI model [1, 2]_ fits a two compartment model to dMRI data
-# with more than one non-zero shell. One compartment is a spherical compartment
-# with the diffusivity of water, which accounts for free water in the tissue.
-# The other compartment is the standard diffusion tensor.
+The free-water DTI model [1, 2]_ fits a two compartment model to dMRI data
+with more than one non-zero shell. One compartment is a spherical compartment
+with the diffusivity of water, which accounts for free water in the tissue.
+The other compartment is the standard diffusion tensor.
 
-# In this example, we will compare the results of the fwDTI model and the standard DTI model.
+In this example, we will compare the results of the fwDTI model and the standard DTI model.
 
-# """
+"""
 # import os.path as op
 
 # import matplotlib.pyplot as plt

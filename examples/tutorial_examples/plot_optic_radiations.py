@@ -1,23 +1,23 @@
-# """
-# =============================
-# Plotting the Optic Radiations
-# =============================
+"""
+=============================
+Plotting the Optic Radiations
+=============================
 
-# pyAFQ is designed to be customizable and extensible. This example shows how you
-# can customize it to define a new bundle based on a definition of waypoint and
-# endpoint ROIs of your design.
+pyAFQ is designed to be customizable and extensible. This example shows how you
+can customize it to define a new bundle based on a definition of waypoint and
+endpoint ROIs of your design.
 
-# In this case, we add the optic radiations, based on work by Caffara et al. [1]_,
-# [2]_. The optic radiations (OR) are the primary projection of visual information
-# from the lateral geniculate nucleus of the thalamus to the primary visual
-# cortex. Studying the optic radiations with dMRI provides a linkage between white
-# matter tissue properties, visual perception and behavior, and physiological
-# responses of the visual cortex to visual stimulation.
+In this case, we add the optic radiations, based on work by Caffara et al. [1]_,
+[2]_. The optic radiations (OR) are the primary projection of visual information
+from the lateral geniculate nucleus of the thalamus to the primary visual
+cortex. Studying the optic radiations with dMRI provides a linkage between white
+matter tissue properties, visual perception and behavior, and physiological
+responses of the visual cortex to visual stimulation.
 
-# We start by importing some of the components that we need for this example and
-# fixing the random seed for reproducibility
+We start by importing some of the components that we need for this example and
+fixing the random seed for reproducibility
 
-# """
+"""
 
 # import os.path as op
 # import plotly

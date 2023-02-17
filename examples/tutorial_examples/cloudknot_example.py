@@ -1,20 +1,20 @@
-# """
-# ==========================================
-# Using cloudknot to run pyAFQ on AWS batch:
-# ==========================================
-# One of the purposes of ``pyAFQ`` is to analyze large-scale openly-available
-# datasets, such as those in the
-# `Human Connectome Project <https://www.humanconnectome.org/>`_.
+"""
+==========================================
+Using cloudknot to run pyAFQ on AWS batch:
+==========================================
+One of the purposes of ``pyAFQ`` is to analyze large-scale openly-available
+datasets, such as those in the
+`Human Connectome Project <https://www.humanconnectome.org/>`_.
 
-# To analyze these datasets, large amounts of compute are needed.
-# One way to gain access to massive computational power is by using
-# cloud computing. Here, we will demonstrate
-# how to use ``pyAFQ`` in the Amazon Web Services cloud.
+To analyze these datasets, large amounts of compute are needed.
+One way to gain access to massive computational power is by using
+cloud computing. Here, we will demonstrate
+how to use ``pyAFQ`` in the Amazon Web Services cloud.
 
-# We will rely on the `AWS Batch Service <https://aws.amazon.com/batch/>`_ ,
-# and we will submit work into AWS Batch using software that our group
-# developed called `Cloudknot <https://nrdg.github.io/cloudknot/>`_.
-# """
+We will rely on the `AWS Batch Service <https://aws.amazon.com/batch/>`_ ,
+and we will submit work into AWS Batch using software that our group
+developed called `Cloudknot <https://nrdg.github.io/cloudknot/>`_.
+"""
 
 # ##########################################################################
 # # Import cloudknot and set the AWS region within which computations will take
