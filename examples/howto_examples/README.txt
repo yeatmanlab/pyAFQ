@@ -3,4 +3,4 @@
 Examples
 ========
 
-Introductory examples.
+How To examples.
