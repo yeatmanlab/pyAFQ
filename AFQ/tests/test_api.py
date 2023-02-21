@@ -22,6 +22,7 @@ import dipy.tracking.utils as dtu
 import dipy.tracking.streamline as dts
 from dipy.data import get_fnames
 from dipy.testing.decorators import xvfb_it
+from dipy.io.streamline import load_tractogram
 
 from AFQ.api.bundle_dict import BundleDict
 from AFQ.api.group import GroupAFQ
@@ -613,9 +614,19 @@ def test_AFQ_pft():
         tracking_params={
             "stop_mask": stop_mask,
             "stop_threshold": "CMC",
-            "tracker": "pft"
+            "tracker": "pft",
+            "max_length": 150,
         })
-    myafq.export("streamlines")
+    sl_file = myafq.export("streamlines")["01"]
+    dwi_file = myafq.export("dwi")["01"]
+    sls = load_tractogram(
+        sl_file,
+        dwi_file,
+        bbox_valid_check=False,
+        trk_header_check=False).streamlines
+    for sl in sls:
+        # double the max_length, due to step size of 0.5
+        assert len(sl) <= 300
 
 
 @pytest.mark.nightly_custom
