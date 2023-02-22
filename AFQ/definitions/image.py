@@ -1,4 +1,5 @@
 import numpy as np
+import logging
 
 import nibabel as nib
 from dipy.segment.mask import median_otsu
@@ -12,6 +13,9 @@ __all__ = [
     "ImageFile", "FullImage", "RoiImage", "B0Image", "LabelledImageFile",
     "ThresholdedImageFile", "ScalarImage", "ThresholdedScalarImage",
     "TemplateImage"]
+
+
+logger = logging.getLogger('AFQ')
 
 
 def _resample_image(image_data, dwi_data, image_affine, dwi_affine):
@@ -339,6 +343,12 @@ class B0Image(ImageDefinition):
         def image_getter_helper(b0):
             mean_b0_img = nib.load(b0)
             mean_b0 = mean_b0_img.get_fdata()
+            logger.warning((
+                "It is reccomended that you provide a brain mask. "
+                "It is provided with the brain_mask_definition argument. "
+                "Otherwise, the default brain mask is calculated "
+                "by using OTSU on the median-filtered B0 image. "
+                "This can be unreliable. "))
             _, image_data = median_otsu(mean_b0, **self.median_otsu_kwargs)
             return nib.Nifti1Image(
                 image_data.astype(np.float32),

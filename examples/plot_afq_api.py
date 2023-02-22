@@ -189,7 +189,9 @@ fig_files = myafq.export("tract_profile_plots")["01"]
 bundle_counts = pd.read_csv(myafq.export("sl_counts")["01"], index_col=[0])
 for ind in bundle_counts.index:
     #  few streamlines are found for these bundles in this subject
-    if ind == "FP" or ind == "FA" or "VOF" in ind:
+    if ind == "FP":
+        threshold = 0
+    elif ind == "FA" or "VOF" in ind:
         threshold = 20
     else:
         threshold = 40
