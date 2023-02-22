@@ -1,3 +1,12 @@
+1.0.1 (February 22, 2023)
+=========================
+Fixed two bugs, where max streamline length was not being enforced and the
+mean b0 was being calculated incorrectly. Small documenation fixes.
+  * [FIX] Add max length constraint, b0 fix (#955)
+  * Small documentation fixes, to improve auto-rendering of API docs. (#949)
+  * MAINT: Upgrade pytest as a start to tackling CI errors. (#945)
+  * MAINT: pep517 => build. (#947)
+
 1.0 (January 05, 2023)
 ======================
 This is the first major release of pyAFQ. The API should be stable
