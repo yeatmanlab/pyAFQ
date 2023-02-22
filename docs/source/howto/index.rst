@@ -8,4 +8,5 @@ How To
     contributing
     developing/index
     getting_help
+    cite
 
