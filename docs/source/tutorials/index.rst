@@ -1,4 +1,7 @@
 Tutorials
 ---------
 
-something random
+.. toctree::
+    :maxdepth: 2
+
+    tutorial_examples/index

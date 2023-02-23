@@ -225,8 +225,8 @@ sphinx_gallery_conf = {
     # path to your examples scripts
     'examples_dirs': ['../../examples/howto_examples', '../../examples/tutorial_examples'],
     # path where to save gallery generated examples
-    'gallery_dirs': ['howto_examples', 'tutorial_examples'],
-    'ignore_pattern': 'plot_baby_afq.py',
+    'gallery_dirs': ['howto/howto_examples', 'tutorials/tutorial_examples'],
+    'ignore_pattern': '/plot',
     'image_scrapers': image_scrapers,
     'reset_modules': (reset_progressbars),
 }

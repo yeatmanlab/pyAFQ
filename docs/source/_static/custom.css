@@ -2,7 +2,7 @@ tbody, tr, td
 {
     border: 0 !important;
 }
-  
+
 .sd-card-header {
     text-align: center;
     background-color: white;
@@ -10,7 +10,7 @@ tbody, tr, td
     font-size: var(--pst-font-size-h5);
     font-weight: bold;
     margin: 10px 0px;
-    padding: 10x;
+
 }
 
 .sd-card-footer {

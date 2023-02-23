@@ -9,4 +9,5 @@ How To
     developing/index
     getting_help
     cite
+    howto_examples/index
 
