@@ -5,8 +5,8 @@ AFQ/version.py
 docs/_build
 docs/build
 docs/source/auto_examples/
-docs/source/tutorial_examples/
-docs/source/howto_examples/
+docs/source/tutorials/tutorial_examples/
+docs/source/howto/howto_examples/
 docs/source/usage/config.rst
 examples/**/*.nii.gz
 examples/**/*.trk
