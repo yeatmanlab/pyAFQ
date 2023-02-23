@@ -33,7 +33,6 @@ Attributes
 
 
 .. py:data:: viz_logger
-   
 
    
 

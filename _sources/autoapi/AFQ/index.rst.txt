@@ -34,7 +34,7 @@ Package Contents
 ----------------
 
 .. py:data:: _ga_id
-   :annotation: = UA-156363454-3
+   :value: 'UA-156363454-3'
 
    
 

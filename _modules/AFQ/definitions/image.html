@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.definitions.image &#8212; AFQ 1.0 documentation</title>
+    <title>AFQ.definitions.image &#8212; AFQ 1.0.1 documentation</title>
   
   
   
@@ -388,6 +388,7 @@
               
   <h1>Source code for AFQ.definitions.image</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
 <span class="kn">from</span> <span class="nn">dipy.segment.mask</span> <span class="kn">import</span> <span class="n">median_otsu</span>
@@ -401,6 +402,9 @@
     <span class="s2">&quot;ImageFile&quot;</span><span class="p">,</span> <span class="s2">&quot;FullImage&quot;</span><span class="p">,</span> <span class="s2">&quot;RoiImage&quot;</span><span class="p">,</span> <span class="s2">&quot;B0Image&quot;</span><span class="p">,</span> <span class="s2">&quot;LabelledImageFile&quot;</span><span class="p">,</span>
     <span class="s2">&quot;ThresholdedImageFile&quot;</span><span class="p">,</span> <span class="s2">&quot;ScalarImage&quot;</span><span class="p">,</span> <span class="s2">&quot;ThresholdedScalarImage&quot;</span><span class="p">,</span>
     <span class="s2">&quot;TemplateImage&quot;</span><span class="p">]</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ&#39;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_resample_image</span><span class="p">(</span><span class="n">image_data</span><span class="p">,</span> <span class="n">dwi_data</span><span class="p">,</span> <span class="n">image_affine</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">):</span>
@@ -728,6 +732,12 @@
         <span class="k">def</span> <span class="nf">image_getter_helper</span><span class="p">(</span><span class="n">b0</span><span class="p">):</span>
             <span class="n">mean_b0_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">b0</span><span class="p">)</span>
             <span class="n">mean_b0</span> <span class="o">=</span> <span class="n">mean_b0_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span>
+                <span class="s2">&quot;It is reccomended that you provide a brain mask. &quot;</span>
+                <span class="s2">&quot;It is provided with the brain_mask_definition argument. &quot;</span>
+                <span class="s2">&quot;Otherwise, the default brain mask is calculated &quot;</span>
+                <span class="s2">&quot;by using OTSU on the median-filtered B0 image. &quot;</span>
+                <span class="s2">&quot;This can be unreliable. &quot;</span><span class="p">))</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">image_data</span> <span class="o">=</span> <span class="n">median_otsu</span><span class="p">(</span><span class="n">mean_b0</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">median_otsu_kwargs</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span>
                 <span class="n">image_data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>

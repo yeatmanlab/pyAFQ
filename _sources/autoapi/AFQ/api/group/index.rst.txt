@@ -22,7 +22,6 @@ Classes
    Bases: :py:obj:`object`
 
    .. py:attribute:: clobber
-      
 
       
 

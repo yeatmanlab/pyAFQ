@@ -49,12 +49,10 @@ Attributes
 
 
 .. py:data:: scope
-   
 
    
 
 .. py:data:: viz_logger
-   
 
    
 
@@ -359,17 +357,17 @@ Attributes
    ..
        !! processed by numpydoc !!
    .. py:attribute:: X
-      :annotation: = 0
+      :value: 0
 
       
 
    .. py:attribute:: Y
-      :annotation: = 1
+      :value: 1
 
       
 
    .. py:attribute:: Z
-      :annotation: = 2
+      :value: 2
 
       
 

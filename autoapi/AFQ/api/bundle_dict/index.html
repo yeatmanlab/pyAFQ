@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.api.bundle_dict &#8212; AFQ 1.0 documentation</title>
+    <title>AFQ.api.bundle_dict &#8212; AFQ 1.0.1 documentation</title>
   
   
   
@@ -471,10 +471,10 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.api.bundle_dict.BundleDict" title="AFQ.api.bundle_dict.BundleDict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BundleDict</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Create a bundle dictionary, needed for the segmentation.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.api.bundle_dict.PediatricBundleDict" title="AFQ.api.bundle_dict.PediatricBundleDict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PediatricBundleDict</span></code></a></p></td>
-<td><p></p></td>
+<td><p>Create a bundle dictionary, needed for the segmentation.</p></td>
 </tr>
 </tbody>
 </table>
@@ -482,6 +482,88 @@
 <dt class="sig sig-object py" id="AFQ.api.bundle_dict.BundleDict">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.api.bundle_dict.</span></span><span class="sig-name descname"><span class="pre">BundleDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bundle_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">BUNDLES</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seg_algo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'afq'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resample_to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resample_subject_to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_in_memory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/api/bundle_dict.html#BundleDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.bundle_dict.BundleDict" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.MutableMapping" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">collections.abc.MutableMapping</span></code></a></p>
+<p>Create a bundle dictionary, needed for the segmentation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>bundle_info</strong><span class="classifier">list or dict, optional</span></dt><dd><p>A list of the bundles to be used, or a dictionary defining
+custom bundles. See <cite>Defining Custom Bundle Dictionaries</cite>
+in the <cite>usage</cite> section of pyAFQ’s documentation for details.
+Default: AFQ.api.bundle_dict.BUNDLES</p>
+</dd>
+<dt><strong>seg_algo: One of {“afq”, “reco”, “reco16”, “reco80”}</strong></dt><dd><dl class="simple">
+<dt>The bundle segmentation algorithm to use.</dt><dd><p>“afq” : Use waypoint ROIs + probability maps, as described
+in <a class="reference internal" href="../../../../index.html#yeatman2012" id="id1"><span>[Yeatman2012]</span></a>
+“reco” / “reco16” : Use Recobundles <a class="reference internal" href="../../../../auto_examples/plot_recobundles.html#garyfallidis2017" id="id2"><span>[Garyfallidis2017]</span></a>
+with a 16-bundle set.
+“reco80”: Use Recobundles with an 80-bundle set.</p>
+</dd>
+</dl>
+</dd>
+<dt><strong>resample_to</strong><span class="classifier">Nifti1Image or bool, optional</span></dt><dd><p>If there are bundles in bundle_info with the ‘space’ attribute
+set to ‘template’, or with no ‘space’ attribute,
+their images (all ROIs and probability maps)
+will be resampled to the affine and shape of this image.
+If None, the MNI template will be used.
+If False, no resampling will be done.
+Default: None</p>
+</dd>
+<dt><strong>resample_subject_to</strong><span class="classifier">Nifti1Image or bool, optional</span></dt><dd><p>If there are bundles in bundle_info with the ‘space’ attribute
+set to ‘subject’, their images (all ROIs and probability maps)
+will be resampled to the affine and shape of this image.
+If False, no resampling will be done.
+Default: None</p>
+</dd>
+<dt><strong>keep_in_memory</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether, once loaded, all ROIs and probability maps will stay
+loaded in memory within this object. By default, ROIs are loaded
+into memory on demand and no references to ROIs are kept, other
+than their paths. The default 18 bundles use ~6GB when all loaded.
+Default: False</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p># import OR ROIs and create a custom bundle dict
+# from them
+import AFQ.data.fetch as afd
+or_rois = afd.read_or_templates()</p>
+<dl>
+<dt>bundles = BundleDict({</dt><dd><dl>
+<dt>“L_OR”: {</dt><dd><dl class="simple">
+<dt>“include”: [</dt><dd><p>or_rois[“left_OR_1”],  # these can be paths to Nifti files
+or_rois[“left_OR_2”]],  # or they can Nifti images</p>
+</dd>
+<dt>“exclude”: [</dt><dd><p>or_rois[“left_OP_MNI”],
+or_rois[“left_TP_MNI”],
+or_rois[“left_pos_thal_MNI”]],</p>
+</dd>
+</dl>
+<p>“start”: or_rois[‘left_thal_MNI’],
+“end”: or_rois[‘left_V1_MNI’],
+“cross_midline”: False,</p>
+</dd>
+</dl>
+<p>},
+“R_OR”: {</p>
+<blockquote>
+<div><dl class="simple">
+<dt>“include”: [</dt><dd><p>or_rois[“right_OR_1”],
+or_rois[“right_OR_2”]],</p>
+</dd>
+<dt>“exclude”: [</dt><dd><p>or_rois[“right_OP_MNI”],
+or_rois[“right_TP_MNI”],
+or_rois[“right_pos_thal_MNI”]],</p>
+</dd>
+</dl>
+<p>“start”: or_rois[‘right_thal_MNI’],
+“end”: or_rois[‘right_V1_MNI’],
+“cross_midline”: False</p>
+</div></blockquote>
+<p>}</p>
+</dd>
+</dl>
+<p>})</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.api.bundle_dict.BundleDict.load_templates">
 <span class="sig-name descname"><span class="pre">load_templates</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/api/bundle_dict.html#BundleDict.load_templates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.bundle_dict.BundleDict.load_templates" title="Permalink to this definition">#</a></dt>
@@ -599,6 +681,88 @@ depending on its “space” attribute.</p>
 <dt class="sig sig-object py" id="AFQ.api.bundle_dict.PediatricBundleDict">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.api.bundle_dict.</span></span><span class="sig-name descname"><span class="pre">PediatricBundleDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bundle_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PEDIATRIC_BUNDLES</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seg_algo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'afq'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resample_to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resample_subject_to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_in_memory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/api/bundle_dict.html#PediatricBundleDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.bundle_dict.PediatricBundleDict" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#AFQ.api.bundle_dict.BundleDict" title="AFQ.api.bundle_dict.BundleDict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BundleDict</span></code></a></p>
+<p>Create a bundle dictionary, needed for the segmentation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>bundle_info</strong><span class="classifier">list or dict, optional</span></dt><dd><p>A list of the bundles to be used, or a dictionary defining
+custom bundles. See <cite>Defining Custom Bundle Dictionaries</cite>
+in the <cite>usage</cite> section of pyAFQ’s documentation for details.
+Default: AFQ.api.bundle_dict.BUNDLES</p>
+</dd>
+<dt><strong>seg_algo: One of {“afq”, “reco”, “reco16”, “reco80”}</strong></dt><dd><dl class="simple">
+<dt>The bundle segmentation algorithm to use.</dt><dd><p>“afq” : Use waypoint ROIs + probability maps, as described
+in <a class="reference internal" href="../../../../index.html#yeatman2012" id="id3"><span>[Yeatman2012]</span></a>
+“reco” / “reco16” : Use Recobundles <a class="reference internal" href="../../../../auto_examples/plot_recobundles.html#garyfallidis2017" id="id4"><span>[Garyfallidis2017]</span></a>
+with a 16-bundle set.
+“reco80”: Use Recobundles with an 80-bundle set.</p>
+</dd>
+</dl>
+</dd>
+<dt><strong>resample_to</strong><span class="classifier">Nifti1Image or bool, optional</span></dt><dd><p>If there are bundles in bundle_info with the ‘space’ attribute
+set to ‘template’, or with no ‘space’ attribute,
+their images (all ROIs and probability maps)
+will be resampled to the affine and shape of this image.
+If None, the MNI template will be used.
+If False, no resampling will be done.
+Default: None</p>
+</dd>
+<dt><strong>resample_subject_to</strong><span class="classifier">Nifti1Image or bool, optional</span></dt><dd><p>If there are bundles in bundle_info with the ‘space’ attribute
+set to ‘subject’, their images (all ROIs and probability maps)
+will be resampled to the affine and shape of this image.
+If False, no resampling will be done.
+Default: None</p>
+</dd>
+<dt><strong>keep_in_memory</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether, once loaded, all ROIs and probability maps will stay
+loaded in memory within this object. By default, ROIs are loaded
+into memory on demand and no references to ROIs are kept, other
+than their paths. The default 18 bundles use ~6GB when all loaded.
+Default: False</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p># import OR ROIs and create a custom bundle dict
+# from them
+import AFQ.data.fetch as afd
+or_rois = afd.read_or_templates()</p>
+<dl>
+<dt>bundles = BundleDict({</dt><dd><dl>
+<dt>“L_OR”: {</dt><dd><dl class="simple">
+<dt>“include”: [</dt><dd><p>or_rois[“left_OR_1”],  # these can be paths to Nifti files
+or_rois[“left_OR_2”]],  # or they can Nifti images</p>
+</dd>
+<dt>“exclude”: [</dt><dd><p>or_rois[“left_OP_MNI”],
+or_rois[“left_TP_MNI”],
+or_rois[“left_pos_thal_MNI”]],</p>
+</dd>
+</dl>
+<p>“start”: or_rois[‘left_thal_MNI’],
+“end”: or_rois[‘left_V1_MNI’],
+“cross_midline”: False,</p>
+</dd>
+</dl>
+<p>},
+“R_OR”: {</p>
+<blockquote>
+<div><dl class="simple">
+<dt>“include”: [</dt><dd><p>or_rois[“right_OR_1”],
+or_rois[“right_OR_2”]],</p>
+</dd>
+<dt>“exclude”: [</dt><dd><p>or_rois[“right_OP_MNI”],
+or_rois[“right_TP_MNI”],
+or_rois[“right_pos_thal_MNI”]],</p>
+</dd>
+</dl>
+<p>“start”: or_rois[‘right_thal_MNI’],
+“end”: or_rois[‘right_V1_MNI’],
+“cross_midline”: False</p>
+</div></blockquote>
+<p>}</p>
+</dd>
+</dl>
+<p>})</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="AFQ.api.bundle_dict.PediatricBundleDict.load_templates">
 <span class="sig-name descname"><span class="pre">load_templates</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/api/bundle_dict.html#PediatricBundleDict.load_templates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.api.bundle_dict.PediatricBundleDict.load_templates" title="Permalink to this definition">#</a></dt>

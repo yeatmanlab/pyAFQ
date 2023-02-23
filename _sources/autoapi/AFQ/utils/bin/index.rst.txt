@@ -50,7 +50,7 @@ Attributes
 
 
 .. py:data:: qsi_prep_ignore_params
-   :annotation: = ['bids_path', 'bids_filters', 'preproc_pipeline', 'participant_labels', 'output_dir']
+   :value: ['bids_path', 'bids_filters', 'preproc_pipeline', 'participant_labels', 'output_dir']
 
    
 

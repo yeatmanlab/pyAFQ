@@ -32,7 +32,6 @@ Attributes
 
 
 .. py:data:: logger
-   
 
    
 

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.models.dti &#8212; AFQ 1.0 documentation</title>
+    <title>AFQ.models.dti &#8212; AFQ 1.0.1 documentation</title>
   
   
   
@@ -474,7 +474,7 @@
 <div class="viewcode-block" id="fit_dti"><a class="viewcode-back" href="../../../autoapi/AFQ/models/dti/index.html#AFQ.models.dti.fit_dti">[docs]</a><span class="k">def</span> <span class="nf">fit_dti</span><span class="p">(</span><span class="n">data_files</span><span class="p">,</span> <span class="n">bval_files</span><span class="p">,</span> <span class="n">bvec_files</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Fit the DTI model using default settings, save files with derived maps</span>
+<span class="sd">    Fit the DTI model using default settings, save files with derived maps.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -496,11 +496,12 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    file_paths : a dict with the derived maps that were computed and full-paths</span>
-<span class="sd">    to the files containing these maps.</span>
+<span class="sd">    file_paths : dict</span>
+<span class="sd">        A dict with the derived maps that were computed and full-paths</span>
+<span class="sd">        to the files containing these maps.</span>
 
-<span class="sd">    Note</span>
-<span class="sd">    ----</span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
 <span class="sd">    Maps that are calculated: FA, MD, AD, RD</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">img</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">prepare_data</span><span class="p">(</span><span class="n">data_files</span><span class="p">,</span> <span class="n">bval_files</span><span class="p">,</span>
@@ -536,8 +537,10 @@
 
 <div class="viewcode-block" id="predict"><a class="viewcode-back" href="../../../autoapi/AFQ/models/dti/index.html#AFQ.models.dti.predict">[docs]</a><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">params_file</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">S0_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Create a signal prediction from DTI params</span>
+<span class="sd">    Create a signal prediction from DTI params.</span>
 
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
 <span class="sd">    params_file : str</span>
 <span class="sd">        Full path to a file with parameters saved from a DKI fit</span>
 
@@ -548,6 +551,12 @@
 <span class="sd">        Full path to a nifti file that contains S0 measurements to incorporate</span>
 <span class="sd">        into the prediction. If the file contains 4D data, the volumes that</span>
 <span class="sd">        contain the S0 data must be the same as the gtab.b0s_mask.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fname : str</span>
+<span class="sd">        The name of the nifti file with saved predictions.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">out_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">out_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">params_file</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>

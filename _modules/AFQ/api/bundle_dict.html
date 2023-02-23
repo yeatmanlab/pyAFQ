@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.api.bundle_dict &#8212; AFQ 1.0 documentation</title>
+    <title>AFQ.api.bundle_dict &#8212; AFQ 1.0.1 documentation</title>
   
   
   
@@ -451,88 +451,89 @@
 
 
 <div class="viewcode-block" id="BundleDict"><a class="viewcode-back" href="../../../autoapi/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.BundleDict">[docs]</a><span class="k">class</span> <span class="nc">BundleDict</span><span class="p">(</span><span class="n">MutableMapping</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a bundle dictionary, needed for the segmentation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    bundle_info : list or dict, optional</span>
+<span class="sd">        A list of the bundles to be used, or a dictionary defining</span>
+<span class="sd">        custom bundles. See `Defining Custom Bundle Dictionaries`</span>
+<span class="sd">        in the `usage` section of pyAFQ&#39;s documentation for details.</span>
+<span class="sd">        Default: AFQ.api.bundle_dict.BUNDLES</span>
+
+<span class="sd">    seg_algo: One of {&quot;afq&quot;, &quot;reco&quot;, &quot;reco16&quot;, &quot;reco80&quot;}</span>
+<span class="sd">        The bundle segmentation algorithm to use.</span>
+<span class="sd">            &quot;afq&quot; : Use waypoint ROIs + probability maps, as described</span>
+<span class="sd">            in [Yeatman2012]_</span>
+<span class="sd">            &quot;reco&quot; / &quot;reco16&quot; : Use Recobundles [Garyfallidis2017]_</span>
+<span class="sd">            with a 16-bundle set.</span>
+<span class="sd">            &quot;reco80&quot;: Use Recobundles with an 80-bundle set.</span>
+
+<span class="sd">    resample_to : Nifti1Image or bool, optional</span>
+<span class="sd">        If there are bundles in bundle_info with the &#39;space&#39; attribute</span>
+<span class="sd">        set to &#39;template&#39;, or with no &#39;space&#39; attribute,</span>
+<span class="sd">        their images (all ROIs and probability maps)</span>
+<span class="sd">        will be resampled to the affine and shape of this image.</span>
+<span class="sd">        If None, the MNI template will be used.</span>
+<span class="sd">        If False, no resampling will be done.</span>
+<span class="sd">        Default: None</span>
+
+<span class="sd">    resample_subject_to : Nifti1Image or bool, optional</span>
+<span class="sd">        If there are bundles in bundle_info with the &#39;space&#39; attribute</span>
+<span class="sd">        set to &#39;subject&#39;, their images (all ROIs and probability maps)</span>
+<span class="sd">        will be resampled to the affine and shape of this image.</span>
+<span class="sd">        If False, no resampling will be done.</span>
+<span class="sd">        Default: None</span>
+
+<span class="sd">    keep_in_memory : bool, optional</span>
+<span class="sd">        Whether, once loaded, all ROIs and probability maps will stay</span>
+<span class="sd">        loaded in memory within this object. By default, ROIs are loaded</span>
+<span class="sd">        into memory on demand and no references to ROIs are kept, other</span>
+<span class="sd">        than their paths. The default 18 bundles use ~6GB when all loaded.</span>
+<span class="sd">        Default: False</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    # import OR ROIs and create a custom bundle dict</span>
+<span class="sd">    # from them</span>
+<span class="sd">    import AFQ.data.fetch as afd</span>
+<span class="sd">    or_rois = afd.read_or_templates()</span>
+
+<span class="sd">    bundles = BundleDict({</span>
+<span class="sd">        &quot;L_OR&quot;: {</span>
+<span class="sd">            &quot;include&quot;: [</span>
+<span class="sd">                or_rois[&quot;left_OR_1&quot;],  # these can be paths to Nifti files</span>
+<span class="sd">                or_rois[&quot;left_OR_2&quot;]],  # or they can Nifti images</span>
+<span class="sd">            &quot;exclude&quot;: [</span>
+<span class="sd">                or_rois[&quot;left_OP_MNI&quot;],</span>
+<span class="sd">                or_rois[&quot;left_TP_MNI&quot;],</span>
+<span class="sd">                or_rois[&quot;left_pos_thal_MNI&quot;]],</span>
+<span class="sd">            &quot;start&quot;: or_rois[&#39;left_thal_MNI&#39;],</span>
+<span class="sd">            &quot;end&quot;: or_rois[&#39;left_V1_MNI&#39;],</span>
+<span class="sd">            &quot;cross_midline&quot;: False,</span>
+<span class="sd">        },</span>
+<span class="sd">        &quot;R_OR&quot;: {</span>
+<span class="sd">            &quot;include&quot;: [</span>
+<span class="sd">                or_rois[&quot;right_OR_1&quot;],</span>
+<span class="sd">                or_rois[&quot;right_OR_2&quot;]],</span>
+<span class="sd">            &quot;exclude&quot;: [</span>
+<span class="sd">                or_rois[&quot;right_OP_MNI&quot;],</span>
+<span class="sd">                or_rois[&quot;right_TP_MNI&quot;],</span>
+<span class="sd">                or_rois[&quot;right_pos_thal_MNI&quot;]],</span>
+<span class="sd">            &quot;start&quot;: or_rois[&#39;right_thal_MNI&#39;],</span>
+<span class="sd">            &quot;end&quot;: or_rois[&#39;right_V1_MNI&#39;],</span>
+<span class="sd">            &quot;cross_midline&quot;: False</span>
+<span class="sd">        }</span>
+<span class="sd">    })</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">bundle_info</span><span class="o">=</span><span class="n">BUNDLES</span><span class="p">,</span>
                  <span class="n">seg_algo</span><span class="o">=</span><span class="s2">&quot;afq&quot;</span><span class="p">,</span>
                  <span class="n">resample_to</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">resample_subject_to</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">keep_in_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create a bundle dictionary, needed for the segmentation</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        bundle_info : list or dict, optional</span>
-<span class="sd">            A list of the bundles to be used, or a dictionary defining</span>
-<span class="sd">            custom bundles. See `Defining Custom Bundle Dictionaries`</span>
-<span class="sd">            in the `usage` section of pyAFQ&#39;s documentation for details.</span>
-<span class="sd">            Default: AFQ.api.bundle_dict.BUNDLES</span>
-
-<span class="sd">        seg_algo: One of {&quot;afq&quot;, &quot;reco&quot;, &quot;reco16&quot;, &quot;reco80&quot;}</span>
-<span class="sd">            The bundle segmentation algorithm to use.</span>
-<span class="sd">                &quot;afq&quot; : Use waypoint ROIs + probability maps, as described</span>
-<span class="sd">                in [Yeatman2012]_</span>
-<span class="sd">                &quot;reco&quot; / &quot;reco16&quot; : Use Recobundles [Garyfallidis2017]_</span>
-<span class="sd">                with a 16-bundle set.</span>
-<span class="sd">                &quot;reco80&quot;: Use Recobundles with an 80-bundle set.</span>
-
-<span class="sd">        resample_to : Nifti1Image or bool, optional</span>
-<span class="sd">            If there are bundles in bundle_info with the &#39;space&#39; attribute</span>
-<span class="sd">            set to &#39;template&#39;, or with no &#39;space&#39; attribute,</span>
-<span class="sd">            their images (all ROIs and probability maps)</span>
-<span class="sd">            will be resampled to the affine and shape of this image.</span>
-<span class="sd">            If None, the MNI template will be used.</span>
-<span class="sd">            If False, no resampling will be done.</span>
-<span class="sd">            Default: None</span>
-
-<span class="sd">        resample_subject_to : Nifti1Image or bool, optional</span>
-<span class="sd">            If there are bundles in bundle_info with the &#39;space&#39; attribute</span>
-<span class="sd">            set to &#39;subject&#39;, their images (all ROIs and probability maps)</span>
-<span class="sd">            will be resampled to the affine and shape of this image.</span>
-<span class="sd">            If False, no resampling will be done.</span>
-<span class="sd">            Default: None</span>
-
-<span class="sd">        keep_in_memory : bool, optional</span>
-<span class="sd">            Whether, once loaded, all ROIs and probability maps will stay</span>
-<span class="sd">            loaded in memory within this object. By default, ROIs are loaded</span>
-<span class="sd">            into memory on demand and no references to ROIs are kept, other</span>
-<span class="sd">            than their paths. The default 18 bundles use ~6GB when all loaded.</span>
-<span class="sd">            Default: False</span>
-
-<span class="sd">        Examples</span>
-<span class="sd">        --------</span>
-<span class="sd">        # import OR ROIs and create a custom bundle dict</span>
-<span class="sd">        # from them</span>
-<span class="sd">        import AFQ.data.fetch as afd</span>
-<span class="sd">        or_rois = afd.read_or_templates()</span>
-
-<span class="sd">        bundles = BundleDict({</span>
-<span class="sd">            &quot;L_OR&quot;: {</span>
-<span class="sd">                &quot;include&quot;: [</span>
-<span class="sd">                    or_rois[&quot;left_OR_1&quot;],  # these can be paths to Nifti files</span>
-<span class="sd">                    or_rois[&quot;left_OR_2&quot;]],  # or they can Nifti images</span>
-<span class="sd">                &quot;exclude&quot;: [</span>
-<span class="sd">                    or_rois[&quot;left_OP_MNI&quot;],</span>
-<span class="sd">                    or_rois[&quot;left_TP_MNI&quot;],</span>
-<span class="sd">                    or_rois[&quot;left_pos_thal_MNI&quot;]],</span>
-<span class="sd">                &quot;start&quot;: or_rois[&#39;left_thal_MNI&#39;],</span>
-<span class="sd">                &quot;end&quot;: or_rois[&#39;left_V1_MNI&#39;],</span>
-<span class="sd">                &quot;cross_midline&quot;: False,</span>
-<span class="sd">            },</span>
-<span class="sd">            &quot;R_OR&quot;: {</span>
-<span class="sd">                &quot;include&quot;: [</span>
-<span class="sd">                    or_rois[&quot;right_OR_1&quot;],</span>
-<span class="sd">                    or_rois[&quot;right_OR_2&quot;]],</span>
-<span class="sd">                &quot;exclude&quot;: [</span>
-<span class="sd">                    or_rois[&quot;right_OP_MNI&quot;],</span>
-<span class="sd">                    or_rois[&quot;right_TP_MNI&quot;],</span>
-<span class="sd">                    or_rois[&quot;right_pos_thal_MNI&quot;]],</span>
-<span class="sd">                &quot;start&quot;: or_rois[&#39;right_thal_MNI&#39;],</span>
-<span class="sd">                &quot;end&quot;: or_rois[&#39;right_V1_MNI&#39;],</span>
-<span class="sd">                &quot;cross_midline&quot;: False</span>
-<span class="sd">            }</span>
-<span class="sd">        })</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">bundle_info</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
                 <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bundle_info</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">((</span>

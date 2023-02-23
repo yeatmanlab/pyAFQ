@@ -34,7 +34,6 @@ Attributes
 
 
 .. py:data:: fetch_callosum_templates
-   
 
    
 
@@ -79,7 +78,6 @@ Attributes
        !! processed by numpydoc !!
 
 .. py:data:: fetch_templates
-   
 
    
 
@@ -124,7 +122,6 @@ Attributes
        !! processed by numpydoc !!
 
 .. py:data:: fetch_or_templates
-   
 
    
 
@@ -169,7 +166,6 @@ Attributes
        !! processed by numpydoc !!
 
 .. py:data:: fetch_stanford_hardi_tractography
-   
 
    
 
@@ -243,7 +239,6 @@ Attributes
        !! processed by numpydoc !!
 
 .. py:data:: fetch_stanford_hardi_lv1
-   
 
    
 

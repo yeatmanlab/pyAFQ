@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.data &#8212; AFQ 1.0 documentation</title>
+    <title>AFQ.tasks.data &#8212; AFQ 1.0.1 documentation</title>
   
   
   
@@ -473,7 +473,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    full path to a nifti file containing the mean b0</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">mean_b0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="o">~</span><span class="n">gtab</span><span class="o">.</span><span class="n">b0s_mask</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">mean_b0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">gtab</span><span class="o">.</span><span class="n">b0s_mask</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">mean_b0_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">mean_b0</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
     <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">b0_threshold</span><span class="o">=</span><span class="n">gtab</span><span class="o">.</span><span class="n">b0_threshold</span><span class="p">,</span>
                 <span class="n">source</span><span class="o">=</span><span class="n">dwi</span><span class="p">)</span>
@@ -699,6 +699,7 @@
 <span class="sd">    anisotropy</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">fwdti_tf</span><span class="o">.</span><span class="n">fa</span></div>
+
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;fwdti_md&quot;</span><span class="p">)</span>
 <span class="nd">@as_file</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;_model-FWDTI_desc-MD_dwi.nii.gz&#39;</span><span class="p">)</span>
