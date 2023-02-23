@@ -33,7 +33,6 @@ pyAFQ is an open-source software tool for the analysis of brain white matter in 
 
     .. grid-item-card::
         :link: howto/index.html
-        :margin: 1
 
         :octicon:`rocket;3em;sd-text-center`
 
@@ -48,7 +47,6 @@ pyAFQ is an open-source software tool for the analysis of brain white matter in 
 
     .. grid-item-card::
         :link: tutorials/index.html
-        :margin: 1
 
         :octicon:`book;3em;sd-text-center`
 
@@ -62,8 +60,7 @@ pyAFQ is an open-source software tool for the analysis of brain white matter in 
 
 
     .. grid-item-card::
-        :link: explanations/index.html
-        :margin: 1
+        :link: explanations/index.htmls
 
         :octicon:`comment-discussion;3em;sd-text-center`
 
@@ -78,7 +75,6 @@ pyAFQ is an open-source software tool for the analysis of brain white matter in 
 
     .. grid-item-card::
         :link: reference/index.html
-        :margin: 1
 
         :octicon:`search;3em;sd-text-center`
 
