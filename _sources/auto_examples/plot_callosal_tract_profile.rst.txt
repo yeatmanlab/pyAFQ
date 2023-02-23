@@ -762,7 +762,7 @@ contains the following keys:
     Assigning Streamlines to Bundles
     Finding Streamlines for AntFrontal
     562 streamlines exceed the probability threshold.
-      0%|          | 0/562 [00:00<?, ?it/s]      0%|          | 2/562 [00:00<00:42, 13.30it/s]      1%|          | 4/562 [00:05<14:59,  1.61s/it]      3%|3         | 18/562 [00:05<02:10,  4.16it/s]     48%|####8     | 270/562 [00:05<00:03, 91.97it/s]    100%|##########| 562/562 [00:05<00:00, 96.72it/s]
+      0%|          | 0/562 [00:00<?, ?it/s]      0%|          | 2/562 [00:00<00:32, 17.33it/s]      1%|          | 4/562 [00:06<16:54,  1.82s/it]      1%|1         | 8/562 [00:06<06:24,  1.44it/s]     48%|####8     | 272/562 [00:06<00:03, 83.12it/s]    100%|##########| 562/562 [00:06<00:00, 86.01it/s]
     129 streamlines selected with waypoint ROIs
     Cleaning up Loky...
     Loky Cleaned up
@@ -951,7 +951,7 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 14 minutes  58.088 seconds)
+   **Total running time of the script:** ( 15 minutes  0.388 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_callosal_tract_profile.py:
