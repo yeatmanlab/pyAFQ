@@ -4,7 +4,8 @@
 Automated Fiber Quantification in Python (pyAFQ)
 -------------------------------------------------
 
-pyAFQ is an open-source software tool for the analysis of brain white matter in diffusion MRI measurements.
+pyAFQ is an open-source software tool for the analysis of brain white matter in
+diffusion MRI measurements.
 
 .. todo::
   create and link to page that lists the `major fiber tracts` supported by

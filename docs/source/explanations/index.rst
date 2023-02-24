@@ -25,5 +25,5 @@ For further statistical analysis of pyAFQ results, see `AFQ-Insight <https://git
 
 .. toctree::
     :maxdepth: 2
-    
+
     tractometry_pipeline
