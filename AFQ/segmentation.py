@@ -18,13 +18,16 @@ from dipy.stats.analysis import gaussian_weights
 import dipy.core.gradients as dpg
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.io.streamline import save_tractogram
+from dipy.utils.parallel import paramap
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
 import AFQ.utils.volume as auv
 import AFQ.data.fetch as afd
 from AFQ.data.utils import BUNDLE_RECO_2_AFQ
-from dipy.utils.parallel import paramap
+
+from geomstats.geometry.euclidean import Euclidean
+from geomstats.geometry.discrete_curves import DiscreteCurves
 
 __all__ = ["Segmentation", "clean_bundle", "clean_by_endpoints"]
 
@@ -630,11 +633,8 @@ class Segmentation:
                         bundle_def["start"],
                         -1,
                         tol=dist_to_atlas)
-                    if np.intersect1d(
-                            cleaned_idx_to_flip,
-                            cleaned_idx).shape[0] < 1:
-                        b_sls.reorient(cleaned_idx_to_flip)
-                    cleaned_idx = list(set(cleaned_idx).union(
+                    b_sls.reorient(cleaned_idx_to_flip)
+                    cleaned_idx = list(set(cleaned_idx).symmetric_difference(
                         set(cleaned_idx_to_flip)))
                 b_sls.clean(cleaned_idx, "startpoint")
 
@@ -652,11 +652,8 @@ class Segmentation:
                         bundle_def["end"],
                         0,
                         tol=dist_to_atlas)
-                    if np.intersect1d(
-                            cleaned_idx_to_flip,
-                            cleaned_idx).shape[0] < 1:
-                        b_sls.reorient(cleaned_idx_to_flip)
-                    cleaned_idx = list(set(cleaned_idx).union(
+                    b_sls.reorient(cleaned_idx_to_flip)
+                    cleaned_idx = list(set(cleaned_idx).symmetric_difference(
                         set(cleaned_idx_to_flip)))
                 b_sls.clean(cleaned_idx, "endpoint")
 
@@ -681,6 +678,24 @@ class Segmentation:
                     bundle_def.get(
                         "primary_axis_percentage", None))
                 b_sls.clean(cleaned_idx, "orientation")
+
+            if b_sls and "curvature" in bundle_def:
+                b_sls.initiate_clean("curvature")
+                ref_curve = np.loadtxt(bundle_def["curvature"])
+                ref_curve_threshold = bundle_def.get("curvature_thresh", 5)
+                for dim_idx in range(3):
+                    if self.img_affine[dim_idx, dim_idx] < 0:
+                        ref_curve[:, dim_idx] = -ref_curve[:, dim_idx]
+                resampled_sls = dps.set_number_of_points(
+                    b_sls.selected_sls, ref_curve.shape[0])
+                curves_r3 = DiscreteCurves(ambient_manifold=Euclidean(dim=3))
+                cleaned_idx = []
+                for idx, sl in enumerate(resampled_sls):
+                    dist = curves_r3.square_root_velocity_metric.dist(
+                        ref_curve, sl)
+                    if dist <= ref_curve_threshold:
+                        cleaned_idx.append(idx)
+                b_sls.clean(cleaned_idx, "curvature")
 
             if b_sls and "include" in bundle_def:
                 b_sls.initiate_clean("include")
@@ -773,7 +788,7 @@ class Segmentation:
                     "pyAFQ was unable to consistently orient streamlines "
                     f"in bundle {bundle_name} using the provided ROIs. "
                     "This can be fixed by including at least 2 "
-                    "waypoint ROIs, or by using more restrictive "
+                    "waypoint ROIs, or by using "
                     "endpoint ROIs.")
 
             if "space" not in bundle_def or bundle_def["space"] == "template":
