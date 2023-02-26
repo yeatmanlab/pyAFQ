@@ -288,17 +288,33 @@ def csd(dwi, brain_mask, gtab, data,
 csd_params = pimms.calc("csd_params")(csd)
 
 
-@pimms.calc("pmap")
+@pimms.calc("csd_pmap")
 @as_file(suffix='_model-CSD_desc-APM_dwi.nii.gz')
+@as_img
 def anisotropic_power_map(csd_params):
     """
     full path to a nifti file containing
     the anisotropic power map
     """
-    sh_coeff = nib.load(csd_params)
-    pmap = shm.anisotropic_power(sh_coeff.get_fdata())
-    pmap = nib.Nifti1Image(pmap, sh_coeff.affine)
+    sh_coeff = nib.load(csd_params).get_fdata()
+    pmap = shm.anisotropic_power(sh_coeff)
     return pmap, dict(CSDParamsFile=csd_params)
+
+
+@pimms.calc("csd_ai")
+@as_file(suffix='_model-CSD_desc-AI_dwi.nii.gz')
+@as_img
+def anisotropic_index(csd_params):
+    """
+    full path to a nifti file containing
+    the anisotropic index
+    """
+    sh_coeff = nib.load(csd_params).get_fdata()
+    sh_0 = sh_coeff[..., 0] ** 2
+    sh_sum_squared = np.sum(sh_coeff ** 2, axis=-1)
+    AI = np.zeros_like(sh_0)
+    AI = np.sqrt(1 - sh_0 / sh_sum_squared)
+    return AI, dict(CSDParamsFile=csd_params)
 
 
 @pimms.calc("fwdti_fa")
@@ -722,7 +738,7 @@ def get_bundle_dict(base_fname, dwi, gtab, segmentation_params,
             dwi, gtab, bids_info, b0, data_imap=None)
         return roi_img
     for b_name, b_info in bundle_dict._dict.items():
-        if "space" in b_info or b_info["space"] == "subject":
+        if "space" not in b_info or b_info["space"] != "subject":
             bundle_dict.apply_to_rois(b_name, roi_scalar_to_info)
             bundle_dict._resample_roi(b_name)
     return bundle_dict, reg_template
@@ -738,7 +754,7 @@ def get_data_plan(kwargs):
 
     data_tasks = with_name([
         get_data_gtab, b0, b0_mask, brain_mask,
-        dti_fit, dki_fit, fwdti_fit, anisotropic_power_map,
+        dti_fit, dki_fit, fwdti_fit, anisotropic_power_map, anisotropic_index,
         dti_fa, dti_lt, dti_cfa, dti_pdd, dti_md, dki_kt, dki_lt, dki_fa,
         fwdti_fa, fwdti_md, fwdti_fwf,
         dki_md, dki_awf, dki_mk, dti_ga, dti_rd, dti_ad, dki_ga, dki_rd,

@@ -22,7 +22,6 @@ from dipy.utils.parallel import paramap
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
-import AFQ.utils.volume as auv
 import AFQ.data.fetch as afd
 from AFQ.data.utils import BUNDLE_RECO_2_AFQ
 
@@ -45,20 +44,6 @@ def _resample_tg(tg, n_points):
         streamlines = tg.streamlines
 
     return dps.set_number_of_points(streamlines, n_points)
-
-
-def _roi_transform_helper(img, mapping, new_affine):
-    warped_img = mapping.transform_inverse(
-        img.get_fdata(),
-        interpolation='nearest')
-    warped_img = nib.Nifti1Image(warped_img, new_affine)
-    return warped_img
-
-
-def _roi_save_helper(img, roi_type, dir):
-    nib.save(
-        img,
-        op.join(dir, f'{roi_type}_point_as_used.nii.gz'))
 
 
 class _SlsBeingRecognized:
@@ -565,41 +550,22 @@ class Segmentation:
         dist_to_atlas = self.dist_to_atlas / vox_dim
 
         self.logger.info("Assigning Streamlines to Bundles")
-        for bundle_idx, (bundle_name, bundle_def) in enumerate(
-                self.bundle_dict.items()):
+        for bundle_idx, bundle_name in enumerate(
+                self.bundle_dict):
             self.logger.info(f"Finding Streamlines for {bundle_name}")
 
             # Warp ROIs
-            if "space" not in bundle_def or bundle_def["space"] == "template":
-                untransformed_rois = self.bundle_dict.apply_to_rois(
-                    bundle_name,
-                    _roi_transform_helper,
-                    self.mapping,
-                    self.img_affine)
-
-            # Optionally save warped ROIs
-            if self.save_intermediates is not None:
-                warped_roi_save_dir = op.join(
-                    self.save_intermediates,
-                    'warped_ROI',
-                    bundle_name)
-                os.makedirs(warped_roi_save_dir, exist_ok=True)
-                self.bundle_dict.apply_to_rois(
-                    bundle_name,
-                    _roi_save_helper,
-                    warped_roi_save_dir,
-                    pass_roi_names=True,
-                    has_return=False)
+            bundle_def = self.bundle_dict.transform_rois(
+                bundle_name,
+                self.mapping,
+                self.img_affine)
 
             b_sls = _SlsBeingRecognized(tg.streamlines, self.logger)
 
             if "prob_map" in bundle_def:
                 b_sls.initiate_clean("Prob. Map")
-                prob_map = bundle_def.get(
-                    "prob_map",
-                    np.ones(self.img.get_fdata().shape))
                 fiber_probabilities = dts.values_from_volume(
-                    prob_map,
+                    bundle_def["prob_map"].get_fdata(),
                     fgarray[b_sls.selected_fiber_idxs], np.eye(4))
                 fiber_probabilities = np.mean(fiber_probabilities, -1)
                 if not self.roi_dist_tie_break:
@@ -699,8 +665,8 @@ class Segmentation:
 
             if b_sls and "include" in bundle_def:
                 b_sls.initiate_clean("include")
-                if len(b_sls["include"]) > 1 and not b_sls.oriented_yet:
-                    flip_using_include = True
+                flip_using_include = len(bundle_def["include"]) > 1\
+                    and not b_sls.oriented_yet
 
                 if f'inc_addtol' in bundle_def:
                     include_roi_tols = []
@@ -710,9 +676,9 @@ class Segmentation:
                     include_roi_tols = [tol**2] * len(bundle_def["include"])
 
                 include_rois = []
-                for include_roi in b_sls["include"]:
+                for include_roi in bundle_def["include"]:
                     include_rois.append(np.array(
-                        np.where(include_roi)).T)
+                        np.where(include_roi.get_fdata())).T)
 
                 # with parallel segmentation, the first for loop will
                 # only collect streamlines and does not need tqdm
@@ -728,14 +694,14 @@ class Segmentation:
                     for sl in tqdm(b_sls.selected_sls):
                         inc_results.append(
                             _check_sl_with_inclusion(
-                                b_sls.selected_sls,
+                                sl,
                                 include_rois,
                                 include_roi_tols))
 
                 cleaned_idx = []
                 if self.roi_dist_tie_break:
                     min_dist_coords = []
-                if len(b_sls["include"]) > 1 and self.clip_edges:
+                if len(bundle_def["include"]) > 1 and self.clip_edges:
                     roi_dists = []
                 if flip_using_include:
                     to_flip = []
@@ -773,9 +739,9 @@ class Segmentation:
                 else:
                     exclude_roi_tols = [tol**2] * len(bundle_def["exclude"])
                 exclude_rois = []
-                for exclude_roi in b_sls["exclude"]:
+                for exclude_roi in bundle_def["exclude"]:
                     exclude_rois.append(np.array(
-                        np.where(exclude_roi)).T)
+                        np.where(exclude_roi.get_fdata())).T)
                 cleaned_idx = []
                 for sl_idx, sl in enumerate(b_sls.selected_sls):
                     if _check_sl_with_exclusion(
@@ -791,8 +757,6 @@ class Segmentation:
                     "waypoint ROIs, or by using "
                     "endpoint ROIs.")
 
-            if "space" not in bundle_def or bundle_def["space"] == "template":
-                self.bundle_dict[bundle_name].update(untransformed_rois)
             if b_sls:
                 bundle_votes[
                     b_sls.selected_fiber_idxs,
@@ -1303,7 +1267,7 @@ def clean_by_endpoints(streamlines, target, target_idx, tol=None,
         if flip_sls[ii]:
             this_idx = (len(sl) - this_idx - 1) % len(sl)
         dist = np.min(cdist(
-            np.array([sl[this_idx]]), idxes, 'sqeuclidean'))
+            [sl[this_idx]], idxes, 'sqeuclidean'))
         if dist <= tol:
             clean_idxes.append(ii)
 

@@ -58,48 +58,39 @@ def export_rois(base_fname, results_dir, data_imap, mapping, dwi_affine):
     rois_dir = op.join(results_dir, 'ROIs')
     os.makedirs(rois_dir, exist_ok=True)
     roi_files = {}
-    for bundle in bundle_dict:
-        roi_files[bundle] = []
-        for roi_type in ['include', 'exclude', 'start', 'end']:
-            if roi_type in bundle_dict[bundle]:
-                rois = bundle_dict[bundle][roi_type]
-                if not isinstance(rois, list):
-                    rois = [rois]
-                for ii, roi in enumerate(rois):
-                    fname = op.split(
-                        get_fname(
-                            base_fname,
-                            '_space-subject_desc-'
-                            f'{str_to_desc(bundle)}{ii + 1}{roi_type}'
-                            '_mask.nii.gz'))
 
-                    fname = op.join(rois_dir, fname[1])
-                    if not op.exists(fname):
-                        if "space" not in bundle_dict[bundle]\
-                            or bundle_dict[bundle][
-                                "space"] == "template":
-                            warped_roi = auv.transform_inverse_roi(
-                                roi,
-                                mapping,
-                                bundle_name=bundle)
-                        else:
-                            if isinstance(roi, str):
-                                roi = nib.load(roi)
-                            if isinstance(roi, nib.Nifti1Image):
-                                roi = roi.get_fdata()
-                            warped_roi = roi
+    def _export_roi_helper(img, roi_type, bundle_name):
+        warped_data = auv.transform_inverse_roi(
+            img.get_fdata(),
+            mapping,
+            bundle_name=bundle_name)
+        fname = op.split(
+            get_fname(
+                base_fname,
+                '_space-subject_desc-'
+                f'{str_to_desc(bundle_name)}{roi_type}'
+                '_mask.nii.gz'))
+        fname = op.join(rois_dir, fname[1])
+        # Cast to float32,
+        # so that it can be read in by MI-Brain:
+        logger.info(f"Saving {fname}")
+        nib.save(
+            nib.Nifti1Image(
+                warped_data.astype(np.float32),
+                dwi_affine), fname)
+        meta = {}
+        meta_fname = f'{drop_extension(fname)}.json'
+        write_json(meta_fname, meta)
+        return fname
 
-                        # Cast to float32,
-                        # so that it can be read in by MI-Brain:
-                        logger.info(f"Saving {fname}")
-                        nib.save(
-                            nib.Nifti1Image(
-                                warped_roi.astype(np.float32),
-                                dwi_affine), fname)
-                        meta = {}
-                        meta_fname = f'{drop_extension(fname)}.json'
-                        write_json(meta_fname, meta)
-                    roi_files[bundle].append(fname)
+    for bundle_name in bundle_dict:
+        roi_files[bundle_name] = bundle_dict.apply_to_rois(
+            bundle_name,
+            _export_roi_helper,
+            bundle_name,
+            pass_roi_names=True,
+            has_return=True,
+            dry_run=True)
     return {'rois': roi_files}
 
 
@@ -214,7 +205,7 @@ def get_reg_subject(data_imap, bids_info, base_fname, dwi,
 
     filename_dict = {
         "b0": "b0",
-        "power_map": "pmap",
+        "power_map": "csd_pmap",
         "dti_fa_subject": "dti_fa",
         "subject_sls": "b0",
     }

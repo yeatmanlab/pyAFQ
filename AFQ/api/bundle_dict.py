@@ -1,6 +1,7 @@
 import logging
 from collections.abc import MutableMapping
 import AFQ.data.fetch as afd
+import AFQ.utils.volume as auv
 import numpy as np
 import nibabel as nib
 
@@ -348,7 +349,8 @@ class BundleDict(MutableMapping):
         if isinstance(item, str):
             item = nib.load(item)
         self._dict[key] = item
-        self.bundle_names.append(key)
+        if key not in self.bundle_names:
+            self.bundle_names.append(key)
 
     def __len__(self):
         return len(self.bundle_names)
@@ -395,6 +397,7 @@ class BundleDict(MutableMapping):
 
     def apply_to_rois(self, b_name, func, *args,
                       pass_roi_names=False, has_return=True,
+                      dry_run=False,
                       **kwargs):
         """
         Applies some transformation to all ROIs (include, exclude, end, start)
@@ -413,6 +416,9 @@ class BundleDict(MutableMapping):
         has_return : bool
             Whether the function returns a Nifti1Image which will replace the
             current Nifti.
+        dry_run : bool
+            Whether to actually apply changes returned by `func` to the ROIs.
+            If has_return is False, dry_run is not used.
         *args :
             Additional arguments for func
         **kwargs
@@ -423,13 +429,13 @@ class BundleDict(MutableMapping):
         Dictionary containing the old values of all ROIs and prob_map
         """
         if has_return:
-            old_vals = {}
+            return_vals = {}
         if self.seg_algo == "afq":
             for roi_type in ["include", "exclude", "start", "end", "prob_map"]:
                 if roi_type in self._dict[b_name]:
                     roi = self._dict[b_name][roi_type]
-                    if has_return:
-                        old_vals[roi_type] = roi
+                    if has_return and not dry_run:
+                        return_vals[roi_type] = roi
                     if roi_type in ["start", "end", "prob_map"]:
                         if pass_roi_names:
                             return_v = func(
@@ -438,7 +444,10 @@ class BundleDict(MutableMapping):
                             return_v = func(
                                 roi, *args, **kwargs)
                         if has_return:
-                            self._dict[b_name][roi_type] = return_v
+                            if dry_run:
+                                return_vals[roi_type] = return_v
+                            else:
+                                self._dict[b_name][roi_type] = return_v
                     else:
                         changed_rois = []
                         for ii, _roi in enumerate(roi):
@@ -450,14 +459,20 @@ class BundleDict(MutableMapping):
                                     _roi, *args, **kwargs)
                             changed_rois.append(return_v)
                         if has_return:
-                            self._dict[b_name][roi_type] = changed_rois
+                            if dry_run:
+                                return_vals[roi_type] = changed_rois
+                            else:
+                                self._dict[b_name][roi_type] = changed_rois
         elif self.seg_algo.startswith("reco"):
             if b_name == "whole_brain":
                 return_v = func(
                     self._dict[b_name], *args, **kwargs)
                 if has_return:
-                    old_vals = self._dict[b_name]
-                    self._dict[b_name] = return_v
+                    if dry_run:
+                        return_vals = return_v
+                    else:
+                        return_vals = self._dict[b_name]
+                        self._dict[b_name] = return_v
             else:
                 for sl_type in ["sl", "centroid"]:
                     if pass_roi_names:
@@ -469,10 +484,14 @@ class BundleDict(MutableMapping):
                             self._dict[b_name][sl_type],
                             *args, **kwargs)
                     if has_return:
-                        old_vals[sl_type] = self._dict[b_name][sl_type]
-                        self._dict[b_name][sl_type] = return_v
+                        if dry_run:
+                            return_vals = return_v
+                        else:
+                            return_vals[sl_type] = self._dict[b_name][sl_type]
+                            if not dry_run:
+                                self._dict[b_name][sl_type] = return_v
         if has_return:
-            return old_vals
+            return return_vals
         else:
             return None
 
@@ -488,8 +507,7 @@ class BundleDict(MutableMapping):
             Name of the bundle to be resampled.
         """
         if self.seg_algo == "afq":
-            if "space" not in self._dict[b_name]\
-                    or self._dict[b_name]["space"] == "template":
+            if self.is_bundle_in_template(b_name):
                 resample_to = self.resample_to
             else:
                 resample_to = self.resample_subject_to
@@ -505,6 +523,48 @@ class BundleDict(MutableMapping):
                         self._dict[b_name]["resampled"] = False
                     else:
                         raise
+
+    def is_bundle_in_template(self, bundle_name):
+        return "space" not in self._dict[bundle_name]\
+            or self._dict[bundle_name]["space"] == "template"
+
+    def _roi_transform_helper(self, img, mapping, new_affine, bundle_name):
+        warped_img = auv.transform_inverse_roi(
+            img.get_fdata(),
+            mapping,
+            bundle_name=bundle_name)
+        warped_img = nib.Nifti1Image(warped_img, new_affine)
+        return warped_img
+
+    def transform_rois(self, bundle_name, mapping, new_affine):
+        """
+        Get the bundle definition with transformed ROIs
+        for a given bundle into a
+        given subject space using a given mapping.
+        Will only run on bundles which are in template
+        space, otherwise will just return the bundle
+        definition without transformation.
+
+        Parameters
+        ----------
+        bundle_name : str
+            Name of the bundle to be transformed.
+        mapping : DiffeomorphicMap object
+            A mapping between DWI space and a template.
+        new_affine : array
+            Affine of space transformed into.
+        """
+        if self.is_bundle_in_template(bundle_name):
+            transformed_rois = self.apply_to_rois(
+                bundle_name,
+                self._roi_transform_helper,
+                mapping,
+                new_affine,
+                bundle_name,
+                dry_run=True)
+        else:
+            transformed_rois = self[bundle_name]
+        return transformed_rois
 
     def __add__(self, other):
         self.gen_all()

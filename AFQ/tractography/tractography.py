@@ -30,10 +30,10 @@ def get_percentile_threshold(mask, threshold):
 
 
 def track(params_file, directions="prob", max_angle=30., sphere=None,
-          seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False,
-          rng_seed=None, stop_mask=None, stop_threshold=0, step_size=0.5,
-          min_length=50, max_length=250, odf_model="CSD",
-          tracker="local"):
+          seed_mask=None, seed_threshold=0, thresholds_as_percentages=False,
+          n_seeds=1, random_seeds=False, rng_seed=None, stop_mask=None,
+          stop_threshold=0, step_size=0.5, min_length=50, max_length=250,
+          odf_model="CSD", tracker="local"):
     """
     Tractography
 
@@ -87,6 +87,12 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         A string is required if the tracker is set to "pft".
         Defaults to 0 (this means that if no stop_mask is passed,
         we will stop only at the edge of the image).
+    thresholds_as_percentages : bool, optional
+        Interpret seed_threshold and stop_threshold as percentages of the
+        total non-nan voxels in the seed and stop mask to include
+        (between 0 and 100), instead of as a threshold on the
+        values themselves. 
+        Default: False
     step_size : float, optional.
         The size of a step (in mm) of tractography. Default: 0.5
     min_length: int, optional
@@ -133,6 +139,13 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         if seed_mask is None:
             seed_mask = np.ones(params_img.shape[:3])
         elif seed_mask.dtype != 'bool':
+            if thresholds_as_percentages:
+                zero_mask = seed_mask == 0
+                seed_mask[zero_mask] = np.nan
+                seed_threshold = np.nanpercentile(
+                    seed_mask,
+                    100 - seed_threshold)
+                seed_mask[zero_mask] = 0
             seed_mask = seed_mask > seed_threshold
         if random_seeds:
             seeds = dtu.random_seeds_from_mask(seed_mask, seeds_count=n_seeds,
@@ -170,6 +183,13 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
     if tracker == "local":
         if stop_mask is None:
             stop_mask = np.ones(params_img.shape[:3])
+        if thresholds_as_percentages:
+            zero_mask = stop_mask == 0
+            stop_mask[zero_mask] = np.nan
+            stop_threshold = np.nanpercentile(
+                stop_mask,
+                100 - stop_threshold)
+            stop_mask[zero_mask] = 0
 
         if stop_mask.dtype == 'bool':
             stopping_criterion = ThresholdStoppingCriterion(stop_mask,
