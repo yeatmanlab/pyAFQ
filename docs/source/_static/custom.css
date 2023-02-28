@@ -19,3 +19,31 @@ tbody, tr, td
 .sd-card-footer {
     display: none;
 }
+
+.top-image {
+  float: left;
+  width: 25%;
+  padding-bottom: 10px;
+}
+
+.bottom-image {
+    float: right;
+    width: 25%;
+    padding-bottom: 10px;
+
+}
+
+.right-arrow {
+    float: left;
+    width: 10%;
+}
+
+.left-arrow {
+    float: right;
+    width: 10%;
+}
+
+.down-left-arrow {
+    float: right;
+    width: 10%;
+}

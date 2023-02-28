@@ -98,15 +98,15 @@ and by a grant from the
 `University of Washington eScience Institute <http://escience.washington.edu/>`_, by a `CRCNS <https://www.nsf.gov/funding/pgm_summ.jsp?pims_id=5147>`_ grant (NIH
 R01EB027585) to Eleftherios Garyfallidis and to Ariel Rokem , and by `NSF grant 1551330 <https://www.nsf.gov/awardsearch/showAward?AWD_ID=1551330>`_ to Jason Yeatman.
 
-.. .. figure:: _static/eScience_Logo_HR.png
-..    :align: center
-..    :figclass: align-center
-..    :target: http://escience.washington.edu
+.. figure:: _static/eScience_Logo_HR.png
+   :align: center
+   :figclass: align-center
+   :target: http://escience.washington.edu
 
-.. .. figure:: _static/BDE_Banner_revised20160211-01.jpg
-..    :align: center
-..    :figclass: align-center
-..    :target: http://brainandeducation.com
+.. figure:: _static/BDE_Banner_revised20160211-01.jpg
+   :align: center
+   :figclass: align-center
+   :target: http://brainandeducation.com
 
 
 
