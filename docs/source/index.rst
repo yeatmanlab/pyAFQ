@@ -61,7 +61,7 @@ diffusion MRI measurements.
 
 
     .. grid-item-card::
-        :link: explanations/index.htmls
+        :link: explanations/index.html
 
         :octicon:`comment-discussion;3em;sd-text-center`
 
