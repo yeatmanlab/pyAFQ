@@ -45,7 +45,26 @@ tbody, tr, td
     width: 10%;
 }
 
+/* fitting down arrow */
 .reference.internal.image-reference {
-    margin-left: 20%;
+    margin-left: 18%;
 }
 
+/* fitting right arrows */
+.right-arrow.figure.align-default {
+    margin-top: 5%;
+}
+
+/* fitting left arrows */
+.left-arrow.figure.align-default {
+    margin-top: 5%;
+}
+
+/* fitting bottom images to match top images.. shift bottom rightmost image to the left*/
+#id5.bottom-image.figure.align-default {
+    margin-right: 5%;
+}
+
+.top-image.figure.align-default {
+    margin-bottom: 0px;
+}

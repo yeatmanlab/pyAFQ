@@ -25,6 +25,7 @@ AFQ Tractometry Pipeline
 .. figure:: _static/right_arrow.png
    :figclass: right-arrow
 
+
 .. figure:: _static/tract_segmentation.png
    :figclass: top-image
    :target: http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/segmentation/index.html
