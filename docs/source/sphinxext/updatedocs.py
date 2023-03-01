@@ -35,5 +35,5 @@ def setup(app):
     example_config = dict_to_toml(arg_dict)
     example_config = '    ' + example_config.replace('\n', '\n    ')
 
-    with open('./source/usage/config.rst', 'w') as ff:
+    with open('./source/reference/config.rst', 'w') as ff:
         ff.write(prologue + example_config + epilogue)
