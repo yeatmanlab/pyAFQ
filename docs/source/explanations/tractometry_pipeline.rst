@@ -38,13 +38,25 @@ AFQ Tractometry Pipeline
    :figclass: top-image
    :target: http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/segmentation/index.html#AFQ.segmentation.clean_bundles
 
-   `3. Cleaning <http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/segmentation/index.html#AFQ.segmentation.clean_bundles>`_
+   `3. Refinement <http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/segmentation/index.html#AFQ.segmentation.clean_bundles>`_
+
+.. image:: _static/down_arrow.png
+   :width: 8%
+
+.. figure:: _static/tract_cleaning_2.png
+   :figclass: bottom-image
+   :target: http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/segmentation/index.html#AFQ.segmentation.clean_bundles
+
+   `4. Cleaning <http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/viz/index.html>`_
+
+.. figure:: _static/left_arrow.png
+   :figclass: left-arrow
 
 .. figure:: _static/tract_profiling.png
    :figclass: bottom-image
    :target: https://dipy.org/documentation/1.4.0./reference/dipy.stats/#afq-profile
 
-   `4. Profiling <https://dipy.org/documentation/1.4.0./reference/dipy.stats/#afq-profile>`_
+   `5. Profiling <https://dipy.org/documentation/1.4.0./reference/dipy.stats/#afq-profile>`_
 
 .. figure:: _static/left_arrow.png
    :figclass: left-arrow
@@ -53,6 +65,7 @@ AFQ Tractometry Pipeline
    :figclass: bottom-image
    :target: http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/viz/index.html
 
-   `5. Visualization <http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/viz/index.html>`_
+   `6. Visualization <http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/viz/index.html>`_
+
 
 

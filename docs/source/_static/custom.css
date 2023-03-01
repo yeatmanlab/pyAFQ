@@ -1,6 +1,8 @@
 tbody, tr, td
 {
     border: 0 !important;
+    height: 100%;
+    width: 100%;
 }
 
 .sd-card {
@@ -21,16 +23,16 @@ tbody, tr, td
 }
 
 .top-image {
-  float: left;
-  width: 25%;
-  padding-bottom: 10px;
+    float: left;
+    width: 25%;
+    height: 100%;
 }
 
 .bottom-image {
     float: right;
     width: 25%;
-    padding-bottom: 10px;
-
+    height: 100%;
+    clear: left;
 }
 
 .right-arrow {
@@ -43,7 +45,7 @@ tbody, tr, td
     width: 10%;
 }
 
-.down-left-arrow {
-    float: right;
-    width: 10%;
+.reference.internal.image-reference {
+    margin-left: 20%;
 }
+
