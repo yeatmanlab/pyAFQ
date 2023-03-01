@@ -21,5 +21,5 @@ into 5 sections:
 
 
 def setup(app):
-    with open('./source/usage/kwargs.rst', 'w') as ff:
+    with open('./source/reference/kwargs.rst', 'w') as ff:
         ff.write(prologue + AFQclass_doc)
