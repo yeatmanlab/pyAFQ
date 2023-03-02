@@ -1,1 +1,4 @@
 .. _recognition:
+
+Bundle Recognition
+==================

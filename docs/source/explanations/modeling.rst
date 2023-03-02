@@ -1,5 +1,11 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 Modeling white matter
+=======
+.. _modeling:
+
+Modeling White Matter
+>>>>>>> 41adea6c (Added titles to files)
 =====================
 
 In order to make inferences about white matter tissue properties, we use a
