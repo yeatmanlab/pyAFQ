@@ -16,56 +16,56 @@ AFQ Tractometry Pipeline
 ..      - |rArr| `Profiling <https://dipy.org/documentation/1.4.0./reference/dipy.stats/#afq-profile>`_
 ..      - |rArr| `Visualization <http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/viz/index.html>`_
 
-.. figure:: docs/source/explanations/_static/tract_tractography.png
+.. figure:: _static/tract_tractography.png
    :figclass: top-image
-   :target: docs/source/explanations/tractography.rst
+   :target: tractography.html
 
-   `1. Registration <http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/registration/index.html>`_
+   :ref:`tractography`
 
 .. figure:: _static/right_arrow.png
    :figclass: right-arrow
 
-.. figure:: docs/source/explanations/_static/tract_modeling.png
+.. figure:: _static/tract_modeling.png
    :figclass: top-image
-   :target: docs/source/explanations/modeling.rst
+   :target: modeling.html
 
-   `2. Segmentation <http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/segmentation/index.html>`_
+   :ref:`modeling`
 
 .. figure:: _static/right_arrow.png
    :figclass: right-arrow
 
-.. figure:: docs/source/explanations/_static/tract_buncle_recognition.png
+.. figure:: _static/tract_recognition.png
    :figclass: top-image
-   :target: docs/source/explanations/bundle_recognition.rst
+   :target: recognition.html
 
-   `3. Refinement <http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/segmentation/index.html#AFQ.segmentation.clean_bundles>`_
+   :ref:`recognition`
 
 .. image:: _static/down_arrow.png
    :width: 8%
 
-.. figure:: docs/source/explanations/_static/tract_cleaning.png
+.. figure:: _static/tract_cleaning.png
    :figclass: bottom-image
-   :target: docs/source/explanations/cleaning.rst
+   :target: cleaning.html
 
-   `4. Cleaning <http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/viz/index.html>`_
+   :ref:`cleaning`
 
 .. figure:: _static/left_arrow.png
    :figclass: left-arrow
 
-.. figure:: docs/source/explanations/_static/tract_profiling.png
+.. figure:: _static/tract_profiling.png
    :figclass: bottom-image
-   :target: docs/source/explanations/tract_profiles.rst
+   :target: profiling.html
 
-   `5. Profiling <https://dipy.org/documentation/1.4.0./reference/dipy.stats/#afq-profile>`_
+   :ref:`profiling`
 
 .. figure:: _static/left_arrow.png
    :figclass: left-arrow
 
-.. figure:: docs/source/explanations/_static/tract_visualization.png
+.. figure:: _static/tract_visualization.png
    :figclass: bottom-image
-   :target: docs/source/explanations/visualization.rst
+   :target: visualization.html
 
-   `6. Visualization <http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/viz/index.html>`_
+   :ref:`visualization`
 
 
 
