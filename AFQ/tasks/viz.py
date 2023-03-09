@@ -30,6 +30,7 @@ def _viz_prepare_vol(vol, xform, mapping, scalar_dict):
         vol = nib.load(vol).get_fdata()
     if xform:
         vol = mapping.transform_inverse(vol)
+    vol[np.isnan(vol)] = 0
     return vol
 
 
@@ -251,14 +252,20 @@ def viz_indivBundle(base_fname,
                     interact=False,
                     figure=figure)
 
-        for i, roi in enumerate(mapping_imap["rois"][bundle_name]):
-            figure = viz_backend.visualize_roi(
-                roi,
-                name=f"{bundle_name} ROI {i}",
-                flip_axes=flip_axes,
-                inline=False,
-                interact=False,
-                figure=figure)
+        for roi_type, rois in mapping_imap["rois"][bundle_name].items():
+            if roi_type in ["include", "exclude"]:
+                names = [f"{roi_type} ROI {ii}" for ii in range(len(rois))]
+            else:
+                names = [roi_type + " ROI"]
+                rois = [rois]
+            for ii, roi in enumerate(rois):
+                figure = viz_backend.visualize_roi(
+                    roi,
+                    name=names[ii],
+                    flip_axes=flip_axes,
+                    inline=False,
+                    interact=False,
+                    figure=figure)
 
         roi_dir = op.join(results_dir, 'viz_bundles')
         os.makedirs(roi_dir, exist_ok=True)

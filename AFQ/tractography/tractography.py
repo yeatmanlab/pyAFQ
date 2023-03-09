@@ -138,7 +138,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
     if isinstance(n_seeds, int):
         if seed_mask is None:
             seed_mask = np.ones(params_img.shape[:3])
-        elif seed_mask.dtype != 'bool':
+        elif len(np.unique(seed_mask)) > 2:
             if thresholds_as_percentages:
                 zero_mask = seed_mask == 0
                 seed_mask[zero_mask] = np.nan
@@ -183,18 +183,18 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
     if tracker == "local":
         if stop_mask is None:
             stop_mask = np.ones(params_img.shape[:3])
-        if thresholds_as_percentages:
-            zero_mask = stop_mask == 0
-            stop_mask[zero_mask] = np.nan
-            stop_threshold = np.nanpercentile(
-                stop_mask,
-                100 - stop_threshold)
-            stop_mask[zero_mask] = 0
 
-        if stop_mask.dtype == 'bool':
+        if len(np.unique(stop_mask)) <= 2:
             stopping_criterion = ThresholdStoppingCriterion(stop_mask,
                                                             0.5)
         else:
+            if thresholds_as_percentages:
+                zero_mask = stop_mask == 0
+                stop_mask[zero_mask] = np.nan
+                stop_threshold = np.nanpercentile(
+                    stop_mask,
+                    100 - stop_threshold)
+                stop_mask[zero_mask] = 0
             stopping_criterion = ThresholdStoppingCriterion(stop_mask,
                                                             stop_threshold)
 

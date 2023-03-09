@@ -555,10 +555,11 @@ class Segmentation:
             self.logger.info(f"Finding Streamlines for {bundle_name}")
 
             # Warp ROIs
-            bundle_def = self.bundle_dict.transform_rois(
+            bundle_def = self.bundle_dict[bundle_name].copy()
+            bundle_def.update(self.bundle_dict.transform_rois(
                 bundle_name,
                 self.mapping,
-                self.img_affine)
+                self.img_affine))
 
             b_sls = _SlsBeingRecognized(tg.streamlines, self.logger)
 
@@ -624,7 +625,7 @@ class Segmentation:
                 b_sls.clean(cleaned_idx, "endpoint")
 
             if b_sls and (
-                    "min_len" in bundle_def or "max_len" in bundle_def):
+                    ("min_len" in bundle_def) or ("max_len" in bundle_def)):
                 b_sls.initiate_clean("length")
                 min_len = bundle_def.get("min_len", 0) / vox_dim
                 max_len = bundle_def.get("max_len", np.inf) / vox_dim
