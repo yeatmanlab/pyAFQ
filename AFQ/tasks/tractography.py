@@ -83,7 +83,7 @@ def export_stop_mask_pft(pve_wm, pve_gm, pve_csf):
 
 
 @pimms.calc("streamlines")
-@as_file('_tractography.trk', include_track=True)
+@as_file('_tractography.trx', include_track=True)
 def streamlines(data_imap, seed, stop,
                 tracking_params):
     """

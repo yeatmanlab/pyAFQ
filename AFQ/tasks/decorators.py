@@ -9,6 +9,8 @@ from dipy.io.streamline import save_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram
 from AFQ.data.s3bids import write_json
 
+from trx.trx_file_memmap import TrxFile
+
 import numpy as np
 
 from AFQ.tasks.utils import get_fname
@@ -136,8 +138,16 @@ def as_file(suffix, include_track=False, include_seg=False):
                 if isinstance(img_trk_np_or_csv, nib.Nifti1Image):
                     nib.save(img_trk_np_or_csv, this_file)
                 elif isinstance(img_trk_np_or_csv, StatefulTractogram):
+                    dtype_dict = {'positions': np.float32,
+                                  'offsets': np.uint32}
+                    trx = TrxFile.from_lazy_tractogram(
+                        img_trk_np_or_csv,
+                        dtype_dict=dtype_dict)
                     save_tractogram(
-                        img_trk_np_or_csv, this_file, bbox_valid_check=False)
+                        trx,
+                        this_file,
+                        bbox_valid_check=False)
+
                 elif isinstance(img_trk_np_or_csv, np.ndarray):
                     np.save(this_file, img_trk_np_or_csv)
                 else:
