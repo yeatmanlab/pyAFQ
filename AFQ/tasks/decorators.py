@@ -8,8 +8,8 @@ import nibabel as nib
 from dipy.io.streamline import save_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram
 from AFQ.data.s3bids import write_json
-
 from trx.trx_file_memmap import TrxFile
+from trx.io import save as save_trx
 
 import numpy as np
 
@@ -137,17 +137,9 @@ def as_file(suffix, include_track=False, include_seg=False):
                 logger.info(f"Saving {this_file}")
                 if isinstance(img_trk_np_or_csv, nib.Nifti1Image):
                     nib.save(img_trk_np_or_csv, this_file)
-                elif isinstance(img_trk_np_or_csv, StatefulTractogram):
-                    dtype_dict = {'positions': np.float32,
-                                  'offsets': np.uint32}
-                    trx = TrxFile.from_lazy_tractogram(
-                        img_trk_np_or_csv,
-                        dtype_dict=dtype_dict)
-                    save_tractogram(
-                        trx,
-                        this_file,
-                        bbox_valid_check=False)
-
+                elif isinstance(img_trk_np_or_csv, TrxFile):
+                    save_trx(img_trk_np_or_csv,
+                             this_file)
                 elif isinstance(img_trk_np_or_csv, np.ndarray):
                     np.save(this_file, img_trk_np_or_csv)
                 else:

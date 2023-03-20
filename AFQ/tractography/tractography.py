@@ -3,6 +3,8 @@ import numpy as np
 import nibabel as nib
 import logging
 
+from nibabel.streamlines.tractogram import LazyTractogram
+
 import dipy.data as dpd
 from dipy.align import resample
 from dipy.direction import (DeterministicMaximumDirectionGetter,
@@ -253,4 +255,5 @@ def _tracking(tracker, seeds, dg, stopping_criterion, params_img,
         max_length=max_length,
         random_seed=random_seed)
 
-    return StatefulTractogram(tracker, params_img, Space.RASMM)
+    return LazyTractogram(lambda: tracker,
+                          affine_to_rasmm=params_img.affine)

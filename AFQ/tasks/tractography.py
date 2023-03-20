@@ -1,6 +1,7 @@
 import nibabel as nib
 from time import time
 import logging
+import numpy as np
 
 import pimms
 
@@ -16,6 +17,12 @@ try:
     has_gputrack = True
 except ModuleNotFoundError:
     has_gputrack = False
+
+try:
+    from trx.trx_file_memmap import TrxFile
+    has_trx = True
+except ModuleNotFoundError:
+    has_trx = False
 
 logger = logging.getLogger('AFQ')
 
@@ -121,14 +128,45 @@ def streamlines(data_imap, seed, stop,
     else:
         this_tracking_params['stop_mask'] = stop
 
-    # perform tractography
-    start_time = time()
-    sft = aft.track(params_file, **this_tracking_params)
-    sft.to_vox()
+    is_trx = this_tracking_params.get("trx", False)
+    if not is_trx:
+        # perform tractography
+        start_time = time()
+        sft = aft.track(params_file, **this_tracking_params)
+        sft.to_vox()
 
-    return sft, _meta_from_tracking_params(
-        tracking_params, start_time,
-        sft, seed, stop)
+        return sft, _meta_from_tracking_params(
+            tracking_params, start_time,
+            sft, seed, stop)
+    else:
+        dtype_dict = {'positions': np.float32, 'offsets': np.uint32}
+
+        trx = TrxFile.from_lazy_tractogram(
+            aft.track(params_file, **this_tracking_params),
+            seed,
+            dtype_dict=dtype_dict)
+
+        meta_directions = {
+            "det": "deterministic",
+            "prob": "probabilistic"}
+        meta = dict(
+            TractographyClass="local",
+            TractographyMethod=meta_directions[
+                tracking_params["directions"]],
+            Seeding=dict(
+                ROI=seed,
+                n_seeds=tracking_params["n_seeds"],
+                random_seeds=tracking_params["random_seeds"]),
+            Constraints=dict(ROI=stop),
+            Parameters=dict(
+                Units="mm",
+                StepSize=tracking_params["step_size"],
+                MinimumLength=tracking_params["min_length"],
+                MaximumLength=tracking_params["max_length"],
+                Unidirectional=False),
+            Timing=time() - start_time)
+
+        return trx, meta
 
 
 @pimms.calc("streamlines")
