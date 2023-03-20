@@ -19,6 +19,8 @@ import AFQ.api.bundle_dict as abd
 import AFQ.utils.streamlines as aus
 import AFQ.utils.volume as auv
 
+from trx.io import load as load_trx
+
 from dipy.io.streamline import load_tractogram, save_tractogram
 from dipy.io.stateful_tractogram import Space
 from dipy.stats.analysis import afq_profile, gaussian_weights
@@ -48,9 +50,8 @@ def segment(dwi, data_imap, mapping_imap,
     # We pass `clean_params` here, but do not use it, so we have the
     # same signature as `_clean_bundles`.
     img = nib.load(dwi)
-    tg = load_tractogram(
-        streamlines, img, Space.VOX,
-        bbox_valid_check=False)
+    tg = load_trx(streamlines, img).to_sft()
+
     indices_to_remove, _ = tg.remove_invalid_streamlines()
     if len(indices_to_remove) > 0:
         logger.warning(f"{len(indices_to_remove)} invalid streamlines removed")
