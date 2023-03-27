@@ -9,14 +9,19 @@ import pimms
 import dipy.reconst.dki as dpy_dki
 import dipy.reconst.dti as dpy_dti
 import dipy.reconst.fwdti as dpy_fwdti
+from dipy.reconst.gqi import GeneralizedQSamplingModel, normalize_qa
+from dipy.direction import peaks_from_model
 from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
 from AFQ.definitions.image import ImageDefinition
+from dipy.data import default_sphere
 
 from AFQ.tasks.decorators import as_file, as_img, as_fit_deriv
 from AFQ.tasks.utils import get_fname, with_name
 import AFQ.api.bundle_dict as abd
 import AFQ.data.fetch as afd
+from AFQ.utils.path import drop_extension
+from AFQ.data.s3bids import write_json
 
 from AFQ.definitions.utils import Definition
 from AFQ.definitions.image import B0Image
@@ -315,6 +320,57 @@ def anisotropic_index(csd_params):
     AI = np.zeros_like(sh_0)
     AI = np.sqrt(1 - sh_0 / sh_sum_squared)
     return AI, dict(CSDParamsFile=csd_params)
+
+
+@pimms.calc("gq_params", "gq_qa")
+def gq(base_fname, gtab, dwi_affine, brain_mask, data,
+       gq_sampling_length=3):
+    """
+    full path to a nifti file containing
+    parameters for the Generalized Q-Sampling
+    shm_coeff,
+    full path to a nifti file containing quantitative
+    anisotropy
+
+    Parameters
+    ----------
+    gq_sampling_length : float
+        Diffusion sampling length.
+        Default: 3
+    """
+    mask =\
+        nib.load(brain_mask).get_fdata()
+    gqmodel = GeneralizedQSamplingModel(
+        gtab,
+        sampling_length=gq_sampling_length)
+    gqmodel.fit(data, mask=mask)
+    gqpeaks = peaks_from_model(model=gqmodel,
+                               sphere=default_sphere,
+                               data=data,
+                               relative_peak_threshold=.5,
+                               min_separation_angle=25,
+                               mask=mask,
+                               return_odf=False,
+                               normalize_peaks=True)
+    qa = normalize_qa(gqpeaks.qa)[..., 0]
+
+    params_suffix = "_model-GQ_desc-diffmodel_dwi.nii.gz"
+    params_fname = get_fname(base_fname, params_suffix)
+    nib.save(nib.Nifti1Image(gqpeaks.shm_coeff, dwi_affine), params_fname)
+    write_json(
+        get_fname(base_fname, f"{drop_extension(params_suffix)}.json"),
+        dict(GQParamsFile=params_fname)
+    )
+
+    qa_suffix = "_model-GQ_desc-QA_dwi.nii.gz"
+    qa_fname = get_fname(base_fname, qa_suffix)
+    nib.save(nib.Nifti1Image(qa, dwi_affine), qa_fname)
+    write_json(
+        get_fname(base_fname, f"{drop_extension(qa_suffix)}.json"),
+        dict(GQSamplingLength=gq_sampling_length)
+    )
+
+    return params_fname, qa_fname
 
 
 @pimms.calc("fwdti_fa")
@@ -756,7 +812,7 @@ def get_data_plan(kwargs):
         get_data_gtab, b0, b0_mask, brain_mask,
         dti_fit, dki_fit, fwdti_fit, anisotropic_power_map, anisotropic_index,
         dti_fa, dti_lt, dti_cfa, dti_pdd, dti_md, dki_kt, dki_lt, dki_fa,
-        fwdti_fa, fwdti_md, fwdti_fwf,
+        gq, fwdti_fa, fwdti_md, fwdti_fwf,
         dki_md, dki_awf, dki_mk, dti_ga, dti_rd, dti_ad, dki_ga, dki_rd,
         dki_ad, dki_rk, dki_ak, dti_params, dki_params, fwdti_params,
         csd_params, get_bundle_dict])

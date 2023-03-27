@@ -177,7 +177,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         evecs = model_params[..., 3:12].reshape(params_img.shape[:3] + (3, 3))
         odf = tensor_odf(evals, evecs, sphere)
         dg = dg.from_pmf(odf, max_angle=max_angle, sphere=sphere)
-    elif odf_model == "CSD":
+    elif odf_model == "CSD" or odf_model == "GQ":
         dg = dg.from_shcoeff(model_params, max_angle=max_angle, sphere=sphere)
 
     if tracker == "local":

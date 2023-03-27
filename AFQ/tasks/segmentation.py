@@ -15,7 +15,6 @@ from AFQ.utils.path import drop_extension
 import AFQ.utils.streamlines as aus
 from AFQ.tasks.utils import get_default_args
 from AFQ.data.s3bids import write_json
-import AFQ.api.bundle_dict as abd
 import AFQ.utils.volume as auv
 
 from dipy.io.streamline import load_tractogram, save_tractogram
@@ -85,7 +84,7 @@ def segment(dwi, data_imap, mapping_imap,
 
 @pimms.calc("clean_bundles")
 @as_file('_desc-clean_tractography.trk', include_track=True, include_seg=True)
-def clean_bundles(bundles, data_imap, clean_params=None):
+def clean_bundles(bundles, clean_params=None):
     """
     full path to a trk file containting segmented
     streamlines, cleaned using the Mahalanobis distance, and labeled by
@@ -98,7 +97,6 @@ def clean_bundles(bundles, data_imap, clean_params=None):
         Default: use the default behavior of the seg.clean_bundle
         function.
     """
-    bundle_dict = data_imap["bundle_dict"]
     default_clean_params = get_default_args(seg.clean_bundle)
     if clean_params is not None:
         for k in clean_params:
@@ -110,7 +108,7 @@ def clean_bundles(bundles, data_imap, clean_params=None):
     start_time = time()
 
     bundles = {}
-    for b in bundle_dict.keys():
+    for b in seg_sft.bundle_names:
         if b != "whole_brain":
             idx = seg_sft.bundle_idxs[b]
             this_tg = seg_sft.get_bundle(b)
@@ -140,32 +138,19 @@ def clean_bundles(bundles, data_imap, clean_params=None):
 @pimms.calc("indiv_bundles")
 def export_bundles(base_fname, results_dir,
                    clean_bundles, bundles,
-                   data_imap, tracking_params,
+                   tracking_params,
                    segmentation_params):
     """
     dictionary of paths, where each path is
     a full path to a trk file containing the streamlines of a given bundle,
     cleaned or uncleaned
     """
-    bundle_dict = data_imap["bundle_dict"]
-    reg_template = data_imap["reg_template"]
-    if "presegment_bundle_dict" in segmentation_params and\
-        segmentation_params["presegment_bundle_dict"] is not None\
-        and not isinstance(
-            segmentation_params["presegment_bundle_dict"],
-            abd.BundleDict):
-        segmentation_params["presegment_bundle_dict"] =\
-            abd.BundleDict(
-                segmentation_params["presegment_bundle_dict"],
-                seg_algo="afq",
-                resample_to=reg_template)
-
     for this_bundles_file, folder in zip([clean_bundles, bundles],
                                          ['clean_bundles', 'bundles']):
         bundles_dir = op.join(results_dir, folder)
         os.makedirs(bundles_dir, exist_ok=True)
         seg_sft = aus.SegmentedSFT.fromfile(this_bundles_file)
-        for bundle in bundle_dict:
+        for bundle in seg_sft.bundle_names:
             if bundle != "whole_brain":
                 fname = op.split(
                     get_fname(
@@ -192,29 +177,24 @@ def export_sl_counts(data_imap,
     """
     full path to a JSON file containing streamline counts
     """
-    bundle_dict = data_imap["bundle_dict"]
     sl_counts_clean = []
     sl_counts = []
-    bundle_names = list(bundle_dict.keys())
-    if "whole_brain" not in bundle_names:
-        bundle_names.append("whole_brain")
     bundles_files = [clean_bundles, bundles]
     lists = [sl_counts_clean, sl_counts]
 
     for bundles_file, count in zip(bundles_files, lists):
         seg_sft = aus.SegmentedSFT.fromfile(bundles_file)
 
-        for bundle in bundle_names:
-            if bundle == "whole_brain":
-                count.append(len(seg_sft.sft.streamlines))
-            else:
-                count.append(len(
-                    seg_sft.get_bundle(bundle).streamlines))
+        for bundle in seg_sft.bundle_names:
+            count.append(len(
+                seg_sft.get_bundle(bundle).streamlines))
+        count.append(len(seg_sft.sft.streamlines))
+
     counts_df = pd.DataFrame(
         data=dict(
             n_streamlines=sl_counts,
             n_streamlines_clean=sl_counts_clean),
-        index=bundle_names)
+        index=seg_sft.bundle_names + ["Total Recognized"])
     return counts_df, dict(sources=bundles_files)
 
 
@@ -222,68 +202,62 @@ def export_sl_counts(data_imap,
 @as_file(
     '_desc-medianBundleLengths_dwi.csv',
     include_track=True, include_seg=True)
-def export_bundle_lengths(data_imap,
-                          clean_bundles, bundles):
+def export_bundle_lengths(clean_bundles, bundles):
     """
     full path to a JSON file containing median bundle lengths
     """
-    bundle_dict = data_imap["bundle_dict"]
     med_len_clean_counts = []
     med_len_counts = []
-    bundle_names = list(bundle_dict.keys())
-    if "whole_brain" not in bundle_names:
-        bundle_names.append("whole_brain")
     bundles_files = [clean_bundles, bundles]
     lists = [med_len_clean_counts, med_len_counts]
 
     for bundles_file, lens in zip(bundles_files, lists):
         seg_sft = aus.SegmentedSFT.fromfile(bundles_file)
 
-        for bundle in bundle_names:
-            if bundle == "whole_brain":
+        for bundle in seg_sft.bundle_names:
+            these_lengths = seg_sft.get_bundle(
+                bundle)._tractogram._streamlines._lengths
+            if len(these_lengths) > 0:
                 lens.append(np.median(
-                    seg_sft.sft._tractogram._streamlines._lengths))
+                    these_lengths))
             else:
-                these_lengths = seg_sft.get_bundle(
-                    bundle)._tractogram._streamlines._lengths
-                if len(these_lengths) > 0:
-                    lens.append(np.median(
-                        these_lengths))
-                else:
-                    lens.append(0)
+                lens.append(0)
+        lens.append(np.median(
+            seg_sft.sft._tractogram._streamlines._lengths))
 
     counts_df = pd.DataFrame(
         data=dict(
             median_len=med_len_counts,
             median_len_clean=med_len_clean_counts),
-        index=bundle_names)
+        index=seg_sft.bundle_names + ["Total Recognized"])
     return counts_df, dict(sources=bundles_files)
 
 
 @pimms.calc("density_maps")
 @as_file('_desc-density_dwi.nii.gz', include_track=True, include_seg=True)
 @as_img
-def export_density_maps(clean_bundles, dwi, data_imap):
+def export_density_maps(clean_bundles, dwi):
     """
     full path to 4d nifti file containing streamline counts per voxel
     per bundle, where the 4th dimension encodes the bundle
     """
-    bundle_dict = data_imap["bundle_dict"]
     seg_sft = aus.SegmentedSFT.fromfile(
         clean_bundles)
-    entire_density_map = np.zeros((*nib.load(dwi).shape[:3], len(bundle_dict)))
-    for ii, bundle_name in enumerate(bundle_dict.keys()):
+    entire_density_map = np.zeros((
+        *nib.load(dwi).shape[:3],
+        len(seg_sft.bundle_names)))
+    for ii, bundle_name in enumerate(seg_sft.bundle_names):
         bundle_sl = seg_sft.get_bundle(bundle_name)
         bundle_density = auv.density_map(bundle_sl).get_fdata()
         entire_density_map[..., ii] = bundle_density
 
     return entire_density_map, dict(
-        source=clean_bundles, bundles=list(bundle_dict.keys()))
+        source=clean_bundles, bundles=list(seg_sft.bundle_names))
 
 
 @pimms.calc("profiles")
 @as_file('_desc-profiles_dwi.csv', include_track=True, include_seg=True)
-def tract_profiles(clean_bundles, data_imap,
+def tract_profiles(clean_bundles,
                    scalar_dict, dwi_affine,
                    profile_weights="gauss"):
     """
@@ -300,7 +274,6 @@ def tract_profiles(clean_bundles, data_imap,
         instead of a mean or weighted mean.
         Default: "gauss"
     """
-    bundle_dict = data_imap["bundle_dict"]
     if not (profile_weights is None
             or isinstance(profile_weights, str)
             or callable(profile_weights)
@@ -324,7 +297,7 @@ def tract_profiles(clean_bundles, data_imap,
     seg_sft = aus.SegmentedSFT.fromfile(
         clean_bundles)
     seg_sft.sft.to_rasmm()
-    for bundle_name in bundle_dict.keys():
+    for bundle_name in seg_sft.bundle_names:
         this_sl = seg_sft.get_bundle(bundle_name).streamlines
         if len(this_sl) == 0:
             continue

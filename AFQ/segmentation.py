@@ -509,6 +509,23 @@ class Segmentation:
             self.fiber_groups[bundle] = StatefulTractogram(
                 [], self.img, Space.VOX)
 
+    def _add_bundle_to_fiber_group(self, b_name, sl, idx):
+        """
+        Helper function for segment_afq, to add a bundle
+        to a fiber group.
+        """
+        sl = StatefulTractogram(
+            sl,
+            self.img,
+            Space.VOX)
+
+        if self.return_idx:
+            self.fiber_groups[b_name] = {}
+            self.fiber_groups[b_name]['sl'] = sl
+            self.fiber_groups[b_name]['idx'] = idx
+        else:
+            self.fiber_groups[b_name] = sl
+
     def segment_afq(self, tg=None):
         """
         Assign streamlines to bundles using the waypoint ROI approach
@@ -519,6 +536,15 @@ class Segmentation:
         tg = self._read_tg(tg=tg)
         tg.to_vox()
 
+        # analyze bundle information
+        max_includes = 2
+        record_roi_dists = self.clip_edges
+        for bundle_info in self.bundle_dict.values():
+            if "subbundles" in bundle_info:
+                record_roi_dists = True
+            if len(bundle_info["include"]) > max_includes:
+                max_includes = len(bundle_info["include"])
+
         fgarray = np.array(_resample_tg(tg, 100))
         n_streamlines = len(tg)
 
@@ -528,9 +554,9 @@ class Segmentation:
         bundle_to_flip = np.zeros(
             (n_streamlines, len(self.bundle_dict)),
             dtype=bool)
-        if self.clip_edges:
+        if record_roi_dists:
             bundle_roi_dists = -np.ones(
-                (n_streamlines, len(self.bundle_dict), 2),
+                (n_streamlines, len(self.bundle_dict), max_includes),
                 dtype=int)
 
         self.fiber_groups = {}
@@ -702,7 +728,7 @@ class Segmentation:
                 cleaned_idx = []
                 if self.roi_dist_tie_break:
                     min_dist_coords = []
-                if len(bundle_def["include"]) > 1 and self.clip_edges:
+                if len(bundle_def["include"]) > 1 and record_roi_dists:
                     roi_dists = []
                 if flip_using_include:
                     to_flip = []
@@ -717,8 +743,10 @@ class Segmentation:
                         if len(sl_dist) > 1:
                             roi_dist1 = np.argmin(sl_dist[0], 0)[0]
                             roi_dist2 = np.argmin(sl_dist[1], 0)[0]
-                            if self.clip_edges:
-                                roi_dists.append([roi_dist1, roi_dist2])
+                            if record_roi_dists:
+                                roi_dists.append([
+                                    np.argmin(dist, 0)[0]
+                                    for dist in sl_dist])
                             # Flip sl if it is close to second ROI
                             # before its close to the first ROI
                             if flip_using_include:
@@ -728,7 +756,7 @@ class Segmentation:
                     b_sls.reorient(to_flip)
                 if self.roi_dist_tie_break:
                     b_sls.bundle_vote = -np.asarray(min_dist_coords)
-                if self.clip_edges:
+                if record_roi_dists:
                     b_sls.roi_dists = np.asarray(roi_dists, dtype=int)
 
             if b_sls and "exclude" in bundle_def:
@@ -765,7 +793,7 @@ class Segmentation:
                 bundle_to_flip[
                     b_sls.selected_fiber_idxs,
                     bundle_idx] = b_sls.sls_flipped
-                if hasattr(self, "roi_dists"):
+                if hasattr(b_sls, "roi_dists"):
                     bundle_roi_dists[
                         b_sls.selected_fiber_idxs,
                         bundle_idx
@@ -813,33 +841,23 @@ class Segmentation:
                 if to_flip[ii]:
                     select_sl[ii] = sl[::-1]
 
+            roi_dists = bundle_roi_dists[:, bundle_idx, :]
             if self.clip_edges:
-                if np.sum(bundle_roi_dists[:, bundle_idx, :] == -1) == 0:
+                if np.sum(roi_dists == -1) == 0:
                     self.logger.info("Clipping Streamlines by ROI")
-                    for bundle_sl_idx, idx in enumerate(select_idx):
-                        min0 = int(bundle_roi_dists[idx, bundle_idx, 0])
-                        min1 = int(bundle_roi_dists[idx, bundle_idx, 1])
-
-                        # If the point that is closest to the first ROI
-                        # is the same as the point closest to the second ROI,
-                        # include the surrounding points to make a streamline.
-                        if min0 == min1:
-                            min1 = min1 + 1
-                            min0 = min0 - 1
-
-                        select_sl[bundle_sl_idx] = select_sl[
-                            bundle_sl_idx][min0:min1]
-
-            select_sl = StatefulTractogram(select_sl,
-                                           self.img,
-                                           Space.VOX)
-
-            if self.return_idx:
-                self.fiber_groups[bundle] = {}
-                self.fiber_groups[bundle]['sl'] = select_sl
-                self.fiber_groups[bundle]['idx'] = select_idx
+                    _cut_sls_by_dist(
+                        select_sl, select_idx, roi_dists,
+                        (0, 1), in_place=True)
+            if "subbundles" in self.bundle_dict[bundle]:
+                for sb_name, sb_include_cuts in self.bundle_dict[bundle][
+                        "subbundles"].items():
+                    subbundle_select_sl = _cut_sls_by_dist(
+                        select_sl, select_idx, roi_dists,
+                        sb_include_cuts, in_place=False)
+                    self._add_bundle_to_fiber_group(
+                        sb_name, subbundle_select_sl, select_idx)
             else:
-                self.fiber_groups[bundle] = select_sl
+                self._add_bundle_to_fiber_group(bundle, select_sl, select_idx)
         return self.fiber_groups
 
     def move_streamlines(self, tg, reg_algo='slr'):
@@ -1173,6 +1191,42 @@ def _check_sl_with_exclusion(sl, exclude_rois,
             return False
     # Either there are no exclusion ROIs, or you are not close to any:
     return True
+
+
+def _cut_sls_by_dist(select_sl, select_idx, roi_dists, roi_idxs,
+                     in_place=False):
+    """
+    Helper function to cut streamlines according to which points
+    are closest to certain rois.
+
+    Parameters
+    ----------
+    select_sl, streamlines to cut
+    select_idx, indices of these streamlines into the original tractography
+    roi_dists, distances from a given streamline to a given inclusion roi
+    roi_idxs, two indices into the list of inclusion rois to use for the cut
+    in_place, whether to modify select_sl
+    """
+    if in_place:
+        cut_sls = select_sl
+    else:
+        cut_sls = [None] * len(select_sl)
+
+    for bundle_sl_idx, idx in enumerate(select_idx):
+        min0 = int(roi_dists[idx, roi_idxs[0]])
+        min1 = int(roi_dists[idx, roi_idxs[1]])
+
+        # If the point that is closest to the first ROI
+        # is the same as the point closest to the second ROI,
+        # include the surrounding points to make a streamline.
+        if min0 == min1:
+            min1 = min1 + 1
+            min0 = min0 - 1
+
+        cut_sls[bundle_sl_idx] = select_sl[
+            bundle_sl_idx][min0:min1]
+
+    return cut_sls
 
 
 def clean_by_orientation(streamlines, primary_axis, tol=None):
