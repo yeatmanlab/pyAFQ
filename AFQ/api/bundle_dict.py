@@ -518,7 +518,8 @@ class BundleDict(MutableMapping):
                         b_name,
                         afd.read_resample_roi,
                         resample_to=resample_to)
-                    self._dict[b_name]["resampled"] = True
+                    if b_name != "whole_brain":
+                        self._dict[b_name]["resampled"] = True
                 except AttributeError as e:
                     if "'ImageFile' object" in str(e):
                         self._dict[b_name]["resampled"] = False
