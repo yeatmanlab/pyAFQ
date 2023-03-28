@@ -24,6 +24,7 @@ import AFQ.registration as reg
 import AFQ.utils.models as ut
 import AFQ.data.fetch as afd
 from AFQ.data.utils import BUNDLE_RECO_2_AFQ
+from AFQ.api.bundle_dict import BundleDict
 
 from geomstats.geometry.euclidean import Euclidean
 from geomstats.geometry.discrete_curves import DiscreteCurves
@@ -49,18 +50,18 @@ def _resample_tg(tg, n_points):
 class _SlsBeingRecognized:
     def __init__(self, sls, logger):
         self.oriented_yet = False
-        self.selected_fiber_idxs = np.arange(len(sls), dtype=int)
+        self.selected_fiber_idxs = np.arange(len(sls), dtype=np.int32)
         self.selected_sls = sls
         self.sls_flipped = np.zeros(len(sls), dtype=bool)
         self.bundle_vote = np.full(len(sls), -np.inf)
         self.logger = logger
         self.start_time = -1
 
-    def initiate_clean(self, clean_name):
+    def initiate_selection(self, clean_name):
         self.start_time = time()
         self.logger.info(f"Filtering by {clean_name}")
 
-    def clean(self, idx, clean_name):
+    def select(self, idx, clean_name):
         self.selected_fiber_idxs = self.selected_fiber_idxs[idx]
         self.selected_sls = self.selected_sls[idx]
         self.sls_flipped = self.sls_flipped[idx]
@@ -381,6 +382,8 @@ class Segmentation:
 
         self.prepare_map(mapping, reg_prealign, reg_template)
         self.bundle_dict = bundle_dict
+        if not isinstance(self.bundle_dict, BundleDict):
+            self.bundle_dict = BundleDict(self.bundle_dict)
 
         if self.seg_algo == "afq":
             # We only care about midline crossing if we use AFQ:
@@ -542,7 +545,8 @@ class Segmentation:
         for bundle_info in self.bundle_dict.values():
             if "subbundles" in bundle_info:
                 record_roi_dists = True
-            if len(bundle_info["include"]) > max_includes:
+            if "include" in bundle_info\
+                    and len(bundle_info["include"]) > max_includes:
                 max_includes = len(bundle_info["include"])
 
         fgarray = np.array(_resample_tg(tg, 100))
@@ -557,7 +561,7 @@ class Segmentation:
         if record_roi_dists:
             bundle_roi_dists = -np.ones(
                 (n_streamlines, len(self.bundle_dict), max_includes),
-                dtype=int)
+                dtype=np.int32)
 
         self.fiber_groups = {}
 
@@ -581,7 +585,7 @@ class Segmentation:
             self.logger.info(f"Finding Streamlines for {bundle_name}")
 
             # Warp ROIs
-            bundle_def = self.bundle_dict[bundle_name].copy()
+            bundle_def = dict(self.bundle_dict[bundle_name])
             bundle_def.update(self.bundle_dict.transform_rois(
                 bundle_name,
                 self.mapping,
@@ -590,7 +594,7 @@ class Segmentation:
             b_sls = _SlsBeingRecognized(tg.streamlines, self.logger)
 
             if "prob_map" in bundle_def:
-                b_sls.initiate_clean("Prob. Map")
+                b_sls.initiate_selection("Prob. Map")
                 fiber_probabilities = dts.values_from_volume(
                     bundle_def["prob_map"].get_fdata(),
                     fgarray[b_sls.selected_fiber_idxs], np.eye(4))
@@ -600,20 +604,20 @@ class Segmentation:
                 idx_above_prob = np.where(
                     fiber_probabilities > self.prob_threshold)[0]
 
-                b_sls.clean(idx_above_prob, "Prob. Map")
+                b_sls.select(idx_above_prob, "Prob. Map")
             elif not self.roi_dist_tie_break:
                 b_sls.bundle_vote = np.ones(len(b_sls.selected_fiber_idxs))
 
             if b_sls and "cross_midline" in bundle_def:
-                b_sls.initiate_clean("Cross Mid.")
+                b_sls.initiate_selection("Cross Mid.")
                 accepted = self.crosses[b_sls.selected_fiber_idxs]
                 if not bundle_def["cross_midline"]:
                     accepted = np.invert(accepted)
                 accepted_idx = np.where(accepted)[0]
-                b_sls.clean(accepted_idx, "Cross Mid.")
+                b_sls.select(accepted_idx, "Cross Mid.")
 
             if b_sls and "start" in bundle_def:
-                b_sls.initiate_clean("startpoint")
+                b_sls.initiate_selection("startpoint")
                 cleaned_idx = clean_by_endpoints(
                     b_sls.selected_sls,
                     bundle_def["start"],
@@ -629,10 +633,10 @@ class Segmentation:
                     b_sls.reorient(cleaned_idx_to_flip)
                     cleaned_idx = list(set(cleaned_idx).symmetric_difference(
                         set(cleaned_idx_to_flip)))
-                b_sls.clean(cleaned_idx, "startpoint")
+                b_sls.select(cleaned_idx, "startpoint")
 
             if b_sls and "end" in bundle_def:
-                b_sls.initiate_clean("endpoint")
+                b_sls.initiate_selection("endpoint")
                 cleaned_idx = clean_by_endpoints(
                     b_sls.selected_sls,
                     bundle_def["end"],
@@ -648,11 +652,11 @@ class Segmentation:
                     b_sls.reorient(cleaned_idx_to_flip)
                     cleaned_idx = list(set(cleaned_idx).symmetric_difference(
                         set(cleaned_idx_to_flip)))
-                b_sls.clean(cleaned_idx, "endpoint")
+                b_sls.select(cleaned_idx, "endpoint")
 
             if b_sls and (
                     ("min_len" in bundle_def) or ("max_len" in bundle_def)):
-                b_sls.initiate_clean("length")
+                b_sls.initiate_selection("length")
                 min_len = bundle_def.get("min_len", 0) / vox_dim
                 max_len = bundle_def.get("max_len", np.inf) / vox_dim
                 cleaned_idx = []
@@ -661,19 +665,19 @@ class Segmentation:
                         np.linalg.norm(sl[1:, :] - sl[:-1, :], axis=1))
                     if sl_len >= min_len and sl_len <= max_len:
                         cleaned_idx.append(idx)
-                b_sls.clean(cleaned_idx, "length")
+                b_sls.select(cleaned_idx, "length")
 
             if b_sls and "primary_axis" in bundle_def:
-                b_sls.initiate_clean("orientation")
+                b_sls.initiate_selection("orientation")
                 cleaned_idx, _, _ = clean_by_orientation(
                     b_sls.selected_sls,
                     bundle_def["primary_axis"],
                     bundle_def.get(
                         "primary_axis_percentage", None))
-                b_sls.clean(cleaned_idx, "orientation")
+                b_sls.select(cleaned_idx, "orientation")
 
             if b_sls and "curvature" in bundle_def:
-                b_sls.initiate_clean("curvature")
+                b_sls.initiate_selection("curvature")
                 ref_curve = np.loadtxt(bundle_def["curvature"])
                 ref_curve_threshold = bundle_def.get("curvature_thresh", 5)
                 for dim_idx in range(3):
@@ -688,10 +692,10 @@ class Segmentation:
                         ref_curve, sl)
                     if dist <= ref_curve_threshold:
                         cleaned_idx.append(idx)
-                b_sls.clean(cleaned_idx, "curvature")
+                b_sls.select(cleaned_idx, "curvature")
 
             if b_sls and "include" in bundle_def:
-                b_sls.initiate_clean("include")
+                b_sls.initiate_selection("include")
                 flip_using_include = len(bundle_def["include"]) > 1\
                     and not b_sls.oriented_yet
 
@@ -727,9 +731,11 @@ class Segmentation:
 
                 cleaned_idx = []
                 if self.roi_dist_tie_break:
-                    min_dist_coords = []
+                    min_dist_coords = np.ones(len(b_sls.selected_sls))
                 if len(bundle_def["include"]) > 1 and record_roi_dists:
-                    roi_dists = []
+                    roi_dists = -np.ones(
+                        (len(b_sls.selected_sls), max_includes),
+                        dtype=np.int32)
                 if flip_using_include:
                     to_flip = []
                 for sl_idx, inc_result in enumerate(inc_results):
@@ -738,29 +744,29 @@ class Segmentation:
                     if sl_accepted:
                         cleaned_idx.append(sl_idx)
                         if self.roi_dist_tie_break:
-                            min_dist_coords.append(np.min(sl_dist))
+                            min_dist_coords[sl_idx] = np.min(sl_dist)
 
                         if len(sl_dist) > 1:
                             roi_dist1 = np.argmin(sl_dist[0], 0)[0]
                             roi_dist2 = np.argmin(sl_dist[1], 0)[0]
                             if record_roi_dists:
-                                roi_dists.append([
+                                roi_dists[sl_idx] = [
                                     np.argmin(dist, 0)[0]
-                                    for dist in sl_dist])
+                                    for dist in sl_dist]
                             # Flip sl if it is close to second ROI
                             # before its close to the first ROI
                             if flip_using_include:
                                 to_flip.append(roi_dist1 > roi_dist2)
-                b_sls.clean(cleaned_idx, "include")
-                if flip_using_include:
-                    b_sls.reorient(to_flip)
                 if self.roi_dist_tie_break:
                     b_sls.bundle_vote = -np.asarray(min_dist_coords)
                 if record_roi_dists:
-                    b_sls.roi_dists = np.asarray(roi_dists, dtype=int)
+                    b_sls.roi_dists = np.asarray(roi_dists, dtype=np.int32)
+                b_sls.select(cleaned_idx, "include")
+                if flip_using_include:
+                    b_sls.reorient(to_flip)
 
             if b_sls and "exclude" in bundle_def:
-                b_sls.initiate_clean("exclude")
+                b_sls.initiate_selection("exclude")
                 if f'exc_addtol' in bundle_def:
                     exclude_roi_tols = []
                     for exc_tol in bundle_def["exc_addtol"]:
@@ -776,7 +782,7 @@ class Segmentation:
                     if _check_sl_with_exclusion(
                             sl, exclude_rois, exclude_roi_tols):
                         cleaned_idx.append(sl_idx)
-                b_sls.clean(cleaned_idx, "exclude")
+                b_sls.select(cleaned_idx, "exclude")
 
             if b_sls and not b_sls.oriented_yet:
                 raise ValueError(
@@ -841,7 +847,8 @@ class Segmentation:
                 if to_flip[ii]:
                     select_sl[ii] = sl[::-1]
 
-            roi_dists = bundle_roi_dists[:, bundle_idx, :]
+            if record_roi_dists:
+                roi_dists = bundle_roi_dists[:, bundle_idx, :]
             if self.clip_edges:
                 if np.sum(roi_dists == -1) == 0:
                     self.logger.info("Clipping Streamlines by ROI")
@@ -1293,7 +1300,7 @@ def clean_by_endpoints(streamlines, target, target_idx, tol=None,
     target_idx: int.
         Index within each streamline to check if within the target region.
         Typically 0 for startpoint ROIs or -1 for endpoint ROIs.
-        If using flip_sls, this becomes -()
+        If using flip_sls, this becomes (len(sl) - this_idx - 1) % len(sl)
     tol : float, optional A distance tolerance (in units that the coordinates
         of the streamlines are represented in). Default: 0, which means that
         the endpoint is exactly in the coordinate of the target ROI.

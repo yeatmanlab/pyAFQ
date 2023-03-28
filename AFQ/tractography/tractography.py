@@ -6,8 +6,7 @@ import logging
 import dipy.data as dpd
 from dipy.align import resample
 from dipy.direction import (DeterministicMaximumDirectionGetter,
-                            ProbabilisticDirectionGetter,
-                            PTTDirectionGetter)
+                            ProbabilisticDirectionGetter)
 import dipy.tracking.utils as dtu
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.tracking.stopping_criterion import (ThresholdStoppingCriterion,
@@ -44,7 +43,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         coefficients, or nibabel img with model params.
     directions : str
         How tracking directions are determined.
-        One of: {"det" | "prob" | "ptt"}
+        One of: {"det" | "prob"}
         Default: "prob"
     max_angle : float, optional.
         The maximum turning angle in each step. Default: 30
@@ -167,8 +166,6 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         dg = DeterministicMaximumDirectionGetter
     elif directions == "prob":
         dg = ProbabilisticDirectionGetter
-    elif directions == "ptt":
-        dg = PTTDirectionGetter
     else:
         raise ValueError(f"Unrecognized direction '{directions}'.")
 

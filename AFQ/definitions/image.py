@@ -312,47 +312,6 @@ class RoiImage(ImageDefinition):
             "require later derivatives to be calculated"))
 
 
-class ExperimentalWMMask(ImageDefinition):
-    def __init__(self):
-        pass
-
-    def find_path(self, bids_layout, from_path, subject, session):
-        pass
-
-    def get_name(self):
-        return "EWM"
-
-    def get_image_getter(self, task_name):
-        def image_getter(data_imap):
-            from scipy.ndimage import gaussian_filter
-            ai_img = nib.load(data_imap["csd_ai"])
-            blurred_ai = gaussian_filter(ai_img.get_fdata(), sigma=1)
-            stop_threshold_blur = np.nanpercentile(
-                blurred_ai,
-                50)
-            stop_threshold = np.nanpercentile(
-                ai_img.get_fdata(),
-                50)
-            ewm_mask = np.logical_or(
-                blurred_ai > stop_threshold_blur,
-                ai_img.get_fdata() > stop_threshold)
-
-            return nib.Nifti1Image(
-                ewm_mask.astype(np.int8),
-                ai_img.affine), dict(
-                    source=data_imap["csd_ai"],
-                    technique="Blurred AI thresholded maps")
-        return image_getter
-
-    def get_image_direct(self, dwi, gtab, bids_info, b0_file, data_imap=None):
-        if data_imap is not None:
-            return self.get_image_getter("direct")(data_imap)
-        else:
-            raise ValueError((
-                "ExperimentalWMMask cannot be used in this context, as it"
-                "require later derivatives to be calculated"))
-
-
 class ExperimentalBrainMask(ImageDefinition):
     """
     """

@@ -194,27 +194,25 @@ def test_clean_by_endpoints():
     atlas[4, 1, 1] = 3
     atlas[4, 1, 2] = 4
 
-    clean_idx = list(seg.clean_by_endpoints(
-        sl, [1, 2], [3, 4], atlas=atlas))
-    npt.assert_array_equal(clean_idx, np.array([0, 1]))
+    target_img_start = nib.Nifti1Image(
+        np.logical_or(atlas==1, atlas==2).astype(np.float32), np.eye(4))
+    target_img_end = nib.Nifti1Image(
+        np.logical_or(atlas==3, atlas==4).astype(np.float32), np.eye(4))
+
+    clean_idx_start = list(seg.clean_by_endpoints(
+        sl, target_img_start, 0))
+    clean_idx_end = list(seg.clean_by_endpoints(
+        sl, target_img_end, -1))
+    npt.assert_array_equal(np.intersect1d(
+        clean_idx_start, clean_idx_end), np.array([0, 1]))
 
     # If tol=1, the third streamline also gets included
-    clean_idx = list(seg.clean_by_endpoints(
-        sl, [1, 2], [3, 4], tol=1, atlas=atlas))
-    npt.assert_array_equal(clean_idx, np.array([0, 1, 2]))
-
-    # Provide the Nx3 array of indices instead.
-    idx_start = np.array(np.where(atlas == 1)).T
-    idx_end = np.array(np.where(atlas == 3)).T
-
-    clean_idx = list(seg.clean_by_endpoints(
-        sl, idx_start, idx_end, atlas=atlas))
-    npt.assert_array_equal(clean_idx, np.array([0]))
-
-    # Sometimes no requirement for one side:
-    clean_idx = list(seg.clean_by_endpoints(
-        sl, [1], None, atlas=atlas))
-    npt.assert_array_equal(clean_idx, np.array([0, 2, 3]))
+    clean_idx_start = list(seg.clean_by_endpoints(
+        sl, target_img_start, 0, tol=1))
+    clean_idx_end = list(seg.clean_by_endpoints(
+        sl, target_img_end, -1, tol=1))
+    npt.assert_array_equal(np.intersect1d(
+        clean_idx_start, clean_idx_end), np.array([0, 1, 2]))
 
 
 def test_exclusion_ROI():

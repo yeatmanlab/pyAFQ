@@ -222,7 +222,7 @@ def viz_indivBundle(base_fname,
             flip_axes=flip_axes,
             interact=False,
             inline=False)
-        if len(clean_bundles.get_bundle(bundle_name) > 0):
+        if len(clean_bundles.get_bundle(bundle_name)) > 0:
             figure = viz_backend.visualize_bundles(
                 clean_bundles,
                 shade_by_volume=shade_by_volume,

@@ -513,7 +513,7 @@ def test_AFQ_slr():
 
     afd.read_stanford_hardi_tractography()
 
-    _, bids_path, sub_path = get_temp_hardi()
+    _, bids_path, _ = get_temp_hardi()
     bd = BundleDict(["CST_L"])
 
     myafq = GroupAFQ(
@@ -528,7 +528,8 @@ def test_AFQ_slr():
             'full_segmented_cleaned_tractography.trk'),
         segmentation_params={
             "dist_to_waypoint": 10,
-            "filter_by_endpoints": False},
+            "filter_by_endpoints": False,
+            "parallel_segmentation": {"engine": "serial"}},
         bundle_info=bd,
         mapping_definition=SlrMap(slr_kwargs={
             "rng": np.random.RandomState(seed)}))
@@ -755,7 +756,15 @@ def test_AFQ_data_waypoint():
         bundle_names,
         resample_subject_to=nib.load(
             op.join(vista_folder, "sub-01_ses-01_dwi.nii.gz")))
-    del bundle_info["SLF_L"]["include"]  # test endpoint ROIs as include
+
+    # Test when we have endpoint ROIs only
+    bundle_info.load_templates()
+    bundle_info["SLF_L"] = {
+        "start": bundle_info.templates["SLF_L_start"],
+        "end": bundle_info.templates["SLF_L_end"],
+        "prob_map" : bundle_info.templates["SLF_L_prob_map"]
+    }
+
     bundle_info["LV1"] = {
         "include": [
             ImageFile(path=lv1_fname),
@@ -767,9 +776,7 @@ def test_AFQ_data_waypoint():
 
     tracking_params = dict(odf_model="csd",
                            seed_mask=RoiImage(),
-                           min_length=10,
-                           max_length=1000,
-                           n_seeds=100,
+                           n_seeds=200,
                            random_seeds=True,
                            rng_seed=42)
     segmentation_params = dict(filter_by_endpoints=False,
@@ -793,7 +800,6 @@ def test_AFQ_data_waypoint():
             "dti_lt2",
             ImageFile(path=t1_path_other),
             TemplateImage(t1_path)],
-        robust_tensor_fitting=True,
         tracking_params=tracking_params,
         segmentation_params=segmentation_params,
         clean_params=clean_params)
@@ -819,14 +825,14 @@ def test_AFQ_data_waypoint():
 
     seg_sft = aus.SegmentedSFT.fromfile(
         myafq.export("clean_bundles"))
-    npt.assert_(len(seg_sft.get_bundle('SLF_L').streamlines) > 0)
+    npt.assert_(len(seg_sft.get_bundle('SLF_R').streamlines) > 0)
 
     # Test ROI exporting:
     myafq.export("rois")
     assert op.exists(op.join(
         myafq.export("results_dir"),
         'ROIs',
-        'sub-01_ses-01_dwi_space-subject_desc-CSTR1include_mask.json'))
+        'sub-01_ses-01_dwi_space-subject_desc-CSTRinclude_1_mask.json'))
 
     # Test bundles exporting:
     myafq.export("indiv_bundles")
@@ -839,7 +845,7 @@ def test_AFQ_data_waypoint():
     tract_profiles = pd.read_csv(tract_profile_fname)
 
     assert tract_profiles.select_dtypes(include=[np.number]).sum().sum() != 0
-    assert tract_profiles.shape == (500, 9)
+    assert tract_profiles.shape == (400, 9)
 
     myafq.export("indiv_bundles_figures")
     assert op.exists(op.join(
@@ -873,20 +879,23 @@ def test_AFQ_data_waypoint():
     # ROI mask needs to be put in quotes in config
     tracking_params = dict(odf_model="CSD",
                            seed_mask="RoiImage()",
-                           n_seeds=100,
-                           min_length=10,
-                           max_length=1000,
+                           n_seeds=200,
                            random_seeds=True,
                            rng_seed=42)
     bundle_dict_as_str = (
         'BundleDict(["SLF_L", "SLF_R", "ARC_L", '
-        '"ARC_R", "CST_L", "CST_R", "FP"])')
+        '"ARC_R", "CST_L", "CST_R", "FP"])'
+        '+ BundleDict({"LV1": {"include": ['
+        f'ImageFile(path="{lv1_fname}"), '
+        'LabelledImageFile('
+        f'path="{seg_fname}", '
+        'inclusive_labels=[71])],'
+        '"space": "subject"}})')
     config = dict(
         BIDS_PARAMS=dict(
             bids_path=bids_path,
             preproc_pipeline='vistasoft'),
         DATA=dict(
-            robust_tensor_fitting=True,
             bundle_info=bundle_dict_as_str),
         SEGMENTATION=dict(
             scalars=[
@@ -896,8 +905,6 @@ def test_AFQ_data_waypoint():
                 "dti_lt2",
                 f"ImageFile('{t1_path_other}')",
                 f"TemplateImage('{t1_path}')"]),
-        VIZ=dict(
-            viz_backend_spec="plotly_no_gif"),
         TRACTOGRAPHY_PARAMS=tracking_params,
         SEGMENTATION_PARAMS=segmentation_params,
         CLEANING_PARAMS=clean_params)
@@ -916,14 +923,14 @@ def test_AFQ_data_waypoint():
     # The tract profiles should already exist from the CLI Run:
     from_file = pd.read_csv(tract_profile_fname)
 
-    assert from_file.shape == (500, 9)
+    assert from_file.shape == (400, 9)
     assert_series_equal(tract_profiles['dti_fa'], from_file['dti_fa'])
 
     # Make sure the CLI did indeed generate these:
     assert op.exists(op.join(
         results_dir,
         'ROIs',
-        'sub-01_ses-01_dwi_space-subject_desc-SLFL1include_mask.json'))
+        'sub-01_ses-01_dwi_space-subject_desc-SLFLinclude_1_mask.json'))
 
     assert op.exists(op.join(
         results_dir,

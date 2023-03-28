@@ -1,5 +1,6 @@
 import logging
 from collections.abc import MutableMapping
+from types import MappingProxyType as ReadOnlyDictProxy
 import AFQ.data.fetch as afd
 import AFQ.utils.volume as auv
 import numpy as np
@@ -336,7 +337,7 @@ class BundleDict(MutableMapping):
             if "resampled" not in self._dict[key] or not self._dict[
                     key]["resampled"]:
                 self._resample_roi(key)
-        _item = self._dict[key].copy()
+        _item = ReadOnlyDictProxy(self._dict[key].copy())
         if old_vals is not None:
             if isinstance(old_vals, dict):
                 for roi_type, roi in old_vals.items():
@@ -528,9 +529,11 @@ class BundleDict(MutableMapping):
         return "space" not in self._dict[bundle_name]\
             or self._dict[bundle_name]["space"] == "template"
 
-    def _roi_transform_helper(self, img, mapping, new_affine, bundle_name):
+    def _roi_transform_helper(self, roi, mapping, new_affine, bundle_name):
+        if isinstance(roi, str):
+            roi = afd.read_resample_roi(roi, self.resample_to)
         warped_img = auv.transform_inverse_roi(
-            img.get_fdata(),
+            roi.get_fdata(),
             mapping,
             bundle_name=bundle_name)
         warped_img = nib.Nifti1Image(warped_img, new_affine)

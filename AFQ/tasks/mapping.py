@@ -59,11 +59,18 @@ def export_rois(base_fname, results_dir, data_imap, mapping, dwi_affine):
     os.makedirs(rois_dir, exist_ok=True)
     roi_files = {}
 
-    def _export_roi_helper(img, roi_type, bundle_name):
-        warped_data = auv.transform_inverse_roi(
-            img.get_fdata(),
-            mapping,
-            bundle_name=bundle_name)
+    def _export_roi_helper(roi, roi_type, bundle_name, is_subject_space):
+        if is_subject_space:
+            roi = roi.get_fdata()
+        else:
+            if isinstance(roi, str):
+                roi = afd.read_resample_roi(roi, bundle_dict.resample_to)
+
+            roi = auv.transform_inverse_roi(
+                roi.get_fdata(),
+                mapping,
+                bundle_name=bundle_name)
+
         fname = op.split(
             get_fname(
                 base_fname,
@@ -76,7 +83,7 @@ def export_rois(base_fname, results_dir, data_imap, mapping, dwi_affine):
         logger.info(f"Saving {fname}")
         nib.save(
             nib.Nifti1Image(
-                warped_data.astype(np.float32),
+                roi.astype(np.float32),
                 dwi_affine), fname)
         meta = {}
         meta_fname = f'{drop_extension(fname)}.json'
@@ -84,10 +91,13 @@ def export_rois(base_fname, results_dir, data_imap, mapping, dwi_affine):
         return fname
 
     for bundle_name in bundle_dict:
+        is_subject_space = "space" in bundle_dict[bundle_name]\
+            and bundle_dict[bundle_name]["space"] == "subject"
         roi_files[bundle_name] = bundle_dict.apply_to_rois(
             bundle_name,
             _export_roi_helper,
             bundle_name,
+            is_subject_space,
             pass_roi_names=True,
             has_return=True,
             dry_run=True)
