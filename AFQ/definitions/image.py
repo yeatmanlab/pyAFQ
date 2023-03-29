@@ -12,7 +12,7 @@ from AFQ.definitions.utils import Definition, find_file, name_from_path
 __all__ = [
     "ImageFile", "FullImage", "RoiImage", "B0Image", "LabelledImageFile",
     "ThresholdedImageFile", "ScalarImage", "ThresholdedScalarImage",
-    "TemplateImage"]
+    "TemplateImage", "ExperimentalBrainImage"]
 
 
 logger = logging.getLogger('AFQ')
