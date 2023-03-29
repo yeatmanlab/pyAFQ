@@ -464,8 +464,7 @@ bundle_to_viz = SegmentedSFT({"AntFrontal": load_tractogram(
 
 plotly.io.show(visualize_bundles(bundle_to_viz,
                                  figure=visualize_volume(warped_MNI_T2_data),
-                                 shade_by_volume=FA_data,
-                                 bundle_dict=bundles))
+                                 shade_by_volume=FA_data))
 
 ##########################################################################
 # Bundle profiles:
