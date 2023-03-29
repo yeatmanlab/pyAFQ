@@ -63,9 +63,7 @@ def export_rois(base_fname, results_dir, data_imap, mapping, dwi_affine):
         if is_subject_space:
             roi = roi.get_fdata()
         else:
-            if isinstance(roi, str):
-                roi = afd.read_resample_roi(roi, bundle_dict.resample_to)
-
+            roi = afd.read_resample_roi(roi, bundle_dict.resample_to)
             roi = auv.transform_inverse_roi(
                 roi.get_fdata(),
                 mapping,

@@ -531,8 +531,7 @@ class BundleDict(MutableMapping):
             or self._dict[bundle_name]["space"] == "template"
 
     def _roi_transform_helper(self, roi, mapping, new_affine, bundle_name):
-        if isinstance(roi, str):
-            roi = afd.read_resample_roi(roi, self.resample_to)
+        roi = afd.read_resample_roi(roi, self.resample_to)
         warped_img = auv.transform_inverse_roi(
             roi.get_fdata(),
             mapping,

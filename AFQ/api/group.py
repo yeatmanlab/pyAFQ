@@ -610,7 +610,6 @@ class GroupAFQ(object):
             figure = viz_backend.visualize_bundles(
                 clean_bundles,
                 shade_by_volume=best_scalar,
-                bundle_dict=bundle_dict,
                 flip_axes=flip_axes,
                 bundle=bundle_name,
                 interact=False,
