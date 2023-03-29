@@ -231,8 +231,8 @@ def test_exclusion_ROI():
     slf_tg = StatefulTractogram(
         np.asarray(
             [
-                [[6, 50, 39], [28, 38, 61], [28, 61, 38]],
-                [[6, 50, 39], [28, 38, 62], [18, 41, 31]]
+                [[8, 53, 39], [30, 41, 61], [28, 61, 38]],
+                [[8, 53, 39], [30, 41, 62], [20, 44, 34]]
             ]).astype(float),
         hardi_img, Space.VOX)
     fiber_groups = segmentation.segment(

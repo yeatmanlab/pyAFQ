@@ -1320,7 +1320,7 @@ def clean_by_endpoints(streamlines, target, target_idx, tol=None,
     idxes = np.array(np.where(target.get_fdata() > 0)).T
 
     if flip_sls is None:
-        flip_sls = np.zeros_like(streamlines)
+        flip_sls = np.zeros(len(streamlines))
     flip_sls = flip_sls.astype(int)
 
     clean_idxes = []
