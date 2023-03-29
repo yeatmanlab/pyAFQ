@@ -312,7 +312,7 @@ class RoiImage(ImageDefinition):
             "require later derivatives to be calculated"))
 
 
-class ExperimentalBrainMask(ImageDefinition):
+class ExperimentalBrainImage(ImageDefinition):
     """
     """
 
