@@ -750,7 +750,7 @@ class Segmentation:
                             roi_dist1 = np.argmin(sl_dist[0], 0)[0]
                             roi_dist2 = np.argmin(sl_dist[1], 0)[0]
                             if record_roi_dists:
-                                roi_dists[sl_idx] = [
+                                roi_dists[sl_idx, :len(sl_dist)] = [
                                     np.argmin(dist, 0)[0]
                                     for dist in sl_dist]
                             # Flip sl if it is close to second ROI
