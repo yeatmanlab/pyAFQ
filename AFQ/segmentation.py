@@ -836,7 +836,11 @@ class Segmentation:
 
             if len(select_idx) == 0:
                 # There's nothing here, set and move to the next bundle:
-                self._return_empty(bundle)
+                if "subbundles" in self.bundle_dict[bundle]:
+                    for sb_name in self.bundle_dict[bundle]["subbundles"]:
+                        self._return_empty(sb_name)
+                else:
+                    self._return_empty(bundle)
                 continue
 
             # Use a list here, because ArraySequence doesn't support item
