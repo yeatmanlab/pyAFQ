@@ -110,6 +110,7 @@ def clean_bundles(bundles, clean_params=None):
     bundles = {}
     for b in seg_sft.bundle_names:
         if b != "whole_brain":
+            logger.info(f"Cleaning {b}")
             idx = seg_sft.bundle_idxs[b]
             this_tg = seg_sft.get_bundle(b)
             this_tg = seg.clean_bundle(this_tg, **clean_params)
@@ -172,8 +173,7 @@ def export_bundles(base_fname, results_dir,
 
 @pimms.calc("sl_counts")
 @as_file('_desc-slCount_dwi.csv', include_track=True, include_seg=True)
-def export_sl_counts(data_imap,
-                     clean_bundles, bundles):
+def export_sl_counts(clean_bundles, bundles):
     """
     full path to a JSON file containing streamline counts
     """
