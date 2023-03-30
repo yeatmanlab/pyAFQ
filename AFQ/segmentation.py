@@ -732,7 +732,7 @@ class Segmentation:
                 cleaned_idx = []
                 if self.roi_dist_tie_break:
                     min_dist_coords = np.ones(len(b_sls.selected_sls))
-                if len(bundle_def["include"]) > 1 and record_roi_dists:
+                if record_roi_dists:
                     roi_dists = -np.ones(
                         (len(b_sls.selected_sls), max_includes),
                         dtype=np.int32)
@@ -758,9 +758,9 @@ class Segmentation:
                             if flip_using_include:
                                 to_flip.append(roi_dist1 > roi_dist2)
                 if self.roi_dist_tie_break:
-                    b_sls.bundle_vote = -np.asarray(min_dist_coords)
+                    b_sls.bundle_vote = -min_dist_coords
                 if record_roi_dists:
-                    b_sls.roi_dists = np.asarray(roi_dists, dtype=np.int32)
+                    b_sls.roi_dists = roi_dists
                 b_sls.select(cleaned_idx, "include")
                 if flip_using_include:
                     b_sls.reorient(to_flip)
