@@ -1,5 +1,6 @@
 import nibabel as nib
 import numpy as np
+from scipy.linalg import blas
 
 from dipy.io.gradients import read_bvals_bvecs
 import dipy.core.gradients as dpg
@@ -9,8 +10,10 @@ import pimms
 import dipy.reconst.dki as dpy_dki
 import dipy.reconst.dti as dpy_dti
 import dipy.reconst.fwdti as dpy_fwdti
-from dipy.reconst.gqi import GeneralizedQSamplingModel, normalize_qa
-from dipy.direction import peaks_from_model
+from dipy.reconst.gqi import GeneralizedQSamplingModel
+from dipy.reconst.gqi import (
+    GeneralizedQSamplingModel,
+    squared_radial_component)
 from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
 from AFQ.definitions.image import ImageDefinition
@@ -322,55 +325,72 @@ def anisotropic_index(csd_params):
     return AI, dict(CSDParamsFile=csd_params)
 
 
-@pimms.calc("gq_params", "gq_qa")
-def gq(base_fname, gtab, dwi_affine, brain_mask, data,
-       gq_sampling_length=3):
+@pimms.calc("gq_params", "gq_iso", "gq_aso")
+def gq(base_fname, gtab, dwi_affine, data,
+       gq_sampling_length=1.2):
     """
     full path to a nifti file containing
     parameters for the Generalized Q-Sampling
     shm_coeff,
-    full path to a nifti file containing quantitative
-    anisotropy
+    full path to a nifti file containing isotropic diffusion component,
+    full path to a nifti file containing anisotropic diffusion component
 
     Parameters
     ----------
     gq_sampling_length : float
         Diffusion sampling length.
-        Default: 3
+        Default: 1.2
     """
-    mask =\
-        nib.load(brain_mask).get_fdata()
     gqmodel = GeneralizedQSamplingModel(
         gtab,
         sampling_length=gq_sampling_length)
-    gqmodel.fit(data, mask=mask)
-    gqpeaks = peaks_from_model(model=gqmodel,
-                               sphere=default_sphere,
-                               data=data,
-                               relative_peak_threshold=.5,
-                               min_separation_angle=25,
-                               mask=mask,
-                               return_odf=False,
-                               normalize_peaks=True)
-    qa = normalize_qa(gqpeaks.qa)[..., 0]
+
+    gqi_vector = np.real(
+        squared_radial_component(np.dot(
+            gqmodel.b_vector, default_sphere.vertices.T) *
+            gqmodel.Lambda))
+    ODF = blas.dgemm(
+        alpha=1.,
+        a=data.reshape(-1, gqi_vector.shape[0]),
+        b=gqi_vector
+    ).reshape((*data.shape[:-1], gqi_vector.shape[1]))
+
+    ODF_norm = ODF / ODF.max()
+    ASO = ODF_norm.max(axis=-1)
+    ISO = ODF_norm.min(axis=-1)
+
+    _, invB = shm.sh_to_sf_matrix(
+        default_sphere, sh_order=8, basis_type=None, return_inv=True)
+    GQ_shm = blas.dgemm(
+        alpha=1.,
+        a=ODF.reshape(-1, invB.shape[0]), b=invB).reshape(
+        (*ODF.shape[:-1], invB.shape[1]))
 
     params_suffix = "_model-GQ_desc-diffmodel_dwi.nii.gz"
     params_fname = get_fname(base_fname, params_suffix)
-    nib.save(nib.Nifti1Image(gqpeaks.shm_coeff, dwi_affine), params_fname)
+    nib.save(nib.Nifti1Image(GQ_shm, dwi_affine), params_fname)
     write_json(
         get_fname(base_fname, f"{drop_extension(params_suffix)}.json"),
         dict(GQParamsFile=params_fname)
     )
 
-    qa_suffix = "_model-GQ_desc-QA_dwi.nii.gz"
-    qa_fname = get_fname(base_fname, qa_suffix)
-    nib.save(nib.Nifti1Image(qa, dwi_affine), qa_fname)
+    ASO_suffix = "_model-GQ_desc-ASO_dwi.nii.gz"
+    ASO_fname = get_fname(base_fname, ASO_suffix)
+    nib.save(nib.Nifti1Image(ASO, dwi_affine), ASO_fname)
     write_json(
-        get_fname(base_fname, f"{drop_extension(qa_suffix)}.json"),
+        get_fname(base_fname, f"{drop_extension(ASO_suffix)}.json"),
         dict(GQSamplingLength=gq_sampling_length)
     )
 
-    return params_fname, qa_fname
+    ISO_suffix = "_model-GQ_desc-ISO_dwi.nii.gz"
+    ISO_fname = get_fname(base_fname, ISO_suffix)
+    nib.save(nib.Nifti1Image(ISO, dwi_affine), ISO_fname)
+    write_json(
+        get_fname(base_fname, f"{drop_extension(ISO_suffix)}.json"),
+        dict(GQSamplingLength=gq_sampling_length)
+    )
+
+    return params_fname, ISO_fname, ASO_fname
 
 
 @pimms.calc("fwdti_fa")

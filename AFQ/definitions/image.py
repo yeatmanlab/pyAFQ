@@ -2,17 +2,24 @@ import numpy as np
 import logging
 
 import nibabel as nib
-from dipy.segment.mask import median_otsu
 
+from dipy.segment.mask import median_otsu
 from dipy.align import resample
+from dipy.reconst.gqi import (
+    GeneralizedQSamplingModel,
+    squared_radial_component)
+from dipy.data import default_sphere
+
 import AFQ.utils.volume as auv
 from AFQ.definitions.utils import Definition, find_file, name_from_path
 
+from skimage.morphology import convex_hull_image, binary_opening
+from scipy.linalg import blas
 
 __all__ = [
     "ImageFile", "FullImage", "RoiImage", "B0Image", "LabelledImageFile",
     "ThresholdedImageFile", "ScalarImage", "ThresholdedScalarImage",
-    "TemplateImage", "ExperimentalBrainImage"]
+    "TemplateImage", "GQImage"]
 
 
 logger = logging.getLogger('AFQ')
@@ -220,13 +227,23 @@ class RoiImage(ImageDefinition):
 
     Parameters
     ----------
+    use_waypoints : bool
+        Whether to use the include ROIs to generate the image.
     use_presegment : bool
         Whether to use presegment bundle dict from segmentation params
         to get ROIs.
     use_endpoints : bool
-        Whether to use the endpoints ("start" and "end") instead of the
-        include ROIs to generate the image.
-
+        Whether to use the endpoints ("start" and "end") to generate
+        the image.
+    tissue_property : str or None
+        Tissue property from `scalars` to multiply the ROI image with.
+        Can be useful to limit seed mask to the core white matter.
+        Note: this must be a built-in tissue property.
+        Default: None
+    tissue_property_threshold : int or None
+        Threshold to threshold `tissue_property` if a boolean mask is
+        desired. This threshold is interpreted as a percentile.
+        Default: None
     Examples
     --------
     seed_image = RoiImage()
@@ -236,10 +253,14 @@ class RoiImage(ImageDefinition):
     def __init__(self,
                  use_waypoints=True,
                  use_presegment=False,
-                 use_endpoints=False):
+                 use_endpoints=False,
+                 tissue_property=None,
+                 tissue_property_threshold=None):
         self.use_waypoints = use_waypoints
         self.use_presegment = use_presegment
         self.use_endpoints = use_endpoints
+        self.tissue_property = tissue_property
+        self.tissue_property_threshold = tissue_property_threshold
         if not np.logical_or(self.use_waypoints, np.logical_or(
                 self.use_endpoints, self.use_presegment)):
             raise ValueError((
@@ -286,6 +307,17 @@ class RoiImage(ImageDefinition):
                     image_data = np.logical_or(
                         image_data,
                         warped_roi.astype(bool))
+            if self.tissue_property is not None:
+                tp = nib.load(data_imap[self.tissue_property]).get_fdata()
+                image_data = image_data.astype(np.float32) * tp
+                if self.tissue_property_threshold is not None:
+                    zero_mask = image_data == 0
+                    image_data[zero_mask] = np.nan
+                    tissue_property_threshold = np.nanpercentile(
+                        image_data,
+                        100 - self.tissue_property_threshold)
+                    image_data[zero_mask] = 0
+                    image_data = image_data > tissue_property_threshold
             return nib.Nifti1Image(
                 image_data.astype(np.float32),
                 dwi_affine), dict(source="ROIs")
@@ -312,7 +344,7 @@ class RoiImage(ImageDefinition):
             "require later derivatives to be calculated"))
 
 
-class ExperimentalBrainImage(ImageDefinition):
+class GQImage(ImageDefinition):
     """
     """
 
@@ -323,46 +355,45 @@ class ExperimentalBrainImage(ImageDefinition):
         pass
 
     def get_name(self):
-        return "EBM"
+        return "GQ"
 
     def get_image_getter(self, task_name):
-        def image_getter_helper(gtab, data, b0):
-            from dipy.reconst import shm
-            from AFQ.models.csd import _fit as csd_fit_model
-            from skimage.morphology import convex_hull_image
-
+        def image_getter_helper(gtab, data):
             data_img = nib.load(data)
             data_arr = data_img.get_fdata()
 
-            # Fit CSD model and extract APM scalar
-            csdf = csd_fit_model(
-                gtab, data_arr, mask=np.ones(data_arr.shape[:3]))
-            pmap = shm.anisotropic_power(csdf.shm_coeff)
+            gqmodel = GeneralizedQSamplingModel(gtab)
+            gqi_vector = np.real(
+                squared_radial_component(np.dot(
+                    gqmodel.b_vector, default_sphere.vertices.T) *
+                    gqmodel.Lambda))
+            ODF = blas.dgemm(
+                alpha=1.,
+                a=data_arr.reshape(-1, gqi_vector.shape[0]),
+                b=gqi_vector
+            ).reshape((*data_arr.shape[:-1], gqi_vector.shape[1]))
 
-            # Harmonize APM background
-            # pmap_cutoff = np.percentile(pmap[pmap!=0], 15)
-            # pmap_norm = (pmap - pmap_cutoff)/(pmap.max()-pmap_cutoff)
-            # pmap_norm[pmap_norm<0] = 0
-
-            # Fit OTSU mask
-            # _, otsu_data = median_otsu(pmap_norm)
+            ODF_norm = ODF / ODF.max()
+            ODF_max = ODF_norm.max(axis=-1)
+            ODF_mask = convex_hull_image(
+                binary_opening(
+                    ODF_max > 0.1))
 
             return nib.Nifti1Image(
-                convex_hull_image(pmap > 6.5).astype(np.float32),
+                ODF_mask.astype(np.float32),
                 data_img.affine), dict(
                     source=data,
-                    technique="APM thresholded maps")
+                    technique="GQ thresholded maps")
 
         if task_name == "data" or task_name == "direct":
             return image_getter_helper
         else:
             return lambda data_imap: image_getter_helper(
                 data_imap["gtab"],
-                data_imap["data"],
-                data_imap["b0"])
+                data_imap["data"])
 
     def get_image_direct(self, dwi, gtab, bids_info, b0_file, data_imap=None):
-        return self.get_image_getter("direct")(gtab, dwi, b0_file)
+        return self.get_image_getter("direct")(gtab, dwi)
 
 
 class B0Image(ImageDefinition):
