@@ -25,10 +25,11 @@ def gpu_track(data, gtab, seed_img, stop_img,
     seed_data = seed_img.get_fdata()
     stop_data = stop_img.get_fdata()
 
-    if thresholds_as_percentages:
-        seed_threshold = get_percentile_threshold(
-            seed_data, seed_threshold)
-    seed_data = seed_data > seed_threshold
+    if len(np.unique(seed_data)) > 2:
+        if thresholds_as_percentages:
+            seed_threshold = get_percentile_threshold(
+                seed_data, seed_threshold)
+        seed_data = seed_data > seed_threshold
 
     if thresholds_as_percentages:
         stop_threshold = get_percentile_threshold(
