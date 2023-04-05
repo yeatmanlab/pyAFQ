@@ -12,15 +12,27 @@ from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 from nibabel.streamlines.array_sequence import concatenate
 
+from AFQ.tractography import get_percentile_threshold
+
 
 # Modified from https://github.com/dipy/GPUStreamlines/blob/master/run_dipy_gpu.py
 def gpu_track(data, gtab, seed_img, stop_img,
+              seed_threshold, stop_threshold, thresholds_as_percentages,
               max_angle, step_size, sampling_density, ngpus):
     chunk_size = 100000
     sh_order = 6
 
     seed_data = seed_img.get_fdata()
     stop_data = stop_img.get_fdata()
+
+    if thresholds_as_percentages:
+        seed_threshold = get_percentile_threshold(
+            seed_data, seed_threshold)
+    seed_data = seed_data > seed_threshold
+
+    if thresholds_as_percentages:
+        stop_threshold = get_percentile_threshold(
+            stop_data, stop_threshold)
 
     model = OpdtModel(gtab, sh_order=sh_order, min_signal=1)
     fit_matrix = model._fit_matrix
@@ -42,7 +54,7 @@ def gpu_track(data, gtab, seed_img, stop_img,
     gpu_tracker = cuslines.GPUTracker(
         radians(max_angle),
         1.0,
-        0.1,
+        stop_threshold,
         step_size,
         data.astype(np.float64), H, R, delta_b, delta_q,
         b0s_mask.astype(np.int32), stop_data.astype(np.float64),

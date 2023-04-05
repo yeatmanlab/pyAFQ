@@ -139,12 +139,8 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
             seed_mask = np.ones(params_img.shape[:3])
         elif len(np.unique(seed_mask)) > 2:
             if thresholds_as_percentages:
-                zero_mask = seed_mask == 0
-                seed_mask[zero_mask] = np.nan
-                seed_threshold = np.nanpercentile(
-                    seed_mask,
-                    100 - seed_threshold)
-                seed_mask[zero_mask] = 0
+                seed_threshold = get_percentile_threshold(
+                    seed_mask, seed_threshold)
             seed_mask = seed_mask > seed_threshold
         if random_seeds:
             seeds = dtu.random_seeds_from_mask(seed_mask, seeds_count=n_seeds,
@@ -186,12 +182,8 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
                                                             0.5)
         else:
             if thresholds_as_percentages:
-                zero_mask = stop_mask == 0
-                stop_mask[zero_mask] = np.nan
-                stop_threshold = np.nanpercentile(
-                    stop_mask,
-                    100 - stop_threshold)
-                stop_mask[zero_mask] = 0
+                stop_threshold = get_percentile_threshold(
+                    stop_mask, stop_threshold)
             stopping_criterion = ThresholdStoppingCriterion(stop_mask,
                                                             stop_threshold)
 
