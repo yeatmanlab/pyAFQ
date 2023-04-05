@@ -545,6 +545,8 @@ class Segmentation:
         for bundle_info in self.bundle_dict.values():
             if "subbundles" in bundle_info:
                 record_roi_dists = True
+            if "curvature" in bundle_info:
+                record_roi_dists = True
             if "include" in bundle_info\
                     and len(bundle_info["include"]) > max_includes:
                 max_includes = len(bundle_info["include"])
@@ -676,24 +678,6 @@ class Segmentation:
                         "primary_axis_percentage", None))
                 b_sls.select(cleaned_idx, "orientation")
 
-            if b_sls and "curvature" in bundle_def:
-                b_sls.initiate_selection("curvature")
-                ref_curve = np.loadtxt(bundle_def["curvature"])
-                ref_curve_threshold = bundle_def.get("curvature_thresh", 5)
-                for dim_idx in range(3):
-                    if self.img_affine[dim_idx, dim_idx] < 0:
-                        ref_curve[:, dim_idx] = -ref_curve[:, dim_idx]
-                resampled_sls = dps.set_number_of_points(
-                    b_sls.selected_sls, ref_curve.shape[0])
-                curves_r3 = DiscreteCurves(ambient_manifold=Euclidean(dim=3))
-                cleaned_idx = []
-                for idx, sl in enumerate(resampled_sls):
-                    dist = curves_r3.square_root_velocity_metric.dist(
-                        ref_curve, sl)
-                    if dist <= ref_curve_threshold:
-                        cleaned_idx.append(idx)
-                b_sls.select(cleaned_idx, "curvature")
-
             if b_sls and "include" in bundle_def:
                 b_sls.initiate_selection("include")
                 flip_using_include = len(bundle_def["include"]) > 1\
@@ -748,7 +732,8 @@ class Segmentation:
 
                         if len(sl_dist) > 1:
                             roi_dist1 = np.argmin(sl_dist[0], 0)[0]
-                            roi_dist2 = np.argmin(sl_dist[1], 0)[0]
+                            roi_dist2 = np.argmin(sl_dist[
+                                len(sl_dist) - 1], 0)[0]
                             if record_roi_dists:
                                 roi_dists[sl_idx, :len(sl_dist)] = [
                                     np.argmin(dist, 0)[0]
@@ -756,7 +741,12 @@ class Segmentation:
                             # Flip sl if it is close to second ROI
                             # before its close to the first ROI
                             if flip_using_include:
-                                to_flip.append(roi_dist1 > roi_dist2)
+                                this_flips = roi_dist1 > roi_dist2
+                                to_flip.append(this_flips)
+                                if this_flips:
+                                    roi_dists[sl_idx, :len(sl_dist)] =\
+                                        np.flip(
+                                            roi_dists[sl_idx, :len(sl_dist)])
                 if self.roi_dist_tie_break:
                     b_sls.bundle_vote = -min_dist_coords
                 if record_roi_dists:
@@ -764,6 +754,33 @@ class Segmentation:
                 b_sls.select(cleaned_idx, "include")
                 if flip_using_include:
                     b_sls.reorient(to_flip)
+
+            if b_sls and "curvature" in bundle_def:
+                b_sls.initiate_selection("curvature")
+                ref_curve = np.loadtxt(bundle_def["curvature"])
+                ref_curve_threshold = bundle_def.get("curvature_thresh", 5)
+                for dim_idx in range(3):
+                    if self.img_affine[dim_idx, dim_idx] < 0:
+                        ref_curve[:, dim_idx] = -ref_curve[:, dim_idx]
+                curves_r3 = DiscreteCurves(ambient_manifold=Euclidean(dim=3))
+                n_roi_dists = len(bundle_def["include"])
+                cleaned_idx = []
+                for idx, sl in enumerate(b_sls.selected_sls):
+                    if abs(
+                        b_sls.roi_dists[idx, 0]
+                            - b_sls.roi_dists[idx, n_roi_dists - 1]) < 2:
+                        continue
+                    cut_sl = sl[
+                        b_sls.roi_dists[idx, 0]:
+                        b_sls.roi_dists[idx, n_roi_dists - 1] + 1]
+                    cut_sl = dps.set_number_of_points(
+                        cut_sl, ref_curve.shape[0])
+                    dist = curves_r3.square_root_velocity_metric.dist(
+                        ref_curve, cut_sl)
+                    if dist <= ref_curve_threshold:
+                        print(dist)
+                        cleaned_idx.append(idx)
+                b_sls.select(cleaned_idx, "curvature")
 
             if b_sls and "exclude" in bundle_def:
                 b_sls.initiate_selection("exclude")
@@ -858,7 +875,7 @@ class Segmentation:
                     self.logger.info("Clipping Streamlines by ROI")
                     _cut_sls_by_dist(
                         select_sl, select_idx, roi_dists,
-                        (0, 1), in_place=True)
+                        (0, len(bundle["include"]) - 1), in_place=True)
             if "subbundles" in self.bundle_dict[bundle]:
                 for sb_name, sb_include_cuts in self.bundle_dict[bundle][
                         "subbundles"].items():
