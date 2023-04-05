@@ -127,10 +127,11 @@ def dti_fit(dti_params, gtab):
     return dpy_dti.TensorFit(tm, dti_params)
 
 
+@pimms.calc("dti_params")
 @as_file(suffix='_model-DTI_desc-diffmodel_dwi.nii.gz')
 @as_img
-def dti(brain_mask, data, gtab,
-        bval, bvec, b0_threshold=50, robust_tensor_fitting=False):
+def dti_params(brain_mask, data, gtab,
+               bval, bvec, b0_threshold=50, robust_tensor_fitting=False):
     """
     full path to a nifti file containing parameters
     for the DTI fit
@@ -166,9 +167,6 @@ def dti(brain_mask, data, gtab,
     return dtf.model_params, meta
 
 
-dti_params = pimms.calc("dti_params")(dti)
-
-
 @pimms.calc("fwdti_tf")
 def fwdti_fit(fwdti_params, gtab):
     """Free-water DTI TensorFit object"""
@@ -177,9 +175,10 @@ def fwdti_fit(fwdti_params, gtab):
     return dpy_fwdti.FreeWaterTensorFit(fwtm, fwdti_params)
 
 
+@pimms.calc("fwdti_params")
 @as_file(suffix='_model-FWDTI_desc-diffmodel_dwi.nii.gz')
 @as_img
-def fwdti(brain_mask, data, gtab):
+def fwdti_params(brain_mask, data, gtab):
     """
     Full path to a nifti file containing parameters
     for the free-water DTI fit.
@@ -196,9 +195,6 @@ def fwdti(brain_mask, data, gtab):
     return dtf.model_params, meta
 
 
-fwdti_params = pimms.calc("fwdti_params")(fwdti)
-
-
 @pimms.calc("dki_tf")
 def dki_fit(dki_params, gtab):
     """DKI DiffusionKurtosisFit object"""
@@ -207,9 +203,10 @@ def dki_fit(dki_params, gtab):
     return dpy_dki.DiffusionKurtosisFit(tm, dki_params)
 
 
+@pimms.calc("dki_params")
 @as_file(suffix='_model-DKI_desc-diffmodel_dwi.nii.gz')
 @as_img
-def dki(brain_mask, gtab, data):
+def dki_params(brain_mask, gtab, data):
     """
     full path to a nifti file containing
     parameters for the DKI fit
@@ -227,14 +224,12 @@ def dki(brain_mask, gtab, data):
     return dkf.model_params, meta
 
 
-dki_params = pimms.calc("dki_params")(dki)
-
-
+@pimms.calc("csd_params")
 @as_file(suffix='_model-CSD_desc-diffmodel_dwi.nii.gz')
 @as_img
-def csd(dwi, brain_mask, gtab, data,
-        csd_response=None, csd_sh_order=None,
-        csd_lambda_=1, csd_tau=0.1):
+def csd_params(dwi, brain_mask, gtab, data,
+               csd_response=None, csd_sh_order=None,
+               csd_lambda_=1, csd_tau=0.1):
     """
     full path to a nifti file containing
     parameters for the CSD fit
@@ -293,9 +288,6 @@ def csd(dwi, brain_mask, gtab, data,
     return csdf.shm_coeff, meta
 
 
-csd_params = pimms.calc("csd_params")(csd)
-
-
 @pimms.calc("csd_pmap")
 @as_file(suffix='_model-CSD_desc-APM_dwi.nii.gz')
 @as_img
@@ -334,7 +326,6 @@ def gq(base_fname, gtab, dwi_affine, data,
     shm_coeff,
     full path to a nifti file containing isotropic diffusion component,
     full path to a nifti file containing anisotropic diffusion component
-
     Parameters
     ----------
     gq_sampling_length : float
@@ -391,6 +382,35 @@ def gq(base_fname, gtab, dwi_affine, data,
     )
 
     return params_fname, ISO_fname, ASO_fname
+
+
+@pimms.calc("gq_pmap")
+@as_file(suffix='_model-GQ_desc-APM_dwi.nii.gz')
+@as_img
+def gq_pmap(gq_params):
+    """
+    full path to a nifti file containing
+    the anisotropic power map from GQ
+    """
+    sh_coeff = nib.load(gq_params).get_fdata()
+    pmap = shm.anisotropic_power(sh_coeff)
+    return pmap, dict(GQParamsFile=gq_params)
+
+
+@pimms.calc("gq_ai")
+@as_file(suffix='_model-GQ_desc-AI_dwi.nii.gz')
+@as_img
+def gq_ai(gq_params):
+    """
+    full path to a nifti file containing
+    the anisotropic index from GQ
+    """
+    sh_coeff = nib.load(gq_params).get_fdata()
+    sh_0 = sh_coeff[..., 0] ** 2
+    sh_sum_squared = np.sum(sh_coeff ** 2, axis=-1)
+    AI = np.zeros_like(sh_0)
+    AI = np.sqrt(1 - sh_0 / sh_sum_squared)
+    return AI, dict(GQParamsFile=gq_params)
 
 
 @pimms.calc("fwdti_fa")
@@ -832,7 +852,7 @@ def get_data_plan(kwargs):
         get_data_gtab, b0, b0_mask, brain_mask,
         dti_fit, dki_fit, fwdti_fit, anisotropic_power_map, anisotropic_index,
         dti_fa, dti_lt, dti_cfa, dti_pdd, dti_md, dki_kt, dki_lt, dki_fa,
-        gq, fwdti_fa, fwdti_md, fwdti_fwf,
+        gq, gq_pmap, fwdti_fa, fwdti_md, fwdti_fwf,
         dki_md, dki_awf, dki_mk, dti_ga, dti_rd, dti_ad, dki_ga, dki_rd,
         dki_ad, dki_rk, dki_ak, dti_params, dki_params, fwdti_params,
         csd_params, get_bundle_dict])
