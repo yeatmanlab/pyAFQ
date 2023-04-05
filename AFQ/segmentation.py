@@ -778,7 +778,6 @@ class Segmentation:
                     dist = curves_r3.square_root_velocity_metric.dist(
                         ref_curve, cut_sl)
                     if dist <= ref_curve_threshold:
-                        print(dist)
                         cleaned_idx.append(idx)
                 b_sls.select(cleaned_idx, "curvature")
 
