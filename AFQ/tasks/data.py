@@ -852,7 +852,7 @@ def get_data_plan(kwargs):
         get_data_gtab, b0, b0_mask, brain_mask,
         dti_fit, dki_fit, fwdti_fit, anisotropic_power_map, anisotropic_index,
         dti_fa, dti_lt, dti_cfa, dti_pdd, dti_md, dki_kt, dki_lt, dki_fa,
-        gq, gq_pmap, fwdti_fa, fwdti_md, fwdti_fwf,
+        gq, gq_pmap, gq_ai, fwdti_fa, fwdti_md, fwdti_fwf,
         dki_md, dki_awf, dki_mk, dti_ga, dti_rd, dti_ad, dki_ga, dki_rd,
         dki_ad, dki_rk, dki_ak, dti_params, dki_params, fwdti_params,
         csd_params, get_bundle_dict])

@@ -1224,8 +1224,14 @@ def _cut_sls_by_dist(select_sl, select_idx, roi_dists, roi_idxs,
         cut_sls = [None] * len(select_sl)
 
     for bundle_sl_idx, idx in enumerate(select_idx):
-        min0 = int(roi_dists[idx, roi_idxs[0]])
-        min1 = int(roi_dists[idx, roi_idxs[1]])
+        if roi_idxs[0] == -1:
+            min0 = 0
+        else:
+            min0 = int(roi_dists[idx, roi_idxs[0]])
+        if roi_idxs[1] == -1:
+            min1 = None
+        else:
+            min1 = int(roi_dists[idx, roi_idxs[1]])
 
         # If the point that is closest to the first ROI
         # is the same as the point closest to the second ROI,
