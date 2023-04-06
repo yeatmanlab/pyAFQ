@@ -206,8 +206,8 @@ def get_reg_subject(data_imap, bids_info, base_fname, dwi,
         Default: "power_map"
     """
     if not isinstance(reg_subject_spec, str)\
-            and not isinstance(reg_subject_spec, nib.Nifti1Image)\
-            and not isinstance(reg_subject_spec, ImageDefinition):
+            and not isinstance(reg_subject_spec, nib.Nifti1Image):
+        # Note the ImageDefinition case is handled in get_mapping_plan
         raise TypeError(
             "reg_subject must be a str, ImageDefinition, or Nifti1Image")
 
@@ -219,18 +219,9 @@ def get_reg_subject(data_imap, bids_info, base_fname, dwi,
     }
     bm = nib.load(data_imap["brain_mask"])
 
-    if bids_info is not None and isinstance(reg_subject_spec, ImageDefinition):
-        reg_subject_spec.find_path(
-            bids_info["bids_layout"],
-            dwi,
-            bids_info["subject"],
-            bids_info["session"])
-        img, _ = reg_subject_spec.get_image_direct(
-            dwi, data_imap["gtab"], bids_info, data_imap["b0"],
-            data_imap=data_imap)
-    else:
-        if reg_subject_spec in filename_dict:
-            reg_subject_spec = data_imap[filename_dict[reg_subject_spec]]
+    if reg_subject_spec in filename_dict:
+        reg_subject_spec = data_imap[filename_dict[reg_subject_spec]]
+    if isinstance(reg_subject_spec, str):
         img = nib.load(reg_subject_spec)
     bm = bm.get_fdata().astype(bool)
     masked_data = img.get_fdata()
@@ -271,5 +262,18 @@ def get_mapping_plan(kwargs, use_sls=False):
 
     if use_sls:
         mapping_tasks["mapping_res"] = sls_mapping
+
+    reg_ss = kwargs.get("reg_subject_spec", None)
+    if isinstance(reg_ss, ImageDefinition):
+        reg_ss.find_path(
+            bids_info["bids_layout"],
+            kwargs["dwi"],
+            bids_info["subject"],
+            bids_info["session"])
+        del kwargs["reg_subject_spec"]
+        mapping_tasks["reg_subject_spec_res"] = pimms.calc("reg_subject_spec")(
+            as_file((
+                f'_desc-{str_to_desc(reg_ss.get_name())}'
+                '_dwi.nii.gz'))(reg_ss.get_image_getter("mapping")))
 
     return pimms.plan(**mapping_tasks)

@@ -20,7 +20,7 @@ from AFQ.definitions.image import ImageDefinition
 from dipy.data import default_sphere
 
 from AFQ.tasks.decorators import as_file, as_img, as_fit_deriv
-from AFQ.tasks.utils import get_fname, with_name
+from AFQ.tasks.utils import get_fname, with_name, str_to_desc
 import AFQ.api.bundle_dict as abd
 import AFQ.data.fetch as afd
 from AFQ.utils.path import drop_extension
@@ -708,8 +708,7 @@ def dki_ak(dki_tf):
 
 @pimms.calc("brain_mask")
 @as_file('_desc-brain_mask.nii.gz')
-def brain_mask(base_fname, dwi, gtab, b0,
-               bids_info, brain_mask_definition=None):
+def brain_mask(b0, brain_mask_definition=None):
     """
     full path to a nifti file containing
     the brain mask
@@ -724,19 +723,10 @@ def brain_mask(base_fname, dwi, gtab, b0,
         If None, use B0Image()
         Default: None
     """
-    if brain_mask_definition is None:
-        brain_mask_definition = B0Image()
-    if not isinstance(brain_mask_definition, Definition):
-        raise TypeError(
-            "brain_mask_definition must be a Definition")
-    if bids_info is not None:
-        brain_mask_definition.find_path(
-            bids_info["bids_layout"],
-            dwi,
-            bids_info["subject"],
-            bids_info["session"])
-    return brain_mask_definition.get_image_direct(
-        dwi, gtab, bids_info, b0, data_imap=None)
+    # Note that any case where brain_mask_definition is not None
+    # is handled in get_data_plan
+    # This is just the default
+    return B0Image().get_image_getter()(b0)
 
 
 @pimms.calc("bundle_dict", "reg_template")
@@ -821,22 +811,8 @@ def get_bundle_dict(base_fname, dwi, gtab, segmentation_params,
             seg_algo=segmentation_params["seg_algo"],
             resample_to=reg_template)
 
-    def roi_definition_to_image(roi):
-        if not isinstance(roi, ImageDefinition):
-            return roi
-        if bids_info is not None:
-            roi.find_path(
-                bids_info["bids_layout"],
-                dwi,
-                bids_info["subject"],
-                bids_info["session"])
-        roi_img, _ = roi.get_image_direct(
-            dwi, gtab, bids_info, b0, data_imap=None)
-        return roi_img
-    for b_name, b_info in bundle_dict._dict.items():
-        if "space" in b_info and b_info["space"] == "subject":
-            bundle_dict.apply_to_rois(b_name, roi_definition_to_image)
-            bundle_dict._resample_roi(b_name)
+    for b_name in bundle_dict._dict:
+        bundle_dict._resample_roi(b_name)
     return bundle_dict, reg_template
 
 
@@ -867,4 +843,19 @@ def get_data_plan(kwargs):
             else:
                 scalars.append(scalar)
         kwargs["scalars"] = scalars
+
+    bm_def = kwargs.get(
+        "brain_mask_definition", None)
+    if bm_def is not None:
+        if kwargs["bids_info"] is not None:
+            bm_def.find_path(
+                kwargs["bids_info"]["bids_layout"],
+                kwargs["dwi"],
+                kwargs["bids_info"]["subject"],
+                kwargs["bids_info"]["session"])
+        data_tasks["brain_mask_res"] = pimms.calc("brain_mask")(
+            as_file((
+                f'_desc-{str_to_desc(bm_def.get_name())}'
+                '_dwi.nii.gz'))(bm_def.get_image_getter("data")))
+
     return pimms.plan(**data_tasks)

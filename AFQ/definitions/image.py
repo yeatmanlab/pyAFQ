@@ -55,10 +55,6 @@ class ImageDefinition(Definition):
         raise NotImplementedError(
             "Please implement a get_image_getter method")
 
-    def get_image_direct(self, dwi, gtab, bids_info, b0_file, data_imap=None):
-        raise NotImplementedError(
-            "Please implement a get_image_direct method")
-
 
 class CombineImageMixin(object):
     """
@@ -186,10 +182,6 @@ class ImageFile(ImageDefinition):
                 dwi_img.affine), meta
         return image_getter
 
-    def get_image_direct(self, dwi, gtab, bids_info, b0_file, data_imap=None):
-        return self.get_image_getter("direct")(
-            dwi, bids_info)
-
 
 class FullImage(ImageDefinition):
     """
@@ -216,9 +208,6 @@ class FullImage(ImageDefinition):
                 np.ones(dwi_img.get_fdata()[..., 0].shape, dtype=np.float32),
                 dwi_img.affine), dict(source="Entire Volume")
         return image_getter
-
-    def get_image_direct(self, dwi, gtab, bids_info, b0_file, data_imap=None):
-        return self.get_image_getter("direct")(dwi)
 
 
 class RoiImage(ImageDefinition):
@@ -322,7 +311,11 @@ class RoiImage(ImageDefinition):
                 image_data.astype(np.float32),
                 dwi_affine), dict(source="ROIs")
 
-        if task_name == "mapping":
+        if task_name == "data":
+            raise ValueError((
+                "RoiImage cannot be used in this context, as they"
+                "require later derivatives to be calculated"))
+        elif task_name == "mapping":
             def image_getter(
                     dwi_affine, mapping,
                     data_imap, segmentation_params):
@@ -338,14 +331,17 @@ class RoiImage(ImageDefinition):
                     data_imap, segmentation_params)
         return image_getter
 
-    def get_image_direct(self, dwi, gtab, bids_info, b0_file, data_imap=None):
-        raise ValueError((
-            "RoiImage cannot be used in this context, as they"
-            "require later derivatives to be calculated"))
-
 
 class GQImage(ImageDefinition):
     """
+    Threshold the anisotropic diffusion component of the 
+    Generalized Q-Sampling Model to generate a brain mask
+    which will include the eyes, optic nerve, and cerebrum
+    but will exclude most or all of the skull.
+
+    Examples
+    --------
+    api.GroupAFQ(brain_mask_definition=GQImage())
     """
 
     def __init__(self):
@@ -358,42 +354,24 @@ class GQImage(ImageDefinition):
         return "GQ"
 
     def get_image_getter(self, task_name):
-        def image_getter_helper(gtab, data):
-            data_img = nib.load(data)
-            data_arr = data_img.get_fdata()
-
-            gqmodel = GeneralizedQSamplingModel(gtab)
-            gqi_vector = np.real(
-                squared_radial_component(np.dot(
-                    gqmodel.b_vector, default_sphere.vertices.T) *
-                    gqmodel.Lambda))
-            ODF = blas.dgemm(
-                alpha=1.,
-                a=data_arr.reshape(-1, gqi_vector.shape[0]),
-                b=gqi_vector
-            ).reshape((*data_arr.shape[:-1], gqi_vector.shape[1]))
-
-            ODF_norm = ODF / ODF.max()
-            ODF_max = ODF_norm.max(axis=-1)
+        def image_getter_helper(gq_aso):
+            gq_aso_img = nib.load(gq_aso)
+            gq_aso_data = gq_aso_img.get_fdata().max(axis=-1)
             ODF_mask = convex_hull_image(
                 binary_opening(
-                    ODF_max > 0.1))
+                    gq_aso_data > 0.1))
 
             return nib.Nifti1Image(
                 ODF_mask.astype(np.float32),
-                data_img.affine), dict(
-                    source=data,
+                gq_aso_img.affine), dict(
+                    source=gq_aso,
                     technique="GQ thresholded maps")
 
-        if task_name == "data" or task_name == "direct":
+        if task_name == "data":
             return image_getter_helper
         else:
             return lambda data_imap: image_getter_helper(
-                data_imap["gtab"],
-                data_imap["data"])
-
-    def get_image_direct(self, dwi, gtab, bids_info, b0_file, data_imap=None):
-        return self.get_image_getter("direct")(gtab, dwi)
+                data_imap["gq_aso"])
 
 
 class B0Image(ImageDefinition):
@@ -438,13 +416,10 @@ class B0Image(ImageDefinition):
                     source=b0,
                     technique="median_otsu applied to b0",
                     median_otsu_kwargs=self.median_otsu_kwargs)
-        if task_name == "data" or task_name == "direct":
+        if task_name == "data":
             return image_getter_helper
         else:
             return lambda data_imap: image_getter_helper(data_imap["b0"])
-
-    def get_image_direct(self, dwi, gtab, bids_info, b0_file, data_imap=None):
-        return self.get_image_getter("direct")(b0_file)
 
 
 class LabelledImageFile(ImageFile, CombineImageMixin):
@@ -631,18 +606,15 @@ class ScalarImage(ImageDefinition):
         return self.scalar
 
     def get_image_getter(self, task_name):
+        if task_name == "data":
+            raise ValueError((
+                "ScalarImage cannot be used in this context, as they"
+                "require later derivatives to be calculated"))
+
         def image_getter(data_imap):
             return nib.load(data_imap[self.scalar]), dict(
                 FromScalar=self.scalar)
         return image_getter
-
-    def get_image_direct(self, dwi, gtab, bids_info, b0_file, data_imap=None):
-        if data_imap is not None:
-            return self.get_image_getter("direct")(data_imap)
-        else:
-            raise ValueError((
-                "ScalarImage cannot be used in this context, as they"
-                "require later derivatives to be calculated"))
 
 
 class ThresholdedScalarImage(ThresholdedImageFile, ScalarImage):
@@ -724,11 +696,10 @@ class PFTImage(ImageDefinition):
         return "pft"
 
     def get_image_getter(self, task_name):
+        if task_name == "data":
+            raise ValueError("PFTImage cannot be used in this context")
         return [probseg.get_image_getter(task_name)
                 for probseg in self.probsegs]
-
-    def get_image_direct(self, dwi, gtab, bids_info, b0_file, data_imap=None):
-        raise ValueError("PFTImage cannot be used in this context")
 
 
 class TemplateImage(ImageDefinition):
@@ -772,7 +743,11 @@ class TemplateImage(ImageDefinition):
                 scalar_data.astype(np.float32),
                 reg_template.affine), dict(source=self.path)
 
-        if task_name == "mapping":
+        if task_name == "data":
+            raise ValueError((
+                "TemplateImage cannot be used in this context, as they"
+                "require later derivatives to be calculated"))
+        elif task_name == "mapping":
             def image_getter(mapping, data_imap):
                 return _image_getter_helper(
                     mapping, data_imap["reg_template"])
@@ -781,8 +756,3 @@ class TemplateImage(ImageDefinition):
                 return _image_getter_helper(
                     mapping_imap["mapping"], data_imap["reg_template"])
         return image_getter
-
-    def get_image_direct(self, dwi, gtab, bids_info, b0_file, data_imap=None):
-        raise ValueError((
-            "ScalarImage cannot be used in this context, as they"
-            "require later derivatives to be calculated"))
