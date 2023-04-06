@@ -202,11 +202,11 @@ def viz_indivBundle(base_fname,
     # This dictionary contains a mapping to which ROIs
     # should be used from the bundle dict, based on the
     # name from the segmented SFT file. Currently,
-    # This is only different when using subbundles.
+    # This is only different when using bundle sections.
     segmented_bname_to_roi_bname = {}
     for b_name, b_info in bundle_dict.items():
-        if "subbundles" in b_info:
-            for sb_name in b_info["subbundles"]:
+        if "bundlesection" in b_info:
+            for sb_name in b_info["bundlesection"]:
                 segmented_bname_to_roi_bname[sb_name] = b_name
         else:
             segmented_bname_to_roi_bname[b_name] = b_name

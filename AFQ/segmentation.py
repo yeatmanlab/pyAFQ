@@ -543,7 +543,7 @@ class Segmentation:
         max_includes = 2
         record_roi_dists = self.clip_edges
         for bundle_info in self.bundle_dict.values():
-            if "subbundles" in bundle_info:
+            if "bundlesection" in bundle_info:
                 record_roi_dists = True
             if "curvature" in bundle_info:
                 record_roi_dists = True
@@ -852,8 +852,8 @@ class Segmentation:
 
             if len(select_idx) == 0:
                 # There's nothing here, set and move to the next bundle:
-                if "subbundles" in self.bundle_dict[bundle]:
-                    for sb_name in self.bundle_dict[bundle]["subbundles"]:
+                if "bundlesection" in self.bundle_dict[bundle]:
+                    for sb_name in self.bundle_dict[bundle]["bundlesection"]:
                         self._return_empty(sb_name)
                 else:
                     self._return_empty(bundle)
@@ -875,14 +875,14 @@ class Segmentation:
                     _cut_sls_by_dist(
                         select_sl, select_idx, roi_dists,
                         (0, len(bundle["include"]) - 1), in_place=True)
-            if "subbundles" in self.bundle_dict[bundle]:
+            if "bundlesection" in self.bundle_dict[bundle]:
                 for sb_name, sb_include_cuts in self.bundle_dict[bundle][
-                        "subbundles"].items():
-                    subbundle_select_sl = _cut_sls_by_dist(
+                        "bundlesection"].items():
+                    bundlesection_select_sl = _cut_sls_by_dist(
                         select_sl, select_idx, roi_dists,
                         sb_include_cuts, in_place=False)
                     self._add_bundle_to_fiber_group(
-                        sb_name, subbundle_select_sl, select_idx)
+                        sb_name, bundlesection_select_sl, select_idx)
             else:
                 self._add_bundle_to_fiber_group(bundle, select_sl, select_idx)
         return self.fiber_groups
