@@ -338,8 +338,8 @@ def gq(base_fname, gtab, dwi_affine, data,
 
     gqi_vector = np.real(
         squared_radial_component(np.dot(
-            gqmodel.b_vector, default_sphere.vertices.T) *
-            gqmodel.Lambda))
+            gqmodel.b_vector, default_sphere.vertices.T)
+            * gqmodel.Lambda))
     ODF = blas.dgemm(
         alpha=1.,
         a=data.reshape(-1, gqi_vector.shape[0]),
@@ -726,7 +726,7 @@ def brain_mask(b0, brain_mask_definition=None):
     # Note that any case where brain_mask_definition is not None
     # is handled in get_data_plan
     # This is just the default
-    return B0Image().get_image_getter()(b0)
+    return B0Image().get_image_getter("data")(b0)
 
 
 @pimms.calc("bundle_dict", "reg_template")
