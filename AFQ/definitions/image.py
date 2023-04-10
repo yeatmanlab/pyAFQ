@@ -273,24 +273,20 @@ class RoiImage(ImageDefinition):
             else:
                 bundle_dict = bundle_dict
 
-            for bundle_name, bundle_info in bundle_dict.items():
+            for bundle_name in bundle_dict:
+                bundle_entry = bundle_dict.transform_rois(
+                    bundle_name,
+                    mapping,
+                    dwi_affine)
                 rois = []
                 if self.use_endpoints:
                     rois.extend(
-                        [bundle_info[end_type] for end_type in
-                            ["start", "end"] if end_type in bundle_info])
+                        [bundle_entry[end_type] for end_type in
+                            ["start", "end"] if end_type in bundle_entry])
                 if self.use_waypoints:
-                    rois.extend(bundle_info['include']
-                                if 'include' in bundle_info else [])
+                    rois.extend(bundle_entry.get('include', []))
                 for roi in rois:
-                    if bundle_dict.is_bundle_in_template(bundle_name):
-                        warped_roi = auv.transform_inverse_roi(
-                            roi,
-                            mapping,
-                            bundle_name=bundle_name)
-                    else:
-                        warped_roi = roi.get_fdata()
-
+                    warped_roi = roi.get_fdata()
                     if image_data is None:
                         image_data = np.zeros(warped_roi.shape)
                     image_data = np.logical_or(
@@ -307,6 +303,10 @@ class RoiImage(ImageDefinition):
                         100 - self.tissue_property_threshold)
                     image_data[zero_mask] = 0
                     image_data = image_data > tissue_property_threshold
+            if image_data is None:
+                raise ValueError((
+                    "BundleDict does not have enough ROIs to generate "
+                    f"an ROI Image: {bundle_dict._dict}"))
             return nib.Nifti1Image(
                 image_data.astype(np.float32),
                 dwi_affine), dict(source="ROIs")

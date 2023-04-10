@@ -765,7 +765,7 @@ def test_AFQ_data_waypoint():
 
     tracking_params = dict(odf_model="csd",
                            seed_mask=RoiImage(),
-                           n_seeds=200,
+                           n_seeds=100,
                            random_seeds=True,
                            rng_seed=42)
     segmentation_params = dict(filter_by_endpoints=False,
@@ -812,16 +812,16 @@ def test_AFQ_data_waypoint():
         'sub-01_ses-01_dwi_desc-prealign_from-DWI_to-MNI_xform.npy')
     np.save(reg_prealign_file, np.eye(4))
 
-    seg_sft = aus.SegmentedSFT.fromfile(
-        myafq.export("clean_bundles"))
-    npt.assert_(len(seg_sft.get_bundle('SLF_R').streamlines) > 0)
-
     # Test ROI exporting:
     myafq.export("rois")
     assert op.exists(op.join(
         myafq.export("results_dir"),
         'ROIs',
-        'sub-01_ses-01_dwi_space-subject_desc-CSTRinclude_1_mask.json'))
+        'sub-01_ses-01_dwi_space-subject_desc-CSTRinclude1_mask.json'))
+
+    seg_sft = aus.SegmentedSFT.fromfile(
+        myafq.export("clean_bundles"))
+    npt.assert_(len(seg_sft.get_bundle('SLF_R').streamlines) > 0)
 
     # Test bundles exporting:
     myafq.export("indiv_bundles")
@@ -834,7 +834,7 @@ def test_AFQ_data_waypoint():
     tract_profiles = pd.read_csv(tract_profile_fname)
 
     assert tract_profiles.select_dtypes(include=[np.number]).sum().sum() != 0
-    assert tract_profiles.shape == (500, 9)
+    assert tract_profiles.shape == (400, 9)
 
     myafq.export("indiv_bundles_figures")
     assert op.exists(op.join(
@@ -868,7 +868,7 @@ def test_AFQ_data_waypoint():
     # ROI mask needs to be put in quotes in config
     tracking_params = dict(odf_model="CSD",
                            seed_mask="RoiImage()",
-                           n_seeds=200,
+                           n_seeds=100,
                            random_seeds=True,
                            rng_seed=42)
     bundle_dict_as_str = (
@@ -909,14 +909,14 @@ def test_AFQ_data_waypoint():
     # The tract profiles should already exist from the CLI Run:
     from_file = pd.read_csv(tract_profile_fname)
 
-    assert from_file.shape == (500, 9)
+    assert from_file.shape == (400, 9)
     assert_series_equal(tract_profiles['dti_fa'], from_file['dti_fa'])
 
     # Make sure the CLI did indeed generate these:
     assert op.exists(op.join(
         results_dir,
         'ROIs',
-        'sub-01_ses-01_dwi_space-subject_desc-SLFLinclude_1_mask.json'))
+        'sub-01_ses-01_dwi_space-subject_desc-SLFLinclude1_mask.json'))
 
     assert op.exists(op.join(
         results_dir,

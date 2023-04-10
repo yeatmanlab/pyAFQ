@@ -6,7 +6,7 @@ import logging
 
 import pimms
 from AFQ.tasks.decorators import as_file
-from AFQ.tasks.utils import get_fname, with_name, str_to_desc
+from AFQ.tasks.utils import with_name, str_to_desc
 import AFQ.data.fetch as afd
 from AFQ.data.s3bids import write_json
 from AFQ.utils.path import drop_extension
@@ -58,47 +58,17 @@ def export_rois(base_fname, results_dir, data_imap, mapping, dwi_affine):
     rois_dir = op.join(results_dir, 'ROIs')
     os.makedirs(rois_dir, exist_ok=True)
     roi_files = {}
-
-    def _export_roi_helper(roi, roi_type, bundle_name, is_subject_space):
-        if is_subject_space:
-            roi = roi.get_fdata()
-        else:
-            roi = afd.read_resample_roi(roi, bundle_dict.resample_to)
-            roi = auv.transform_inverse_roi(
-                roi.get_fdata(),
-                mapping,
-                bundle_name=bundle_name)
-
-        fname = op.split(
-            get_fname(
-                base_fname,
-                '_space-subject_desc-'
-                f'{str_to_desc(bundle_name)}{roi_type}'
-                '_mask.nii.gz'))
-        fname = op.join(rois_dir, fname[1])
-        # Cast to float32,
-        # so that it can be read in by MI-Brain:
-        logger.info(f"Saving {fname}")
-        nib.save(
-            nib.Nifti1Image(
-                roi.astype(np.float32),
-                dwi_affine), fname)
-        meta = {}
-        meta_fname = f'{drop_extension(fname)}.json'
-        write_json(meta_fname, meta)
-        return fname
-
+    base_roi_fname = op.join(rois_dir, op.split(base_fname)[1])
     for bundle_name in bundle_dict:
-        is_subject_space = "space" in bundle_dict[bundle_name]\
-            and bundle_dict[bundle_name]["space"] == "subject"
-        roi_files[bundle_name] = bundle_dict.apply_to_rois(
-            bundle_name,
-            _export_roi_helper,
-            bundle_name,
-            is_subject_space,
-            pass_roi_names=True,
-            has_return=True,
-            dry_run=True)
+        roi_files[bundle_name] = []
+        for roi_fname in bundle_dict.transform_rois(
+                bundle_name, mapping, dwi_affine,
+                base_fname=base_roi_fname):
+            logger.info(f"Saving {roi_fname}")
+            roi_files[bundle_name].append(roi_fname)
+            meta = {}
+            meta_fname = f'{drop_extension(roi_fname)}.json'
+            write_json(meta_fname, meta)
     return {'rois': roi_files}
 
 

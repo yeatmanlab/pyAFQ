@@ -266,20 +266,14 @@ def viz_indivBundle(base_fname,
                     interact=False,
                     figure=figure)
 
-        for roi_type, rois in mapping_imap["rois"][roi_bname].items():
-            if roi_type in ["include", "exclude"]:
-                names = [f"{roi_type} ROI {ii}" for ii in range(len(rois))]
-            else:
-                names = [roi_type + " ROI"]
-                rois = [rois]
-            for ii, roi in enumerate(rois):
-                figure = viz_backend.visualize_roi(
-                    roi,
-                    name=names[ii],
-                    flip_axes=flip_axes,
-                    inline=False,
-                    interact=False,
-                    figure=figure)
+        for roi_fname in mapping_imap["rois"][roi_bname]:
+            figure = viz_backend.visualize_roi(
+                roi_fname,
+                name=roi_fname.split("desc-")[1].split("_")[0],
+                flip_axes=flip_axes,
+                inline=False,
+                interact=False,
+                figure=figure)
 
         roi_dir = op.join(results_dir, 'viz_bundles')
         os.makedirs(roi_dir, exist_ok=True)
