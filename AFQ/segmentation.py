@@ -593,6 +593,9 @@ class Segmentation:
                 self.mapping,
                 self.img_affine))
 
+            if "curvature" in bundle_def:
+                ref_curve = np.loadtxt(bundle_def["curvature"])
+
             b_sls = _SlsBeingRecognized(tg.streamlines, self.logger)
 
             if "prob_map" in bundle_def:
@@ -757,7 +760,6 @@ class Segmentation:
 
             if b_sls and "curvature" in bundle_def:
                 b_sls.initiate_selection("curvature")
-                ref_curve = np.loadtxt(bundle_def["curvature"])
                 ref_curve_threshold = bundle_def.get("curvature_thresh", 5)
                 for dim_idx in range(3):
                     if self.img_affine[dim_idx, dim_idx] < 0:

@@ -447,8 +447,6 @@ def test_API_type_checking():
             bids_path,
             preproc_pipeline='vistasoft',
             brain_mask_definition="not a brain mask")
-        myafq.export("brain_mask")
-    del myafq
 
     with pytest.raises(
             ValueError,
@@ -460,7 +458,6 @@ def test_API_type_checking():
                 suffix='dne_dne',
                 filters={'scope': 'dne_dne'}))
         myafq.export("brain_mask")
-    del myafq
 
     with pytest.raises(
             TypeError,
@@ -740,16 +737,12 @@ def test_AFQ_data_waypoint():
     vista_folder = op.join(
         bids_path,
         "derivatives/vistasoft/sub-01/ses-01/dwi")
-    freesurfer_folder = op.join(
-        bids_path,
-        "derivatives/freesurfer/sub-01/ses-01/anat")
+
+    # Prepare LV1 ROI
     lv1_files, lv1_folder = afd.fetch_stanford_hardi_lv1()
     lv1_fname = op.join(
         lv1_folder,
         list(lv1_files.keys())[0])
-    seg_fname = op.join(
-        freesurfer_folder,
-        "sub-01_ses-01_seg.nii.gz")
     bundle_names = [
         "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"]
     bundle_info = BundleDict(
@@ -766,11 +759,7 @@ def test_AFQ_data_waypoint():
     }
 
     bundle_info["LV1"] = {
-        "include": [
-            ImageFile(path=lv1_fname),
-            LabelledImageFile(
-                path=seg_fname,
-                inclusive_labels=[71])],
+        "start": lv1_fname,
         "space": "subject"
     }
 
@@ -885,11 +874,8 @@ def test_AFQ_data_waypoint():
     bundle_dict_as_str = (
         'BundleDict(["SLF_L", "SLF_R", "ARC_L", '
         '"ARC_R", "CST_L", "CST_R", "FP"])'
-        '+ BundleDict({"LV1": {"include": ['
-        f'ImageFile(path="{lv1_fname}"), '
-        'LabelledImageFile('
-        f'path="{seg_fname}", '
-        'inclusive_labels=[71])],'
+        '+ BundleDict({"LV1": {"start": '
+        f'"{lv1_fname}", '
         '"space": "subject"}})')
     config = dict(
         BIDS_PARAMS=dict(

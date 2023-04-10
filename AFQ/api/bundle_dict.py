@@ -1,6 +1,5 @@
 import logging
-from collections.abc import MutableMapping
-from types import MappingProxyType as ReadOnlyDictProxy
+from collections.abc import MutableMapping, Mapping
 import AFQ.data.fetch as afd
 import AFQ.utils.volume as auv
 import numpy as np
@@ -61,6 +60,26 @@ PEDIATRIC_BUNDLES = [
 PEDIATRIC_BUNDLES = append_l_r(PEDIATRIC_BUNDLES, ["FA", "FP"])
 
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
+
+
+class _BundleEntry(Mapping):
+    def __init__(self, data):
+        self._data = data
+
+    def __getitem__(self, key):
+        return self._data[key]
+
+    def __len__(self):
+        return len(self._data)
+
+    def __iter__(self):
+        return iter(self._data)
+
+    def __setitem__(self, key, value):
+        raise RuntimeError((
+            "You cannot modify the properties of a bundle's definition. "
+            "To modify a bundle's definition, replace that bundle's entry "
+            "in the BundleDict."))
 
 
 class BundleDict(MutableMapping):
@@ -337,7 +356,7 @@ class BundleDict(MutableMapping):
             if "resampled" not in self._dict[key] or not self._dict[
                     key]["resampled"]:
                 self._resample_roi(key)
-        _item = ReadOnlyDictProxy(self._dict[key].copy())
+        _item = _BundleEntry(self._dict[key].copy())
         if old_vals is not None:
             if isinstance(old_vals, dict):
                 for roi_type, roi in old_vals.items():

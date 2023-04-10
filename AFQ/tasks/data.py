@@ -847,6 +847,9 @@ def get_data_plan(kwargs):
     bm_def = kwargs.get(
         "brain_mask_definition", None)
     if bm_def is not None:
+        if not isinstance(bm_def, Definition):
+            raise TypeError(
+                "brain_mask_definition must be a Definition")
         if kwargs["bids_info"] is not None:
             bm_def.find_path(
                 kwargs["bids_info"]["bids_layout"],
