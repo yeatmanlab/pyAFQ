@@ -339,14 +339,16 @@ class BundleDict(MutableMapping):
         """
         Load ROI or streamline if not already loaded
         """
-        if self.seg_algo == "afq":
-            return nib.load(roi_or_sl) if isinstance(
-                roi_or_sl, str) else roi_or_sl
-        elif self.seg_algo.startswith("reco"):
-            return load_tractogram(
-                roi_or_sl,
-                'same',
-                bbox_valid_check=False).streamlines
+        if isinstance(roi_or_sl, str):
+            if self.seg_algo == "afq":
+                return nib.load(roi_or_sl)
+            elif self.seg_algo.startswith("reco"):
+                return load_tractogram(
+                    roi_or_sl,
+                    'same',
+                    bbox_valid_check=False).streamlines
+        else:
+            return roi_or_sl
 
     def __getitem__(self, key):
         if key not in self._dict and key in self.bundle_names:
