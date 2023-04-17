@@ -20,6 +20,7 @@ import AFQ.utils.streamlines as aus
 import AFQ.utils.volume as auv
 
 from trx.io import load as load_trx
+from trx.trx_file_memmap import TrxFile
 
 from dipy.io.streamline import load_tractogram, save_tractogram
 from dipy.io.stateful_tractogram import Space
@@ -31,7 +32,7 @@ logger = logging.getLogger('AFQ')
 
 
 @pimms.calc("bundles")
-@as_file('_tractography.trk', include_track=True, include_seg=True)
+@as_file('_tractography.trx', include_track=True, include_seg=True)
 def segment(dwi, data_imap, mapping_imap,
             tractography_imap, segmentation_params):
     """
@@ -69,6 +70,8 @@ def segment(dwi, data_imap, mapping_imap,
 
     seg_sft = aus.SegmentedSFT(bundles, Space.VOX)
 
+    trx = TrxFile.from_sft(seg_sft.sft, dtype_dict=dtype_dict)
+
     if len(seg_sft.sft) < 1:
         raise ValueError("Fatal: No bundles recognized.")
 
@@ -86,7 +89,7 @@ def segment(dwi, data_imap, mapping_imap,
 
 
 @pimms.calc("clean_bundles")
-@as_file('_desc-clean_tractography.trk', include_track=True, include_seg=True)
+@as_file('_desc-clean_tractography.trx', include_track=True, include_seg=True)
 def clean_bundles(bundles, data_imap, clean_params=None):
     """
     full path to a trk file containting segmented
@@ -173,11 +176,12 @@ def export_bundles(base_fname, results_dir,
                     get_fname(
                         base_fname,
                         f'_desc-{str_to_desc(bundle)}'
-                        f'_tractography.trk',
+                        f'_tractography.trx',
                         tracking_params=tracking_params,
                         segmentation_params=segmentation_params))
                 fname = op.join(bundles_dir, fname[1])
                 logger.info(f"Saving {fname}")
+                # XXX Save bundles into one TRX here:
                 save_tractogram(
                     seg_sft.get_bundle(bundle), fname,
                     bbox_valid_check=False)

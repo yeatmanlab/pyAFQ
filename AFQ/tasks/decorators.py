@@ -137,9 +137,15 @@ def as_file(suffix, include_track=False, include_seg=False):
                 logger.info(f"Saving {this_file}")
                 if isinstance(img_trk_np_or_csv, nib.Nifti1Image):
                     nib.save(img_trk_np_or_csv, this_file)
+                elif isinstance(img_trk_np_or_csv, StatefulTractogram):
+                    save_tractogram(
+                        img_trk_np_or_csv,
+                        this_file,
+                        bbox_valid_check=False)
                 elif isinstance(img_trk_np_or_csv, TrxFile):
-                    save_trx(img_trk_np_or_csv,
-                             this_file)
+                    save_trx(
+                        img_trk_np_or_csv,
+                        this_file)
                 elif isinstance(img_trk_np_or_csv, np.ndarray):
                     np.save(this_file, img_trk_np_or_csv)
                 else:
