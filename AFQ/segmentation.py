@@ -95,7 +95,7 @@ class Segmentation:
                  reg_algo=None,
                  clip_edges=False,
                  parallel_segmentation={
-                     "n_jobs": -1, "engine": "joblib",
+                     "n_jobs": 4, "engine": "joblib",
                      "backend": "loky"},
                  progressive=True,
                  greater_than=50,
@@ -825,9 +825,8 @@ class Segmentation:
 
         # see https://github.com/joblib/joblib/issues/945
         if (
-                self.parallel_segmentation["engine"] != "serial"
-                and "backend" in self.parallel_segmentation
-                and self.parallel_segmentation["backend"] == "loky"):
+                self.parallel_segmentation.get("engine", "joblib") != "serial"
+                and self.parallel_segmentation.get("backend", "loky") == "loky"):
             from joblib.externals.loky import get_reusable_executor
             self.logger.info("Cleaning up Loky...")
             get_reusable_executor().shutdown(wait=True)
