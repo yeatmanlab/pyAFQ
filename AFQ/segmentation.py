@@ -539,7 +539,8 @@ class Segmentation:
         tg = self._read_tg(tg=tg)
         tg.to_vox()
 
-        # analyze bundle information
+        # analyze bundle information to determine whether we need to
+        # record distance to ROI, and if so, to how many different includes
         max_includes = 2
         record_roi_dists = self.clip_edges
         for bundle_info in self.bundle_dict.values():
@@ -598,6 +599,7 @@ class Segmentation:
 
             b_sls = _SlsBeingRecognized(tg.streamlines, self.logger)
 
+            # filter by probability map
             if "prob_map" in bundle_def:
                 b_sls.initiate_selection("Prob. Map")
                 fiber_probabilities = dts.values_from_volume(
@@ -758,6 +760,8 @@ class Segmentation:
                 if flip_using_include:
                     b_sls.reorient(to_flip)
 
+            # Filters streamlines by how well they match
+            # a curve in orientation and shape but not scale
             if b_sls and "curvature" in bundle_def:
                 b_sls.initiate_selection("curvature")
                 ref_curve_threshold = bundle_def.get("curvature_thresh", 5)
