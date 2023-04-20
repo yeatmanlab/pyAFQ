@@ -66,6 +66,8 @@ DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
 
 class _BundleEntry(Mapping):
+    """Describes how to recognize a single bundle, immutable"""
+
     def __init__(self, data):
         self._data = data
 
