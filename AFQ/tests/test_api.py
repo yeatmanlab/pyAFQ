@@ -657,6 +657,7 @@ def test_AFQ_custom_subject_reg():
             suffix="customb0",
             filters={"scope": "vistasoft"}))
     myafq.export("rois")
+    raise ValueError()
 
 
 # Requires large download

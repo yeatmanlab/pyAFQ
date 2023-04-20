@@ -11,6 +11,8 @@ import AFQ.data.s3bids as afs
 from AFQ.tasks.utils import get_fname
 
 from dipy.align.imaffine import AffineMap
+from dipy.align.imwarp import DiffeomorphicMap
+from dipy.align import resample
 
 try:
     from fsl.data.image import Image
@@ -21,10 +23,10 @@ except ModuleNotFoundError:
     has_fslpy = False
 
 try:
-    import h5py
-    has_h5py = True
+    import ants
+    has_antspyx = True
 except ModuleNotFoundError:
-    has_h5py = False
+    has_antspyx = False
 
 __all__ = ["FnirtMap", "SynMap", "SlrMap", "AffMap", "ItkMap"]
 
@@ -127,7 +129,7 @@ class FnirtMap(Definition):
 
         self.fnames[session][subject] = (nearest_warp, nearest_space)
 
-    def get_for_subses(self, base_fname, dwi, bids_info, reg_subject,
+    def get_for_subses(self, base_fname, b0, bids_info, reg_subject,
                        reg_template):
         if self._from_path:
             nearest_warp, nearest_space = self.fnames
@@ -136,7 +138,7 @@ class FnirtMap(Definition):
                 bids_info['session']][bids_info['subject']]
 
         our_templ = reg_template
-        subj = Image(dwi)
+        subj = Image(b0)
         their_templ = Image(nearest_space)
         warp = readFnirt(nearest_warp, their_templ, subj)
 
@@ -190,9 +192,9 @@ class IdentityMap(Definition):
     def find_path(self, bids_layout, from_path, subject, session):
         pass
 
-    def get_for_subses(self, base_fname, dwi, bids_info, reg_subject,
+    def get_for_subses(self, base_fname, b0, bids_info, reg_subject,
                        reg_template):
-        return ConformedAffineMapping(
+        return AffineMap(
             np.identity(4),
             domain_grid_shape=reg.reduce_shape(
                 reg_subject.shape),
@@ -219,27 +221,38 @@ class ItkMap(Definition):
         the warp file.
         Default: {}
 
-
     Examples
     --------
+    # define ItkMap
     itk_map = ItkMap(
         warp_suffix="xfm",
         warp_filters={
             "scope": "qsiprep",
             "from": "MNI152NLin2009cAsym",
-            "to": "T1w"})
-    api.GroupAFQ(mapping=itk_map)
+            "to": "T1w"},
+        space_suffix="T1w",
+        space_filters={
+            "scope": "qsiprep",
+            "desc": "preproc"})
+
+    # set reg_template_spec to some file (from any subject)
+    # that it is in the same affine/space as the mapping
+    reg_template_spec = (
+        "my_bids/derivatives/qsiprep/sub-SUB/anat/"
+        "sub-SUB_space-MNI152NLin2009cAsym_desc-preproc_T1w.nii.gz")
+
+    api.GroupAFQ(mapping=itk_map, reg_template_spec=reg_template_spec)
     """
 
-    def __init__(self, warp_path=None, warp_suffix=None, warp_filters={}):
-        if not has_h5py:
+    def __init__(self, warp_path=None, warp_suffix=None, warp_filters={},
+                 space_path=None, space_suffix=None, space_filters={}):
+        if not has_antspyx:
             raise ImportError(
-                "Please install h5py if you want to use ItkMap")
+                "Please install antspyx if you want to use ItkMap")
         if warp_path is None and warp_suffix is None:
             raise ValueError((
                 "One of `warp_path` or `warp_suffix` should be set "
                 "to a value other than None."))
-
         if warp_path is not None:
             self._from_path = True
             self.fname = warp_path
@@ -259,46 +272,42 @@ class ItkMap(Definition):
             bids_layout, from_path, self.warp_filters, self.warp_suffix,
             session, subject, extension="h5")
 
-    def get_for_subses(self, base_fname, dwi, bids_info, reg_subject,
+    def get_for_subses(self, base_fname, b0, bids_info, reg_subject,
                        reg_template):
         if self._from_path:
             nearest_warp = self.fname
         else:
             nearest_warp = self.fnames[
                 bids_info['session']][bids_info['subject']]
-        warp_f5 = h5py.File(nearest_warp)
-        their_shape = np.asarray(warp_f5["TransformGroup"]['1'][
-            'TransformFixedParameters'], dtype=int)[:3]
-        our_shape = reg_template.get_fdata().shape
-        if (our_shape != their_shape).any():
-            raise ValueError((
-                f"The shape of your ITK mapping ({their_shape})"
-                f" is not the same as your template for registration"
-                f" ({our_shape})"))
-        their_forward = np.asarray(warp_f5["TransformGroup"]['1'][
-            'TransformParameters']).reshape([*their_shape, 3])
-        their_disp = np.zeros((*their_shape, 3, 2))
-        their_disp[..., 0] = their_forward
-        their_disp = nib.Nifti1Image(
-            their_disp, reg_template.affine)
-        their_prealign = np.zeros((4, 4))
-        their_prealign[:3, :3] = np.asarray(warp_f5["TransformGroup"]["2"][
-            "TransformParameters"])[:9].reshape((3, 3))
-        their_prealign[:3, 3] = np.asarray(warp_f5["TransformGroup"]["2"][
-            "TransformParameters"])[9:]
-        their_prealign[3, 3] = 1.0
-        warp_f5.close()
-        mapping = reg.read_mapping(
-            their_disp, dwi,
-            reg_template, prealign=their_prealign)
+        tx = ants.read_transform(nearest_warp)
+        return ConformedITKMapping(tx, nib.load(b0), reg_template)
 
-        def transform(self, data, **kwargs):
-            raise NotImplementedError(
-                "ITK based mappings can currently"
-                + " only transform from template to subject space")
 
-        mapping.transform = transform
-        return mapping
+class ConformedITKMapping():
+    """
+        ConformedITKMapping which matches the generic mapping API.
+    """
+
+    def __init__(self, tx, sub_ref, templ_ref):
+        self.tx = tx
+        self.sub_ref = sub_ref
+        self.templ_ref = templ_ref
+
+    def transform_inverse(self, data, **kwargs):
+        from AFQ.data.fetch import read_mni_template
+        data = resample(
+            read_mni_template(),
+            self.templ_ref).get_fdata()
+        data = self.tx.apply_to_image(
+            ants.from_numpy(data), **kwargs).numpy()
+        return resample(
+            nib.Nifti1Image(data, self.templ_ref.affine),
+            self.sub_ref).get_fdata()
+
+    def transform(self, data, **kwargs):
+        raise NotImplementedError(
+            "ITK based mappings can currently"
+            + " only transform from template to subject space")
 
 
 class GeneratedMapMixin(object):
@@ -307,57 +316,51 @@ class GeneratedMapMixin(object):
     Useful for maps that are generated by pyAFQ
     """
 
-    def get_fnames(self, extension, base_fname):
+    def find_path(self, bids_layout, from_path, subject, session):
+        pass
+
+    def get_for_subses(self, base_fname, b0, bids_info, reg_subject,
+                       reg_template, subject_sls=None, template_sls=None):
         mapping_file = get_fname(
             base_fname,
             '_desc-mapping_from-DWI_to-MNI_xform')
         meta_fname = f'{mapping_file}.json'
-        mapping_file = mapping_file + extension
-        return mapping_file, meta_fname
+        mapping_file = f'{mapping_file}.nii.gz'
 
-    def prealign(self, base_fname, reg_subject, reg_template, save=True):
-        prealign_file_desc = "_desc-prealign_from-DWI_to-MNI_xform"
-        prealign_file = get_fname(
-            base_fname, f'{prealign_file_desc}.npy')
-        if not op.exists(prealign_file):
-            start_time = time()
-            _, aff = affine_registration(
-                reg_subject,
-                reg_template,
-                **self.affine_kwargs)
-            meta = dict(
-                type="rigid",
-                dependent="dwi",
-                timing=time() - start_time)
-            if not save:
-                return aff
-            logger.info(f"Saving {prealign_file}")
-            np.save(prealign_file, aff)
-            meta_fname = get_fname(
-                base_fname, f'{prealign_file_desc}.json')
-            afs.write_json(meta_fname, meta)
-        return prealign_file if save else np.load(prealign_file)
+        mapping_file_back = get_fname(
+            base_fname,
+            '_desc-mapping_from-MNI_to-dwi_xform')
+        meta_fname_back = f'{mapping_file_back}.json'
+        mapping_file_back = f'{mapping_file_back}.nii.gz'
 
-    def get_for_subses(self, base_fname, dwi, bids_info, reg_subject,
-                       reg_template, subject_sls=None, template_sls=None):
-        mapping_file, meta_fname = self.get_fnames(
-            self.extension, base_fname)
+        b0 = nib.load(b0)
 
-        if self.use_prealign:
-            reg_prealign = np.load(self.prealign(
-                base_fname, reg_subject, reg_template))
-        else:
-            reg_prealign = None
         if not op.exists(mapping_file):
             start_time = time()
             mapping = self.gen_mapping(
-                base_fname, reg_subject, reg_template,
-                subject_sls, template_sls,
-                reg_prealign)
+                reg_subject, reg_template,
+                subject_sls, template_sls)
             total_time = time() - start_time
 
+            if isinstance(mapping, AffineMap):
+                mapping = DiffeomorphicMap(
+                    3,
+                    reg_template.get_fdata().shape,
+                    reg_template.affine,
+                    b0.get_fdata().shape,
+                    b0.affine,
+                    reg_template.get_fdata().shape,
+                    reg_template.affine,
+                    prealign=np.linalg.inv(mapping.affine))
+                mapping.allocate()
+                mapping.is_inverse = True
+
             logger.info(f"Saving {mapping_file}")
-            reg.write_mapping(mapping, mapping_file)
+            reg.write_mapping(mapping,
+                              b0,
+                              reg_template,
+                              mapping_file,
+                              mapping_file_back),
             meta = dict(
                 type="displacementfield",
                 timing=total_time)
@@ -366,13 +369,9 @@ class GeneratedMapMixin(object):
             else:
                 meta["dependent"] = "trk"
             afs.write_json(meta_fname, meta)
-        reg_prealign_inv = np.linalg.inv(reg_prealign) if self.use_prealign\
-            else None
+            afs.write_json(meta_fname_back, meta)
         mapping = reg.read_mapping(
-            mapping_file,
-            dwi,
-            reg_template,
-            prealign=reg_prealign_inv)
+            mapping_file, mapping_file_back)
         return mapping
 
 
@@ -413,23 +412,21 @@ class SynMap(GeneratedMapMixin, Definition):
         self.use_prealign = use_prealign
         self.affine_kwargs = affine_kwargs
         self.syn_kwargs = syn_kwargs
-        self.extension = ".nii.gz"
 
-    def find_path(self, bids_layout, from_path, subject, session):
-        pass
-
-    def gen_mapping(self, base_fname, reg_subject, reg_template,
-                    subject_sls, template_sls,
-                    reg_prealign):
-        _, mapping = syn_registration(
-            reg_subject.get_fdata(),
-            reg_template.get_fdata(),
-            moving_affine=reg_subject.affine,
-            static_affine=reg_template.affine,
-            prealign=reg_prealign,
-            **self.syn_kwargs)
+    def gen_mapping(self, reg_subject, reg_template,
+                    subject_sls, template_sls):
         if self.use_prealign:
-            mapping.codomain_world2grid = np.linalg.inv(reg_prealign)
+            _, aff = affine_registration(
+                reg_subject,
+                reg_template,
+                **self.affine_kwargs)
+        else:
+            aff = np.identity(4)
+        _, mapping = syn_registration(
+            reg_subject,
+            reg_template,
+            prealign=aff,
+            **self.syn_kwargs)
         return mapping
 
 
@@ -461,13 +458,9 @@ class SlrMap(GeneratedMapMixin, Definition):
     def __init__(self, slr_kwargs={}):
         self.slr_kwargs = {}
         self.use_prealign = False
-        self.extension = ".npy"
 
-    def find_path(self, bids_layout, from_path, subject, session):
-        pass
-
-    def gen_mapping(self, base_fname, reg_template, reg_subject,
-                    subject_sls, template_sls, reg_prealign):
+    def gen_mapping(self, reg_template, reg_subject,
+                    subject_sls, template_sls):
         return reg.slr_registration(
             subject_sls, template_sls,
             moving_affine=reg_subject.affine,
@@ -501,35 +494,18 @@ class AffMap(GeneratedMapMixin, Definition):
     def __init__(self, affine_kwargs={}):
         self.use_prealign = False
         self.affine_kwargs = affine_kwargs
-        self.extension = ".npy"
 
-    def find_path(self, bids_layout, from_path, subject, session):
-        pass
-
-    def gen_mapping(self, base_fname, reg_subject, reg_template,
-                    subject_sls, template_sls,
-                    reg_prealign):
-        return ConformedAffineMapping(
-            np.linalg.inv(self.prealign(
-                base_fname, reg_subject, reg_template, save=False)),
+    def gen_mapping(self, reg_subject, reg_template,
+                    subject_sls, template_sls):
+        _, aff = affine_registration(
+            reg_subject,
+            reg_template,
+            **self.affine_kwargs)
+        return AffineMap(
+            aff,
             domain_grid_shape=reg.reduce_shape(
                 reg_subject.shape),
             domain_grid2world=reg_subject.affine,
             codomain_grid_shape=reg.reduce_shape(
                 reg_template.shape),
             codomain_grid2world=reg_template.affine)
-
-
-class ConformedAffineMapping(AffineMap):
-    """
-    Modifies AffineMap API to match DiffeomorphicMap API.
-    Important for SLR maps API to be indistinguishable from SYN maps API.
-    """
-
-    def transform(self, *args, interpolation='linear', **kwargs):
-        kwargs['interp'] = interpolation
-        return super().transform_inverse(*args, **kwargs)
-
-    def transform_inverse(self, *args, interpolation='linear', **kwargs):
-        kwargs['interp'] = interpolation
-        return super().transform(*args, **kwargs)

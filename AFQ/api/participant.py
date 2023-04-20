@@ -233,23 +233,22 @@ class ParticipantAFQ(object):
                     " to a filename and will be ignored."))
 
         for filename in os.listdir(self.output_dir):
-            if filename in exception_file_names:
-                continue
             full_path = os.path.join(self.output_dir, filename)
+            if (full_path in exception_file_names)\
+                    or (not full_path.startswith(self.export("base_fname")))\
+                    or filename.endswith("json"):
+                continue
             if os.path.isfile(full_path) or os.path.islink(full_path):
-                if not full_path.startswith(self.export("base_fname")):
-                    continue
-                if not filename.endswith("json"):
-                    sidecar_file = f'{drop_extension(full_path)}.json'
-                    if op.exists(sidecar_file):
-                        sidecar_info = read_json(sidecar_file)
-                        if "dependent" in sidecar_info\
-                            and sidecar_info["dependent"]\
-                                in dependent_on_list:
-                            os.system(f"{cmd} {full_path} {suffix}")
-                            os.system(f"{cmd} {sidecar_file} {suffix}")
-                    else:
+                sidecar_file = f'{drop_extension(full_path)}.json'
+                if op.exists(sidecar_file):
+                    sidecar_info = read_json(sidecar_file)
+                    if "dependent" in sidecar_info\
+                        and sidecar_info["dependent"]\
+                            in dependent_on_list:
                         os.system(f"{cmd} {full_path} {suffix}")
+                        os.system(f"{cmd} {sidecar_file} {suffix}")
+                else:
+                    os.system(f"{cmd} {full_path} {suffix}")
             elif os.path.isdir(full_path):
                 # other than ROIs, folders are dependent on everything
                 if dependent_on is None or filename != "ROIs":

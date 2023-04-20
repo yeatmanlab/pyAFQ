@@ -85,6 +85,8 @@ FA_data = FA_img.get_fdata()
 
 print("Registering to template...")
 MNI_T2_img = afd.read_mni_template()
+mapping_forward_fname = op.join(working_dir, 'mapping_forward.nii.gz')
+mapping_backward_fname = op.join(working_dir, 'mapping_backward.nii.gz')
 
 if not op.exists(op.join(working_dir, 'mapping.nii.gz')):
     import dipy.core.gradients as dpg
@@ -101,10 +103,15 @@ if not op.exists(op.join(working_dir, 'mapping.nii.gz')):
     # prealignment
     warped_hardi, mapping = reg.syn_register_dwi(hardi_fdata, gtab,
                                                  prealign=prealign)
-    reg.write_mapping(mapping, op.join(working_dir, 'mapping.nii.gz'))
+    reg.write_mapping(
+        mapping,
+        img,
+        MNI_T2_img,
+        mapping_forward_fname,
+        mapping_backward_fname)
 else:
-    mapping = reg.read_mapping(op.join(working_dir, 'mapping.nii.gz'),
-                               img, MNI_T2_img)
+    mapping = reg.read_mapping(mapping_forward_fname,
+                               mapping_backward_fname)
 
 
 ##########################################################################

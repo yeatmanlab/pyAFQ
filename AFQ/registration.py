@@ -72,36 +72,53 @@ def syn_register_dwi(dwi, gtab, template=None, **syn_kwargs):
     return warped_b0, mapping
 
 
-def write_mapping(mapping, fname):
+def write_mapping(mapping, domain_img, codomain_img,
+                  forward_fname, backward_fname):
     """
-    Write out a syn registration mapping to file
+    Write out a DiffeomorphicMap mapping to a file
 
     Parameters
     ----------
-    mapping : a DiffeomorphicMap object derived from :func:`syn_registration`
-    fname : str
-        Full path to the nifti file storing the mapping
-
+    mapping : a DiffeomorphicMap object
+    domain_img : Nifti1Image
+    codomain_img : Nifti1Image
+    forward_fname : str
+        Full path to store the forward displacement field.
+    backward_fname : str
+        Full path to store the backward displacement field.
     """
-    if isinstance(mapping, DiffeomorphicMap):
-        mapping_imap = np.array([mapping.forward.T, mapping.backward.T]).T
-        nib.save(nib.Nifti1Image(mapping_imap, mapping.codomain_world2grid),
-                 fname)
+    is_inverse = mapping.is_inverse
+    mapping = mapping.get_simplified_transform()
+    if is_inverse:
+        forward = mapping.backward
+        backward = mapping.forward
     else:
-        np.save(fname, mapping.affine)
+        forward = mapping.forward
+        backward = mapping.backward
+    nib.save(nib.Nifti1Image(forward.astype(np.float32),
+                             domain_img.affine),
+             forward_fname)
+    nib.save(nib.Nifti1Image(backward.astype(np.float32),
+                             codomain_img.affine),
+             backward_fname)
 
 
-def read_mapping(disp, domain_img, codomain_img, prealign=None):
+def read_mapping(forward, backward):
     """
-    Read a syn registration mapping from a nifti file
+    Read a syn registration mapping from a nifti file,
+    Or an affine mapping from a numpy file.
 
     Parameters
     ----------
-    disp : str, Nifti1Image, or ndarray
-        If string, file must of an image or ndarray.
-        If image, contains the mapping displacement field in each voxel
-        Shape (x, y, z, 3, 2)
-        If ndarray, contains affine transformation used for mapping
+    forward : str, Nifti1Image
+        If string, file must be the image described below.
+        If image, contains the forward mapping displacement field in
+        each voxel Shape (x, y, z, 3)
+
+    backward : str, Nifti1Image
+        If string, file must be the image described below.
+        If image, contains the forward mapping displacement field in
+        each voxel Shape (x, y, z, 3)
 
     domain_img : str or Nifti1Image
 
@@ -111,41 +128,19 @@ def read_mapping(disp, domain_img, codomain_img, prealign=None):
     -------
     A :class:`DiffeomorphicMap` object
     """
-    if isinstance(disp, str):
-        if "nii.gz" in disp:
-            disp = nib.load(disp)
-        else:
-            disp = np.load(disp)
+    if isinstance(forward, str):
+        forward = nib.load(forward)
+    if isinstance(backward, str):
+        backward = nib.load(backward)
+    forward = forward.get_fdata()
+    backward = backward.get_fdata()
 
-    if isinstance(domain_img, str):
-        domain_img = nib.load(domain_img)
-
-    if isinstance(codomain_img, str):
-        codomain_img = nib.load(codomain_img)
-
-    if isinstance(disp, nib.Nifti1Image):
-        mapping = DiffeomorphicMap(3, disp.shape[:3],
-                                   disp_grid2world=np.linalg.inv(disp.affine),
-                                   domain_shape=domain_img.shape[:3],
-                                   domain_grid2world=domain_img.affine,
-                                   codomain_shape=codomain_img.shape,
-                                   codomain_grid2world=codomain_img.affine,
-                                   prealign=prealign)
-
-        disp_data = disp.get_fdata().astype(np.float32)
-        mapping.forward = disp_data[..., 0]
-        mapping.backward = disp_data[..., 1]
-        mapping.is_inverse = True
-    else:
-        from AFQ.definitions.mapping import ConformedAffineMapping
-        mapping = ConformedAffineMapping(
-            disp,
-            domain_grid_shape=reduce_shape(
-                domain_img.shape),
-            domain_grid2world=domain_img.affine,
-            codomain_grid_shape=reduce_shape(
-                codomain_img.shape),
-            codomain_grid2world=codomain_img.affine)
+    mapping = DiffeomorphicMap(
+        3, forward.shape[:3], None,
+        forward.shape[:3], None,
+        backward.shape[:3], None)
+    mapping.forward = forward.astype(np.float32)
+    mapping.backward = backward.astype(np.float32)
 
     return mapping
 

@@ -102,7 +102,7 @@ def mapping(base_fname, dwi, reg_subject, data_imap, bids_info,
             bids_info["subject"],
             bids_info["session"])
     return mapping_definition.get_for_subses(
-        base_fname, dwi, bids_info, reg_subject, reg_template)
+        base_fname, data_imap["b0"], bids_info, reg_subject, reg_template)
 
 
 @pimms.calc("mapping")
@@ -152,7 +152,7 @@ def sls_mapping(base_fname, dwi, reg_subject, data_imap, bids_info,
         atlas_fname,
         'same', bbox_valid_check=False)
     return mapping_definition.get_for_subses(
-        base_fname, dwi, bids_info, reg_subject, reg_template,
+        base_fname, data_imap["b0"], bids_info, reg_subject, reg_template,
         subject_sls=tg.streamlines,
         template_sls=hcp_atlas.streamlines)
 

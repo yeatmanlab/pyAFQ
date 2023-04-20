@@ -67,11 +67,16 @@ def test_slr_registration():
         warped_moving = mapping.transform(subset_b0)
 
         npt.assert_equal(warped_moving.shape, subset_t2.shape)
-        mapping_fname = op.join(tmpdir, 'mapping.npy')
-        write_mapping(mapping, mapping_fname)
+        mapping_fname = op.join(tmpdir, 'mapping_forward.npy')
+        mapping_back_fname = op.join(tmpdir, 'mapping_backward.npy')
+        write_mapping(
+            mapping,
+            subset_b0_img,
+            subset_t2_img,
+            mapping_fname,
+            mapping_back_fname)
         file_mapping = read_mapping(mapping_fname,
-                                    subset_b0_img,
-                                    subset_t2_img)
+                                    mapping_back_fname)
 
         # Test that it has the same effect on the data:
         warped_from_file = file_mapping.transform(subset_b0)
