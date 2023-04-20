@@ -294,10 +294,6 @@ class ConformedITKMapping():
         self.templ_ref = templ_ref
 
     def transform_inverse(self, data, **kwargs):
-        from AFQ.data.fetch import read_mni_template
-        data = resample(
-            read_mni_template(),
-            self.templ_ref).get_fdata()
         data = self.tx.apply_to_image(
             ants.from_numpy(data), **kwargs).numpy()
         return resample(
