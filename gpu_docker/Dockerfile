@@ -28,7 +28,8 @@ ENV LD_LIBRARY_PATH /opt/anaconda/lib:${LD_LIBRARY_PATH}
 RUN pip install numpy scipy cython nibabel dipy tqdm fslpy h5py
 
 # clone pyAFQ GPUStreamlines
-RUN git clone https://github.com/yeatmanlab/pyAFQ.git@${COMMIT} /opt/pyAFQ
+RUN git clone https://github.com/yeatmanlab/pyAFQ.git /opt/pyAFQ
+RUN cd /opt/pyAFQ && git reset --hard ${COMMIT}
 RUN git clone --recursive https://github.com/dipy/GPUStreamlines /opt/GPUStreamlines
 
 # compile
