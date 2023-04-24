@@ -5,10 +5,6 @@ import nibabel as nib
 
 from dipy.segment.mask import median_otsu
 from dipy.align import resample
-from dipy.reconst.gqi import (
-    GeneralizedQSamplingModel,
-    squared_radial_component)
-from dipy.data import default_sphere
 
 import AFQ.utils.volume as auv
 from AFQ.definitions.utils import Definition, find_file, name_from_path
@@ -356,16 +352,16 @@ class GQImage(ImageDefinition):
     def get_image_getter(self, task_name):
         def image_getter_helper(gq_aso):
             gq_aso_img = nib.load(gq_aso)
-            gq_aso_data = gq_aso_img.get_fdata().max(axis=-1)
-            ODF_mask = convex_hull_image(
+            gq_aso_data = gq_aso_img.get_fdata()
+            ASO_mask = convex_hull_image(
                 binary_opening(
                     gq_aso_data > 0.1))
 
             return nib.Nifti1Image(
-                ODF_mask.astype(np.float32),
+                ASO_mask.astype(np.float32),
                 gq_aso_img.affine), dict(
                     source=gq_aso,
-                    technique="GQ thresholded maps")
+                    technique="GQ ASO thresholded maps")
 
         if task_name == "data":
             return image_getter_helper
