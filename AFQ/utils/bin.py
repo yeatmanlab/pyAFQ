@@ -165,7 +165,7 @@ def dict_to_json(dictionary):
 def func_dict_to_arg_dict(func_dict=None, logger=None):
     if func_dict is None:
         import AFQ.segmentation as seg
-        import AFQ.tractography as aft
+        import AFQ.tractography.tractography as aft
         from AFQ.api.group import GroupAFQ
 
         func_dict = {
@@ -412,7 +412,7 @@ def generate_json(json_folder, overwrite=False,
     ]
 }"""
     import AFQ.segmentation as seg
-    import AFQ.tractography as aft
+    import AFQ.tractography.tractography as aft
 
     func_dict = {
         "Tractography": aft.track,
