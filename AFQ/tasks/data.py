@@ -324,6 +324,7 @@ def gq(base_fname, gtab, dwi_affine, data,
     shm_coeff,
     full path to a nifti file containing isotropic diffusion component,
     full path to a nifti file containing anisotropic diffusion component
+
     Parameters
     ----------
     gq_sampling_length : float
@@ -408,9 +409,10 @@ def opdt_params(base_fname, data, gtab,
     parameters for the Orientation Probability Density Transform
     shm_coeff,
     full path to a nifti file containing GFA
+
     Parameters
     ----------
-    opdt_sh_order : int, optional.
+    opdt_sh_order : int
         Spherical harmonics order for OPDT model. Must be even.
         Default: 8
     """
@@ -471,9 +473,10 @@ def csa_params(base_fname, data, gtab,
     parameters for the Constant Solid Angle
     shm_coeff,
     full path to a nifti file containing GFA
+
     Parameters
     ----------
-    csa_sh_order : int, optional.
+    csa_sh_order : int
         Spherical harmonics order for CSA model. Must be even.
         Default: 8
     """
