@@ -9,18 +9,18 @@ Visualizing AFQ derivatives
 # # In this set of examples, we will use the `fury <https://fury.gl/>`_
 # # library to visualize outputs of pyAFQ as publication-ready figures.
 
-# import os
-# import os.path as op
-# import nibabel as nib
-# import numpy as np
+import os
+import os.path as op
+import nibabel as nib
+import numpy as np
 
-# from dipy.io.streamline import load_trk
-# from dipy.tracking.streamline import transform_streamlines
+from dipy.io.streamline import load_trk
+from dipy.tracking.streamline import transform_streamlines
 
-# from fury import actor, window
-# from fury.colormap import create_colormap
+from fury import actor, window
+from fury.colormap import create_colormap
 
-# import AFQ.data.fetch as afd
+import AFQ.data.fetch as afd
 
 # #############################################################################
 # # Get some data from HBN POD2
@@ -37,8 +37,8 @@ Visualizing AFQ derivatives
 # # preprocessed data, as well as the pyAFQ-processed data (Note that this
 # # will take up about 1.75 GB of disk space):
 
-# afd.fetch_hbn_preproc(["NDARAA948VFH"])
-# study_path = afd.fetch_hbn_afq(["NDARAA948VFH"])[1]
+afd.fetch_hbn_preproc(["NDARAA948VFH"])
+study_path = afd.fetch_hbn_afq(["NDARAA948VFH"])[1]
 
 deriv_path = op.join(
     study_path, "derivatives")
@@ -62,12 +62,12 @@ bundle_path = op.join(afq_path,
 # use `"same"` here).
 
 fa_img = nib.load(op.join(afq_path,
-'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_model-DKI_FA.nii.gz'))
+                          'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_model-DKI_FA.nii.gz'))
 fa = fa_img.get_fdata()
 sft_arc = load_trk(op.join(bundle_path,
-     'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_space-RASMM_model-CSD_desc-prob-afq-ARC_L_tractography.trk'), fa_img)
+                           'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_space-RASMM_model-CSD_desc-prob-afq-ARC_L_tractography.trk'), fa_img)
 sft_cst = load_trk(op.join(bundle_path,
-     'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_space-RASMM_model-CSD_desc-prob-afq-CST_L_tractography.trk'), fa_img)
+                           'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_space-RASMM_model-CSD_desc-prob-afq-CST_L_tractography.trk'), fa_img)
 
 #############################################################################
 # Transform into the T1w reference frame
@@ -81,7 +81,7 @@ sft_cst = load_trk(op.join(bundle_path,
 
 
 t1w_img = nib.load(op.join(deriv_path,
-'qsiprep/sub-NDARAA948VFH/anat/sub-NDARAA948VFH_desc-preproc_T1w.nii.gz'))
+                           'qsiprep/sub-NDARAA948VFH/anat/sub-NDARAA948VFH_desc-preproc_T1w.nii.gz'))
 t1w = t1w_img.get_fdata()
 sft_arc.to_rasmm()
 sft_cst.to_rasmm()
@@ -105,8 +105,6 @@ if os.environ.get("XVFB", False):
 
     vdisplay = Xvfb()
     vdisplay.start()
-
-
 
 
 #############################################################################
@@ -184,7 +182,7 @@ def slice_volume(data, x=None, y=None, z=None):
     return slicer_actors
 
 
-slicers = slice_volume(t1w, x=t1w.shape[0]//2, z=t1w.shape[-1]//3)
+slicers = slice_volume(t1w, x=t1w.shape[0] // 2, z=t1w.shape[-1] // 3)
 
 #############################################################################
 # Making a `scene`
@@ -319,13 +317,13 @@ core_arc_actor = lines_as_tubes(
     [core_arc],
     40,
     colors=create_colormap(arc_profile, 'viridis')
-    )
+)
 
 core_cst_actor = lines_as_tubes(
     [core_cst],
     40,
     colors=create_colormap(arc_profile, 'viridis')
-    )
+)
 
 scene.clear()
 
