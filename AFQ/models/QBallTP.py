@@ -2,7 +2,7 @@ from scipy.linalg import blas
 import numpy as np
 
 from dipy.data import default_sphere
-from dipy.reconst.shm import anisotropic_power
+from dipy.reconst.shm import anisotropic_power, sh_to_sf_matrix
 
 __all__ = ["extract_ODF", "anisotropic_index", "anisotropic_power"]
 
@@ -17,7 +17,7 @@ def extract_ODF(ODF, sphere=default_sphere, sh_order=8):
     ASO = ODF_norm.max(axis=-1)
     ISO = ODF_norm.min(axis=-1)
 
-    _, invB = shm.sh_to_sf_matrix(
+    _, invB = sh_to_sf_matrix(
         sphere, sh_order=sh_order, basis_type=None, return_inv=True)
     shm = blas.dgemm(
         alpha=1.,
