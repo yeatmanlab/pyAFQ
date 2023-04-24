@@ -16,7 +16,6 @@ from dipy.reconst.gqi import (
     squared_radial_component)
 from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
-from AFQ.definitions.image import ImageDefinition
 from dipy.data import default_sphere
 
 from AFQ.tasks.decorators import as_file, as_img, as_fit_deriv
@@ -35,6 +34,8 @@ from AFQ.models.csd import CsdNanResponseError
 from AFQ.models.dki import _fit as dki_fit_model
 from AFQ.models.dti import _fit as dti_fit_model
 from AFQ.models.fwdti import _fit as fwdti_fit_model
+from AFQ.models.QBallTP import (
+    extract_ODF, anisotropic_index, anisotropic_power)
 
 
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
@@ -297,23 +298,20 @@ def anisotropic_power_map(csd_params):
     the anisotropic power map
     """
     sh_coeff = nib.load(csd_params).get_fdata()
-    pmap = shm.anisotropic_power(sh_coeff)
+    pmap = anisotropic_power(sh_coeff)
     return pmap, dict(CSDParamsFile=csd_params)
 
 
 @pimms.calc("csd_ai")
 @as_file(suffix='_model-CSD_desc-AI_dwi.nii.gz')
 @as_img
-def anisotropic_index(csd_params):
+def csd_anisotropic_index(csd_params):
     """
     full path to a nifti file containing
     the anisotropic index
     """
     sh_coeff = nib.load(csd_params).get_fdata()
-    sh_0 = sh_coeff[..., 0] ** 2
-    sh_sum_squared = np.sum(sh_coeff ** 2, axis=-1)
-    AI = np.zeros_like(sh_0)
-    AI = np.sqrt(1 - sh_0 / sh_sum_squared)
+    AI = anisotropic_index(sh_coeff)
     return AI, dict(CSDParamsFile=csd_params)
 
 
@@ -346,23 +344,14 @@ def gq(base_fname, gtab, dwi_affine, data,
         b=gqi_vector
     ).reshape((*data.shape[:-1], gqi_vector.shape[1]))
 
-    ODF_norm = ODF / ODF.max()
-    ASO = ODF_norm.max(axis=-1)
-    ISO = ODF_norm.min(axis=-1)
-
-    _, invB = shm.sh_to_sf_matrix(
-        default_sphere, sh_order=8, basis_type=None, return_inv=True)
-    GQ_shm = blas.dgemm(
-        alpha=1.,
-        a=ODF.reshape(-1, invB.shape[0]), b=invB).reshape(
-        (*ODF.shape[:-1], invB.shape[1]))
+    GQ_shm, ASO, ISO = extract_ODF(ODF)
 
     params_suffix = "_model-GQ_desc-diffmodel_dwi.nii.gz"
     params_fname = get_fname(base_fname, params_suffix)
     nib.save(nib.Nifti1Image(GQ_shm, dwi_affine), params_fname)
     write_json(
         get_fname(base_fname, f"{drop_extension(params_suffix)}.json"),
-        dict(GQParamsFile=params_fname)
+        dict(GQSamplingLength=gq_sampling_length)
     )
 
     ASO_suffix = "_model-GQ_desc-ASO_dwi.nii.gz"
@@ -393,7 +382,7 @@ def gq_pmap(gq_params):
     the anisotropic power map from GQ
     """
     sh_coeff = nib.load(gq_params).get_fdata()
-    pmap = shm.anisotropic_power(sh_coeff)
+    pmap = anisotropic_power(sh_coeff)
     return pmap, dict(GQParamsFile=gq_params)
 
 
@@ -406,11 +395,134 @@ def gq_ai(gq_params):
     the anisotropic index from GQ
     """
     sh_coeff = nib.load(gq_params).get_fdata()
-    sh_0 = sh_coeff[..., 0] ** 2
-    sh_sum_squared = np.sum(sh_coeff ** 2, axis=-1)
-    AI = np.zeros_like(sh_0)
-    AI = np.sqrt(1 - sh_0 / sh_sum_squared)
+    AI = anisotropic_index(sh_coeff)
     return AI, dict(GQParamsFile=gq_params)
+
+
+@pimms.calc("opdt_params", "opdt_gfa")
+def opdt_params(base_fname, data, gtab,
+                dwi_affine, brain_mask,
+                opdt_sh_order=8):
+    """
+    full path to a nifti file containing
+    parameters for the Orientation Probability Density Transform
+    shm_coeff,
+    full path to a nifti file containing GFA
+    Parameters
+    ----------
+    opdt_sh_order : int, optional.
+        Spherical harmonics order for OPDT model. Must be even.
+        Default: 8
+    """
+    opdt_model = shm.OpdtModel(gtab, opdt_sh_order)
+    opdt_fit = opdt_model.fit(data, mask=brain_mask)
+
+    params_suffix = "_model-OPDT_desc-diffmodel_dwi.nii.gz"
+    params_fname = get_fname(base_fname, params_suffix)
+    nib.save(nib.Nifti1Image(opdt_fit._shm_coef, dwi_affine), params_fname)
+    write_json(
+        get_fname(base_fname, f"{drop_extension(params_suffix)}.json"),
+        dict(sh_order=opdt_sh_order)
+    )
+
+    GFA_suffix = "_model-OPDT_desc-GFA_dwi.nii.gz"
+    GFA_fname = get_fname(base_fname, GFA_suffix)
+    nib.save(nib.Nifti1Image(opdt_fit.gfa, dwi_affine), GFA_fname)
+    write_json(
+        get_fname(base_fname, f"{drop_extension(GFA_suffix)}.json"),
+        dict(sh_order=opdt_sh_order)
+    )
+
+    return params_fname, GFA_fname
+
+
+@pimms.calc("opdt_pmap")
+@as_file(suffix='_model-OPDT_desc-APM_dwi.nii.gz')
+@as_img
+def opdt_pmap(opdt_params):
+    """
+    full path to a nifti file containing
+    the anisotropic power map from OPDT
+    """
+    sh_coeff = nib.load(opdt_params).get_fdata()
+    pmap = anisotropic_power(sh_coeff)
+    return pmap, dict(OPDTParamsFile=opdt_params)
+
+
+@pimms.calc("opdt_ai")
+@as_file(suffix='_model-OPDT_desc-AI_dwi.nii.gz')
+@as_img
+def opdt_ai(opdt_params):
+    """
+    full path to a nifti file containing
+    the anisotropic index from OPDT
+    """
+    sh_coeff = nib.load(opdt_params).get_fdata()
+    AI = anisotropic_index(sh_coeff)
+    return AI, dict(OPDTParamsFile=opdt_params)
+
+
+@pimms.calc("csa_params", "csa_gfa")
+def csa_params(base_fname, data, gtab,
+               dwi_affine, brain_mask,
+               csa_sh_order=8):
+    """
+    full path to a nifti file containing
+    parameters for the Constant Solid Angle
+    shm_coeff,
+    full path to a nifti file containing GFA
+    Parameters
+    ----------
+    csa_sh_order : int, optional.
+        Spherical harmonics order for CSA model. Must be even.
+        Default: 8
+    """
+    csa_model = shm.CsaOdfModel(gtab, csa_sh_order)
+    csa_fit = csa_model.fit(data, mask=brain_mask)
+
+    params_suffix = "_model-CSA_desc-diffmodel_dwi.nii.gz"
+    params_fname = get_fname(base_fname, params_suffix)
+    nib.save(nib.Nifti1Image(csa_fit._shm_coef, dwi_affine), params_fname)
+    write_json(
+        get_fname(base_fname, f"{drop_extension(params_suffix)}.json"),
+        dict(sh_order=csa_sh_order)
+    )
+
+    GFA_suffix = "_model-CSA_desc-GFA_dwi.nii.gz"
+    GFA_fname = get_fname(base_fname, GFA_suffix)
+    nib.save(nib.Nifti1Image(csa_fit.gfa, dwi_affine), GFA_fname)
+    write_json(
+        get_fname(base_fname, f"{drop_extension(GFA_suffix)}.json"),
+        dict(sh_order=csa_sh_order)
+    )
+
+    return params_fname, GFA_fname
+
+
+@pimms.calc("csa_pmap")
+@as_file(suffix='_model-CSA_desc-APM_dwi.nii.gz')
+@as_img
+def csa_pmap(csa_params):
+    """
+    full path to a nifti file containing
+    the anisotropic power map from CSA
+    """
+    sh_coeff = nib.load(csa_params).get_fdata()
+    pmap = anisotropic_power(sh_coeff)
+    return pmap, dict(CSAParamsFile=csa_params)
+
+
+@pimms.calc("csa_ai")
+@as_file(suffix='_model-CSA_desc-AI_dwi.nii.gz')
+@as_img
+def csa_ai(csa_params):
+    """
+    full path to a nifti file containing
+    the anisotropic index from CSA
+    """
+    sh_coeff = nib.load(csa_params).get_fdata()
+    AI = anisotropic_index(sh_coeff)
+    return AI, dict(CSAParamsFile=csa_params)
 
 
 @pimms.calc("fwdti_fa")
@@ -826,9 +938,12 @@ def get_data_plan(kwargs):
 
     data_tasks = with_name([
         get_data_gtab, b0, b0_mask, brain_mask,
-        dti_fit, dki_fit, fwdti_fit, anisotropic_power_map, anisotropic_index,
+        dti_fit, dki_fit, fwdti_fit, anisotropic_power_map,
+        csd_anisotropic_index,
         dti_fa, dti_lt, dti_cfa, dti_pdd, dti_md, dki_kt, dki_lt, dki_fa,
-        gq, gq_pmap, gq_ai, fwdti_fa, fwdti_md, fwdti_fwf,
+        gq, gq_pmap, gq_ai, opdt_params, opdt_pmap, opdt_ai,
+        csa_params, csa_pmap, csa_ai,
+        fwdti_fa, fwdti_md, fwdti_fwf,
         dki_md, dki_awf, dki_mk, dti_ga, dti_rd, dti_ad, dki_ga, dki_rd,
         dki_ad, dki_rk, dki_ak, dti_params, dki_params, fwdti_params,
         csd_params, get_bundle_dict])
