@@ -280,7 +280,18 @@ class ItkMap(Definition):
             nearest_warp = self.fnames[
                 bids_info['session']][bids_info['subject']]
         tx = ants.read_transform(nearest_warp)
-        return ConformedITKMapping(tx, nib.load(b0), reg_template)
+        template_shape = reg_template.get_fdata().shape
+        forward = np.zeros((*template_shape, 3))
+        from tqdm import tqdm
+        for ii in tqdm(range(template_shape[0])):
+            for jj in range(template_shape[1]):
+                for kk in range(template_shape[2]):
+                    forward[ii, jj, kk, :] = np.asarray(tx.apply_to_point(
+                        (ii, jj, kk))) - np.asarray([ii, jj, kk])
+        forward = nib.Nifti1Image(forward, reg_template.affine)
+        mapping = reg.read_mapping(
+            forward, forward)
+        return ConformedITKMapping(tx, nib.load(b0), reg_template, mapping)
 
 
 class ConformedITKMapping():
@@ -288,14 +299,22 @@ class ConformedITKMapping():
         ConformedITKMapping which matches the generic mapping API.
     """
 
-    def __init__(self, tx, sub_ref, templ_ref):
+    def __init__(self, tx, sub_ref, templ_ref, mapping):
         self.tx = tx
         self.sub_ref = sub_ref
         self.templ_ref = templ_ref
+        self.mapping = mapping
+        self.lps_ras = AffineMap(
+            np.diag([-1, -1, 1, 1]),
+            templ_ref.get_fdata().shape,
+            templ_ref.affine,
+            templ_ref.get_fdata().shape,
+            templ_ref.affine)
 
     def transform_inverse(self, data, **kwargs):
-        data = self.tx.apply_to_image(
-            ants.from_numpy(data), **kwargs).numpy()
+        data = self.lps_ras.transform(data)
+        data = self.mapping.transform_inverse(data, **kwargs)
+        data = self.lps_ras.transform_inverse(data)
         return resample(
             nib.Nifti1Image(data, self.templ_ref.affine),
             self.sub_ref).get_fdata()
