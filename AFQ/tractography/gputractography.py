@@ -12,13 +12,50 @@ from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 from nibabel.streamlines.array_sequence import concatenate
 
-from AFQ.tractography import get_percentile_threshold
+from AFQ.tractography.tractography import get_percentile_threshold
 
 
 # Modified from https://github.com/dipy/GPUStreamlines/blob/master/run_dipy_gpu.py
 def gpu_track(data, gtab, seed_img, stop_img,
               seed_threshold, stop_threshold, thresholds_as_percentages,
               max_angle, step_size, sampling_density, ngpus):
+    """
+    Perform GPU tractography on DWI data.
+
+    Parameters
+    ----------
+    data : ndarray
+        DWI data.
+    gtab : GradientTable
+        The gradient table.
+    seed_img : Nifti1Image
+        Float or binary mask describing the ROI within which we seed for
+        tracking.
+    stop_img : Nifti1Image
+        A float or binary mask that determines a stopping criterion
+        (e.g. FA).
+    seed_threshold : float
+        The value of the seed_img above which tracking is seeded.
+    stop_threshold : float
+        The value of the stop_img below which tracking is
+        terminated.
+    thresholds_as_percentages : bool
+        Interpret seed_threshold and stop_threshold as percentages of the
+        total non-nan voxels in the seed and stop mask to include
+        (between 0 and 100), instead of as a threshold on the
+        values themselves. 
+    max_angle : float
+        The maximum turning angle in each step.
+    step_size : float
+        The size of a step (in mm) of tractography.
+    sampling_density : int
+        The seeding density; how many seeds in each voxel on
+        each dimension (for example, 2 => [2, 2, 2]).
+    ngpus : int
+        Number of GPUs to use.
+    Returns
+    -------
+    """
     chunk_size = 100000
     sh_order = 6
 
