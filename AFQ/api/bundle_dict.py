@@ -363,7 +363,7 @@ class BundleDict(MutableMapping):
             suffix = roi_or_sl.pop("suffix", "dwi")
             roi_or_sl = find_file(
                 self._bids_info, self._bids_path,
-                **roi_or_sl,
+                roi_or_sl,
                 suffix,
                 self._session, self._subject)
             return nib.load(roi_or_sl)
