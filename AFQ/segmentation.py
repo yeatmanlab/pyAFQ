@@ -752,6 +752,14 @@ class Segmentation:
                                     roi_dists[sl_idx, :len(sl_dist)] =\
                                         np.flip(
                                             roi_dists[sl_idx, :len(sl_dist)])
+                # see https://github.com/joblib/joblib/issues/945
+                if (
+                    self.parallel_segmentation.get(
+                        "engine", "joblib") != "serial"
+                    and self.parallel_segmentation.get(
+                        "backend", "loky") == "loky"):
+                    from joblib.externals.loky import get_reusable_executor
+                    get_reusable_executor().shutdown(wait=True)
                 if self.roi_dist_tie_break:
                     b_sls.bundle_vote = -min_dist_coords
                 if record_roi_dists:
@@ -826,15 +834,6 @@ class Segmentation:
                         b_sls.selected_fiber_idxs,
                         bundle_idx
                     ] = b_sls.roi_dists
-
-        # see https://github.com/joblib/joblib/issues/945
-        if (
-                self.parallel_segmentation.get("engine", "joblib") != "serial"
-                and self.parallel_segmentation.get("backend", "loky") == "loky"):
-            from joblib.externals.loky import get_reusable_executor
-            self.logger.info("Cleaning up Loky...")
-            get_reusable_executor().shutdown(wait=True)
-            self.logger.info("Loky Cleaned up")
 
         if self.save_intermediates is not None:
             os.makedirs(self.save_intermediates, exist_ok=True)
