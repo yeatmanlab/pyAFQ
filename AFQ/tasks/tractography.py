@@ -7,11 +7,44 @@ import pimms
 from AFQ.tasks.decorators import as_file, as_img
 from AFQ.tasks.utils import with_name
 from AFQ.definitions.utils import Definition
-import AFQ.tractography as aft
+import AFQ.tractography.tractography as aft
 from AFQ.tasks.utils import get_default_args
 from AFQ.definitions.image import ScalarImage
 
+try:
+    from AFQ.tractography.gputractography import gpu_track
+    has_gputrack = True
+except ModuleNotFoundError:
+    has_gputrack = False
+
 logger = logging.getLogger('AFQ')
+
+
+def _meta_from_tracking_params(
+        tracking_params, start_time,
+        sft, seed, stop):
+    meta_directions = {
+        "det": "deterministic",
+        "prob": "probabilistic"}
+    meta = dict(
+        TractographyClass="local",
+        TractographyMethod=meta_directions.get(
+            tracking_params["directions"],
+            tracking_params["directions"]),
+        Count=len(sft.streamlines),
+        Seeding=dict(
+            ROI=seed,
+            n_seeds=tracking_params["n_seeds"],
+            random_seeds=tracking_params["random_seeds"]),
+        Constraints=dict(ROI=stop),
+        Parameters=dict(
+            Units="mm",
+            StepSize=tracking_params["step_size"],
+            MinimumLength=tracking_params["min_length"],
+            MaximumLength=tracking_params["max_length"],
+            Unidirectional=False),
+        Timing=time() - start_time)
+    return meta
 
 
 @pimms.calc("seed")
@@ -92,28 +125,10 @@ def streamlines(data_imap, seed, stop,
     start_time = time()
     sft = aft.track(params_file, **this_tracking_params)
     sft.to_vox()
-    meta_directions = {
-        "det": "deterministic",
-        "prob": "probabilistic"}
-    meta = dict(
-        TractographyClass="local",
-        TractographyMethod=meta_directions[
-            tracking_params["directions"]],
-        Count=len(sft.streamlines),
-        Seeding=dict(
-            ROI=seed,
-            n_seeds=tracking_params["n_seeds"],
-            random_seeds=tracking_params["random_seeds"]),
-        Constraints=dict(ROI=stop),
-        Parameters=dict(
-            Units="mm",
-            StepSize=tracking_params["step_size"],
-            MinimumLength=tracking_params["min_length"],
-            MaximumLength=tracking_params["max_length"],
-            Unidirectional=False),
-        Timing=time() - start_time)
 
-    return sft, meta
+    return sft, _meta_from_tracking_params(
+        tracking_params, start_time,
+        sft, seed, stop)
 
 
 @pimms.calc("streamlines")
@@ -168,6 +183,36 @@ def custom_tractography(bids_info, import_tract=None):
     return import_tract
 
 
+@pimms.calc("streamlines")
+@as_file('_tractography.trk', include_track=True)
+def gpu_tractography(data_imap, tracking_params, seed, stop,
+                     tractography_ngpus=0):
+    """
+    full path to the complete, unsegmented tractography file
+    Parameters
+    ----------
+    tractography_ngpus : int, optional
+        Number of GPUs to use in tractography. If non-0,
+        this algorithm is used for tractography,
+        https://github.com/dipy/GPUStreamlines
+        Default: 0
+    """
+    start_time = time()
+    sft = gpu_track(
+        data_imap["data"], data_imap["gtab"],
+        nib.load(seed), nib.load(stop),
+        tracking_params["seed_threshold"],
+        tracking_params["stop_threshold"],
+        tracking_params["thresholds_as_percentages"],
+        tracking_params["max_angle"], tracking_params["step_size"],
+        tracking_params["n_seeds"],
+        tractography_ngpus)
+
+    return sft, _meta_from_tracking_params(
+        tracking_params, start_time,
+        sft, seed, stop)
+
+
 def get_tractography_plan(kwargs):
     if "tracking_params" in kwargs\
             and not isinstance(kwargs["tracking_params"], dict):
@@ -177,6 +222,13 @@ def get_tractography_plan(kwargs):
     tractography_tasks = with_name([
         export_seed_mask, export_stop_mask, streamlines])
 
+    # use GPU accelerated tractography if asked for
+    if "tractography_ngpus" in kwargs and kwargs["tractography_ngpus"] != 0:
+        if not has_gputrack:
+            raise ImportError("Please install from ghcr.io/nrdg/pyafq_gpu"
+                              " docker file to use gpu-accelerated"
+                              "tractography")
+        tractography_tasks["streamlines_res"] = gpu_tractography
     # use imported tractography if given
     if "import_tract" in kwargs and kwargs["import_tract"] is not None:
         tractography_tasks["streamlines_res"] = custom_tractography

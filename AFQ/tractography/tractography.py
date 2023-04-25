@@ -18,6 +18,16 @@ from AFQ._fixes import (VerboseLocalTracking, VerboseParticleFilteringTracking,
                         tensor_odf)
 
 
+def get_percentile_threshold(mask, threshold):
+    zero_mask = mask == 0
+    mask[zero_mask] = np.nan
+    new_threshold = np.nanpercentile(
+        mask,
+        100 - threshold)
+    mask[zero_mask] = 0
+    return new_threshold
+
+
 def track(params_file, directions="prob", max_angle=30., sphere=None,
           seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False,
           rng_seed=None, stop_mask=None, stop_threshold=0, step_size=0.5,
@@ -45,7 +55,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         tracking.
         Default to the entire volume (all ones).
     seed_threshold : float, optional.
-        A value of the seed_mask below which tracking is terminated.
+        A value of the seed_mask above which tracking is seeded.
         Default to 0.
     n_seeds : int or 2D array, optional.
         The seeding density: if this is an int, it is is how many seeds in each
