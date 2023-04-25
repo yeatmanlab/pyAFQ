@@ -85,8 +85,7 @@ language = 'en'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path .
-exclude_patterns = [
-    "examples/cloudknot_*"]
+exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -226,6 +225,10 @@ sphinx_gallery_conf = {
     'examples_dirs': ['../../examples/howto_examples', '../../examples/tutorial_examples'],
     # path where to save gallery generated examples
     'gallery_dirs': ['howto/howto_examples', 'tutorials/tutorial_examples'],
+    'ignore_pattern': [
+        'plot_baby_afq.py',
+        'cloudknot_hcp_example.py',
+        'cloudknot_example.py'],
     'image_scrapers': image_scrapers,
     'reset_modules': (reset_progressbars),
 }
