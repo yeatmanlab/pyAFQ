@@ -4,6 +4,7 @@ from collections.abc import MutableMapping, Mapping
 import AFQ.data.fetch as afd
 import AFQ.utils.volume as auv
 from AFQ.tasks.utils import get_fname, str_to_desc
+from AFQ.definitions.utils import find_file
 
 import numpy as np
 import nibabel as nib
@@ -182,6 +183,7 @@ class BundleDict(MutableMapping):
         self.resample_to = resample_to
         self.resample_subject_to = resample_subject_to
         self.keep_in_memory = keep_in_memory
+        self.has_bids_info = False
 
         self._dict = {}
         self.bundle_names = []
@@ -337,11 +339,34 @@ class BundleDict(MutableMapping):
             del self.templates
         self.templates_loaded = False
 
+    def set_bids_info(self, bids_layout, bids_path, subject, session):
+        """
+        Provide the bids_layout, a nearest path,
+        and the subject and session information
+        to load ROIS from BIDS
+        """
+        self.has_bids_info = True
+        self._bids_info = bids_layout
+        self._bids_path = bids_path
+        self._subject = subject
+        self._session = session
+
     def _cond_load(self, roi_or_sl):
         """
         Load ROI or streamline if not already loaded
         """
-        if isinstance(roi_or_sl, str):
+        if isinstance(roi_or_sl, dict):
+            if not self.has_bids_info:
+                raise ValueError((
+                    "Attempted to load an ROI using BIDS description without "
+                    "First providing BIDS information."))
+            roi_or_sl = find_file(
+                self._bids_info, self._bids_path,
+                roi_or_sl.get("filters", {}),
+                roi_or_sl.get("suffix", "roi"),
+                self._session, self._subject)
+            return nib.load(roi_or_sl)
+        elif isinstance(roi_or_sl, str):
             if self.seg_algo == "afq":
                 return nib.load(roi_or_sl)
             elif self.seg_algo.startswith("reco"):

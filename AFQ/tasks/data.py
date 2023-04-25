@@ -845,7 +845,7 @@ def brain_mask(b0, brain_mask_definition=None):
 
 
 @pimms.calc("bundle_dict", "reg_template")
-def get_bundle_dict(base_fname, dwi, gtab, segmentation_params,
+def get_bundle_dict(segmentation_params,
                     brain_mask, bids_info, b0,
                     bundle_info=None, reg_template_spec="mni_T1"):
     """
@@ -919,15 +919,19 @@ def get_bundle_dict(base_fname, dwi, gtab, segmentation_params,
             reg_template = nib.load(reg_template_spec)
 
     if isinstance(bundle_info, abd.BundleDict):
-        bundle_dict = bundle_info
+        bundle_dict = bundle_info.copy()
     else:
         bundle_dict = abd.BundleDict(
             bundle_info,
             seg_algo=segmentation_params["seg_algo"],
             resample_to=reg_template)
 
-    for b_name in bundle_dict._dict:
-        bundle_dict._resample_roi(b_name)
+    if bids_info is not None:
+        bundle_dict.set_bids_info(
+            bids_info["bids_layout"],
+            b0,
+            bids_info["subject"],
+            bids_info["session"])
     return bundle_dict, reg_template
 
 
