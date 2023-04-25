@@ -1,11 +1,6 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-Modeling white matter
-=======
 .. _modeling:
 
 Modeling White Matter
->>>>>>> 41adea6c (Added titles to files)
 =====================
 
 In order to make inferences about white matter tissue properties, we use a
@@ -24,6 +19,3 @@ objects.
 .. [Novikov2018] Novikov DS, Kiselev VG, Jespersen SN. On modeling. Magn Reson
     Med. 2018 Jun;79(6):3172-3193. doi: 10.1002/mrm.27101. Epub 2018 Mar 1.
     PMID: 29493816; PMCID: PMC5905348.
-=======
-.. _modeling:
->>>>>>> be6bf556 (Added html links to tract pipeline page)

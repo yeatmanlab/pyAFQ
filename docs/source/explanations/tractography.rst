@@ -10,7 +10,7 @@ Jeurissen et al. [Jeurissen2019]_.
 
 The pyAFQ software implements a simplified programming interface to the myriad
 methods that are implemented in DIPY. Please refer to the detailed
-documentation of the :mod:`AFQ.tractography` module for details.
+documentation of the :mod:`AFQ.tractography.tractography` module for details.
 
 
 References
