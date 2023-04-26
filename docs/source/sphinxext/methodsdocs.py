@@ -28,5 +28,5 @@ def setup(app):
             {desc}
         """)
 
-    with open('./source/usage/methods.rst', 'w') as ff:
+    with open('./source/reference/methods.rst', 'w') as ff:
         ff.write(prologue + method_descriptions)

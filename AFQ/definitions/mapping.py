@@ -66,6 +66,11 @@ class FnirtMap(Definition):
         the space file.
         Default: {}
 
+    Notes
+    -----
+    If you have an existing mapping calculated using Fnirt,
+    you can pass bids filters to :class:`AFQ.definitions.mapping.FnirtMap`
+    and pyAFQ will find and use that mapping.
 
     Examples
     --------
@@ -380,6 +385,15 @@ class SynMap(GeneratedMapMixin, Definition):
         Parameters to pass to syn_registration
         in dipy.align, which does the SyN alignment.
         Default: {}
+
+    Notes
+    -----
+    The default mapping class is to
+    use Symmetric Diffeomorphic Image Registration (SyN).
+    This is done with an optional linear pre-alignment by default.
+    The parameters of the pre-alginment can be specified when
+    initializing the SynMap.
+
     Examples
     --------
     api.GroupAFQ(mapping=SynMap())
@@ -414,10 +428,20 @@ class SlrMap(GeneratedMapMixin, Definition):
     Calculate a SLR registration for each subject/session
     using reg_subject and reg_template.
 
+    Parameters
+    ----------
     slr_kwargs : dictionary, optional
         Parameters to pass to whole_brain_slr
         in dipy, which does the SLR alignment.
         Default: {}
+
+    Notes
+    -----
+    Use this class to tell pyAFQ to use
+    Streamline-based Linear Registration (SLR) 
+    for registration. Note that the reg_template and reg_subject
+    parameters passed to :class:`AFQ.api.group.GroupAFQ` should
+    be streamlines when using this registration.
 
     Examples
     --------
@@ -448,10 +472,16 @@ class AffMap(GeneratedMapMixin, Definition):
     Calculate an affine registration for each subject/session
     using reg_subject and reg_template.
 
+    Parameters
+    ----------
     affine_kwargs : dictionary, optional
         Parameters to pass to affine_registration
         in dipy.align, which does the linear pre-alignment.
         Default: {}
+
+    Notes
+    -----
+    This will only perform a linear alignment for registration.
 
     Examples
     --------

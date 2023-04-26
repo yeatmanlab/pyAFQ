@@ -54,6 +54,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
     'sphinx_gallery.gen_gallery',
+    'sphinx_design',
     'sphinx.ext.autosummary',
     'autoapi.extension',
     'numpydoc',
@@ -84,8 +85,7 @@ language = 'en'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path .
-exclude_patterns = [
-    "examples/cloudknot_*"]
+exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -142,9 +142,11 @@ html_static_path = ['_static']
 #
 # html_sidebars = {}
 
-html_css_files = [
-    'css/custom.css',
-]
+# html_css_files = [
+#     'css/custom.css'
+# ]
+
+html_css_files = ['custom.css']
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
@@ -220,10 +222,10 @@ from _progressbars import reset_progressbars  # noqa
 
 sphinx_gallery_conf = {
     # path to your examples scripts
-    'examples_dirs': '../../examples',
+    'examples_dirs': ['../../examples/howto_examples', '../../examples/tutorial_examples'],
     # path where to save gallery generated examples
-    'gallery_dirs': 'auto_examples',
-    'ignore_pattern': 'plot_baby_afq.py',
+    'gallery_dirs': ['howto/howto_examples', 'tutorials/tutorial_examples'],
+    'ignore_pattern': 'plot_baby_afq.py|cloudknot_hcp_example.py|cloudknot_example.py',
     'image_scrapers': image_scrapers,
     'reset_modules': (reset_progressbars),
 }
@@ -232,3 +234,4 @@ sphinx_gallery_conf = {
 autoapi_type = 'python'
 autoapi_dirs = ['../../AFQ']
 autoapi_ignore = ['*test*', '*_fixes*', '*version*', 'pyAFQ', 'License']
+autoapi_root = 'reference/api'

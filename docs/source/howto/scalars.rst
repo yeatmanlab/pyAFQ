@@ -1,5 +1,6 @@
-The pyAFQ Custom Tissue Properties API
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+How to add custom tissue properties from another pipeline
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Per default, pyAFQ calculates tract profiles of the FA and MD using DTI
 in every bundle that it recognizes. However, there is also a system for users
 to add tissue properties or other scalar images (i.e., 3D images with one
