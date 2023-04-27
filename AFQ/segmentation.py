@@ -19,6 +19,9 @@ import dipy.core.gradients as dpg
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.io.streamline import save_tractogram
 from dipy.utils.parallel import paramap
+from dipy.segment.clustering import QuickBundles
+from dipy.segment.metricspeed import AveragePointwiseEuclideanMetric
+from dipy.segment.featurespeed import ResampleFeature
 
 import AFQ.registration as reg
 import AFQ.utils.models as ut
@@ -794,6 +797,28 @@ class Segmentation:
                     if dist <= ref_curve_threshold:
                         cleaned_idx.append(idx)
                 b_sls.select(cleaned_idx, "curvature")
+
+            if b_sls and "qb_thresh" in bundle_def:
+                b_sls.initiate_selection("qb_thresh")
+                n_roi_dists = len(bundle_def["include"])
+                sls = []
+                for idx, sl in enumerate(b_sls.selected_sls):
+                    if abs(
+                        b_sls.roi_dists[idx, 0]
+                            - b_sls.roi_dists[idx, n_roi_dists - 1]) < 2:
+                        continue
+                    cut_sl = sl[
+                        b_sls.roi_dists[idx, 0]:
+                        b_sls.roi_dists[idx, n_roi_dists - 1] + 1]
+                    sls.append(cut_sl)
+                qbx = QuickBundles(
+                    bundle_def["qb_thresh"],
+                    AveragePointwiseEuclideanMetric(
+                        ResampleFeature(nb_points=12)))
+                clusters = qbx.cluster(sls)
+                cleaned_idx = clusters[np.argmax(
+                    clusters.clusters_sizes())].indices
+                b_sls.select(cleaned_idx, "qb_thresh")
 
             if b_sls and "exclude" in bundle_def:
                 b_sls.initiate_selection("exclude")
