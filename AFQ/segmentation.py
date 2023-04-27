@@ -710,10 +710,10 @@ class Segmentation:
                                             roi_dists[sl_idx, :len(sl_dist)])
                 # see https://github.com/joblib/joblib/issues/945
                 if (
-                    self.parallel_segmentation.get(
-                        "engine", "joblib") != "serial"
-                    and self.parallel_segmentation.get(
-                        "backend", "loky") == "loky"):
+                    (self.parallel_segmentation.get(
+                        "engine", "joblib") != "serial")
+                    and (self.parallel_segmentation.get(
+                        "backend", "loky") == "loky")):
                     from joblib.externals.loky import get_reusable_executor
                     get_reusable_executor().shutdown(wait=True)
                 if self.roi_dist_tie_break:
