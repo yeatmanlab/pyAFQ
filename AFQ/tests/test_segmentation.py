@@ -46,10 +46,10 @@ def test_segment():
     segmentation = seg.Segmentation()
     segmentation.segment(bundles,
                          tg,
+                         mapping,
                          hardi_fdata,
                          hardi_fbval,
-                         hardi_fbvec,
-                         mapping=mapping)
+                         hardi_fbvec)
     fiber_groups = segmentation.fiber_groups
 
     # We asked for 2 fiber groups:
@@ -86,10 +86,10 @@ def test_segment_no_prob():
     segmentation = seg.Segmentation()
     segmentation.segment(bundles_no_prob,
                          tg,
+                         mapping,
                          hardi_fdata,
                          hardi_fbval,
-                         hardi_fbvec,
-                         mapping=mapping)
+                         hardi_fbvec)
     fiber_groups = segmentation.fiber_groups
 
     # This condition should still hold
@@ -102,10 +102,10 @@ def test_segment_return_idx():
     segmentation = seg.Segmentation(return_idx=True)
     segmentation.segment(bundles,
                          tg,
+                         mapping,
                          hardi_fdata,
                          hardi_fbval,
-                         hardi_fbvec,
-                         mapping=mapping)
+                         hardi_fbvec)
     fiber_groups = segmentation.fiber_groups
 
     npt.assert_equal(len(fiber_groups), 2)
@@ -122,10 +122,10 @@ def test_segment_keep_space():
     orig_space = tg.space
     segmentation.segment(bundles,
                          tg,
+                         mapping,
                          hardi_fdata,
                          hardi_fbval,
                          hardi_fbvec,
-                         mapping=mapping,
                          reset_tg_space=True)
 
     npt.assert_equal(tg.space, orig_space)
@@ -163,10 +163,10 @@ def test_segment_clip_edges_api():
 
     fiber_groups = segmentation.segment(bundles,
                                         tg,
+                                        mapping,
                                         hardi_fdata,
                                         hardi_fbval,
-                                        hardi_fbvec,
-                                        mapping=mapping)
+                                        hardi_fbvec)
 
     npt.assert_equal(len(fiber_groups), 2)
     npt.assert_(len(fiber_groups['CST_R']) > 0)
@@ -187,6 +187,7 @@ def test_segment_reco():
                                     rm_small_clusters=1,
                                     rng=np.random.RandomState(seed=8))
     fiber_groups = segmentation.segment(bundles_reco, tg,
+                                        mapping,
                                         hardi_fdata,
                                         hardi_fbval,
                                         hardi_fbvec)
@@ -263,10 +264,10 @@ def test_exclusion_ROI():
     fiber_groups = segmentation.segment(
         slf_bundle,
         slf_tg,
+        mapping,
         hardi_fdata,
         hardi_fbval,
         hardi_fbvec,
-        mapping=mapping,
     )
     npt.assert_equal(len(fiber_groups["SLF_L"]), 2)
 
@@ -275,10 +276,10 @@ def test_exclusion_ROI():
     fiber_groups = segmentation.segment(
         slf_bundle,
         slf_tg,
+        mapping,
         hardi_fdata,
         hardi_fbval,
         hardi_fbvec,
-        mapping=mapping,
     )
     npt.assert_equal(len(fiber_groups["SLF_L"]), 1)
 
@@ -310,10 +311,10 @@ def test_segment_sampled_streamlines():
     fiber_groups = segmentation.segment(
         bundles,
         tg,
+        mapping,
         hardi_fdata,
         hardi_fbval,
         hardi_fbvec,
-        mapping=mapping
     )
 
     # Already using a subsampled tck
@@ -331,10 +332,10 @@ def test_segment_sampled_streamlines():
     sampled_fiber_groups = sampled_segmentation.segment(
         bundles,
         tg,
+        mapping,
         hardi_fdata,
         hardi_fbval,
         hardi_fbvec,
-        mapping=mapping
     )
 
     # sampled streamlines should equal the sample number

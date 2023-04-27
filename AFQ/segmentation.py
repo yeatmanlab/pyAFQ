@@ -13,11 +13,10 @@ from tqdm.auto import tqdm
 import dipy.tracking.streamline as dts
 import dipy.tracking.streamlinespeed as dps
 from dipy.segment.bundles import RecoBundles
-from dipy.align.streamlinear import whole_brain_slr
 from dipy.stats.analysis import gaussian_weights
 import dipy.core.gradients as dpg
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
-from dipy.io.streamline import save_tractogram
+from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.utils.parallel import paramap
 from dipy.segment.clustering import QuickBundles
 from dipy.segment.metricspeed import AveragePointwiseEuclideanMetric
@@ -28,6 +27,7 @@ import AFQ.utils.models as ut
 import AFQ.data.fetch as afd
 from AFQ.data.utils import BUNDLE_RECO_2_AFQ
 from AFQ.api.bundle_dict import BundleDict
+from AFQ.definitions.mapping import ConformedFnirtMapping
 
 from geomstats.geometry.euclidean import Euclidean
 from geomstats.geometry.discrete_curves import DiscreteCurves
@@ -76,6 +76,17 @@ class _SlsBeingRecognized:
             f"After filtering by {clean_name} (time: {time_taken}s), "
             f"{len(self.selected_sls)} streamlines remain.")
 
+    def generate_cut_sls(self, n_roi_dists):
+        for idx, sl in enumerate(self.selected_sls):
+            if abs(
+                self.roi_dists[idx, 0]
+                    - self.roi_dists[idx, n_roi_dists - 1]) < 2:
+                continue
+            cut_sl = sl[
+                self.roi_dists[idx, 0]:
+                self.roi_dists[idx, n_roi_dists - 1] + 1]
+            yield idx, cut_sl
+
     def reorient(self, idx):
         if self.oriented_yet:
             raise RuntimeError((
@@ -95,7 +106,6 @@ class Segmentation:
                  nb_points=False,
                  nb_streamlines=False,
                  seg_algo='AFQ',
-                 reg_algo=None,
                  clip_edges=False,
                  parallel_segmentation={
                      "n_jobs": 4, "engine": "joblib",
@@ -136,13 +146,6 @@ class Segmentation:
             'Reco': Segment streamlines using the RecoBundles algorithm
             [Garyfallidis2017].
             Default: 'AFQ'
-        reg_algo : string or None, optional
-            Algorithm for streamline registration (case-insensitive):
-            'slr' : Use Streamlinear Registration [Garyfallidis2015]_
-            'syn' : Use image-based nonlinear registration
-            If None, will use SyN if a mapping is provided, slr otherwise.
-            If  seg_algo="AFQ", SyN is always used.
-            Default: None
         clip_edges : bool
             Whether to clip the streamlines to be only in between the ROIs.
             Default: False
@@ -265,9 +268,6 @@ class Segmentation:
             self.rng = rng
 
         self.seg_algo = seg_algo.lower()
-        if reg_algo is not None:
-            reg_algo = reg_algo.lower()
-        self.reg_algo = reg_algo
         self.prob_threshold = prob_threshold
         self.roi_dist_tie_break = roi_dist_tie_break
         self.dist_to_waypoint = dist_to_waypoint
@@ -310,8 +310,8 @@ class Segmentation:
 
         return tg
 
-    def segment(self, bundle_dict, tg, fdata=None, fbval=None,
-                fbvec=None, mapping=None, reg_prealign=None,
+    def segment(self, bundle_dict, tg, mapping, fdata=None, fbval=None,
+                fbvec=None, reg_prealign=None,
                 reg_template=None, img_affine=None, reset_tg_space=False):
         """
         Segment streamlines into bundles based on either waypoint ROIs
@@ -328,11 +328,10 @@ class Segmentation:
                     'end': img5}}
         tg : StatefulTractogram
             Bundles to segment
+        mapping : DiffeomorphicMap, or equivalent interface 
+            A mapping between DWI space and a template.
         fdata, fbval, fbvec : str
             Full path to data, bvals, bvecs
-        mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.
-            A mapping between DWI space and a template. If None, mapping will
-            be registered from data used in prepare_img. Default: None.
         reg_prealign : array, optional.
             The linear transformation to be applied to align input images to
             the reference space before warping under the deformation field.
@@ -383,7 +382,12 @@ class Segmentation:
                 dps.set_number_of_points(self.tg.streamlines, self.nb_points),
                 self.tg, self.tg.space)
 
-        self.prepare_map(mapping, reg_prealign, reg_template)
+        if reg_template is None:
+            reg_template = afd.read_mni_template()
+
+        self.reg_prealign = reg_prealign
+        self.reg_template = reg_template
+        self.mapping = mapping
         self.bundle_dict = bundle_dict
         if not isinstance(self.bundle_dict, BundleDict):
             self.bundle_dict = BundleDict(self.bundle_dict)
@@ -420,53 +424,6 @@ class Segmentation:
         self.fdata = fdata
         self.fbval = fbval
         self.fbvec = fbvec
-
-    def prepare_map(self, mapping=None, reg_prealign=None, reg_template=None):
-        """
-        Set mapping between DWI space and a template.
-        Parameters
-        ----------
-        mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.
-            A mapping between DWI space and a template.
-            If None, mapping will be registered from data used in prepare_img.
-            Default: None.
-        reg_template : str or nib.Nifti1Image, optional.
-            Template to use for registration (defaults to the MNI T2)
-            Default: None.
-        reg_prealign : array, optional.
-            The linear transformation to be applied to align input images to
-            the reference space before warping under the deformation field.
-            Default: None.
-        """
-        if reg_template is None:
-            reg_template = afd.read_mni_template()
-
-        self.reg_prealign = reg_prealign
-        self.reg_template = reg_template
-
-        if mapping is None:
-            if self.seg_algo == "afq" or self.reg_algo == "syn":
-                gtab = dpg.gradient_table(self.fbval, self.fbvec)
-                self.mapping = reg.syn_register_dwi(self.fdata, gtab,
-                                                    template=reg_template)[1]
-            else:
-                self.mapping = None
-        elif isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
-            if reg_prealign is None:
-                reg_prealign = np.eye(4)
-            if self.img is None:
-                self.img, _, _, _ = \
-                    ut.prepare_data(self.fdata,
-                                    self.fbval,
-                                    self.fbvec,
-                                    b0_threshold=self.b0_threshold)
-            self.mapping = reg.read_mapping(
-                mapping,
-                self.img,
-                reg_template,
-                prealign=np.linalg.inv(reg_prealign))
-        else:
-            self.mapping = mapping
 
     def cross_streamlines(self, tg=None, template=None, low_coord=10):
         """
@@ -542,19 +499,6 @@ class Segmentation:
         tg = self._read_tg(tg=tg)
         tg.to_vox()
 
-        # analyze bundle information to determine whether we need to
-        # record distance to ROI, and if so, to how many different includes
-        max_includes = 2
-        record_roi_dists = self.clip_edges
-        for bundle_info in self.bundle_dict.values():
-            if "bundlesection" in bundle_info:
-                record_roi_dists = True
-            if "curvature" in bundle_info:
-                record_roi_dists = True
-            if "include" in bundle_info\
-                    and len(bundle_info["include"]) > max_includes:
-                max_includes = len(bundle_info["include"])
-
         fgarray = np.array(_resample_tg(tg, 100))
         n_streamlines = len(tg)
 
@@ -564,10 +508,17 @@ class Segmentation:
         bundle_to_flip = np.zeros(
             (n_streamlines, len(self.bundle_dict)),
             dtype=bool)
-        if record_roi_dists:
-            bundle_roi_dists = -np.ones(
-                (n_streamlines, len(self.bundle_dict), max_includes),
-                dtype=np.int32)
+
+        # analyze bundle information to determine
+        # how much room we need for include ROIs
+        max_includes = 2
+        for bundle_info in self.bundle_dict.values():
+            if "include" in bundle_info\
+                    and len(bundle_info["include"]) > max_includes:
+                max_includes = len(bundle_info["include"])
+        bundle_roi_dists = -np.ones(
+            (n_streamlines, len(self.bundle_dict), max_includes),
+            dtype=np.int32)
 
         self.fiber_groups = {}
 
@@ -598,7 +549,11 @@ class Segmentation:
                 self.img_affine))
 
             if "curvature" in bundle_def:
-                ref_curve = np.loadtxt(bundle_def["curvature"])
+                ref_curve = load_tractogram(
+                    bundle_def["curvature"], "same")
+                moved_ref_curve = self.move_streamlines(
+                    ref_curve, "subject")
+                moved_ref_curve = np.asarray(moved_ref_curve[0])
 
             b_sls = _SlsBeingRecognized(tg.streamlines, self.logger)
 
@@ -724,10 +679,9 @@ class Segmentation:
                 cleaned_idx = []
                 if self.roi_dist_tie_break:
                     min_dist_coords = np.ones(len(b_sls.selected_sls))
-                if record_roi_dists:
-                    roi_dists = -np.ones(
-                        (len(b_sls.selected_sls), max_includes),
-                        dtype=np.int32)
+                roi_dists = -np.ones(
+                    (len(b_sls.selected_sls), max_includes),
+                    dtype=np.int32)
                 if flip_using_include:
                     to_flip = []
                 for sl_idx, inc_result in enumerate(inc_results):
@@ -742,10 +696,9 @@ class Segmentation:
                             roi_dist1 = np.argmin(sl_dist[0], 0)[0]
                             roi_dist2 = np.argmin(sl_dist[
                                 len(sl_dist) - 1], 0)[0]
-                            if record_roi_dists:
-                                roi_dists[sl_idx, :len(sl_dist)] = [
-                                    np.argmin(dist, 0)[0]
-                                    for dist in sl_dist]
+                            roi_dists[sl_idx, :len(sl_dist)] = [
+                                np.argmin(dist, 0)[0]
+                                for dist in sl_dist]
                             # Flip sl if it is close to second ROI
                             # before its close to the first ROI
                             if flip_using_include:
@@ -765,8 +718,7 @@ class Segmentation:
                     get_reusable_executor().shutdown(wait=True)
                 if self.roi_dist_tie_break:
                     b_sls.bundle_vote = -min_dist_coords
-                if record_roi_dists:
-                    b_sls.roi_dists = roi_dists
+                b_sls.roi_dists = roi_dists
                 b_sls.select(cleaned_idx, "include")
                 if flip_using_include:
                     b_sls.reorient(to_flip)
@@ -776,24 +728,14 @@ class Segmentation:
             if b_sls and "curvature" in bundle_def:
                 b_sls.initiate_selection("curvature")
                 ref_curve_threshold = bundle_def.get("curvature_thresh", 5)
-                for dim_idx in range(3):
-                    if self.img_affine[dim_idx, dim_idx] < 0:
-                        ref_curve[:, dim_idx] = -ref_curve[:, dim_idx]
                 curves_r3 = DiscreteCurves(ambient_manifold=Euclidean(dim=3))
                 n_roi_dists = len(bundle_def["include"])
                 cleaned_idx = []
-                for idx, sl in enumerate(b_sls.selected_sls):
-                    if abs(
-                        b_sls.roi_dists[idx, 0]
-                            - b_sls.roi_dists[idx, n_roi_dists - 1]) < 2:
-                        continue
-                    cut_sl = sl[
-                        b_sls.roi_dists[idx, 0]:
-                        b_sls.roi_dists[idx, n_roi_dists - 1] + 1]
+                for idx, cut_sl in b_sls.generate_cut_sls(n_roi_dists):
                     cut_sl = dps.set_number_of_points(
-                        cut_sl, ref_curve.shape[0])
+                        cut_sl, moved_ref_curve.shape[0])
                     dist = curves_r3.square_root_velocity_metric.dist(
-                        ref_curve, cut_sl)
+                        moved_ref_curve, cut_sl)
                     if dist <= ref_curve_threshold:
                         cleaned_idx.append(idx)
                 b_sls.select(cleaned_idx, "curvature")
@@ -802,22 +744,17 @@ class Segmentation:
                 b_sls.initiate_selection("qb_thresh")
                 n_roi_dists = len(bundle_def["include"])
                 sls = []
-                for idx, sl in enumerate(b_sls.selected_sls):
-                    if abs(
-                        b_sls.roi_dists[idx, 0]
-                            - b_sls.roi_dists[idx, n_roi_dists - 1]) < 2:
-                        continue
-                    cut_sl = sl[
-                        b_sls.roi_dists[idx, 0]:
-                        b_sls.roi_dists[idx, n_roi_dists - 1] + 1]
+                og_idxs = []
+                for idx, cut_sl in b_sls.generate_cut_sls(n_roi_dists):
                     sls.append(cut_sl)
+                    og_idxs.append(idx)
                 qbx = QuickBundles(
-                    bundle_def["qb_thresh"],
+                    bundle_def["qb_thresh"] / vox_dim,
                     AveragePointwiseEuclideanMetric(
                         ResampleFeature(nb_points=12)))
                 clusters = qbx.cluster(sls)
-                cleaned_idx = clusters[np.argmax(
-                    clusters.clusters_sizes())].indices
+                cleaned_idx = og_idxs[clusters[np.argmax(
+                    clusters.clusters_sizes())].indices]
                 b_sls.select(cleaned_idx, "qb_thresh")
 
             if b_sls and "exclude" in bundle_def:
@@ -896,8 +833,7 @@ class Segmentation:
                 if to_flip[ii]:
                     select_sl[ii] = sl[::-1]
 
-            if record_roi_dists:
-                roi_dists = bundle_roi_dists[:, bundle_idx, :]
+            roi_dists = bundle_roi_dists[:, bundle_idx, :]
             if self.clip_edges:
                 if np.sum(roi_dists == -1) == 0:
                     self.logger.info("Clipping Streamlines by ROI")
@@ -916,48 +852,48 @@ class Segmentation:
                 self._add_bundle_to_fiber_group(bundle, select_sl, select_idx)
         return self.fiber_groups
 
-    def move_streamlines(self, tg, reg_algo='slr'):
+    def move_streamlines(self, tg, to="template"):
         """Streamline-based registration of a whole-brain tractogram to
         the MNI whole-brain atlas.
 
-        registration_algo : str
-            "slr" or "syn"
+        to : str
+            "template" or "subject"
         """
-        if reg_algo is None:
-            if self.mapping is None:
-                reg_algo = 'slr'
+        tg_og_space = tg.space
+        tg.to_rasmm()
+        if isinstance(self.mapping, ConformedFnirtMapping):
+            if to != "subject":
+                raise ValueError(
+                    "Attempted to transform streamlines to template using "
+                    "unsupported mapping.")
+            moved_sl = self.mapping.warp.transform(tg.streamlines)
+        else:
+            if to == "template":
+                volume = self.mapping.forward
             else:
-                reg_algo = 'syn'
-
-        if reg_algo == "slr":
-            self.logger.info("Registering tractogram with SLR")
-            atlas = self.bundle_dict['whole_brain']
-            self.moved_sl, _, _, _ = whole_brain_slr(
-                atlas, tg.streamlines, x0='affine', verbose=False,
-                progressive=self.progressive,
-                greater_than=self.greater_than,
-                rm_small_clusters=self.rm_small_clusters,
-                rng=self.rng)
-        elif reg_algo == "syn":
-            self.logger.info("Registering tractogram based on syn")
-            tg.to_rasmm()
+                volume = self.mapping.backward
             delta = dts.values_from_volume(
-                self.mapping.forward,
+                volume,
                 tg.streamlines, np.eye(4))
-            self.moved_sl = dts.Streamlines(
+            moved_sl = dts.Streamlines(
                 [d + s for d, s in zip(delta, tg.streamlines)])
-            tg.to_vox()
 
         if self.save_intermediates is not None:
+            if to == "template":
+                ref = self.reg_template
+            else:
+                ref = self.img
             moved_sft = StatefulTractogram(
-                self.moved_sl,
-                self.reg_template,
+                moved_sl,
+                ref,
                 Space.RASMM)
             save_tractogram(
                 moved_sft,
                 op.join(self.save_intermediates,
                         'sls_in_mni.trk'),
                 bbox_valid_check=False)
+        tg.to_space(tg_og_space)
+        return moved_sl
 
     def segment_reco(self, tg=None):
         """
@@ -986,16 +922,16 @@ class Segmentation:
             roiseg.segment(
                 self.presegment_bundle_dict,
                 self.tg,
+                self.mapping,
                 self.fdata,
                 self.fbval,
                 self.fbvec,
                 reg_template=self.reg_template,
-                mapping=self.mapping,
                 reg_prealign=self.reg_prealign)
             roiseg_fg = roiseg.fiber_groups
         else:
-            self.move_streamlines(tg, self.reg_algo)
-            rb = RecoBundles(self.moved_sl, verbose=False, rng=self.rng)
+            moved_sl = self.move_streamlines(tg)
+            rb = RecoBundles(moved_sl, verbose=False, rng=self.rng)
         # Next we'll iterate over bundles, registering each one:
         bundle_list = list(self.bundle_dict.keys())
         if 'whole_brain' in bundle_list:
@@ -1030,9 +966,9 @@ class Segmentation:
                     self.img,
                     Space.VOX)
                 indiv_tg.to_rasmm()
-                self.move_streamlines(indiv_tg, self.reg_algo)
+                moved_sl = self.move_streamlines(indiv_tg)
                 rb = RecoBundles(
-                    self.moved_sl,
+                    moved_sl,
                     verbose=False,
                     rng=self.rng)
             if self.save_intermediates is not None:
@@ -1041,7 +977,7 @@ class Segmentation:
                 else:
                     moved_fname = "whole_brain.trk"
                 moved_sft = StatefulTractogram(
-                    self.moved_sl,
+                    moved_sl,
                     self.reg_template,
                     Space.RASMM)
                 save_tractogram(

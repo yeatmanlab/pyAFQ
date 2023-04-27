@@ -58,11 +58,11 @@ def segment(dwi, data_imap, mapping_imap,
     bundles = segmentation.segment(
         bundle_dict,
         tg,
+        mapping_imap["mapping"],
         dwi,
         data_imap["bval"],
         data_imap["bvec"],
-        reg_template=reg_template,
-        mapping=mapping_imap["mapping"])
+        reg_template=reg_template)
 
     seg_sft = aus.SegmentedSFT(bundles, Space.VOX)
 

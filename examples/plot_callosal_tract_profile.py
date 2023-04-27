@@ -386,10 +386,10 @@ segmentation = seg.Segmentation(return_idx=True,
 
 segmentation.segment(bundles,
                      tractogram,
+                     mapping,
                      fdata=hardi_fdata,
                      fbval=hardi_fbval,
                      fbvec=hardi_fbvec,
-                     mapping=mapping,
                      reg_template=MNI_T2_img)
 
 fiber_groups = segmentation.fiber_groups
