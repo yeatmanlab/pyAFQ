@@ -550,7 +550,9 @@ class Segmentation:
                     bundle_def["curvature"], "same")
                 moved_ref_curve = self.move_streamlines(
                     ref_curve, "subject")
-                moved_ref_curve = np.asarray(moved_ref_curve[0])
+                moved_ref_curve.to_vox()
+                moved_ref_curve = np.asarray(
+                    moved_ref_curve.streamlines[0])
 
             b_sls = _SlsBeingRecognized(tg.streamlines, self.logger)
 
@@ -881,23 +883,22 @@ class Segmentation:
                 tg.streamlines, np.eye(4))
             moved_sl = dts.Streamlines(
                 [d + s for d, s in zip(delta, tg.streamlines)])
-
+        if to == "template":
+            ref = self.reg_template
+        else:
+            ref = self.img
+        moved_sft = StatefulTractogram(
+            moved_sl,
+            ref,
+            Space.RASMM)
         if self.save_intermediates is not None:
-            if to == "template":
-                ref = self.reg_template
-            else:
-                ref = self.img
-            moved_sft = StatefulTractogram(
-                moved_sl,
-                ref,
-                Space.RASMM)
             save_tractogram(
                 moved_sft,
                 op.join(self.save_intermediates,
                         f'sls_in_{to}.trk'),
                 bbox_valid_check=False)
         tg.to_space(tg_og_space)
-        return moved_sl
+        return moved_sft
 
     def segment_reco(self, tg=None):
         """
@@ -934,7 +935,7 @@ class Segmentation:
                 reg_prealign=self.reg_prealign)
             roiseg_fg = roiseg.fiber_groups
         else:
-            moved_sl = self.move_streamlines(tg)
+            moved_sl = self.move_streamlines(tg).streamlines
             rb = RecoBundles(moved_sl, verbose=False, rng=self.rng)
         # Next we'll iterate over bundles, registering each one:
         bundle_list = list(self.bundle_dict.keys())
@@ -970,7 +971,7 @@ class Segmentation:
                     self.img,
                     Space.VOX)
                 indiv_tg.to_rasmm()
-                moved_sl = self.move_streamlines(indiv_tg)
+                moved_sl = self.move_streamlines(indiv_tg).streamlines
                 rb = RecoBundles(
                     moved_sl,
                     verbose=False,
