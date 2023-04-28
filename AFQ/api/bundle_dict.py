@@ -366,8 +366,7 @@ class BundleDict(MutableMapping):
                 roi_or_sl,
                 suffix,
                 self._session, self._subject)
-            return nib.load(roi_or_sl)
-        elif isinstance(roi_or_sl, str):
+        if isinstance(roi_or_sl, str):
             if self.seg_algo == "afq":
                 return nib.load(roi_or_sl)
             elif self.seg_algo.startswith("reco"):
