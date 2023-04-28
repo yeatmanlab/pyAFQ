@@ -7,14 +7,12 @@ import numpy as np
 from scipy.spatial.distance import cdist
 from scipy.stats import zscore
 
-import nibabel as nib
 from tqdm.auto import tqdm
 
 import dipy.tracking.streamline as dts
 import dipy.tracking.streamlinespeed as dps
 from dipy.segment.bundles import RecoBundles
 from dipy.stats.analysis import gaussian_weights
-import dipy.core.gradients as dpg
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.io.streamline import save_tractogram, load_tractogram
 from dipy.utils.parallel import paramap
@@ -22,7 +20,6 @@ from dipy.segment.clustering import QuickBundles
 from dipy.segment.metricspeed import AveragePointwiseEuclideanMetric
 from dipy.segment.featurespeed import ResampleFeature
 
-import AFQ.registration as reg
 import AFQ.utils.models as ut
 import AFQ.data.fetch as afd
 from AFQ.data.utils import BUNDLE_RECO_2_AFQ
@@ -860,18 +857,25 @@ class Segmentation:
             "template" or "subject"
         """
         tg_og_space = tg.space
-        tg.to_rasmm()
         if isinstance(self.mapping, ConformedFnirtMapping):
             if to != "subject":
                 raise ValueError(
                     "Attempted to transform streamlines to template using "
-                    "unsupported mapping.")
-            moved_sl = self.mapping.warp.transform(tg.streamlines)
+                    "unsupported mapping. "
+                    "Use something other than Fnirt.")
+            tg.to_vox()
+            moved_sl = []
+            for sl in tg.streamlines:
+                moved_sl.append(self.mapping.transform_inverse_pts(sl))
         else:
             if to == "template":
+                tg.to_rasmm()
                 volume = self.mapping.forward
             else:
-                volume = self.mapping.backward
+                raise ValueError(
+                    "Attempted to transform streamlines to subject using "
+                    "unsupported mapping. "
+                    "Curvature only implemented for Fnirt.")
             delta = dts.values_from_volume(
                 volume,
                 tg.streamlines, np.eye(4))
@@ -890,7 +894,7 @@ class Segmentation:
             save_tractogram(
                 moved_sft,
                 op.join(self.save_intermediates,
-                        'sls_in_mni.trk'),
+                        f'sls_in_{to}.trk'),
                 bbox_valid_check=False)
         tg.to_space(tg_og_space)
         return moved_sl

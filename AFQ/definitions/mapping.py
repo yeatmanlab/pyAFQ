@@ -157,6 +157,16 @@ class ConformedFnirtMapping():
             data.astype(np.float32), self.ref_affine))
         return np.asarray(applyDeformation(data_img, self.warp).data)
 
+    def transform_inverse_pts(self, pts):
+        # This should only be used for curvature analysis,
+        # Because I think the results still need to be shifted
+        pts = nib.affines.apply_affine(
+            self.warp.src.getAffine('voxel', 'world'), pts)
+        pts = nib.affines.apply_affine(
+            np.linalg.inv(self.ref_affine), pts)
+        pts = self.warp.transform(pts, 'fsl', "world")
+        return pts
+
     def transform(self, data, **kwargs):
         raise NotImplementedError(
             "Fnirt based mappings can currently"
