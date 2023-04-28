@@ -747,6 +747,7 @@ class Segmentation:
                 for idx, cut_sl in b_sls.generate_cut_sls(n_roi_dists):
                     sls.append(cut_sl)
                     og_idxs.append(idx)
+                og_idxs = np.asarray(og_idxs)
                 qbx = QuickBundles(
                     bundle_def["qb_thresh"] / vox_dim,
                     AveragePointwiseEuclideanMetric(
