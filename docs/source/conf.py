@@ -228,6 +228,7 @@ sphinx_gallery_conf = {
     'ignore_pattern': 'plot_baby_afq.py|cloudknot_hcp_example.py|cloudknot_example.py',
     'image_scrapers': image_scrapers,
     'reset_modules': (reset_progressbars),
+    'show_memory': True,
 }
 
 # Auto API
