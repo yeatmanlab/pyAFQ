@@ -5,3 +5,8 @@ Reference Documentation
     :maxdepth: 2
 
     api/index
+    bundledict
+    kwargs
+    methods
+    tracking
+    viz_backend
