@@ -64,7 +64,7 @@ class _SlsBeingRecognized:
         self.start_time = time()
         self.logger.info(f"Filtering by {clean_name}")
 
-    def select(self, idx, clean_name):
+    def select(self, idx, clean_name, cut_with=None):
         self.selected_fiber_idxs = self.selected_fiber_idxs[idx]
         self.selected_sls = self.selected_sls[idx]
         self.sls_flipped = self.sls_flipped[idx]
@@ -76,13 +76,17 @@ class _SlsBeingRecognized:
             f"After filtering by {clean_name} (time: {time_taken}s), "
             f"{len(self.selected_sls)} streamlines remain.")
         if self.save_intermediates is not None:
+            if cut_with is None:
+                sls = self.selected_sls
+            else:
+                sls = list(self.generate_cut_sls(cut_with, return_idx=False))
             save_tractogram(
-                StatefulTractogram(self.selected_sls, self.ref, Space.VOX),
+                StatefulTractogram(sls, self.ref, Space.VOX),
                 op.join(self.save_intermediates,
                         f'sls_after_{clean_name}_for_{self.b_name}.trk'),
                 bbox_valid_check=False)
 
-    def generate_cut_sls(self, n_roi_dists):
+    def generate_cut_sls(self, n_roi_dists, return_idx=True):
         for idx, sl in enumerate(self.selected_sls):
             if abs(
                 self.roi_dists[idx, 0]
@@ -91,7 +95,10 @@ class _SlsBeingRecognized:
             cut_sl = sl[
                 self.roi_dists[idx, 0]:
                 self.roi_dists[idx, n_roi_dists - 1] + 1]
-            yield idx, cut_sl
+            if return_idx:
+                yield idx, cut_sl
+            else:
+                yield cut_sl
 
     def reorient(self, idx):
         if self.oriented_yet:
@@ -747,9 +754,11 @@ class Segmentation:
                     sls = np.asarray(list(b_sls.generate_cut_sls(n_roi_dists)))
                     idxs = sls[:, 0]
                     sls = sls[:, 1]
+                    cut_with = n_roi_dists
                 else:
                     sls = b_sls.selected_sls
                     idxs = np.arange(sls)
+                    cut_with = None
                 for idx, sl in enumerate(sls):
                     sl = dps.set_number_of_points(
                         sl, moved_ref_curve.shape[0])
@@ -757,7 +766,7 @@ class Segmentation:
                         moved_ref_curve, sl)
                     if dist <= ref_curve_threshold:
                         cleaned_idx.append(idxs[idx])
-                b_sls.select(cleaned_idx, "curvature")
+                b_sls.select(cleaned_idx, "curvature", cut_with=cut_with)
 
             if b_sls and "qb_thresh" in bundle_def:
                 b_sls.initiate_selection("qb_thresh")
@@ -775,7 +784,7 @@ class Segmentation:
                 clusters = qbx.cluster(sls)
                 cleaned_idx = og_idxs[clusters[np.argmax(
                     clusters.clusters_sizes())].indices]
-                b_sls.select(cleaned_idx, "qb_thresh")
+                b_sls.select(cleaned_idx, "qb_thresh", cut_with=n_roi_dists)
 
             if b_sls and "exclude" in bundle_def:
                 b_sls.initiate_selection("exclude")
