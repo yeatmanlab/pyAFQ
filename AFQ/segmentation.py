@@ -744,7 +744,7 @@ class Segmentation:
                 n_roi_dists = len(bundle_def["include"])
                 cleaned_idx = []
                 if bundle_def["curvature"].get("cut", False):
-                    sls = np.asarray(b_sls.generate_cut_sls(n_roi_dists))
+                    sls = np.asarray(list(b_sls.generate_cut_sls(n_roi_dists)))
                     idxs = sls[:, 0]
                     sls = sls[:, 1]
                 else:
