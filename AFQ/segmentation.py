@@ -744,16 +744,19 @@ class Segmentation:
                 n_roi_dists = len(bundle_def["include"])
                 cleaned_idx = []
                 if bundle_def["curvature"].get("cut", False):
-                    sls = b_sls.generate_cut_sls(n_roi_dists)
+                    sls = np.asarray(b_sls.generate_cut_sls(n_roi_dists))
+                    idxs = sls[:, 0]
+                    sls = sls[:, 1]
                 else:
                     sls = b_sls.selected_sls
+                    idxs = np.arange(sls)
                 for idx, sl in enumerate(sls):
                     sl = dps.set_number_of_points(
                         sl, moved_ref_curve.shape[0])
                     dist = curves_r3.square_root_velocity_metric.dist(
                         moved_ref_curve, sl)
                     if dist <= ref_curve_threshold:
-                        cleaned_idx.append(idx)
+                        cleaned_idx.append(idxs[idx])
                 b_sls.select(cleaned_idx, "curvature")
 
             if b_sls and "qb_thresh" in bundle_def:
