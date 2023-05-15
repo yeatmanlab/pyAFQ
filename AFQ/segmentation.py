@@ -48,7 +48,7 @@ def _resample_tg(tg, n_points):
 
 
 class _SlsBeingRecognized:
-    def __init__(self, sls, logger):
+    def __init__(self, sls, logger, save_intermediates, b_name, ref):
         self.oriented_yet = False
         self.selected_fiber_idxs = np.arange(len(sls), dtype=np.int32)
         self.selected_sls = sls
@@ -56,6 +56,9 @@ class _SlsBeingRecognized:
         self.bundle_vote = np.full(len(sls), -np.inf)
         self.logger = logger
         self.start_time = -1
+        self.save_intermediates = save_intermediates
+        self.b_name = b_name
+        self.ref = ref
 
     def initiate_selection(self, clean_name):
         self.start_time = time()
@@ -72,6 +75,12 @@ class _SlsBeingRecognized:
         self.logger.info(
             f"After filtering by {clean_name} (time: {time_taken}s), "
             f"{len(self.selected_sls)} streamlines remain.")
+        if self.save_intermediates is not None:
+            save_tractogram(
+                StatefulTractogram(self.selected_sls, self.ref, Space.VOX),
+                op.join(self.save_intermediates,
+                        f'sls_after_{clean_name}_for_{self.b_name}.trk'),
+                bbox_valid_check=False)
 
     def generate_cut_sls(self, n_roi_dists):
         for idx, sl in enumerate(self.selected_sls):
@@ -547,14 +556,18 @@ class Segmentation:
 
             if "curvature" in bundle_def:
                 ref_curve = load_tractogram(
-                    bundle_def["curvature"], "same")
+                    bundle_def["curvature"]["path"], "same",
+                    bbox_valid_check=False)
                 moved_ref_curve = self.move_streamlines(
                     ref_curve, "subject")
                 moved_ref_curve.to_vox()
                 moved_ref_curve = np.asarray(
                     moved_ref_curve.streamlines[0])
 
-            b_sls = _SlsBeingRecognized(tg.streamlines, self.logger)
+            b_sls = _SlsBeingRecognized(
+                tg.streamlines, self.logger,
+                self.save_intermediates, bundle_name,
+                self.img)
 
             # filter by probability map
             if "prob_map" in bundle_def:
@@ -726,15 +739,19 @@ class Segmentation:
             # a curve in orientation and shape but not scale
             if b_sls and "curvature" in bundle_def:
                 b_sls.initiate_selection("curvature")
-                ref_curve_threshold = bundle_def.get("curvature_thresh", 5)
+                ref_curve_threshold = bundle_def["curvature"].get("thresh", 5)
                 curves_r3 = DiscreteCurves(ambient_manifold=Euclidean(dim=3))
                 n_roi_dists = len(bundle_def["include"])
                 cleaned_idx = []
-                for idx, cut_sl in b_sls.generate_cut_sls(n_roi_dists):
-                    cut_sl = dps.set_number_of_points(
-                        cut_sl, moved_ref_curve.shape[0])
+                if bundle_def["curvature"].get("cut", False):
+                    sls = b_sls.generate_cut_sls(n_roi_dists)
+                else:
+                    sls = b_sls.selected_sls
+                for idx, sl in enumerate(sls):
+                    sl = dps.set_number_of_points(
+                        sl, moved_ref_curve.shape[0])
                     dist = curves_r3.square_root_velocity_metric.dist(
-                        moved_ref_curve, cut_sl)
+                        moved_ref_curve, sl)
                     if dist <= ref_curve_threshold:
                         cleaned_idx.append(idx)
                 b_sls.select(cleaned_idx, "curvature")
@@ -871,14 +888,11 @@ class Segmentation:
             for sl in tg.streamlines:
                 moved_sl.append(self.mapping.transform_inverse_pts(sl))
         else:
+            tg.to_rasmm()
             if to == "template":
-                tg.to_rasmm()
                 volume = self.mapping.forward
             else:
-                raise ValueError(
-                    "Attempted to transform streamlines to subject using "
-                    "unsupported mapping. "
-                    "Curvature only implemented for Fnirt.")
+                volume = self.mapping.backward
             delta = dts.values_from_volume(
                 volume,
                 tg.streamlines, np.eye(4))
