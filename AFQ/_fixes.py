@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.sparse.linalg import ArpackNoConvergence
 
 from scipy.special import lpmv, gammaln
 
@@ -11,6 +10,23 @@ from dipy.tracking.stopping_criterion import StreamlineStatus
 import random
 
 import math
+
+from dipy.reconst.gqi import squared_radial_component
+from dipy.data import default_sphere
+from scipy.linalg import blas
+
+
+def GWI_ODF(gqmodel, data):
+    gqi_vector = np.real(
+        squared_radial_component(np.dot(
+            gqmodel.b_vector, default_sphere.vertices.T)
+            * gqmodel.Lambda))
+    ODF = blas.dgemm(
+        alpha=1.,
+        a=data.reshape(-1, gqi_vector.shape[0]),
+        b=gqi_vector
+    ).reshape((*data.shape[:-1], gqi_vector.shape[1]))
+    return ODF
 
 
 def spherical_harmonics(m, n, theta, phi):

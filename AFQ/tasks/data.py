@@ -1,6 +1,5 @@
 import nibabel as nib
 import numpy as np
-from scipy.linalg import blas
 
 from dipy.io.gradients import read_bvals_bvecs
 import dipy.core.gradients as dpg
@@ -11,12 +10,8 @@ import dipy.reconst.dki as dpy_dki
 import dipy.reconst.dti as dpy_dti
 import dipy.reconst.fwdti as dpy_fwdti
 from dipy.reconst.gqi import GeneralizedQSamplingModel
-from dipy.reconst.gqi import (
-    GeneralizedQSamplingModel,
-    squared_radial_component)
 from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
-from dipy.data import default_sphere
 
 from AFQ.tasks.decorators import as_file, as_img, as_fit_deriv
 from AFQ.tasks.utils import get_fname, with_name, str_to_desc
@@ -24,6 +19,7 @@ import AFQ.api.bundle_dict as abd
 import AFQ.data.fetch as afd
 from AFQ.utils.path import drop_extension
 from AFQ.data.s3bids import write_json
+from AFQ._fixes import GWI_ODF
 
 from AFQ.definitions.utils import Definition
 from AFQ.definitions.image import B0Image
@@ -335,15 +331,7 @@ def gq(base_fname, gtab, dwi_affine, data,
         gtab,
         sampling_length=gq_sampling_length)
 
-    gqi_vector = np.real(
-        squared_radial_component(np.dot(
-            gqmodel.b_vector, default_sphere.vertices.T)
-            * gqmodel.Lambda))
-    ODF = blas.dgemm(
-        alpha=1.,
-        a=data.reshape(-1, gqi_vector.shape[0]),
-        b=gqi_vector
-    ).reshape((*data.shape[:-1], gqi_vector.shape[1]))
+    ODF = GWI_ODF(gqmodel, data)
 
     GQ_shm, ASO, ISO = extract_ODF(ODF)
 
