@@ -1628,7 +1628,6 @@ def fetch_hbn_afq(subjects, path=None):
     else:
         my_path = path
 
-
     base_dir = op.join(my_path, "HBN", 'derivatives', 'afq')
 
     if not os.path.exists(base_dir):
@@ -1649,10 +1648,9 @@ def fetch_hbn_afq(subjects, path=None):
         ses_dir = op.join(sub_dir, ses)
 
         for deriv_dir in ["bundles",
-                        "clean_bundles",
-                        "ROIs",
-                        "tract_profile_plots",
-                        "viz_bundles"]:
+                          "ROIs",
+                          "tract_profile_plots",
+                          "viz_bundles"]:
             this_deriv = os.path.join(ses_dir, deriv_dir)
             if not os.path.exists(this_deriv):
                 os.makedirs(this_deriv, exist_ok=True)

@@ -532,7 +532,7 @@ def test_AFQ_slr():
             "rng": np.random.RandomState(seed)}))
 
     seg_sft = aus.SegmentedSFT.fromfile(
-        myafq.export("clean_bundles")["01"])
+        myafq.export("bundles")["01"])
     npt.assert_(len(seg_sft.get_bundle('CST_L').streamlines) > 0)
 
 
@@ -552,7 +552,7 @@ def test_AFQ_reco():
             'rng': 42})
 
     seg_sft = aus.SegmentedSFT.fromfile(
-        myafq.export("clean_bundles")["01"])
+        myafq.export("bundles")["01"])
     npt.assert_(len(seg_sft.get_bundle('CCMid').streamlines) > 0)
     myafq.export_all()
 
@@ -820,7 +820,7 @@ def test_AFQ_data_waypoint():
         'sub-01_ses-01_dwi_space-subject_desc-CSTRinclude1_mask.json'))
 
     seg_sft = aus.SegmentedSFT.fromfile(
-        myafq.export("clean_bundles"))
+        myafq.export("bundles"))
     npt.assert_(len(seg_sft.get_bundle('SLF_R').streamlines) > 0)
 
     # Test bundles exporting:
