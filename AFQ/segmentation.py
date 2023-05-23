@@ -90,10 +90,10 @@ class _SlsBeingRecognized:
     def get_selected_sls(self, cut=False):
         if cut:
             cut_sls = [None] * len(self)
-            for idx in self.selected_fiber_idxs:
-                cut_sls[idx] = self.ref_sls[idx][
+            for idx, sl_idx in enumerate(self.selected_fiber_idxs):
+                cut_sls[idx] = self.ref_sls[sl_idx][
                     self.roi_dists[idx, 0]:
-                    self.roi_dists[idx, self.self.n_roi_dists - 1] + 1]
+                    self.roi_dists[idx, self.n_roi_dists - 1] + 1]
             return cut_sls
         else:
             return self.ref_sls[self.selected_fiber_idxs]
@@ -724,7 +724,7 @@ class Segmentation:
                                 np.argmin(dist, 0)[0]
                                 for dist in sl_dist]
                             # Only accept SLs that, when cut, are meaningful
-                            if abs(
+                            if (len(sl_dist) < 2) or abs(
                                 roi_dists[sl_idx, 0] - roi_dists[
                                     sl_idx, len(sl_dist) - 1]) > 1:
                                 # Flip sl if it is close to second ROI

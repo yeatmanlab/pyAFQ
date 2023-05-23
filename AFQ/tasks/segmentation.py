@@ -55,12 +55,6 @@ def segment(dwi, data_imap, mapping_imap,
     if len(indices_to_remove) > 0:
         logger.warning(f"{len(indices_to_remove)} invalid streamlines removed")
 
-    default_clean_params = get_default_args(seg.clean_bundle)
-    if clean_params is not None:
-        for k in clean_params:
-            default_clean_params[k] = clean_params[k]
-    clean_params = default_clean_params
-
     start_time = time()
     segmentation = seg.Segmentation(**segmentation_params)
     bundles = segmentation.segment(
@@ -339,5 +333,11 @@ def get_segmentation_plan(kwargs):
         for k in kwargs["segmentation_params"]:
             default_seg_params[k] = kwargs["segmentation_params"][k]
 
+    default_clean_params = get_default_args(seg.clean_bundle)
+    if "clean_params" in kwargs:
+        for k in kwargs["clean_params"]:
+            default_clean_params[k] = kwargs["clean_params"][k]
+
     kwargs["segmentation_params"] = default_seg_params
+    kwargs["clean_params"] = default_clean_params
     return pimms.plan(**segmentation_tasks)

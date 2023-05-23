@@ -41,7 +41,7 @@ bundles = {'CST_L': {
            'CST_R': {
                     'include': [
                         templates['CST_roi1_R'],
-                        templates['CST_roi1_R']],
+                        templates['CST_roi2_R']],
                     'prob_map': templates['CST_R_prob_map'],
                     'cross_midline': None}}
 
@@ -84,7 +84,7 @@ def test_segment_no_prob():
         'CST_R': {
             'include': [
                 templates['CST_roi1_R'],
-                templates['CST_roi1_R']],
+                templates['CST_roi2_R']],
             'cross_midline': False}}
 
     segmentation = seg.Segmentation()
@@ -261,8 +261,12 @@ def test_exclusion_ROI():
     slf_tg = StatefulTractogram(
         np.asarray(
             [
-                [[8, 53, 39], [30, 41, 61], [28, 61, 38]],
-                [[8, 53, 39], [30, 41, 62], [20, 44, 34]]
+                [
+                    [8, 53, 39], [8, 50, 39], [8, 45, 39],
+                    [30, 41, 61], [28, 61, 38]],
+                [
+                    [8, 53, 39], [8, 50, 39], [8, 45, 39],
+                    [30, 41, 62], [20, 44, 34]]
             ]).astype(float),
         hardi_img, Space.VOX)
     fiber_groups = segmentation.segment(
