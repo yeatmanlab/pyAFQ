@@ -114,10 +114,9 @@ class Segmentation:
                  nb_streamlines=False,
                  seg_algo='AFQ',
                  clip_edges=False,
-                 parallel_segmentation={"engine": "serial"},
-                 #  parallel_segmentation={
-                 #      "n_jobs": 4, "engine": "joblib",
-                 #      "backend": "loky"},
+                 parallel_segmentation={
+                     "n_jobs": 4, "engine": "joblib",
+                     "backend": "loky"},
                  progressive=True,
                  greater_than=50,
                  rm_small_clusters=50,
