@@ -41,8 +41,10 @@ def _resample_tg(tg, n_points):
         if len(tg.shape) > 2:
             streamlines = tg.tolist()
             streamlines = [np.asarray(item) for item in streamlines]
-    else:
+    elif hasattr(tg, "streamlines"):
         streamlines = tg.streamlines
+    else:
+        streamlines = tg
 
     return dps.set_number_of_points(streamlines, n_points)
 
@@ -79,26 +81,18 @@ class _SlsBeingRecognized:
             if cut_with is None:
                 sls = self.selected_sls
             else:
-                sls = list(self.generate_cut_sls(cut_with, return_idx=False))
+                sls = list(self.generate_cut_sls(cut_with))
             save_tractogram(
                 StatefulTractogram(sls, self.ref, Space.VOX),
                 op.join(self.save_intermediates,
                         f'sls_after_{clean_name}_for_{self.b_name}.trk'),
                 bbox_valid_check=False)
 
-    def generate_cut_sls(self, n_roi_dists, return_idx=True):
+    def generate_cut_sls(self, n_roi_dists):
         for idx, sl in enumerate(self.selected_sls):
-            if abs(
-                self.roi_dists[idx, 0]
-                    - self.roi_dists[idx, n_roi_dists - 1]) < 2:
-                continue
-            cut_sl = sl[
+            yield sl[
                 self.roi_dists[idx, 0]:
                 self.roi_dists[idx, n_roi_dists - 1] + 1]
-            if return_idx:
-                yield idx, cut_sl
-            else:
-                yield cut_sl
 
     def reorient(self, idx):
         if self.oriented_yet:
@@ -326,7 +320,8 @@ class Segmentation:
 
     def segment(self, bundle_dict, tg, mapping, fdata=None, fbval=None,
                 fbvec=None, reg_prealign=None,
-                reg_template=None, img_affine=None, reset_tg_space=False):
+                reg_template=None, img_affine=None, reset_tg_space=False,
+                clean_params={}):
         """
         Segment streamlines into bundles based on either waypoint ROIs
         [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
@@ -358,6 +353,8 @@ class Segmentation:
         reset_tg_space : bool, optional
             Whether to reset the space of the input tractogram after
             segmentation is complete. Default: False.
+        clean_params : dict, optional
+            Parameters for Mahalanobis cleaning. Default: {}
 
         Returns
         -------
@@ -409,7 +406,7 @@ class Segmentation:
         if self.seg_algo == "afq":
             # We only care about midline crossing if we use AFQ:
             self.cross_streamlines()
-            fiber_groups = self.segment_afq()
+            fiber_groups = self.segment_afq(clean_params=clean_params)
         elif self.seg_algo.startswith("reco"):
             fiber_groups = self.segment_reco()
         else:
@@ -503,7 +500,7 @@ class Segmentation:
         else:
             self.fiber_groups[b_name] = sl
 
-    def segment_afq(self, tg=None):
+    def segment_afq(self, clean_params={}, tg=None):
         """
         Assign streamlines to bundles using the waypoint ROI approach
         Parameters
@@ -512,6 +509,8 @@ class Segmentation:
         """
         tg = self._read_tg(tg=tg)
         tg.to_vox()
+
+        clean_params["return_idx"] = True
 
         fgarray = np.array(_resample_tg(tg, 100))
         n_streamlines = len(tg)
@@ -708,7 +707,6 @@ class Segmentation:
                     sl_accepted, sl_dist = inc_result
 
                     if sl_accepted:
-                        cleaned_idx.append(sl_idx)
                         if self.roi_dist_tie_break:
                             min_dist_coords[sl_idx] = np.min(sl_dist)
 
@@ -719,15 +717,22 @@ class Segmentation:
                             roi_dists[sl_idx, :len(sl_dist)] = [
                                 np.argmin(dist, 0)[0]
                                 for dist in sl_dist]
-                            # Flip sl if it is close to second ROI
-                            # before its close to the first ROI
-                            if flip_using_include:
-                                this_flips = roi_dist1 > roi_dist2
-                                to_flip.append(this_flips)
-                                if this_flips:
-                                    roi_dists[sl_idx, :len(sl_dist)] =\
-                                        np.flip(
-                                            roi_dists[sl_idx, :len(sl_dist)])
+                            # Only accept SLs that, when cut, are meaningful
+                            if abs(
+                                roi_dists[sl_idx, 0] - roi_dists[
+                                    sl_idx, len(sl_dist) - 1]) > 1:
+                                # Flip sl if it is close to second ROI
+                                # before its close to the first ROI
+                                if flip_using_include:
+                                    this_flips = roi_dist1 > roi_dist2
+                                    to_flip.append(this_flips)
+                                    if this_flips:
+                                        roi_dists[sl_idx, :len(sl_dist)] =\
+                                            np.flip(
+                                                roi_dists[sl_idx, :len(sl_dist)])
+                                cleaned_idx.append(sl_idx)
+                        else:
+                            cleaned_idx.append(sl_idx)
                 # see https://github.com/joblib/joblib/issues/945
                 if (
                     (self.parallel_segmentation.get(
@@ -773,18 +778,15 @@ class Segmentation:
                 b_sls.initiate_selection("qb_thresh")
                 n_roi_dists = len(bundle_def["include"])
                 sls = []
-                og_idxs = []
-                for idx, cut_sl in b_sls.generate_cut_sls(n_roi_dists):
+                for cut_sl in b_sls.generate_cut_sls(n_roi_dists):
                     sls.append(cut_sl)
-                    og_idxs.append(idx)
-                og_idxs = np.asarray(og_idxs)
                 qbx = QuickBundles(
                     bundle_def["qb_thresh"] / vox_dim,
                     AveragePointwiseEuclideanMetric(
                         ResampleFeature(nb_points=12)))
                 clusters = qbx.cluster(sls)
-                cleaned_idx = og_idxs[clusters[np.argmax(
-                    clusters.clusters_sizes())].indices]
+                cleaned_idx = clusters[np.argmax(
+                    clusters.clusters_sizes())].indices
                 b_sls.select(cleaned_idx, "qb_thresh", cut_with=n_roi_dists)
 
             if b_sls and "exclude" in bundle_def:
@@ -806,6 +808,13 @@ class Segmentation:
                         cleaned_idx.append(sl_idx)
                 b_sls.select(cleaned_idx, "exclude")
 
+            if b_sls:
+                b_sls.initiate_selection("Mahalanobis")
+                _, cleaned_idx = clean_bundle(
+                    b_sls.generate_cut_sls(n_roi_dists),
+                    **clean_params)
+                b_sls.select(cleaned_idx, "Mahalanobis")
+
             if b_sls and not b_sls.oriented_yet:
                 raise ValueError(
                     "pyAFQ was unable to consistently orient streamlines "
@@ -817,15 +826,16 @@ class Segmentation:
             if b_sls:
                 bundle_votes[
                     b_sls.selected_fiber_idxs,
-                    bundle_idx] = b_sls.bundle_vote
+                    bundle_idx] = b_sls.bundle_vote.copy()
                 bundle_to_flip[
                     b_sls.selected_fiber_idxs,
-                    bundle_idx] = b_sls.sls_flipped
+                    bundle_idx] = b_sls.sls_flipped.copy()
                 if hasattr(b_sls, "roi_dists"):
                     bundle_roi_dists[
                         b_sls.selected_fiber_idxs,
                         bundle_idx
-                    ] = b_sls.roi_dists
+                    ] = b_sls.roi_dists.copy()
+            del b_sls
 
         if self.save_intermediates is not None:
             os.makedirs(self.save_intermediates, exist_ok=True)
@@ -1080,7 +1090,7 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
 
     Parameters
     ----------
-    tg : StatefulTractogram class instance
+    tg : StatefulTractogram class instance or ArraySequence
         A whole-brain tractogram to be segmented.
     n_points : int, optional
         Number of points to resample streamlines to.
@@ -1113,23 +1123,27 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
     # Convert string to callable, if that's what you got.
     if isinstance(stat, str):
         stat = getattr(np, stat)
+
+    if hasattr(tg, "streamlines"):
+        streamlines = tg.streamlines
+
     # We don't even bother if there aren't enough streamlines:
-    if len(tg.streamlines) < min_sl:
+    if len(streamlines) < min_sl:
         if return_idx:
-            return tg, np.arange(len(tg.streamlines))
+            return tg, np.arange(len(streamlines))
         else:
             return tg
 
     # Resample once up-front:
-    fgarray = _resample_tg(tg, n_points)
+    fgarray = _resample_tg(streamlines, n_points)
 
     # Keep this around, so you can use it for indexing at the very end:
     idx = np.arange(len(fgarray))
     # get lengths of each streamline
-    lengths = np.array([sl.shape[0] for sl in tg.streamlines])
+    lengths = np.array([sl.shape[0] for sl in streamlines])
     # We'll only do this for clean_rounds
     rounds_elapsed = 0
-    while rounds_elapsed < clean_rounds and len(tg.streamlines) > min_sl:
+    while rounds_elapsed < clean_rounds and len(streamlines) > min_sl:
         # This calculates the Mahalanobis for each streamline/node:
         m_dist = gaussian_weights(fgarray, return_mahalnobis=True, stat=stat)
         logger.debug(f"Shape of fgarray: {np.asarray(fgarray).shape}")
@@ -1177,7 +1191,10 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
         rounds_elapsed += 1
 
     # Select based on the variable that was keeping track of things for us:
-    out = StatefulTractogram(tg.streamlines[idx], tg, Space.VOX)
+    if hasattr(tg, "streamlines"):
+        out = StatefulTractogram(tg.streamlines[idx], tg, Space.VOX)
+    else:
+        out = streamlines[idx]
     if return_idx:
         return out, idx
     else:

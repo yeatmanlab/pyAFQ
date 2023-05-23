@@ -29,7 +29,7 @@ logger = logging.getLogger('AFQ')
 @pimms.calc("bundles")
 @as_file('_tractography.trk', include_track=True, include_seg=True)
 def segment(dwi, data_imap, mapping_imap,
-            tractography_imap, segmentation_params):
+            tractography_imap, segmentation_params, clean_params):
     """
     full path to a trk file containing containting
     segmented streamlines, labeled by bundle
@@ -39,12 +39,14 @@ def segment(dwi, data_imap, mapping_imap,
     segmentation_params : dict, optional
         The parameters for segmentation.
         Default: use the default behavior of the seg.Segmentation object.
+    clean_params: dict, optional
+        The parameters for cleaning.
+        Default: use the default behavior of the seg.clean_bundle
+        function.
     """
     bundle_dict = data_imap["bundle_dict"]
     reg_template = data_imap["reg_template"]
     streamlines = tractography_imap["streamlines"]
-    # We pass `clean_params` here, but do not use it, so we have the
-    # same signature as `_clean_bundles`.
     img = nib.load(dwi)
     tg = load_tractogram(
         streamlines, img, Space.VOX,
@@ -52,6 +54,12 @@ def segment(dwi, data_imap, mapping_imap,
     indices_to_remove, _ = tg.remove_invalid_streamlines()
     if len(indices_to_remove) > 0:
         logger.warning(f"{len(indices_to_remove)} invalid streamlines removed")
+
+    default_clean_params = get_default_args(seg.clean_bundle)
+    if clean_params is not None:
+        for k in clean_params:
+            default_clean_params[k] = clean_params[k]
+    clean_params = default_clean_params
 
     start_time = time()
     segmentation = seg.Segmentation(**segmentation_params)
@@ -62,7 +70,8 @@ def segment(dwi, data_imap, mapping_imap,
         dwi,
         data_imap["bval"],
         data_imap["bvec"],
-        reg_template=reg_template)
+        reg_template=reg_template,
+        clean_params=clean_params)
 
     seg_sft = aus.SegmentedSFT(bundles, Space.VOX)
 
@@ -77,68 +86,15 @@ def segment(dwi, data_imap, mapping_imap,
         for arg_name, value in segmentation_params.items()}
 
     meta["source"] = streamlines
-    meta["Parameters"] = segmentation_params_out
+    meta["Recognition Parameters"] = segmentation_params_out
+    meta["Cleaning Parameters"] = clean_params
     meta["Timing"] = time() - start_time
     return tgram, meta
 
 
-@pimms.calc("clean_bundles")
-@as_file('_desc-clean_tractography.trk', include_track=True, include_seg=True)
-def clean_bundles(bundles, clean_params=None):
-    """
-    full path to a trk file containting segmented
-    streamlines, cleaned using the Mahalanobis distance, and labeled by
-    bundle
-
-    Parameters
-    ----------
-    clean_params: dict, optional
-        The parameters for cleaning.
-        Default: use the default behavior of the seg.clean_bundle
-        function.
-    """
-    default_clean_params = get_default_args(seg.clean_bundle)
-    if clean_params is not None:
-        for k in clean_params:
-            default_clean_params[k] = clean_params[k]
-    clean_params = default_clean_params
-
-    seg_sft = aus.SegmentedSFT.fromfile(bundles)
-
-    start_time = time()
-
-    bundles = {}
-    for b in seg_sft.bundle_names:
-        if b != "whole_brain":
-            logger.info(f"Cleaning {b}")
-            idx = seg_sft.bundle_idxs[b]
-            this_tg = seg_sft.get_bundle(b)
-            this_tg = seg.clean_bundle(this_tg, **clean_params)
-            if clean_params['return_idx']:
-                bundles[b] = {}
-                bundles[b]['sl'], bundles[b]['idx'] = this_tg
-                bundles[b]['idx'] = np.array(
-                    idx)[bundles[b]['idx']].tolist()
-            else:
-                bundles[b] = this_tg
-
-    sft, meta = aus.SegmentedSFT(
-        bundles, Space.RASMM).get_sft_and_sidecar()
-
-    seg_args = get_default_args(seg.clean_bundle)
-    for k in seg_args:
-        if callable(seg_args[k]):
-            seg_args[k] = seg_args[k].__name__
-
-    meta["source"] = bundles
-    meta["Parameters"] = seg_args
-    meta["Timing"] = time() - start_time
-    return sft, meta
-
-
 @pimms.calc("indiv_bundles")
 def export_bundles(base_fname, results_dir,
-                   clean_bundles, bundles,
+                   bundles,
                    tracking_params,
                    segmentation_params):
     """
@@ -146,103 +102,89 @@ def export_bundles(base_fname, results_dir,
     a full path to a trk file containing the streamlines of a given bundle,
     cleaned or uncleaned
     """
-    for this_bundles_file, folder in zip([clean_bundles, bundles],
-                                         ['clean_bundles', 'bundles']):
-        bundles_dir = op.join(results_dir, folder)
-        os.makedirs(bundles_dir, exist_ok=True)
-        seg_sft = aus.SegmentedSFT.fromfile(this_bundles_file)
-        for bundle in seg_sft.bundle_names:
-            if bundle != "whole_brain":
-                fname = op.split(
-                    get_fname(
-                        base_fname,
-                        f'_desc-{str_to_desc(bundle)}'
-                        f'_tractography.trk',
-                        tracking_params=tracking_params,
-                        segmentation_params=segmentation_params))
-                fname = op.join(bundles_dir, fname[1])
-                logger.info(f"Saving {fname}")
-                save_tractogram(
-                    seg_sft.get_bundle(bundle), fname,
-                    bbox_valid_check=False)
-                meta = dict(source=this_bundles_file)
-                meta_fname = drop_extension(fname) + '.json'
-                write_json(meta_fname, meta)
-    return True
+    bundles_dir = op.join(results_dir, "bundles")
+    os.makedirs(bundles_dir, exist_ok=True)
+    seg_sft = aus.SegmentedSFT.fromfile(bundles)
+    for bundle in seg_sft.bundle_names:
+        if bundle != "whole_brain":
+            fname = op.split(
+                get_fname(
+                    base_fname,
+                    f'_desc-{str_to_desc(bundle)}'
+                    f'_tractography.trk',
+                    tracking_params=tracking_params,
+                    segmentation_params=segmentation_params))
+            fname = op.join(bundles_dir, fname[1])
+            logger.info(f"Saving {fname}")
+            save_tractogram(
+                seg_sft.get_bundle(bundle), fname,
+                bbox_valid_check=False)
+            meta = dict(source=bundles)
+            meta_fname = drop_extension(fname) + '.json'
+            write_json(meta_fname, meta)
+    return bundles_dir
 
 
 @pimms.calc("sl_counts")
 @as_file('_desc-slCount_dwi.csv', include_track=True, include_seg=True)
-def export_sl_counts(clean_bundles, bundles):
+def export_sl_counts(bundles):
     """
     full path to a JSON file containing streamline counts
     """
-    sl_counts_clean = []
     sl_counts = []
-    bundles_files = [clean_bundles, bundles]
-    lists = [sl_counts_clean, sl_counts]
+    seg_sft = aus.SegmentedSFT.fromfile(bundles)
 
-    for bundles_file, count in zip(bundles_files, lists):
-        seg_sft = aus.SegmentedSFT.fromfile(bundles_file)
-
-        for bundle in seg_sft.bundle_names:
-            count.append(len(
-                seg_sft.get_bundle(bundle).streamlines))
-        count.append(len(seg_sft.sft.streamlines))
+    for bundle in seg_sft.bundle_names:
+        sl_counts.append(len(
+            seg_sft.get_bundle(bundle).streamlines))
+    sl_counts.append(len(seg_sft.sft.streamlines))
 
     counts_df = pd.DataFrame(
         data=dict(
-            n_streamlines=sl_counts,
-            n_streamlines_clean=sl_counts_clean),
+            n_streamlines=sl_counts),
         index=seg_sft.bundle_names + ["Total Recognized"])
-    return counts_df, dict(sources=bundles_files)
+    return counts_df, dict(source=bundles)
 
 
 @pimms.calc("median_bundle_lengths")
 @as_file(
     '_desc-medianBundleLengths_dwi.csv',
     include_track=True, include_seg=True)
-def export_bundle_lengths(clean_bundles, bundles):
+def export_bundle_lengths(bundles):
     """
     full path to a JSON file containing median bundle lengths
     """
-    med_len_clean_counts = []
     med_len_counts = []
-    bundles_files = [clean_bundles, bundles]
-    lists = [med_len_clean_counts, med_len_counts]
+    seg_sft = aus.SegmentedSFT.fromfile(bundles)
 
-    for bundles_file, lens in zip(bundles_files, lists):
-        seg_sft = aus.SegmentedSFT.fromfile(bundles_file)
-
-        for bundle in seg_sft.bundle_names:
-            these_lengths = seg_sft.get_bundle(
-                bundle)._tractogram._streamlines._lengths
-            if len(these_lengths) > 0:
-                lens.append(np.median(
-                    these_lengths))
-            else:
-                lens.append(0)
-        lens.append(np.median(
-            seg_sft.sft._tractogram._streamlines._lengths))
+    for bundle in seg_sft.bundle_names:
+        these_lengths = seg_sft.get_bundle(
+            bundle)._tractogram._streamlines._lengths
+        if len(these_lengths) > 0:
+            med_len_counts.append(np.median(
+                these_lengths))
+        else:
+            med_len_counts.append(0)
+    med_len_counts.append(np.median(
+        seg_sft.sft._tractogram._streamlines._lengths))
 
     counts_df = pd.DataFrame(
         data=dict(
-            median_len=med_len_counts,
-            median_len_clean=med_len_clean_counts),
+            median_len=med_len_counts),
         index=seg_sft.bundle_names + ["Total Recognized"])
-    return counts_df, dict(sources=bundles_files)
+    return counts_df, dict(source=bundles)
 
 
 @pimms.calc("density_maps")
 @as_file('_desc-density_dwi.nii.gz', include_track=True, include_seg=True)
 @as_img
-def export_density_maps(clean_bundles, dwi):
+def export_density_maps(bundles, dwi):
     """
     full path to 4d nifti file containing streamline counts per voxel
     per bundle, where the 4th dimension encodes the bundle
     """
     seg_sft = aus.SegmentedSFT.fromfile(
-        clean_bundles)
+        bundles)
     entire_density_map = np.zeros((
         *nib.load(dwi).shape[:3],
         len(seg_sft.bundle_names)))
@@ -252,12 +194,12 @@ def export_density_maps(clean_bundles, dwi):
         entire_density_map[..., ii] = bundle_density
 
     return entire_density_map, dict(
-        source=clean_bundles, bundles=list(seg_sft.bundle_names))
+        source=bundles, bundles=list(seg_sft.bundle_names))
 
 
 @pimms.calc("profiles")
 @as_file('_desc-profiles_dwi.csv', include_track=True, include_seg=True)
-def tract_profiles(clean_bundles,
+def tract_profiles(bundles,
                    scalar_dict, dwi_affine,
                    profile_weights="gauss"):
     """
@@ -295,7 +237,7 @@ def tract_profiles(clean_bundles,
     this_profile = np.zeros((len(scalar_dict), 100))
 
     seg_sft = aus.SegmentedSFT.fromfile(
-        clean_bundles)
+        bundles)
     seg_sft.sft.to_rasmm()
     for bundle_name in seg_sft.bundle_names:
         this_sl = seg_sft.get_bundle(bundle_name).streamlines
@@ -346,7 +288,7 @@ def tract_profiles(clean_bundles,
         profile_dict[scalar] = profiles[ii]
 
     profile_dframe = pd.DataFrame(profile_dict)
-    meta = dict(source=clean_bundles,
+    meta = dict(source=bundles,
                 parameters=get_default_args(afq_profile))
 
     return profile_dframe, meta
@@ -389,7 +331,6 @@ def get_segmentation_plan(kwargs):
         export_bundle_lengths,
         export_bundles,
         export_density_maps,
-        clean_bundles,
         segment,
         tract_profiles])
 

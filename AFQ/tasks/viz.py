@@ -106,7 +106,7 @@ def viz_bundles(base_fname,
         figure=figure)
 
     figure = viz_backend.visualize_bundles(
-        segmentation_imap["clean_bundles"],
+        segmentation_imap["bundles"],
         shade_by_volume=shade_by_volume,
         sbv_lims=sbv_lims_bundles,
         include_profiles=(pd.read_csv(profiles_file), best_scalar),
@@ -196,8 +196,8 @@ def viz_indivBundle(base_fname,
     for i in range(3):
         flip_axes[i] = (dwi_affine[i, i] < 0)
 
-    clean_bundles = aus.SegmentedSFT.fromfile(
-        segmentation_imap["clean_bundles"])
+    bundles = aus.SegmentedSFT.fromfile(
+        segmentation_imap["bundles"])
 
     # This dictionary contains a mapping to which ROIs
     # should be used from the bundle dict, based on the
@@ -212,7 +212,7 @@ def viz_indivBundle(base_fname,
             segmented_bname_to_roi_bname[b_name] = b_name
 
     figures = {}
-    for bundle_name in clean_bundles.bundle_names:
+    for bundle_name in bundles.bundle_names:
         logger.info(f"Generating {bundle_name} visualization...")
         roi_bname = segmented_bname_to_roi_bname[bundle_name]
 
@@ -222,9 +222,9 @@ def viz_indivBundle(base_fname,
             flip_axes=flip_axes,
             interact=False,
             inline=False)
-        if len(clean_bundles.get_bundle(bundle_name)) > 0:
+        if len(bundles.get_bundle(bundle_name)) > 0:
             figure = viz_backend.visualize_bundles(
-                clean_bundles,
+                bundles,
                 shade_by_volume=shade_by_volume,
                 sbv_lims=sbv_lims_indiv,
                 bundle=bundle_name,
@@ -328,7 +328,7 @@ def viz_indivBundle(base_fname,
                     interact=False,
                     inline=False)
                 core_fig = viz_backend.visualize_bundles(
-                    segmentation_imap["clean_bundles"],
+                    segmentation_imap["bundles"],
                     shade_by_volume=shade_by_volume,
                     sbv_lims=sbv_lims_indiv,
                     bundle=bundle_name,
@@ -340,7 +340,7 @@ def viz_indivBundle(base_fname,
                     figure=core_fig)
                 core_fig = viz_backend.single_bundle_viz(
                     indiv_profile,
-                    segmentation_imap["clean_bundles"],
+                    segmentation_imap["bundles"],
                     bundle_name,
                     best_scalar,
                     flip_axes=flip_axes,
