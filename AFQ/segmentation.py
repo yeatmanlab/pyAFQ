@@ -1122,7 +1122,7 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
     if hasattr(tg, "streamlines"):
         streamlines = tg.streamlines
     else:
-        streamlines = tg
+        streamlines = dts.Streamlines(tg)
 
     # We don't even bother if there aren't enough streamlines:
     if len(streamlines) < min_sl:

@@ -1648,6 +1648,7 @@ def fetch_hbn_afq(subjects, path=None):
         ses_dir = op.join(sub_dir, ses)
 
         for deriv_dir in ["bundles",
+                          "clean_bundles",
                           "ROIs",
                           "tract_profile_plots",
                           "viz_bundles"]:
