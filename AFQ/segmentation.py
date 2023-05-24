@@ -518,6 +518,7 @@ class Segmentation:
 
         clean_params["return_idx"] = True
 
+        fgarray = np.array(_resample_tg(tg, 20))  # for prob map
         n_streamlines = len(tg)
 
         bundle_votes = np.full(
@@ -527,15 +528,11 @@ class Segmentation:
             (n_streamlines, len(self.bundle_dict)),
             dtype=bool)
 
-        # analyze bundle information to determine
-        # how much room we need for include ROIs
-        max_includes = 2
-        for bundle_info in self.bundle_dict.values():
-            if "include" in bundle_info\
-                    and len(bundle_info["include"]) > max_includes:
-                max_includes = len(bundle_info["include"])
         bundle_roi_dists = -np.ones(
-            (n_streamlines, len(self.bundle_dict), max_includes),
+            (
+                n_streamlines,
+                len(self.bundle_dict),
+                self.bundle_dict.max_includes),
             dtype=np.int32)
 
         self.fiber_groups = {}
@@ -586,7 +583,7 @@ class Segmentation:
                 b_sls.initiate_selection("Prob. Map")
                 fiber_probabilities = dts.values_from_volume(
                     bundle_def["prob_map"].get_fdata(),
-                    b_sls.get_selected_sls(), np.eye(4))
+                    fgarray[b_sls.selected_fiber_idxs], np.eye(4))
                 fiber_probabilities = np.mean(fiber_probabilities, -1)
                 if not self.roi_dist_tie_break:
                     b_sls.bundle_vote = fiber_probabilities
@@ -704,7 +701,7 @@ class Segmentation:
                 if self.roi_dist_tie_break:
                     min_dist_coords = np.ones(len(b_sls))
                 roi_dists = -np.ones(
-                    (len(b_sls), max_includes),
+                    (len(b_sls), self.bundle_dict.max_includes),
                     dtype=np.int32)
                 if flip_using_include:
                     to_flip = []
