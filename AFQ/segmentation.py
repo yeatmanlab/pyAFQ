@@ -53,9 +53,9 @@ class _SlsBeingRecognized:
     def __init__(self, sls, logger, save_intermediates, b_name, ref,
                  n_roi_dists):
         self.oriented_yet = False
-        self.selected_fiber_idxs = np.arange(len(sls), dtype=np.int32)
+        self.selected_fiber_idxs = np.arange(len(sls), dtype=np.uint32)
         self.sls_flipped = np.zeros(len(sls), dtype=bool)
-        self.bundle_vote = np.full(len(sls), -np.inf)
+        self.bundle_vote = np.full(len(sls), -np.inf, dtype=np.float32)
         self.logger = logger
         self.start_time = -1
         self.save_intermediates = save_intermediates
@@ -518,7 +518,6 @@ class Segmentation:
 
         clean_params["return_idx"] = True
 
-        fgarray = np.array(_resample_tg(tg, 100))
         n_streamlines = len(tg)
 
         bundle_votes = np.full(
@@ -587,7 +586,7 @@ class Segmentation:
                 b_sls.initiate_selection("Prob. Map")
                 fiber_probabilities = dts.values_from_volume(
                     bundle_def["prob_map"].get_fdata(),
-                    fgarray[b_sls.selected_fiber_idxs], np.eye(4))
+                    b_sls.get_selected_sls(), np.eye(4))
                 fiber_probabilities = np.mean(fiber_probabilities, -1)
                 if not self.roi_dist_tie_break:
                     b_sls.bundle_vote = fiber_probabilities
