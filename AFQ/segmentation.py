@@ -54,7 +54,7 @@ class _SlsBeingRecognized:
                  n_roi_dists):
         self.oriented_yet = False
         self.selected_fiber_idxs = np.arange(len(sls), dtype=np.uint32)
-        self.sls_flipped = np.zeros(len(sls), dtype=bool)
+        self.sls_flipped = np.zeros(len(sls), dtype=np.bool8)
         self.bundle_vote = np.full(len(sls), -np.inf, dtype=np.float32)
         self.logger = logger
         self.start_time = -1
@@ -523,17 +523,17 @@ class Segmentation:
 
         bundle_votes = np.full(
             (n_streamlines, len(self.bundle_dict)),
-            -np.inf)
+            -np.inf, dtype=np.float32)
         bundle_to_flip = np.zeros(
             (n_streamlines, len(self.bundle_dict)),
-            dtype=bool)
+            dtype=np.bool8)
 
         bundle_roi_dists = -np.ones(
             (
                 n_streamlines,
                 len(self.bundle_dict),
                 self.bundle_dict.max_includes),
-            dtype=np.int32)
+            dtype=np.uint32)
 
         self.fiber_groups = {}
 
@@ -553,7 +553,7 @@ class Segmentation:
 
         self.logger.info("Assigning Streamlines to Bundles")
         for bundle_idx, bundle_name in enumerate(
-                self.bundle_dict):
+                self.bundle_dict.bundle_names):
             self.logger.info(f"Finding Streamlines for {bundle_name}")
 
             # Warp ROIs
@@ -826,7 +826,6 @@ class Segmentation:
                         b_sls.selected_fiber_idxs,
                         bundle_idx
                     ] = b_sls.roi_dists.copy()
-            del b_sls
 
         if self.save_intermediates is not None:
             os.makedirs(self.save_intermediates, exist_ok=True)
@@ -842,7 +841,7 @@ class Segmentation:
         # the ROIs. This order is ARBITRARY but CONSISTENT (going from ROI0
         # to ROI1).
         self.logger.info("Re-orienting streamlines to consistent directions")
-        for bundle_idx, bundle in enumerate(self.bundle_dict):
+        for bundle_idx, bundle in enumerate(self.bundle_dict.bundle_names):
             self.logger.info(f"Processing {bundle}")
 
             select_idx = np.where(bundle_choice == bundle_idx)[0]
