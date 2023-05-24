@@ -409,7 +409,8 @@ class BundleDict(MutableMapping):
 
     def __setitem__(self, key, item):
         self._dict[key] = item
-        self.update_max_includes(len(item.get("include", [])))
+        if hasattr(item, "get"):
+            self.update_max_includes(len(item.get("include", [])))
         if key not in self.bundle_names:
             self.bundle_names.append(key)
 
