@@ -387,24 +387,20 @@ class BundleDict(MutableMapping):
             # generate all in one go, so templates are not kept in memory
             self.gen_all()
         if not self.keep_in_memory:
-            old_vals = self.apply_to_rois(key, self._cond_load)
-            self._resample_roi(key)
+            _item = self._dict[key].copy()
+            _res = self._resample_roi(key, dry_run=True)
+            if _res is not None:
+                _item.update(_res)
+            _item = _BundleEntry(_item)
         else:
             if "loaded" not in self._dict[key] or\
                     not self._dict[key]["loaded"]:
                 self.apply_to_rois(key, self._cond_load)
                 self._dict[key]["loaded"] = True
-            old_vals = None
             if "resampled" not in self._dict[key] or not self._dict[
                     key]["resampled"]:
                 self._resample_roi(key)
-        _item = _BundleEntry(self._dict[key].copy())
-        if old_vals is not None:
-            if isinstance(old_vals, dict):
-                for roi_type, roi in old_vals.items():
-                    self._dict[key][roi_type] = roi
-            else:
-                self._dict[key] = old_vals
+            _item = _BundleEntry(self._dict[key].copy())
         return _item
 
     def __setitem__(self, key, item):
@@ -511,7 +507,7 @@ class BundleDict(MutableMapping):
                 self._dict[b_name][roi_type] = roi
         return return_vals
 
-    def _resample_roi(self, b_name):
+    def _resample_roi(self, b_name, dry_run=False):
         """
         Given a bundle name, resample all ROIs and prob maps
         into either template or subject space for that bundle,
@@ -529,10 +525,11 @@ class BundleDict(MutableMapping):
                 resample_to = self.resample_subject_to
             if resample_to:
                 try:
-                    self.apply_to_rois(
+                    return_v = self.apply_to_rois(
                         b_name,
                         afd.read_resample_roi,
-                        resample_to=resample_to)
+                        resample_to=resample_to,
+                        dry_run=dry_run)
                     if b_name != "whole_brain":
                         self._dict[b_name]["resampled"] = True
                 except AttributeError as e:
@@ -540,6 +537,8 @@ class BundleDict(MutableMapping):
                         self._dict[b_name]["resampled"] = False
                     else:
                         raise
+                return return_v
+        return None
 
     def is_bundle_in_template(self, bundle_name):
         return "space" not in self._dict[bundle_name]\
