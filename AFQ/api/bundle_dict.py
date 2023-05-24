@@ -184,6 +184,7 @@ class BundleDict(MutableMapping):
         self.resample_subject_to = resample_subject_to
         self.keep_in_memory = keep_in_memory
         self.has_bids_info = False
+        self.max_includes = 3
 
         self._dict = {}
         self.bundle_names = []
@@ -219,6 +220,10 @@ class BundleDict(MutableMapping):
                     " assigns each streamline to only one bundle."
                     " Only AntFrontal will be used."))
                 self.bundle_names.remove("FA")
+
+    def update_max_includes(self, new_max):
+        if new_max > self.max_includes:
+            self.max_includes = new_max
 
     def load_templates(self):
         """
@@ -403,9 +408,8 @@ class BundleDict(MutableMapping):
         return _item
 
     def __setitem__(self, key, item):
-        if isinstance(item, str):
-            item = nib.load(item)
         self._dict[key] = item
+        self.update_max_includes(len(item.get("include", [])))
         if key not in self.bundle_names:
             self.bundle_names.append(key)
 
