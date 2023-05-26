@@ -241,12 +241,9 @@ class BundleDict(MutableMapping):
             self.templates['ARC_roi2_R'] = self.templates['SLFt_roi2_R']
             callosal_templates =\
                 afd.read_callosum_templates(as_img=False)
-            endpoint_templates =\
-                afd.bundles_to_aal(self.bundle_names)
             self.templates = {
                 **self.templates,
-                **callosal_templates,
-                **endpoint_templates}
+                **callosal_templates}
         elif self.seg_algo.startswith("reco"):
             if self.seg_algo.endswith("80"):
                 self.templates = afd.read_hcp_atlas(80, as_file=True)
