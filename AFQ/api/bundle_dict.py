@@ -353,7 +353,7 @@ class BundleDict(MutableMapping):
         self._subject = subject
         self._session = session
 
-    def _cond_load(self, roi_or_sl):
+    def _cond_load(self, roi_or_sl, resample_to):
         """
         Load ROI or streamline if not already loaded
         """
@@ -370,7 +370,9 @@ class BundleDict(MutableMapping):
                 self._session, self._subject)
         if isinstance(roi_or_sl, str):
             if self.seg_algo == "afq":
-                return nib.load(roi_or_sl)
+                return afd.read_resample_roi(
+                    roi_or_sl,
+                    resample_to=resample_to)
             elif self.seg_algo.startswith("reco"):
                 return load_tractogram(
                     roi_or_sl,
@@ -385,14 +387,14 @@ class BundleDict(MutableMapping):
             self.gen_all()
         if not self.keep_in_memory:
             _item = self._dict[key].copy()
-            _res = self._resample_roi(key, dry_run=True)
+            _res = self._cond_load_bundle(key, dry_run=True)
             if _res is not None:
                 _item.update(_res)
             _item = _BundleEntry(_item)
         else:
             if "loaded" not in self._dict[key] or\
                     not self._dict[key]["loaded"]:
-                self.apply_to_rois(key, self._cond_load)
+                self._cond_load_bundle(key)
                 self._dict[key]["loaded"] = True
             if "resampled" not in self._dict[key] or not self._dict[
                     key]["resampled"]:
@@ -504,7 +506,7 @@ class BundleDict(MutableMapping):
                 self._dict[b_name][roi_type] = roi
         return return_vals
 
-    def _resample_roi(self, b_name, dry_run=False):
+    def _cond_load_bundle(self, b_name, dry_run=False):
         """
         Given a bundle name, resample all ROIs and prob maps
         into either template or subject space for that bundle,
@@ -520,22 +522,13 @@ class BundleDict(MutableMapping):
                 resample_to = self.resample_to
             else:
                 resample_to = self.resample_subject_to
-            if resample_to:
-                try:
-                    return_v = self.apply_to_rois(
-                        b_name,
-                        afd.read_resample_roi,
-                        resample_to=resample_to,
-                        dry_run=dry_run)
-                    if b_name != "whole_brain":
-                        self._dict[b_name]["resampled"] = True
-                except AttributeError as e:
-                    if "'ImageFile' object" in str(e):
-                        self._dict[b_name]["resampled"] = False
-                    else:
-                        raise
-                return return_v
-        return None
+        else:
+            resample_to = None
+        return self.apply_to_rois(
+            b_name,
+            self._cond_load,
+            resample_to,
+            dry_run=dry_run)
 
     def is_bundle_in_template(self, bundle_name):
         return "space" not in self._dict[bundle_name]\
@@ -592,6 +585,7 @@ class BundleDict(MutableMapping):
             transformed_rois = self.apply_to_rois(
                 bundle_name,
                 self._cond_load,
+                self.resample_subject_to,
                 dry_run=True)
 
         if base_fname is not None:

@@ -869,7 +869,8 @@ class Segmentation:
                     self.logger.info("Clipping Streamlines by ROI")
                     _cut_sls_by_dist(
                         select_sl, select_idx, roi_dists,
-                        (0, len(bundle["include"]) - 1), in_place=True)
+                        (0, len(self.bundle_dict[
+                            bundle]["include"]) - 1), in_place=True)
             if "bundlesection" in self.bundle_dict[bundle]:
                 for sb_name, sb_include_cuts in self.bundle_dict[bundle][
                         "bundlesection"].items():
