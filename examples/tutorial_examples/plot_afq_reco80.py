@@ -32,7 +32,7 @@ afd.organize_stanford_data(clear_previous_afq=True)
 #
 # We only do this to make this example faster and consume less space.
 
-tracking_params = dict(n_seeds=50000,
+tracking_params = dict(n_seeds=10000,
                        random_seeds=True,
                        rng_seed=42)
 

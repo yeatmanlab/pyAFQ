@@ -124,7 +124,9 @@ if not op.exists(op.join(working_dir, 'dti_streamlines_reco.trk')):
              op.join(working_dir, 'seed_roi.nii.gz'))
     sft = aft.track(dti_params['params'], seed_mask=seed_roi,
                     directions='det', stop_mask=FA_data,
-                    stop_threshold=0.1, odf_model="dti")
+                    stop_threshold=0.1, odf_model="dti",
+                    n_seeds=10000, random_seeds=True,
+                    rng_seed=42)
     print(len(sft.streamlines))
     save_tractogram(sft, op.join(working_dir, 'dti_streamlines_reco.trk'),
                     bbox_valid_check=False)
