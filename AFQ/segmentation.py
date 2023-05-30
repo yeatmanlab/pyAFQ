@@ -746,9 +746,9 @@ class Segmentation:
                 if self.roi_dist_tie_break:
                     b_sls.bundle_vote = -min_dist_coords
                 b_sls.roi_dists = roi_dists
-                b_sls.select(accept_idx, "include")
                 if flip_using_include:
                     b_sls.reorient(to_flip)
+                b_sls.select(accept_idx, "include")
 
             # Filters streamlines by how well they match
             # a curve in orientation and shape but not scale
