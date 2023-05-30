@@ -69,11 +69,11 @@ class _SlsBeingRecognized:
         self.logger.info(f"Filtering by {clean_name}")
 
     def select(self, idx, clean_name, cut=False):
-        self.selected_fiber_idxs = self.selected_fiber_idxs[idx]
-        self.sls_flipped = self.sls_flipped[idx]
-        self.bundle_vote = self.bundle_vote[idx]
+        self.selected_fiber_idxs = self.selected_fiber_idxs[idx].copy()
+        self.sls_flipped = self.sls_flipped[idx].copy()
+        self.bundle_vote = self.bundle_vote[idx].copy()
         if hasattr(self, "roi_dists"):
-            self.roi_dists = self.roi_dists[idx]
+            self.roi_dists = self.roi_dists[idx].copy()
         time_taken = time() - self.start_time
         self.logger.info(
             f"After filtering by {clean_name} (time: {time_taken}s), "
