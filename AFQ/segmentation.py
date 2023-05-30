@@ -67,6 +67,7 @@ class _SlsBeingRecognized:
     def initiate_selection(self, clean_name):
         self.start_time = time()
         self.logger.info(f"Filtering by {clean_name}")
+        return np.zeros(len(self.selected_fiber_idxs), dtype=np.bool8)
 
     def select(self, idx, clean_name, cut=False):
         self.selected_fiber_idxs = self.selected_fiber_idxs[idx].copy()
@@ -587,10 +588,9 @@ class Segmentation:
                 fiber_probabilities = np.mean(fiber_probabilities, -1)
                 if not self.roi_dist_tie_break:
                     b_sls.bundle_vote = fiber_probabilities
-                idx_above_prob = np.where(
-                    fiber_probabilities > self.prob_threshold)[0]
-
-                b_sls.select(idx_above_prob, "Prob. Map")
+                b_sls.select(
+                    fiber_probabilities > self.prob_threshold,
+                    "Prob. Map")
             elif not self.roi_dist_tie_break:
                 b_sls.bundle_vote = np.ones(len(b_sls))
 
@@ -599,71 +599,71 @@ class Segmentation:
                 accepted = self.crosses[b_sls.selected_fiber_idxs]
                 if not bundle_def["cross_midline"]:
                     accepted = np.invert(accepted)
-                accepted_idx = np.where(accepted)[0]
-                b_sls.select(accepted_idx, "Cross Mid.")
+                b_sls.select(accepted, "Cross Mid.")
 
             if b_sls and "start" in bundle_def:
-                b_sls.initiate_selection("startpoint")
-                cleaned_idx = clean_by_endpoints(
+                accept_idx = b_sls.initiate_selection("startpoint")
+                clean_by_endpoints(
                     b_sls.get_selected_sls(),
                     bundle_def["start"],
                     0,
                     tol=dist_to_atlas,
-                    flip_sls=b_sls.sls_flipped)
+                    flip_sls=b_sls.sls_flipped,
+                    accepted_idxs=accept_idx)
                 if not b_sls.oriented_yet:
-                    cleaned_idx_to_flip = clean_by_endpoints(
+                    accepted_idx_flipped = clean_by_endpoints(
                         b_sls.get_selected_sls(),
                         bundle_def["start"],
                         -1,
                         tol=dist_to_atlas)
-                    b_sls.reorient(cleaned_idx_to_flip)
-                    cleaned_idx = list(set(cleaned_idx).symmetric_difference(
-                        set(cleaned_idx_to_flip)))
-                b_sls.select(cleaned_idx, "startpoint")
+                    b_sls.reorient(accepted_idx_flipped)
+                    accept_idx = np.logical_xor(
+                        accepted_idx_flipped, accept_idx)
+                b_sls.select(accept_idx, "startpoint")
 
             if b_sls and "end" in bundle_def:
-                b_sls.initiate_selection("endpoint")
+                accept_idx = b_sls.initiate_selection("endpoint")
                 cleaned_idx = clean_by_endpoints(
                     b_sls.get_selected_sls(),
                     bundle_def["end"],
                     -1,
                     tol=dist_to_atlas,
-                    flip_sls=b_sls.sls_flipped)
+                    flip_sls=b_sls.sls_flipped,
+                    accepted_idxs=accept_idx)
                 if not b_sls.oriented_yet:
-                    cleaned_idx_to_flip = clean_by_endpoints(
+                    accepted_idx_flipped = clean_by_endpoints(
                         b_sls.get_selected_sls(),
                         bundle_def["end"],
                         0,
                         tol=dist_to_atlas)
-                    b_sls.reorient(cleaned_idx_to_flip)
-                    cleaned_idx = list(set(cleaned_idx).symmetric_difference(
-                        set(cleaned_idx_to_flip)))
-                b_sls.select(cleaned_idx, "endpoint")
+                    b_sls.reorient(accepted_idx_flipped)
+                    accept_idx = np.logical_xor(
+                        accepted_idx_flipped, accept_idx)
+                b_sls.select(accept_idx, "endpoint")
 
             if b_sls and (
                     ("min_len" in bundle_def) or ("max_len" in bundle_def)):
-                b_sls.initiate_selection("length")
+                accept_idx = b_sls.initiate_selection("length")
                 min_len = bundle_def.get("min_len", 0) / vox_dim
                 max_len = bundle_def.get("max_len", np.inf) / vox_dim
-                cleaned_idx = []
                 for idx, sl in enumerate(b_sls.get_selected_sls()):
                     sl_len = np.sum(
                         np.linalg.norm(sl[1:, :] - sl[:-1, :], axis=1))
                     if sl_len >= min_len and sl_len <= max_len:
-                        cleaned_idx.append(idx)
-                b_sls.select(cleaned_idx, "length")
+                        accept_idx[idx] = 1
+                b_sls.select(accept_idx, "length")
 
             if b_sls and "primary_axis" in bundle_def:
                 b_sls.initiate_selection("orientation")
-                cleaned_idx, _, _ = clean_by_orientation(
+                accept_idx, _, _ = clean_by_orientation(
                     b_sls.get_selected_sls(),
                     bundle_def["primary_axis"],
                     bundle_def.get(
                         "primary_axis_percentage", None))
-                b_sls.select(cleaned_idx, "orientation")
+                b_sls.select(accept_idx, "orientation")
 
             if b_sls and "include" in bundle_def:
-                b_sls.initiate_selection("include")
+                accept_idx = b_sls.initiate_selection("include")
                 flip_using_include = len(bundle_def["include"]) > 1\
                     and not b_sls.oriented_yet
 
@@ -689,22 +689,22 @@ class Segmentation:
                         **self.parallel_segmentation)
 
                 else:
-                    inc_results = []
-                    for sl in tqdm(b_sls.get_selected_sls()):
-                        inc_results.append(
+                    inc_results = np.zeros((len(b_sls), 2))
+                    for sl_idx, sl in enumerate(
+                            tqdm(b_sls.get_selected_sls())):
+                        inc_results[sl_idx, :] =\
                             _check_sl_with_inclusion(
                                 sl,
                                 include_rois,
-                                include_roi_tols))
+                                include_roi_tols)
 
-                cleaned_idx = []
                 if self.roi_dist_tie_break:
                     min_dist_coords = np.ones(len(b_sls))
                 roi_dists = -np.ones(
                     (len(b_sls), self.bundle_dict.max_includes),
                     dtype=np.int32)
                 if flip_using_include:
-                    to_flip = []
+                    to_flip = np.ones_like(accept_idx, dtype=np.bool8)
                 for sl_idx, inc_result in enumerate(inc_results):
                     sl_accepted, sl_dist = inc_result
 
@@ -727,14 +727,14 @@ class Segmentation:
                                 # before its close to the first ROI
                                 if flip_using_include:
                                     this_flips = roi_dist1 > roi_dist2
-                                    to_flip.append(this_flips)
+                                    to_flip[sl_idx] = this_flips
                                     if this_flips:
                                         roi_dists[sl_idx, :len(sl_dist)] =\
                                             np.flip(
                                                 roi_dists[sl_idx, :len(sl_dist)])
-                                cleaned_idx.append(sl_idx)
+                                accept_idx[sl_idx] = 1
                         else:
-                            cleaned_idx.append(sl_idx)
+                            accept_idx[sl_idx] = 1
                 # see https://github.com/joblib/joblib/issues/945
                 if (
                     (self.parallel_segmentation.get(
@@ -746,17 +746,16 @@ class Segmentation:
                 if self.roi_dist_tie_break:
                     b_sls.bundle_vote = -min_dist_coords
                 b_sls.roi_dists = roi_dists
-                b_sls.select(cleaned_idx, "include")
+                b_sls.select(accept_idx, "include")
                 if flip_using_include:
                     b_sls.reorient(to_flip)
 
             # Filters streamlines by how well they match
             # a curve in orientation and shape but not scale
             if b_sls and "curvature" in bundle_def:
-                b_sls.initiate_selection("curvature")
+                accept_idx = b_sls.initiate_selection("curvature")
                 ref_curve_threshold = bundle_def["curvature"].get("thresh", 5)
                 curves_r3 = DiscreteCurves(ambient_manifold=Euclidean(dim=3))
-                cleaned_idx = []
                 cut = bundle_def["curvature"].get("cut", False)
                 for idx, sl in enumerate(b_sls.get_selected_sls(cut=cut)):
                     sl = dps.set_number_of_points(
@@ -764,11 +763,11 @@ class Segmentation:
                     dist = curves_r3.square_root_velocity_metric.dist(
                         moved_ref_curve, sl)
                     if dist <= ref_curve_threshold:
-                        cleaned_idx.append(idx)
-                b_sls.select(cleaned_idx, "curvature", cut=cut)
+                        accept_idx[idx] = 1
+                b_sls.select(accept_idx, "curvature", cut=cut)
 
             if b_sls and "exclude" in bundle_def:
-                b_sls.initiate_selection("exclude")
+                accept_idx = b_sls.initiate_selection("exclude")
                 if f'exc_addtol' in bundle_def:
                     exclude_roi_tols = []
                     for exc_tol in bundle_def["exc_addtol"]:
@@ -779,12 +778,11 @@ class Segmentation:
                 for exclude_roi in bundle_def["exclude"]:
                     exclude_rois.append(np.array(
                         np.where(exclude_roi.get_fdata())).T)
-                cleaned_idx = []
                 for sl_idx, sl in enumerate(b_sls.get_selected_sls()):
                     if _check_sl_with_exclusion(
                             sl, exclude_rois, exclude_roi_tols):
-                        cleaned_idx.append(sl_idx)
-                b_sls.select(cleaned_idx, "exclude")
+                        accept_idx[sl_idx] = 1
+                b_sls.select(accept_idx, "exclude")
 
             if b_sls and "qb_thresh" in bundle_def:
                 b_sls.initiate_selection("qb_thresh")
@@ -799,7 +797,7 @@ class Segmentation:
                 b_sls.select(cleaned_idx, "qb_thresh", cut=cut)
 
             if b_sls:
-                b_sls.initiate_selection("Mahalanobis")
+                accept_idx = b_sls.initiate_selection("Mahalanobis")
                 cut = self.clip_edges or ("bundlesection" in bundle_def)
                 _, cleaned_idx = clean_bundle(
                     b_sls.get_selected_sls(cut=cut),
@@ -1319,7 +1317,7 @@ def clean_by_orientation(streamlines, primary_axis, tol=None):
 
 
 def clean_by_endpoints(streamlines, target, target_idx, tol=None,
-                       flip_sls=None):
+                       flip_sls=None, accepted_idxs=None):
     """
     Clean a collection of streamlines based on an endpoint ROI.
     Filters down to only include items that have their start or end points
@@ -1340,12 +1338,18 @@ def clean_by_endpoints(streamlines, target, target_idx, tol=None,
         the endpoint is exactly in the coordinate of the target ROI.
     flip_sls : 1d array, optional
         Length is len(streamlines), whether to flip the streamline.
+    accepted_idxs : 1d array, optional
+        Boolean array, where entries correspond to eachs streamline,
+        and streamlines that pass cleaning will be set to 1.
     Yields
     -------
-    Generator of the indicies into streamlines that survive cleaning.
+    boolean array of streamlines that survive cleaning.
     """
     if tol is None:
         tol = 0
+
+    if accepted_idxs is None:
+        accepted_idxs = np.zeros(len(streamlines), dtype=np.bool8)
 
     # We square the tolerance, because below we are using the squared Euclidean
     # distance which is slightly faster:
@@ -1357,7 +1361,6 @@ def clean_by_endpoints(streamlines, target, target_idx, tol=None,
         flip_sls = np.zeros(len(streamlines))
     flip_sls = flip_sls.astype(int)
 
-    clean_idxes = []
     for ii, sl in enumerate(streamlines):
         this_idx = target_idx
         if flip_sls[ii]:
@@ -1365,6 +1368,6 @@ def clean_by_endpoints(streamlines, target, target_idx, tol=None,
         dist = np.min(cdist(
             [sl[this_idx]], idxes, 'sqeuclidean'))
         if dist <= tol:
-            clean_idxes.append(ii)
+            accepted_idxs[ii] = 1
 
-    return clean_idxes
+    return accepted_idxs

@@ -233,16 +233,16 @@ def test_clean_by_endpoints():
         sl, target_img_start, 0))
     clean_idx_end = list(seg.clean_by_endpoints(
         sl, target_img_end, -1))
-    npt.assert_array_equal(np.intersect1d(
-        clean_idx_start, clean_idx_end), np.array([0, 1]))
+    npt.assert_array_equal(np.logical_and(
+        clean_idx_start, clean_idx_end), np.array([1, 1, 0, 0]))
 
     # If tol=1, the third streamline also gets included
     clean_idx_start = list(seg.clean_by_endpoints(
         sl, target_img_start, 0, tol=1))
     clean_idx_end = list(seg.clean_by_endpoints(
         sl, target_img_end, -1, tol=1))
-    npt.assert_array_equal(np.intersect1d(
-        clean_idx_start, clean_idx_end), np.array([0, 1, 2]))
+    npt.assert_array_equal(np.logical_and(
+        clean_idx_start, clean_idx_end), np.array([1, 1, 1, 0]))
 
 
 def test_exclusion_ROI():
