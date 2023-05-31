@@ -690,14 +690,10 @@ class Segmentation:
                         **self.parallel_segmentation)
 
                 else:
-                    inc_results = np.zeros((len(b_sls), 2))
-                    for sl_idx, sl in enumerate(
-                            tqdm(b_sls.get_selected_sls())):
-                        inc_results[sl_idx, :] = np.asarray(
-                            _check_sl_with_inclusion(
-                                sl,
-                                include_rois,
-                                include_roi_tols))
+                    inc_results = _check_sls_with_inclusion(
+                        b_sls.get_selected_sls(),
+                        include_rois,
+                        include_roi_tols)
 
                 if self.roi_dist_tie_break:
                     min_dist_coords = np.ones(len(b_sls))
@@ -1195,6 +1191,14 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
 # Helper functions for segmenting using waypoint ROIs
 # they are not a part of the class because we do not want
 # copies of the class to be parallelized
+
+
+def _check_sls_with_inclusion(sls, include_rois, include_roi_tols):
+    for sl in sls:
+        yield _check_sl_with_inclusion(
+            sl,
+            include_rois,
+            include_roi_tols)
 
 
 def _check_sl_with_inclusion(sl, include_rois,
