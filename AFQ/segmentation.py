@@ -582,9 +582,10 @@ class Segmentation:
             # filter by probability map
             if "prob_map" in bundle_def:
                 b_sls.initiate_selection("Prob. Map")
+                # using entire fgarray here only because it is the first step
                 fiber_probabilities = dts.values_from_volume(
                     bundle_def["prob_map"].get_fdata(),
-                    fgarray[b_sls.selected_fiber_idxs], np.eye(4))
+                    fgarray, np.eye(4))
                 fiber_probabilities = np.mean(fiber_probabilities, -1)
                 if not self.roi_dist_tie_break:
                     b_sls.bundle_vote = fiber_probabilities
@@ -648,7 +649,7 @@ class Segmentation:
                 max_len = bundle_def.get("max_len", np.inf) / vox_dim
                 for idx, sl in enumerate(b_sls.get_selected_sls()):
                     sl_len = np.sum(
-                        np.linalg.norm(sl[1:, :] - sl[:-1, :], axis=1))
+                        np.linalg.norm(np.diff(sl, axis=0), axis=1))
                     if sl_len >= min_len and sl_len <= max_len:
                         accept_idx[idx] = 1
                 b_sls.select(accept_idx, "length")
@@ -692,11 +693,11 @@ class Segmentation:
                     inc_results = np.zeros((len(b_sls), 2))
                     for sl_idx, sl in enumerate(
                             tqdm(b_sls.get_selected_sls())):
-                        inc_results[sl_idx, :] =\
+                        inc_results[sl_idx, :] = np.asarray(
                             _check_sl_with_inclusion(
                                 sl,
                                 include_rois,
-                                include_roi_tols)
+                                include_roi_tols))
 
                 if self.roi_dist_tie_break:
                     min_dist_coords = np.ones(len(b_sls))

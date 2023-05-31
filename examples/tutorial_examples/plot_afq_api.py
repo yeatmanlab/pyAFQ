@@ -47,6 +47,19 @@ import AFQ.data.fetch as afd
 afd.organize_stanford_data(clear_previous_afq=True)
 
 ##########################################################################
+# Set tractography parameters (optional)
+# ---------------------
+# We make this tracking_params which we will pass to the GroupAFQ object
+# which specifies that we want 50,000 seeds randomly distributed
+# in the white matter.
+#
+# We only do this to make this example faster and consume less space.
+
+tracking_params = dict(n_seeds=50000,
+                       random_seeds=True,
+                       rng_seed=42)
+
+##########################################################################
 # Initialize a GroupAFQ object:
 # -------------------------
 #
@@ -99,7 +112,8 @@ afd.organize_stanford_data(clear_previous_afq=True)
 myafq = GroupAFQ(
     bids_path=op.join(afd.afq_home, 'stanford_hardi'),
     preproc_pipeline='vistasoft',
-    viz_backend_spec='plotly_no_gif')
+    viz_backend_spec='plotly_no_gif',
+    tracking_params=tracking_params)
 
 ##########################################################################
 # Reading in DTI FA (Diffusion Tensor Imaging Fractional Anisotropy)

@@ -27,7 +27,7 @@ afd.organize_stanford_data(clear_previous_afq=True)
 # Set tractography parameters (optional)
 # ---------------------
 # We make this tracking_params which we will pass to the GroupAFQ object
-# which specifies that we want 50,000 seeds randomly distributed
+# which specifies that we want 10,000 seeds randomly distributed
 # in the white matter.
 #
 # We only do this to make this example faster and consume less space.
