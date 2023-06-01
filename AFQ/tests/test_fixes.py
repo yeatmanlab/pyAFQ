@@ -9,7 +9,7 @@ from dipy.data import default_sphere
 from dipy.reconst.gqi import GeneralizedQSamplingModel
 
 from AFQ.utils.testing import make_dki_data
-from AFQ._fixes import GWI_ODF
+from AFQ._fixes import gwi_odf
 
 
 def test_GQI_fix():
@@ -25,8 +25,8 @@ def test_GQI_fix():
             gtab,
             sampling_length=1.2)
 
-        ODF_ours = GWI_ODF(gqmodel, data)
+        odf_ours = gwi_odf(gqmodel, data)
 
-        ODF_theirs = gqmodel.fit(data).odf(default_sphere)
+        odf_theirs = gqmodel.fit(data).odf(default_sphere)
 
-        npt.assert_array_almost_equal(ODF_ours, ODF_theirs)
+        npt.assert_array_almost_equal(odf_ours, odf_theirs)

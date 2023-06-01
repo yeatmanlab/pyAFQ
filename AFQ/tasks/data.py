@@ -19,7 +19,7 @@ import AFQ.api.bundle_dict as abd
 import AFQ.data.fetch as afd
 from AFQ.utils.path import drop_extension
 from AFQ.data.s3bids import write_json
-from AFQ._fixes import GWI_ODF
+from AFQ._fixes import gwi_odf
 
 from AFQ.definitions.utils import Definition
 from AFQ.definitions.image import B0Image
@@ -31,7 +31,7 @@ from AFQ.models.dki import _fit as dki_fit_model
 from AFQ.models.dti import _fit as dti_fit_model
 from AFQ.models.fwdti import _fit as fwdti_fit_model
 from AFQ.models.QBallTP import (
-    extract_ODF, anisotropic_index, anisotropic_power)
+    extract_odf, anisotropic_index, anisotropic_power)
 
 
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
@@ -331,9 +331,9 @@ def gq(base_fname, gtab, dwi_affine, data,
         gtab,
         sampling_length=gq_sampling_length)
 
-    ODF = GWI_ODF(gqmodel, data)
+    odf = gwi_odf(gqmodel, data)
 
-    GQ_shm, ASO, ISO = extract_ODF(ODF)
+    GQ_shm, ASO, ISO = extract_odf(odf)
 
     params_suffix = "_model-GQ_desc-diffmodel_dwi.nii.gz"
     params_fname = get_fname(base_fname, params_suffix)

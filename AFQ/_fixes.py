@@ -16,17 +16,17 @@ from dipy.data import default_sphere
 from scipy.linalg import blas
 
 
-def GWI_ODF(gqmodel, data):
+def f_odf(gqmodel, data):
     gqi_vector = np.real(
         squared_radial_component(np.dot(
             gqmodel.b_vector, default_sphere.vertices.T)
             * gqmodel.Lambda))
-    ODF = blas.dgemm(
+    odf = blas.dgemm(
         alpha=1.,
         a=data.reshape(-1, gqi_vector.shape[0]),
         b=gqi_vector
     ).reshape((*data.shape[:-1], gqi_vector.shape[1]))
-    return ODF
+    return odf
 
 
 def spherical_harmonics(m, n, theta, phi):
