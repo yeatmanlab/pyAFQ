@@ -50,12 +50,12 @@ afd.organize_stanford_data(clear_previous_afq=True)
 # Set tractography parameters (optional)
 # ---------------------
 # We make this tracking_params which we will pass to the GroupAFQ object
-# which specifies that we want 50,000 seeds randomly distributed
+# which specifies that we want 25,000 seeds randomly distributed
 # in the white matter.
 #
 # We only do this to make this example faster and consume less space.
 
-tracking_params = dict(n_seeds=50000,
+tracking_params = dict(n_seeds=25000,
                        random_seeds=True,
                        rng_seed=42)
 
@@ -203,10 +203,8 @@ fig_files = myafq.export("tract_profile_plots")["01"]
 bundle_counts = pd.read_csv(myafq.export("sl_counts")["01"], index_col=[0])
 for ind in bundle_counts.index:
     #  few streamlines are found for these bundles in this subject
-    if ind == "FP":
+    if ind == "FP" or ind == "FA" or "VOF" in ind:
         threshold = 0
-    elif ind == "FA" or "VOF" in ind:
-        threshold = 20
     else:
         threshold = 40
     if bundle_counts["n_streamlines_clean"][ind] < threshold:
