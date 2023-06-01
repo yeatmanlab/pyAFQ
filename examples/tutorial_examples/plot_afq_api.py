@@ -207,7 +207,7 @@ for ind in bundle_counts.index:
         threshold = 0
     else:
         threshold = 40
-    if bundle_counts["n_streamlines_clean"][ind] < threshold:
+    if bundle_counts["n_streamlines"][ind] < threshold:
         raise ValueError((
             "Small number of streamlines found "
             f"for bundle(s):\n{bundle_counts}"))
