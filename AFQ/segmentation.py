@@ -7,8 +7,6 @@ import numpy as np
 from scipy.spatial.distance import cdist
 from scipy.stats import zscore
 
-from tqdm.auto import tqdm
-
 import dipy.tracking.streamline as dts
 import dipy.tracking.streamlinespeed as dps
 from dipy.segment.bundles import RecoBundles
@@ -656,7 +654,7 @@ class Segmentation:
 
             if b_sls and "primary_axis" in bundle_def:
                 b_sls.initiate_selection("orientation")
-                accept_idx, _, _ = clean_by_orientation(
+                accept_idx = clean_by_orientation(
                     b_sls.get_selected_sls(),
                     bundle_def["primary_axis"],
                     bundle_def.get(
@@ -1318,7 +1316,7 @@ def clean_by_orientation(streamlines, primary_axis, tol=None):
         along_accepted_idx,
         end_accepted_idx)
 
-    return cleaned_idx, along_accepted_idx, end_accepted_idx
+    return cleaned_idx
 
 
 def clean_by_endpoints(streamlines, target, target_idx, tol=None,
