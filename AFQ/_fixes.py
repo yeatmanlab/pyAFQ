@@ -16,7 +16,7 @@ from dipy.data import default_sphere
 from scipy.linalg import blas
 
 
-def f_odf(gqmodel, data):
+def gwi_odf(gqmodel, data):
     gqi_vector = np.real(
         squared_radial_component(np.dot(
             gqmodel.b_vector, default_sphere.vertices.T)
