@@ -14,6 +14,7 @@ from AFQ.tasks.utils import get_fname, with_name, str_to_desc
 import AFQ.utils.volume as auv
 from AFQ.data.s3bids import write_json
 from AFQ.viz.utils import Viz
+import AFQ.utils.streamlines as aus
 
 from plotly.subplots import make_subplots
 
@@ -30,6 +31,7 @@ def _viz_prepare_vol(vol, xform, mapping, scalar_dict):
         vol = nib.load(vol).get_fdata()
     if xform:
         vol = mapping.transform_inverse(vol)
+    vol[np.isnan(vol)] = 0
     return vol
 
 
@@ -75,10 +77,9 @@ def viz_bundles(base_fname,
     Otherwise, returns the figure.
     """
     mapping = mapping_imap["mapping"]
-    bundle_dict = data_imap["bundle_dict"]
     scalar_dict = segmentation_imap["scalar_dict"]
     profiles_file = segmentation_imap["profiles"]
-    volume = data_imap["b0"]
+    volume = data_imap["masked_b0"]
     shade_by_volume = data_imap[best_scalar]
     start_time = time()
     volume = _viz_prepare_vol(volume, False, mapping, scalar_dict)
@@ -105,10 +106,9 @@ def viz_bundles(base_fname,
         figure=figure)
 
     figure = viz_backend.visualize_bundles(
-        segmentation_imap["clean_bundles"],
+        segmentation_imap["bundles"],
         shade_by_volume=shade_by_volume,
         sbv_lims=sbv_lims_bundles,
-        bundle_dict=bundle_dict,
         include_profiles=(pd.read_csv(profiles_file), best_scalar),
         n_points=n_points_bundles,
         flip_axes=flip_axes,
@@ -182,7 +182,7 @@ def viz_indivBundle(base_fname,
     bundle_dict = data_imap["bundle_dict"]
     reg_template = data_imap["reg_template"]
     scalar_dict = segmentation_imap["scalar_dict"]
-    volume = data_imap["b0"]
+    volume = data_imap["masked_b0"]
     shade_by_volume = data_imap[best_scalar]
     profiles = pd.read_csv(segmentation_imap["profiles"])
 
@@ -196,30 +196,44 @@ def viz_indivBundle(base_fname,
     for i in range(3):
         flip_axes[i] = (dwi_affine[i, i] < 0)
 
-    bundle_names = bundle_dict.keys()
+    bundles = aus.SegmentedSFT.fromfile(
+        segmentation_imap["bundles"])
+
+    # This dictionary contains a mapping to which ROIs
+    # should be used from the bundle dict, based on the
+    # name from the segmented SFT file. Currently,
+    # This is only different when using bundle sections.
+    segmented_bname_to_roi_bname = {}
+    for b_name, b_info in bundle_dict.items():
+        if "bundlesection" in b_info:
+            for sb_name in b_info["bundlesection"]:
+                segmented_bname_to_roi_bname[sb_name] = b_name
+        else:
+            segmented_bname_to_roi_bname[b_name] = b_name
 
     figures = {}
-    for bundle_name in bundle_names:
+    for bundle_name in bundles.bundle_names:
         logger.info(f"Generating {bundle_name} visualization...")
+        roi_bname = segmented_bname_to_roi_bname[bundle_name]
+
         figure = viz_backend.visualize_volume(
             volume,
             opacity=volume_opacity_indiv,
             flip_axes=flip_axes,
             interact=False,
             inline=False)
-        try:
+        if len(bundles.get_bundle(bundle_name)) > 0:
             figure = viz_backend.visualize_bundles(
-                segmentation_imap["clean_bundles"],
+                bundles,
                 shade_by_volume=shade_by_volume,
                 sbv_lims=sbv_lims_indiv,
-                bundle_dict=bundle_dict,
                 bundle=bundle_name,
                 n_points=n_points_indiv,
                 flip_axes=flip_axes,
                 interact=False,
                 inline=False,
                 figure=figure)
-        except ValueError:
+        else:
             logger.info(
                 "No streamlines found to visualize for "
                 + bundle_name)
@@ -227,8 +241,9 @@ def viz_indivBundle(base_fname,
         if segmentation_params["filter_by_endpoints"]:
             warped_rois = []
             for reg_type in ['start', 'end']:
-                if reg_type in bundle_dict[bundle_name]:
-                    pp = bundle_dict[bundle_name][reg_type]
+                if reg_type in bundle_dict[
+                        roi_bname]:
+                    pp = bundle_dict[roi_bname][reg_type]
                     pp = resample(
                         pp.get_fdata(),
                         reg_template,
@@ -240,21 +255,21 @@ def viz_indivBundle(base_fname,
                     warped_roi = auv.transform_inverse_roi(
                         atlas_roi,
                         mapping,
-                        bundle_name=bundle_name)
+                        bundle_name=roi_bname)
                     warped_rois.append(warped_roi)
             for i, roi in enumerate(warped_rois):
                 figure = viz_backend.visualize_roi(
                     roi,
-                    name=f"{bundle_name} endpoint ROI {i}",
+                    name=f"{roi_bname} endpoint ROI {i}",
                     flip_axes=flip_axes,
                     inline=False,
                     interact=False,
                     figure=figure)
 
-        for i, roi in enumerate(mapping_imap["rois"][bundle_name]):
+        for roi_fname in mapping_imap["rois"][roi_bname]:
             figure = viz_backend.visualize_roi(
-                roi,
-                name=f"{bundle_name} ROI {i}",
+                roi_fname,
+                name=roi_fname.split("desc-")[1].split("_")[0],
                 flip_axes=flip_axes,
                 inline=False,
                 interact=False,
@@ -313,10 +328,9 @@ def viz_indivBundle(base_fname,
                     interact=False,
                     inline=False)
                 core_fig = viz_backend.visualize_bundles(
-                    segmentation_imap["clean_bundles"],
+                    segmentation_imap["bundles"],
                     shade_by_volume=shade_by_volume,
                     sbv_lims=sbv_lims_indiv,
-                    bundle_dict=bundle_dict,
                     bundle=bundle_name,
                     colors={bundle_name: [0.5, 0.5, 0.5]},
                     n_points=n_points_indiv,
@@ -326,10 +340,9 @@ def viz_indivBundle(base_fname,
                     figure=core_fig)
                 core_fig = viz_backend.single_bundle_viz(
                     indiv_profile,
-                    segmentation_imap["clean_bundles"],
+                    segmentation_imap["bundles"],
                     bundle_name,
                     best_scalar,
-                    bundle_dict=bundle_dict,
                     flip_axes=flip_axes,
                     figure=core_fig,
                     include_profile=True)

@@ -7,9 +7,7 @@ import imageio as io
 from PIL import Image, ImageChops
 
 import nibabel as nib
-from dipy.tracking.utils import transform_tracking_output
 import dipy.tracking.streamlinespeed as dps
-from dipy.io.stateful_tractogram import StatefulTractogram
 from dipy.align import resample
 
 import AFQ.utils.volume as auv
@@ -152,12 +150,11 @@ def viz_import_msg_error(module):
     return msg
 
 
-def tract_generator(trk_file, bundle, bundle_dict, colors, n_points,
+def tract_generator(trk_file, bundle, colors, n_points,
                     n_sls_viz=3600, n_sls_min=75):
     """
     Generates bundles of streamlines from the tractogram.
     Only generates from relevant bundle if bundle is set.
-    Uses bundle_dict and colors to assign colors if set.
     Otherwise, returns all streamlines.
 
     Helper function
@@ -169,11 +166,6 @@ def tract_generator(trk_file, bundle, bundle_dict, colors, n_points,
 
     bundle : str
         The name of a bundle to select from the trk metadata.
-
-    bundle_dict : dict, optional
-        Keys are names of bundles and values are dicts that specify them.
-        Default: bundles are either not identified, or identified
-        only as unique integers in the metadata.
 
     colors : dict or list
         If this is a dict, keys are bundle names and values are RGB tuples.
@@ -197,17 +189,14 @@ def tract_generator(trk_file, bundle, bundle_dict, colors, n_points,
     -------
     Statefule Tractogram streamlines, RGB numpy array, str
     """
-    if colors is None:
-        if bundle_dict is None:
-            colors = tableau_20
-        else:
-            colors = gen_color_dict(bundle_dict.keys())
-
     viz_logger.info("Loading Stateful Tractogram...")
     if isinstance(trk_file, str):
         seg_sft = aus.SegmentedSFT.fromfile(trk_file)
     else:
         seg_sft = trk_file
+
+    if colors is None:
+        colors = gen_color_dict(seg_sft.bundle_names)
 
     seg_sft.sft.to_vox()
     streamlines = seg_sft.sft.streamlines
@@ -227,17 +216,9 @@ def tract_generator(trk_file, bundle, bundle_dict, colors, n_points,
             streamlines = dps.set_number_of_points(streamlines, n_points)
         yield streamlines, colors[0], "all_bundles", seg_sft.sft.dimensions
     else:
-        # There are bundles:
-        if bundle_dict is None:
-            bundle_dict = {'whole_brain': None}
-        else:
-            bundle_dict = bundle_dict.copy()
-            if 'whole_brain' in bundle_dict:
-                del bundle_dict['whole_brain']
-
         if bundle is None:
             # No selection: visualize all of them:
-            for bundle_name in bundle_dict.keys():
+            for bundle_name in seg_sft.bundle_names:
                 idx = seg_sft.bundle_idxs[bundle_name]
                 if len(idx) == 0:
                     continue

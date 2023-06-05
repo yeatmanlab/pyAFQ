@@ -40,7 +40,7 @@ myafq = GroupAFQ(
 
 
 for b_name in bundle_names:
-    b_len = len(aus.SegmentedSFT.fromfile(myafq.export("clean_bundles")[
+    b_len = len(aus.SegmentedSFT.fromfile(myafq.export("bundles")[
         "01"]).get_bundle(b_name))
 
     if b_len < 1:

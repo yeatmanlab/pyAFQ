@@ -29,10 +29,10 @@ def get_percentile_threshold(mask, threshold):
 
 
 def track(params_file, directions="prob", max_angle=30., sphere=None,
-          seed_mask=None, seed_threshold=0, n_seeds=1, random_seeds=False,
-          rng_seed=None, stop_mask=None, stop_threshold=0, step_size=0.5,
-          min_length=50, max_length=250, odf_model="CSD",
-          tracker="local"):
+          seed_mask=None, seed_threshold=0, thresholds_as_percentages=False,
+          n_seeds=1, random_seeds=False, rng_seed=None, stop_mask=None,
+          stop_threshold=0, step_size=0.5, min_length=50, max_length=250,
+          odf_model="CSD", tracker="local"):
     """
     Tractography
 
@@ -86,6 +86,12 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         A string is required if the tracker is set to "pft".
         Defaults to 0 (this means that if no stop_mask is passed,
         we will stop only at the edge of the image).
+    thresholds_as_percentages : bool, optional
+        Interpret seed_threshold and stop_threshold as percentages of the
+        total non-nan voxels in the seed and stop mask to include
+        (between 0 and 100), instead of as a threshold on the
+        values themselves. 
+        Default: False
     step_size : float, optional.
         The size of a step (in mm) of tractography. Default: 0.5
     min_length: int, optional
@@ -131,7 +137,10 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
     if isinstance(n_seeds, int):
         if seed_mask is None:
             seed_mask = np.ones(params_img.shape[:3])
-        elif seed_mask.dtype != 'bool':
+        elif len(np.unique(seed_mask)) > 2:
+            if thresholds_as_percentages:
+                seed_threshold = get_percentile_threshold(
+                    seed_mask, seed_threshold)
             seed_mask = seed_mask > seed_threshold
         if random_seeds:
             seeds = dtu.random_seeds_from_mask(seed_mask, seeds_count=n_seeds,
@@ -153,23 +162,28 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         dg = DeterministicMaximumDirectionGetter
     elif directions == "prob":
         dg = ProbabilisticDirectionGetter
+    else:
+        raise ValueError(f"Unrecognized direction '{directions}'.")
 
     if odf_model == "DTI" or odf_model == "DKI":
         evals = model_params[..., :3]
         evecs = model_params[..., 3:12].reshape(params_img.shape[:3] + (3, 3))
         odf = tensor_odf(evals, evecs, sphere)
         dg = dg.from_pmf(odf, max_angle=max_angle, sphere=sphere)
-    elif odf_model == "CSD":
+    elif odf_model == "CSD" or odf_model == "GQ":
         dg = dg.from_shcoeff(model_params, max_angle=max_angle, sphere=sphere)
 
     if tracker == "local":
         if stop_mask is None:
             stop_mask = np.ones(params_img.shape[:3])
 
-        if stop_mask.dtype == 'bool':
+        if len(np.unique(stop_mask)) <= 2:
             stopping_criterion = ThresholdStoppingCriterion(stop_mask,
                                                             0.5)
         else:
+            if thresholds_as_percentages:
+                stop_threshold = get_percentile_threshold(
+                    stop_mask, stop_threshold)
             stopping_criterion = ThresholdStoppingCriterion(stop_mask,
                                                             stop_threshold)
 

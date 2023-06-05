@@ -2,7 +2,7 @@ import logging
 import numpy as np
 
 import scipy.ndimage as ndim
-from skimage.morphology import binary_dilation
+from skimage.morphology import binary_dilation, convex_hull_image
 from scipy.spatial.distance import dice
 
 import nibabel as nib
@@ -50,12 +50,12 @@ def transform_inverse_roi(roi, mapping, bundle_name="ROI"):
         _roi = binary_dilation(roi)
         _roi = mapping.transform_inverse(_roi, interpolation='linear')
 
-    _roi = patch_up_roi(_roi > 0, bundle_name=bundle_name).astype(int)
+    _roi = patch_up_roi(_roi > 0, bundle_name=bundle_name).astype(np.int32)
 
     return _roi
 
 
-def patch_up_roi(roi, bundle_name="ROI", make_convex=True):
+def patch_up_roi(roi, bundle_name="ROI"):
     """
     After being non-linearly transformed, ROIs tend to have holes in them.
     We perform a couple of computational geometry operations on the ROI to
@@ -66,12 +66,6 @@ def patch_up_roi(roi, bundle_name="ROI", make_convex=True):
     roi : 3D binary array
         The ROI after it has been transformed.
 
-    sigma : float
-        The sigma for initial Gaussian smoothing.
-
-    truncate : float
-        The truncation for the Gaussian
-
     bundle_name : str, optional
         Name of bundle, which may be useful for error messages.
         Default: None
@@ -80,7 +74,6 @@ def patch_up_roi(roi, bundle_name="ROI", make_convex=True):
     -------
     ROI after dilation and hole-filling
     """
-
     hole_filled = ndim.binary_fill_holes(roi > 0)
     if not np.any(hole_filled):
         raise ValueError((

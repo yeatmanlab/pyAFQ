@@ -6,7 +6,7 @@ import logging
 
 import pimms
 from AFQ.tasks.decorators import as_file
-from AFQ.tasks.utils import get_fname, with_name, str_to_desc
+from AFQ.tasks.utils import with_name, str_to_desc
 import AFQ.data.fetch as afd
 from AFQ.data.s3bids import write_json
 from AFQ.utils.path import drop_extension
@@ -58,48 +58,17 @@ def export_rois(base_fname, results_dir, data_imap, mapping, dwi_affine):
     rois_dir = op.join(results_dir, 'ROIs')
     os.makedirs(rois_dir, exist_ok=True)
     roi_files = {}
-    for bundle in bundle_dict:
-        roi_files[bundle] = []
-        for roi_type in ['include', 'exclude', 'start', 'end']:
-            if roi_type in bundle_dict[bundle]:
-                rois = bundle_dict[bundle][roi_type]
-                if not isinstance(rois, list):
-                    rois = [rois]
-                for ii, roi in enumerate(rois):
-                    fname = op.split(
-                        get_fname(
-                            base_fname,
-                            '_space-subject_desc-'
-                            f'{str_to_desc(bundle)}{ii + 1}{roi_type}'
-                            '_mask.nii.gz'))
-
-                    fname = op.join(rois_dir, fname[1])
-                    if not op.exists(fname):
-                        if "space" not in bundle_dict[bundle]\
-                            or bundle_dict[bundle][
-                                "space"] == "template":
-                            warped_roi = auv.transform_inverse_roi(
-                                roi,
-                                mapping,
-                                bundle_name=bundle)
-                        else:
-                            if isinstance(roi, str):
-                                roi = nib.load(roi)
-                            if isinstance(roi, nib.Nifti1Image):
-                                roi = roi.get_fdata()
-                            warped_roi = roi
-
-                        # Cast to float32,
-                        # so that it can be read in by MI-Brain:
-                        logger.info(f"Saving {fname}")
-                        nib.save(
-                            nib.Nifti1Image(
-                                warped_roi.astype(np.float32),
-                                dwi_affine), fname)
-                        meta = {}
-                        meta_fname = f'{drop_extension(fname)}.json'
-                        write_json(meta_fname, meta)
-                    roi_files[bundle].append(fname)
+    base_roi_fname = op.join(rois_dir, op.split(base_fname)[1])
+    for bundle_name in bundle_dict:
+        roi_files[bundle_name] = []
+        for roi_fname in bundle_dict.transform_rois(
+                bundle_name, mapping, dwi_affine,
+                base_fname=base_roi_fname):
+            logger.info(f"Saving {roi_fname}")
+            roi_files[bundle_name].append(roi_fname)
+            meta = {}
+            meta_fname = f'{drop_extension(roi_fname)}.json'
+            write_json(meta_fname, meta)
     return {'rois': roi_files}
 
 
@@ -207,31 +176,22 @@ def get_reg_subject(data_imap, bids_info, base_fname, dwi,
         Default: "power_map"
     """
     if not isinstance(reg_subject_spec, str)\
-            and not isinstance(reg_subject_spec, nib.Nifti1Image)\
-            and not isinstance(reg_subject_spec, ImageDefinition):
+            and not isinstance(reg_subject_spec, nib.Nifti1Image):
+        # Note the ImageDefinition case is handled in get_mapping_plan
         raise TypeError(
             "reg_subject must be a str, ImageDefinition, or Nifti1Image")
 
     filename_dict = {
         "b0": "b0",
-        "power_map": "pmap",
+        "power_map": "csd_pmap",
         "dti_fa_subject": "dti_fa",
         "subject_sls": "b0",
     }
     bm = nib.load(data_imap["brain_mask"])
 
-    if bids_info is not None and isinstance(reg_subject_spec, ImageDefinition):
-        reg_subject_spec.find_path(
-            bids_info["bids_layout"],
-            dwi,
-            bids_info["subject"],
-            bids_info["session"])
-        img, _ = reg_subject_spec.get_image_direct(
-            dwi, bids_info, data_imap["b0"],
-            data_imap=data_imap)
-    else:
-        if reg_subject_spec in filename_dict:
-            reg_subject_spec = data_imap[filename_dict[reg_subject_spec]]
+    if reg_subject_spec in filename_dict:
+        reg_subject_spec = data_imap[filename_dict[reg_subject_spec]]
+    if isinstance(reg_subject_spec, str):
         img = nib.load(reg_subject_spec)
     bm = bm.get_fdata().astype(bool)
     masked_data = img.get_fdata()
@@ -272,5 +232,18 @@ def get_mapping_plan(kwargs, use_sls=False):
 
     if use_sls:
         mapping_tasks["mapping_res"] = sls_mapping
+
+    reg_ss = kwargs.get("reg_subject_spec", None)
+    if isinstance(reg_ss, ImageDefinition):
+        reg_ss.find_path(
+            bids_info["bids_layout"],
+            kwargs["dwi"],
+            bids_info["subject"],
+            bids_info["session"])
+        del kwargs["reg_subject_spec"]
+        mapping_tasks["reg_subject_spec_res"] = pimms.calc("reg_subject_spec")(
+            as_file((
+                f'_desc-{str_to_desc(reg_ss.get_name())}'
+                '_dwi.nii.gz'))(reg_ss.get_image_getter("mapping")))
 
     return pimms.plan(**mapping_tasks)

@@ -2,17 +2,20 @@ import numpy as np
 import logging
 
 import nibabel as nib
-from dipy.segment.mask import median_otsu
 
+from dipy.segment.mask import median_otsu
 from dipy.align import resample
+
 import AFQ.utils.volume as auv
 from AFQ.definitions.utils import Definition, find_file, name_from_path
 
+from skimage.morphology import convex_hull_image, binary_opening
+from scipy.linalg import blas
 
 __all__ = [
     "ImageFile", "FullImage", "RoiImage", "B0Image", "LabelledImageFile",
     "ThresholdedImageFile", "ScalarImage", "ThresholdedScalarImage",
-    "TemplateImage"]
+    "TemplateImage", "GQImage"]
 
 
 logger = logging.getLogger('AFQ')
@@ -47,10 +50,6 @@ class ImageDefinition(Definition):
     def get_image_getter(self, task_name):
         raise NotImplementedError(
             "Please implement a get_image_getter method")
-
-    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
-        raise NotImplementedError(
-            "Please implement a get_image_direct method")
 
 
 class CombineImageMixin(object):
@@ -179,10 +178,6 @@ class ImageFile(ImageDefinition):
                 dwi_img.affine), meta
         return image_getter
 
-    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
-        return self.get_image_getter("direct")(
-            dwi, bids_info)
-
 
 class FullImage(ImageDefinition):
     """
@@ -210,9 +205,6 @@ class FullImage(ImageDefinition):
                 dwi_img.affine), dict(source="Entire Volume")
         return image_getter
 
-    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
-        return self.get_image_getter("direct")(dwi)
-
 
 class RoiImage(ImageDefinition):
     """
@@ -220,13 +212,23 @@ class RoiImage(ImageDefinition):
 
     Parameters
     ----------
+    use_waypoints : bool
+        Whether to use the include ROIs to generate the image.
     use_presegment : bool
         Whether to use presegment bundle dict from segmentation params
         to get ROIs.
     use_endpoints : bool
-        Whether to use the endpoints ("start" and "end") instead of the
-        include ROIs to generate the image.
-
+        Whether to use the endpoints ("start" and "end") to generate
+        the image.
+    tissue_property : str or None
+        Tissue property from `scalars` to multiply the ROI image with.
+        Can be useful to limit seed mask to the core white matter.
+        Note: this must be a built-in tissue property.
+        Default: None
+    tissue_property_threshold : int or None
+        Threshold to threshold `tissue_property` if a boolean mask is
+        desired. This threshold is interpreted as a percentile.
+        Default: None
     Examples
     --------
     seed_image = RoiImage()
@@ -236,10 +238,14 @@ class RoiImage(ImageDefinition):
     def __init__(self,
                  use_waypoints=True,
                  use_presegment=False,
-                 use_endpoints=False):
+                 use_endpoints=False,
+                 tissue_property=None,
+                 tissue_property_threshold=None):
         self.use_waypoints = use_waypoints
         self.use_presegment = use_presegment
         self.use_endpoints = use_endpoints
+        self.tissue_property = tissue_property
+        self.tissue_property_threshold = tissue_property_threshold
         if not np.logical_or(self.use_waypoints, np.logical_or(
                 self.use_endpoints, self.use_presegment)):
             raise ValueError((
@@ -263,36 +269,49 @@ class RoiImage(ImageDefinition):
             else:
                 bundle_dict = bundle_dict
 
-            for bundle_name, bundle_info in bundle_dict.items():
+            for bundle_name in bundle_dict:
+                bundle_entry = bundle_dict.transform_rois(
+                    bundle_name,
+                    mapping,
+                    dwi_affine)
                 rois = []
                 if self.use_endpoints:
                     rois.extend(
-                        [bundle_info[end_type] for end_type in
-                            ["start", "end"] if end_type in bundle_info])
+                        [bundle_entry[end_type] for end_type in
+                            ["start", "end"] if end_type in bundle_entry])
                 if self.use_waypoints:
-                    rois.extend(bundle_info['include']
-                                if 'include' in bundle_info else [])
+                    rois.extend(bundle_entry.get('include', []))
                 for roi in rois:
-                    if "space" not in bundle_info\
-                        or bundle_info[
-                            "space"] == "template":
-                        warped_roi = auv.transform_inverse_roi(
-                            roi,
-                            mapping,
-                            bundle_name=bundle_name)
-                    else:
-                        warped_roi = roi.get_fdata()
-
+                    warped_roi = roi.get_fdata()
                     if image_data is None:
                         image_data = np.zeros(warped_roi.shape)
                     image_data = np.logical_or(
                         image_data,
                         warped_roi.astype(bool))
+            if self.tissue_property is not None:
+                tp = nib.load(data_imap[self.tissue_property]).get_fdata()
+                image_data = image_data.astype(np.float32) * tp
+                if self.tissue_property_threshold is not None:
+                    zero_mask = image_data == 0
+                    image_data[zero_mask] = np.nan
+                    tissue_property_threshold = np.nanpercentile(
+                        image_data,
+                        100 - self.tissue_property_threshold)
+                    image_data[zero_mask] = 0
+                    image_data = image_data > tissue_property_threshold
+            if image_data is None:
+                raise ValueError((
+                    "BundleDict does not have enough ROIs to generate "
+                    f"an ROI Image: {bundle_dict._dict}"))
             return nib.Nifti1Image(
                 image_data.astype(np.float32),
                 dwi_affine), dict(source="ROIs")
 
-        if task_name == "mapping":
+        if task_name == "data":
+            raise ValueError((
+                "RoiImage cannot be used in this context, as they"
+                "require later derivatives to be calculated"))
+        elif task_name == "mapping":
             def image_getter(
                     dwi_affine, mapping,
                     data_imap, segmentation_params):
@@ -308,10 +327,47 @@ class RoiImage(ImageDefinition):
                     data_imap, segmentation_params)
         return image_getter
 
-    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
-        raise ValueError((
-            "RoiImage cannot be used in this context, as they"
-            "require later derivatives to be calculated"))
+
+class GQImage(ImageDefinition):
+    """
+    Threshold the anisotropic diffusion component of the 
+    Generalized Q-Sampling Model to generate a brain mask
+    which will include the eyes, optic nerve, and cerebrum
+    but will exclude most or all of the skull.
+
+    Examples
+    --------
+    api.GroupAFQ(brain_mask_definition=GQImage())
+    """
+
+    def __init__(self):
+        pass
+
+    def find_path(self, bids_layout, from_path, subject, session):
+        pass
+
+    def get_name(self):
+        return "GQ"
+
+    def get_image_getter(self, task_name):
+        def image_getter_helper(gq_aso):
+            gq_aso_img = nib.load(gq_aso)
+            gq_aso_data = gq_aso_img.get_fdata()
+            ASO_mask = convex_hull_image(
+                binary_opening(
+                    gq_aso_data > 0.1))
+
+            return nib.Nifti1Image(
+                ASO_mask.astype(np.float32),
+                gq_aso_img.affine), dict(
+                    source=gq_aso,
+                    technique="GQ ASO thresholded maps")
+
+        if task_name == "data":
+            return image_getter_helper
+        else:
+            return lambda data_imap: image_getter_helper(
+                data_imap["gq_aso"])
 
 
 class B0Image(ImageDefinition):
@@ -356,13 +412,10 @@ class B0Image(ImageDefinition):
                     source=b0,
                     technique="median_otsu applied to b0",
                     median_otsu_kwargs=self.median_otsu_kwargs)
-        if task_name == "data" or task_name == "direct":
+        if task_name == "data":
             return image_getter_helper
         else:
             return lambda data_imap: image_getter_helper(data_imap["b0"])
-
-    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
-        return self.get_image_getter("direct")(b0_file)
 
 
 class LabelledImageFile(ImageFile, CombineImageMixin):
@@ -460,6 +513,11 @@ class ThresholdedImageFile(ImageFile, CombineImageMixin):
         Upper bound to generate boolean image from data in the file.
         If None, no upper bound is applied.
         Default: None.
+    as_percentage : bool, optional
+        Interpret lower_bound and upper_bound as percentages of the
+        total non-nan voxels in the image to include (between 0 and 100),
+        instead of as a threshold on the values themselves.
+        Default: False
     combine : str, optional
         How to combine the boolean images generated by lower_bound
         and upper_bound. If "and", they will be and'd together.
@@ -476,20 +534,33 @@ class ThresholdedImageFile(ImageFile, CombineImageMixin):
     """
 
     def __init__(self, path=None, suffix=None, filters={}, lower_bound=None,
-                 upper_bound=None, combine="and"):
+                 upper_bound=None, as_percentage=False, combine="and"):
         ImageFile.__init__(self, path, suffix, filters)
         CombineImageMixin.__init__(self, combine)
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
+        self.as_percentage = as_percentage
 
     # overrides ImageFile
     def apply_conditions(self, image_data_orig, image_file):
         # Apply thresholds
         self.reset_image_draft(image_data_orig.shape)
         if self.upper_bound is not None:
-            self.image_draft = self * (image_data_orig < self.upper_bound)
+            if self.as_percentage:
+                upper_bound = np.nanpercentile(
+                    image_data_orig,
+                    self.upper_bound)
+            else:
+                upper_bound = self.upper_bound
+            self.image_draft = self * (image_data_orig < upper_bound)
         if self.lower_bound is not None:
-            self.image_draft = self * (image_data_orig > self.lower_bound)
+            if self.as_percentage:
+                lower_bound = np.nanpercentile(
+                    image_data_orig,
+                    100 - self.lower_bound)
+            else:
+                lower_bound = self.lower_bound
+            self.image_draft = self * (image_data_orig > lower_bound)
 
         meta = dict(source=image_file,
                     upper_bound=self.upper_bound,
@@ -531,18 +602,15 @@ class ScalarImage(ImageDefinition):
         return self.scalar
 
     def get_image_getter(self, task_name):
+        if task_name == "data":
+            raise ValueError((
+                "ScalarImage cannot be used in this context, as they"
+                "require later derivatives to be calculated"))
+
         def image_getter(data_imap):
             return nib.load(data_imap[self.scalar]), dict(
                 FromScalar=self.scalar)
         return image_getter
-
-    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
-        if data_imap is not None:
-            return self.get_image_getter("direct")(data_imap)
-        else:
-            raise ValueError((
-                "ScalarImage cannot be used in this context, as they"
-                "require later derivatives to be calculated"))
 
 
 class ThresholdedScalarImage(ThresholdedImageFile, ScalarImage):
@@ -624,11 +692,10 @@ class PFTImage(ImageDefinition):
         return "pft"
 
     def get_image_getter(self, task_name):
+        if task_name == "data":
+            raise ValueError("PFTImage cannot be used in this context")
         return [probseg.get_image_getter(task_name)
                 for probseg in self.probsegs]
-
-    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
-        raise ValueError("PFTImage cannot be used in this context")
 
 
 class TemplateImage(ImageDefinition):
@@ -672,7 +739,11 @@ class TemplateImage(ImageDefinition):
                 scalar_data.astype(np.float32),
                 reg_template.affine), dict(source=self.path)
 
-        if task_name == "mapping":
+        if task_name == "data":
+            raise ValueError((
+                "TemplateImage cannot be used in this context, as they"
+                "require later derivatives to be calculated"))
+        elif task_name == "mapping":
             def image_getter(mapping, data_imap):
                 return _image_getter_helper(
                     mapping, data_imap["reg_template"])
@@ -681,8 +752,3 @@ class TemplateImage(ImageDefinition):
                 return _image_getter_helper(
                     mapping_imap["mapping"], data_imap["reg_template"])
         return image_getter
-
-    def get_image_direct(self, dwi, bids_info, b0_file, data_imap=None):
-        raise ValueError((
-            "ScalarImage cannot be used in this context, as they"
-            "require later derivatives to be calculated"))

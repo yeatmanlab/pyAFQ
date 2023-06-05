@@ -13,6 +13,7 @@ from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 import AFQ.data.fetch as afd
 import AFQ.segmentation as seg
+import AFQ.registration as reg
 
 
 dpd.fetch_stanford_hardi()
@@ -22,7 +23,10 @@ hardi_img = nib.load(hardi_fdata)
 hardi_fbval = op.join(hardi_dir, "HARDI150.bval")
 hardi_fbvec = op.join(hardi_dir, "HARDI150.bvec")
 file_dict = afd.read_stanford_hardi_tractography()
-mapping = file_dict['mapping.nii.gz']
+mapping = reg.read_mapping(
+    file_dict['mapping.nii.gz'],
+    hardi_img,
+    afd.read_mni_template())
 streamlines = file_dict['tractography_subsampled.trk']
 tg = StatefulTractogram(streamlines, hardi_img, Space.RASMM)
 tg.to_vox()
@@ -37,7 +41,7 @@ bundles = {'CST_L': {
            'CST_R': {
                     'include': [
                         templates['CST_roi1_R'],
-                        templates['CST_roi1_R']],
+                        templates['CST_roi2_R']],
                     'prob_map': templates['CST_R_prob_map'],
                     'cross_midline': None}}
 
@@ -46,10 +50,10 @@ def test_segment():
     segmentation = seg.Segmentation()
     segmentation.segment(bundles,
                          tg,
+                         mapping,
                          hardi_fdata,
                          hardi_fbval,
-                         hardi_fbvec,
-                         mapping=mapping)
+                         hardi_fbvec)
     fiber_groups = segmentation.fiber_groups
 
     # We asked for 2 fiber groups:
@@ -80,16 +84,16 @@ def test_segment_no_prob():
         'CST_R': {
             'include': [
                 templates['CST_roi1_R'],
-                templates['CST_roi1_R']],
+                templates['CST_roi2_R']],
             'cross_midline': False}}
 
     segmentation = seg.Segmentation()
     segmentation.segment(bundles_no_prob,
                          tg,
+                         mapping,
                          hardi_fdata,
                          hardi_fbval,
-                         hardi_fbvec,
-                         mapping=mapping)
+                         hardi_fbvec)
     fiber_groups = segmentation.fiber_groups
 
     # This condition should still hold
@@ -102,10 +106,10 @@ def test_segment_return_idx():
     segmentation = seg.Segmentation(return_idx=True)
     segmentation.segment(bundles,
                          tg,
+                         mapping,
                          hardi_fdata,
                          hardi_fbval,
-                         hardi_fbvec,
-                         mapping=mapping)
+                         hardi_fbvec)
     fiber_groups = segmentation.fiber_groups
 
     npt.assert_equal(len(fiber_groups), 2)
@@ -122,26 +126,51 @@ def test_segment_keep_space():
     orig_space = tg.space
     segmentation.segment(bundles,
                          tg,
+                         mapping,
                          hardi_fdata,
                          hardi_fbval,
                          hardi_fbvec,
-                         mapping=mapping,
                          reset_tg_space=True)
 
     npt.assert_equal(tg.space, orig_space)
 
 
-@pytest.mark.nightly
 def test_segment_clip_edges():
+    sls = tg.streamlines
+    idx = np.arange(len(tg.streamlines))
+    accepted_sls = sls[[4, 10, 11]]
+    accepted_ix = idx[[4, 10, 11]]
+    bundle_roi_dists = np.zeros((len(sls), 3))
+    bundle_roi_dists[4, :] = [5, 10, 15]
+    bundle_roi_dists[10, :] = [3, 6, 9]
+    bundle_roi_dists[11, :] = [10, 10, 10]
+    cut_sls = seg._cut_sls_by_dist(
+        accepted_sls,
+        accepted_ix,
+        bundle_roi_dists,
+        [0, 2])
+    npt.assert_array_equal(
+        cut_sls[0],
+        accepted_sls[0][5:15])
+    npt.assert_array_equal(
+        cut_sls[1],
+        accepted_sls[1][3:9])
+    npt.assert_array_equal(
+        cut_sls[2],
+        accepted_sls[2][9:11])
+
+
+@pytest.mark.nightly
+def test_segment_clip_edges_api():
     # Test with the clip_edges kwarg set to True:
     segmentation = seg.Segmentation(clip_edges=True)
 
     fiber_groups = segmentation.segment(bundles,
                                         tg,
+                                        mapping,
                                         hardi_fdata,
                                         hardi_fbval,
-                                        hardi_fbvec,
-                                        mapping=mapping)
+                                        hardi_fbvec)
 
     npt.assert_equal(len(fiber_groups), 2)
     npt.assert_(len(fiber_groups['CST_R']) > 0)
@@ -162,6 +191,7 @@ def test_segment_reco():
                                     rm_small_clusters=1,
                                     rng=np.random.RandomState(seed=8))
     fiber_groups = segmentation.segment(bundles_reco, tg,
+                                        mapping,
                                         hardi_fdata,
                                         hardi_fbval,
                                         hardi_fbvec)
@@ -194,27 +224,25 @@ def test_clean_by_endpoints():
     atlas[4, 1, 1] = 3
     atlas[4, 1, 2] = 4
 
-    clean_idx = list(seg.clean_by_endpoints(
-        sl, [1, 2], [3, 4], atlas=atlas))
-    npt.assert_array_equal(clean_idx, np.array([0, 1]))
+    target_img_start = nib.Nifti1Image(
+        np.logical_or(atlas==1, atlas==2).astype(np.float32), np.eye(4))
+    target_img_end = nib.Nifti1Image(
+        np.logical_or(atlas==3, atlas==4).astype(np.float32), np.eye(4))
+
+    clean_idx_start = list(seg.clean_by_endpoints(
+        sl, target_img_start, 0))
+    clean_idx_end = list(seg.clean_by_endpoints(
+        sl, target_img_end, -1))
+    npt.assert_array_equal(np.logical_and(
+        clean_idx_start, clean_idx_end), np.array([1, 1, 0, 0]))
 
     # If tol=1, the third streamline also gets included
-    clean_idx = list(seg.clean_by_endpoints(
-        sl, [1, 2], [3, 4], tol=1, atlas=atlas))
-    npt.assert_array_equal(clean_idx, np.array([0, 1, 2]))
-
-    # Provide the Nx3 array of indices instead.
-    idx_start = np.array(np.where(atlas == 1)).T
-    idx_end = np.array(np.where(atlas == 3)).T
-
-    clean_idx = list(seg.clean_by_endpoints(
-        sl, idx_start, idx_end, atlas=atlas))
-    npt.assert_array_equal(clean_idx, np.array([0]))
-
-    # Sometimes no requirement for one side:
-    clean_idx = list(seg.clean_by_endpoints(
-        sl, [1], None, atlas=atlas))
-    npt.assert_array_equal(clean_idx, np.array([0, 2, 3]))
+    clean_idx_start = list(seg.clean_by_endpoints(
+        sl, target_img_start, 0, tol=1))
+    clean_idx_end = list(seg.clean_by_endpoints(
+        sl, target_img_end, -1, tol=1))
+    npt.assert_array_equal(np.logical_and(
+        clean_idx_start, clean_idx_end), np.array([1, 1, 1, 0]))
 
 
 def test_exclusion_ROI():
@@ -233,17 +261,21 @@ def test_exclusion_ROI():
     slf_tg = StatefulTractogram(
         np.asarray(
             [
-                [[6, 50, 39], [28, 38, 61], [28, 61, 38]],
-                [[6, 50, 39], [28, 38, 62], [18, 41, 31]]
+                [
+                    [8, 53, 39], [8, 50, 39], [8, 45, 39],
+                    [30, 41, 61], [28, 61, 38]],
+                [
+                    [8, 53, 39], [8, 50, 39], [8, 45, 39],
+                    [30, 41, 62], [20, 44, 34]]
             ]).astype(float),
         hardi_img, Space.VOX)
     fiber_groups = segmentation.segment(
         slf_bundle,
         slf_tg,
+        mapping,
         hardi_fdata,
         hardi_fbval,
         hardi_fbvec,
-        mapping=mapping,
     )
     npt.assert_equal(len(fiber_groups["SLF_L"]), 2)
 
@@ -252,32 +284,27 @@ def test_exclusion_ROI():
     fiber_groups = segmentation.segment(
         slf_bundle,
         slf_tg,
+        mapping,
         hardi_fdata,
         hardi_fbval,
         hardi_fbvec,
-        mapping=mapping,
     )
     npt.assert_equal(len(fiber_groups["SLF_L"]), 1)
 
 
 def test_segment_orientation():
-    cleaned_idx, along_accepted_idx, end_accepted_idx = \
+    cleaned_idx = \
         seg.clean_by_orientation(streamlines, primary_axis=1)
     npt.assert_equal(np.sum(cleaned_idx), 93)
-    npt.assert_equal(np.sum(along_accepted_idx), 104)
-    npt.assert_equal(np.sum(end_accepted_idx), 105)
-
-    _, along_accepted_idx_tol, end_accepted_idx_tol = \
+    cleaned_idx_tol = \
         seg.clean_by_orientation(streamlines, primary_axis=1, tol=50)
-    npt.assert_(np.sum(along_accepted_idx_tol) < np.sum(along_accepted_idx))
-    npt.assert_array_equal(end_accepted_idx_tol, end_accepted_idx)
+    npt.assert_(np.sum(cleaned_idx_tol) < np.sum(cleaned_idx))
 
-    _, along_accepted_idx, end_accepted_idx = \
+    cleaned_idx = \
         seg.clean_by_orientation(streamlines, primary_axis=2)
-    _, along_accepted_idx_tol, end_accepted_idx_tol = \
+    cleaned_idx_tol = \
         seg.clean_by_orientation(streamlines, primary_axis=2, tol=33)
-    npt.assert_array_equal(along_accepted_idx_tol, along_accepted_idx)
-    npt.assert_array_equal(end_accepted_idx_tol, end_accepted_idx)
+    npt.assert_array_equal(cleaned_idx_tol, cleaned_idx)
 
 
 def test_segment_sampled_streamlines():
@@ -287,10 +314,10 @@ def test_segment_sampled_streamlines():
     fiber_groups = segmentation.segment(
         bundles,
         tg,
+        mapping,
         hardi_fdata,
         hardi_fbval,
         hardi_fbvec,
-        mapping=mapping
     )
 
     # Already using a subsampled tck
@@ -308,10 +335,10 @@ def test_segment_sampled_streamlines():
     sampled_fiber_groups = sampled_segmentation.segment(
         bundles,
         tg,
+        mapping,
         hardi_fdata,
         hardi_fbval,
         hardi_fbvec,
-        mapping=mapping
     )
 
     # sampled streamlines should equal the sample number

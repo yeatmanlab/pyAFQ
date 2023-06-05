@@ -223,9 +223,9 @@ def _plot_profiles(profiles, bundle_name, color, fig, scalar):
             yaxis_title=dict(text=vut.display_string(scalar), font=font)))
 
 
-def visualize_bundles(sft, n_points=None, bundle_dict=None,
+def visualize_bundles(sft, n_points=None,
                       bundle=None, colors=None, shade_by_volume=None,
-                      color_by_streamline=None,
+                      color_by_streamline=None, n_sls_viz=3600,
                       sbv_lims=[None, None], include_profiles=(None, None),
                       flip_axes=[False, False, False], opacity=1.0,
                       figure=None, background=(1, 1, 1), interact=False,
@@ -246,20 +246,14 @@ def visualize_bundles(sft, n_points=None, bundle_dict=None,
         n_points to resample streamlines to before plotting. If None, no
         resampling is done.
 
-    bundle_dict : dict, optional
-        Keys are names of bundles and values are dicts that specify them.
-        Default: bundles are either not identified, or identified
-        only as unique integers in the metadata.
-
     bundle : str, optional
-        The name of a bundle to select from among the keys in `bundle_dict`
+        The name of a bundle to select
         or an integer for selection from the sft metadata.
 
     colors : dict or list
         If this is a dict, keys are bundle names and values are RGB tuples.
-        If this is a list, each item is an RGB tuple. Defaults to a list
-        with Tableau 20 RGB values if bundle_dict is None, or dict from
-        bundles to Tableau 20 RGB values if bundle_dict is not None.
+        If this is a list, each item is an RGB tuple. Defaults to a dict
+        from bundles to Tableau 20 RGB values.
 
     shade_by_volume : ndarray or str, optional
         3d volume use to shade the bundles. If None, no shading
@@ -275,6 +269,12 @@ def visualize_bundles(sft, n_points=None, bundle_dict=None,
         of the dict if passing a  dict, or for all streamlines if using
         ndarray.
         Default: None
+
+    n_sls_viz : int
+        Number of streamlines to randomly select if plotting
+        all bundles. Selections will be proportional to the original number of
+        streamlines per bundle.
+        Default: 3600
 
     sbv_lims : ndarray
         Of the form (lower bound, upper bound). Shading based on
@@ -341,7 +341,8 @@ def visualize_bundles(sft, n_points=None, bundle_dict=None,
     set_layout(figure, color=_color_arr2str(background))
 
     for (sls, color, name, dimensions) in vut.tract_generator(
-            sft, bundle, bundle_dict, colors, n_points):
+            sft, bundle, colors, n_points,
+            n_sls_viz=n_sls_viz):
         if isinstance(color_by_streamline, dict):
             if name in color_by_streamline:
                 cbs = color_by_streamline[name]
@@ -726,7 +727,6 @@ def _draw_core(sls, n_points, figure, bundle_name, indiv_profile,
 
 def single_bundle_viz(indiv_profile, sft,
                       bundle, scalar_name,
-                      bundle_dict=None,
                       flip_axes=[False, False, False],
                       labelled_nodes=[0, -1],
                       figure=None,
@@ -753,12 +753,6 @@ def single_bundle_viz(indiv_profile, sft,
 
     scalar_name : str
         The name of the scalar being used.
-
-    bundle_dict : dict, optional
-        This parameter is used if bundle is an int.
-        Keys are names of bundles and values are dicts that specify them.
-        Default: Either the entire sft is treated as a bundle,
-        or identified only as unique integers in the metadata.
 
     flip_axes : ndarray
         Which axes to flip, to orient the image as RAS, which is how we
@@ -795,7 +789,7 @@ def single_bundle_viz(indiv_profile, sft,
 
     n_points = len(indiv_profile)
     sls, _, bundle_name, dimensions = next(vut.tract_generator(
-        sft, bundle, bundle_dict, None, n_points))
+        sft, bundle, None, n_points))
 
     line_color = _draw_core(
         sls, n_points, figure, bundle_name, indiv_profile,

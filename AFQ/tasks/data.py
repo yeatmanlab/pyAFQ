@@ -9,14 +9,17 @@ import pimms
 import dipy.reconst.dki as dpy_dki
 import dipy.reconst.dti as dpy_dti
 import dipy.reconst.fwdti as dpy_fwdti
+from dipy.reconst.gqi import GeneralizedQSamplingModel
 from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
-from AFQ.definitions.image import ImageDefinition
 
 from AFQ.tasks.decorators import as_file, as_img, as_fit_deriv
-from AFQ.tasks.utils import get_fname, with_name
+from AFQ.tasks.utils import get_fname, with_name, str_to_desc
 import AFQ.api.bundle_dict as abd
 import AFQ.data.fetch as afd
+from AFQ.utils.path import drop_extension
+from AFQ.data.s3bids import write_json
+from AFQ._fixes import gwi_odf
 
 from AFQ.definitions.utils import Definition
 from AFQ.definitions.image import B0Image
@@ -27,6 +30,8 @@ from AFQ.models.csd import CsdNanResponseError
 from AFQ.models.dki import _fit as dki_fit_model
 from AFQ.models.dti import _fit as dti_fit_model
 from AFQ.models.fwdti import _fit as fwdti_fit_model
+from AFQ.models.QBallTP import (
+    extract_odf, anisotropic_index, anisotropic_power)
 
 
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
@@ -119,10 +124,11 @@ def dti_fit(dti_params, gtab):
     return dpy_dti.TensorFit(tm, dti_params)
 
 
+@pimms.calc("dti_params")
 @as_file(suffix='_model-DTI_desc-diffmodel_dwi.nii.gz')
 @as_img
-def dti(brain_mask, data, gtab,
-        bval, bvec, b0_threshold=50, robust_tensor_fitting=False):
+def dti_params(brain_mask, data, gtab,
+               bval, bvec, b0_threshold=50, robust_tensor_fitting=False):
     """
     full path to a nifti file containing parameters
     for the DTI fit
@@ -158,9 +164,6 @@ def dti(brain_mask, data, gtab,
     return dtf.model_params, meta
 
 
-dti_params = pimms.calc("dti_params")(dti)
-
-
 @pimms.calc("fwdti_tf")
 def fwdti_fit(fwdti_params, gtab):
     """Free-water DTI TensorFit object"""
@@ -169,9 +172,10 @@ def fwdti_fit(fwdti_params, gtab):
     return dpy_fwdti.FreeWaterTensorFit(fwtm, fwdti_params)
 
 
+@pimms.calc("fwdti_params")
 @as_file(suffix='_model-FWDTI_desc-diffmodel_dwi.nii.gz')
 @as_img
-def fwdti(brain_mask, data, gtab):
+def fwdti_params(brain_mask, data, gtab):
     """
     Full path to a nifti file containing parameters
     for the free-water DTI fit.
@@ -188,9 +192,6 @@ def fwdti(brain_mask, data, gtab):
     return dtf.model_params, meta
 
 
-fwdti_params = pimms.calc("fwdti_params")(fwdti)
-
-
 @pimms.calc("dki_tf")
 def dki_fit(dki_params, gtab):
     """DKI DiffusionKurtosisFit object"""
@@ -199,9 +200,10 @@ def dki_fit(dki_params, gtab):
     return dpy_dki.DiffusionKurtosisFit(tm, dki_params)
 
 
+@pimms.calc("dki_params")
 @as_file(suffix='_model-DKI_desc-diffmodel_dwi.nii.gz')
 @as_img
-def dki(brain_mask, gtab, data):
+def dki_params(brain_mask, gtab, data):
     """
     full path to a nifti file containing
     parameters for the DKI fit
@@ -219,14 +221,12 @@ def dki(brain_mask, gtab, data):
     return dkf.model_params, meta
 
 
-dki_params = pimms.calc("dki_params")(dki)
-
-
+@pimms.calc("csd_params")
 @as_file(suffix='_model-CSD_desc-diffmodel_dwi.nii.gz')
 @as_img
-def csd(dwi, brain_mask, gtab, data,
-        csd_response=None, csd_sh_order=None,
-        csd_lambda_=1, csd_tau=0.1):
+def csd_params(dwi, brain_mask, gtab, data,
+               csd_response=None, csd_sh_order=None,
+               csd_lambda_=1, csd_tau=0.1):
     """
     full path to a nifti file containing
     parameters for the CSD fit
@@ -285,20 +285,235 @@ def csd(dwi, brain_mask, gtab, data,
     return csdf.shm_coeff, meta
 
 
-csd_params = pimms.calc("csd_params")(csd)
-
-
-@pimms.calc("pmap")
+@pimms.calc("csd_pmap")
 @as_file(suffix='_model-CSD_desc-APM_dwi.nii.gz')
+@as_img
 def anisotropic_power_map(csd_params):
     """
     full path to a nifti file containing
     the anisotropic power map
     """
-    sh_coeff = nib.load(csd_params)
-    pmap = shm.anisotropic_power(sh_coeff.get_fdata())
-    pmap = nib.Nifti1Image(pmap, sh_coeff.affine)
+    sh_coeff = nib.load(csd_params).get_fdata()
+    pmap = anisotropic_power(sh_coeff)
     return pmap, dict(CSDParamsFile=csd_params)
+
+
+@pimms.calc("csd_ai")
+@as_file(suffix='_model-CSD_desc-AI_dwi.nii.gz')
+@as_img
+def csd_anisotropic_index(csd_params):
+    """
+    full path to a nifti file containing
+    the anisotropic index
+    """
+    sh_coeff = nib.load(csd_params).get_fdata()
+    AI = anisotropic_index(sh_coeff)
+    return AI, dict(CSDParamsFile=csd_params)
+
+
+@pimms.calc("gq_params", "gq_iso", "gq_aso")
+def gq(base_fname, gtab, dwi_affine, data,
+       gq_sampling_length=1.2):
+    """
+    full path to a nifti file containing
+    parameters for the Generalized Q-Sampling
+    shm_coeff,
+    full path to a nifti file containing isotropic diffusion component,
+    full path to a nifti file containing anisotropic diffusion component
+
+    Parameters
+    ----------
+    gq_sampling_length : float
+        Diffusion sampling length.
+        Default: 1.2
+    """
+    gqmodel = GeneralizedQSamplingModel(
+        gtab,
+        sampling_length=gq_sampling_length)
+
+    odf = gwi_odf(gqmodel, data)
+
+    GQ_shm, ASO, ISO = extract_odf(odf)
+
+    params_suffix = "_model-GQ_desc-diffmodel_dwi.nii.gz"
+    params_fname = get_fname(base_fname, params_suffix)
+    nib.save(nib.Nifti1Image(GQ_shm, dwi_affine), params_fname)
+    write_json(
+        get_fname(base_fname, f"{drop_extension(params_suffix)}.json"),
+        dict(GQSamplingLength=gq_sampling_length)
+    )
+
+    ASO_suffix = "_model-GQ_desc-ASO_dwi.nii.gz"
+    ASO_fname = get_fname(base_fname, ASO_suffix)
+    nib.save(nib.Nifti1Image(ASO, dwi_affine), ASO_fname)
+    write_json(
+        get_fname(base_fname, f"{drop_extension(ASO_suffix)}.json"),
+        dict(GQSamplingLength=gq_sampling_length)
+    )
+
+    ISO_suffix = "_model-GQ_desc-ISO_dwi.nii.gz"
+    ISO_fname = get_fname(base_fname, ISO_suffix)
+    nib.save(nib.Nifti1Image(ISO, dwi_affine), ISO_fname)
+    write_json(
+        get_fname(base_fname, f"{drop_extension(ISO_suffix)}.json"),
+        dict(GQSamplingLength=gq_sampling_length)
+    )
+
+    return params_fname, ISO_fname, ASO_fname
+
+
+@pimms.calc("gq_pmap")
+@as_file(suffix='_model-GQ_desc-APM_dwi.nii.gz')
+@as_img
+def gq_pmap(gq_params):
+    """
+    full path to a nifti file containing
+    the anisotropic power map from GQ
+    """
+    sh_coeff = nib.load(gq_params).get_fdata()
+    pmap = anisotropic_power(sh_coeff)
+    return pmap, dict(GQParamsFile=gq_params)
+
+
+@pimms.calc("gq_ai")
+@as_file(suffix='_model-GQ_desc-AI_dwi.nii.gz')
+@as_img
+def gq_ai(gq_params):
+    """
+    full path to a nifti file containing
+    the anisotropic index from GQ
+    """
+    sh_coeff = nib.load(gq_params).get_fdata()
+    AI = anisotropic_index(sh_coeff)
+    return AI, dict(GQParamsFile=gq_params)
+
+
+@pimms.calc("opdt_params", "opdt_gfa")
+def opdt_params(base_fname, data, gtab,
+                dwi_affine, brain_mask,
+                opdt_sh_order=8):
+    """
+    full path to a nifti file containing
+    parameters for the Orientation Probability Density Transform
+    shm_coeff,
+    full path to a nifti file containing GFA
+
+    Parameters
+    ----------
+    opdt_sh_order : int
+        Spherical harmonics order for OPDT model. Must be even.
+        Default: 8
+    """
+    opdt_model = shm.OpdtModel(gtab, opdt_sh_order)
+    opdt_fit = opdt_model.fit(data, mask=brain_mask)
+
+    params_suffix = "_model-OPDT_desc-diffmodel_dwi.nii.gz"
+    params_fname = get_fname(base_fname, params_suffix)
+    nib.save(nib.Nifti1Image(opdt_fit._shm_coef, dwi_affine), params_fname)
+    write_json(
+        get_fname(base_fname, f"{drop_extension(params_suffix)}.json"),
+        dict(sh_order=opdt_sh_order)
+    )
+
+    GFA_suffix = "_model-OPDT_desc-GFA_dwi.nii.gz"
+    GFA_fname = get_fname(base_fname, GFA_suffix)
+    nib.save(nib.Nifti1Image(opdt_fit.gfa, dwi_affine), GFA_fname)
+    write_json(
+        get_fname(base_fname, f"{drop_extension(GFA_suffix)}.json"),
+        dict(sh_order=opdt_sh_order)
+    )
+
+    return params_fname, GFA_fname
+
+
+@pimms.calc("opdt_pmap")
+@as_file(suffix='_model-OPDT_desc-APM_dwi.nii.gz')
+@as_img
+def opdt_pmap(opdt_params):
+    """
+    full path to a nifti file containing
+    the anisotropic power map from OPDT
+    """
+    sh_coeff = nib.load(opdt_params).get_fdata()
+    pmap = anisotropic_power(sh_coeff)
+    return pmap, dict(OPDTParamsFile=opdt_params)
+
+
+@pimms.calc("opdt_ai")
+@as_file(suffix='_model-OPDT_desc-AI_dwi.nii.gz')
+@as_img
+def opdt_ai(opdt_params):
+    """
+    full path to a nifti file containing
+    the anisotropic index from OPDT
+    """
+    sh_coeff = nib.load(opdt_params).get_fdata()
+    AI = anisotropic_index(sh_coeff)
+    return AI, dict(OPDTParamsFile=opdt_params)
+
+
+@pimms.calc("csa_params", "csa_gfa")
+def csa_params(base_fname, data, gtab,
+               dwi_affine, brain_mask,
+               csa_sh_order=8):
+    """
+    full path to a nifti file containing
+    parameters for the Constant Solid Angle
+    shm_coeff,
+    full path to a nifti file containing GFA
+
+    Parameters
+    ----------
+    csa_sh_order : int
+        Spherical harmonics order for CSA model. Must be even.
+        Default: 8
+    """
+    csa_model = shm.CsaOdfModel(gtab, csa_sh_order)
+    csa_fit = csa_model.fit(data, mask=brain_mask)
+
+    params_suffix = "_model-CSA_desc-diffmodel_dwi.nii.gz"
+    params_fname = get_fname(base_fname, params_suffix)
+    nib.save(nib.Nifti1Image(csa_fit._shm_coef, dwi_affine), params_fname)
+    write_json(
+        get_fname(base_fname, f"{drop_extension(params_suffix)}.json"),
+        dict(sh_order=csa_sh_order)
+    )
+
+    GFA_suffix = "_model-CSA_desc-GFA_dwi.nii.gz"
+    GFA_fname = get_fname(base_fname, GFA_suffix)
+    nib.save(nib.Nifti1Image(csa_fit.gfa, dwi_affine), GFA_fname)
+    write_json(
+        get_fname(base_fname, f"{drop_extension(GFA_suffix)}.json"),
+        dict(sh_order=csa_sh_order)
+    )
+
+    return params_fname, GFA_fname
+
+
+@pimms.calc("csa_pmap")
+@as_file(suffix='_model-CSA_desc-APM_dwi.nii.gz')
+@as_img
+def csa_pmap(csa_params):
+    """
+    full path to a nifti file containing
+    the anisotropic power map from CSA
+    """
+    sh_coeff = nib.load(csa_params).get_fdata()
+    pmap = anisotropic_power(sh_coeff)
+    return pmap, dict(CSAParamsFile=csa_params)
+
+
+@pimms.calc("csa_ai")
+@as_file(suffix='_model-CSA_desc-AI_dwi.nii.gz')
+@as_img
+def csa_ai(csa_params):
+    """
+    full path to a nifti file containing
+    the anisotropic index from CSA
+    """
+    sh_coeff = nib.load(csa_params).get_fdata()
+    AI = anisotropic_index(sh_coeff)
+    return AI, dict(CSAParamsFile=csa_params)
 
 
 @pimms.calc("fwdti_fa")
@@ -596,8 +811,7 @@ def dki_ak(dki_tf):
 
 @pimms.calc("brain_mask")
 @as_file('_desc-brain_mask.nii.gz')
-def brain_mask(base_fname, dwi, b0,
-               bids_info, brain_mask_definition=None):
+def brain_mask(b0, brain_mask_definition=None):
     """
     full path to a nifti file containing
     the brain mask
@@ -612,23 +826,14 @@ def brain_mask(base_fname, dwi, b0,
         If None, use B0Image()
         Default: None
     """
-    if brain_mask_definition is None:
-        brain_mask_definition = B0Image()
-    if not isinstance(brain_mask_definition, Definition):
-        raise TypeError(
-            "brain_mask_definition must be a Definition")
-    if bids_info is not None:
-        brain_mask_definition.find_path(
-            bids_info["bids_layout"],
-            dwi,
-            bids_info["subject"],
-            bids_info["session"])
-    return brain_mask_definition.get_image_direct(
-        dwi, bids_info, b0, data_imap=None)
+    # Note that any case where brain_mask_definition is not None
+    # is handled in get_data_plan
+    # This is just the default
+    return B0Image().get_image_getter("data")(b0)
 
 
 @pimms.calc("bundle_dict", "reg_template")
-def get_bundle_dict(base_fname, dwi, segmentation_params,
+def get_bundle_dict(segmentation_params,
                     brain_mask, bids_info, b0,
                     bundle_info=None, reg_template_spec="mni_T1"):
     """
@@ -702,29 +907,19 @@ def get_bundle_dict(base_fname, dwi, segmentation_params,
             reg_template = nib.load(reg_template_spec)
 
     if isinstance(bundle_info, abd.BundleDict):
-        bundle_dict = bundle_info
+        bundle_dict = bundle_info.copy()
     else:
         bundle_dict = abd.BundleDict(
             bundle_info,
             seg_algo=segmentation_params["seg_algo"],
             resample_to=reg_template)
 
-    def roi_scalar_to_info(roi):
-        if not isinstance(roi, ImageDefinition):
-            return roi
-        if bids_info is not None:
-            roi.find_path(
-                bids_info["bids_layout"],
-                dwi,
-                bids_info["subject"],
-                bids_info["session"])
-        roi_img, _ = roi.get_image_direct(
-            dwi, bids_info, b0, data_imap=None)
-        return roi_img
-    for b_name, b_info in bundle_dict._dict.items():
-        if "space" in b_info and b_info["space"] == "subject":
-            bundle_dict.apply_to_rois(b_name, roi_scalar_to_info)
-            bundle_dict._resample_roi(b_name)
+    if bids_info is not None:
+        bundle_dict.set_bids_info(
+            bids_info["bids_layout"],
+            b0,
+            bids_info["subject"],
+            bids_info["session"])
     return bundle_dict, reg_template
 
 
@@ -739,7 +934,10 @@ def get_data_plan(kwargs):
     data_tasks = with_name([
         get_data_gtab, b0, b0_mask, brain_mask,
         dti_fit, dki_fit, fwdti_fit, anisotropic_power_map,
+        csd_anisotropic_index,
         dti_fa, dti_lt, dti_cfa, dti_pdd, dti_md, dki_kt, dki_lt, dki_fa,
+        gq, gq_pmap, gq_ai, opdt_params, opdt_pmap, opdt_ai,
+        csa_params, csa_pmap, csa_ai,
         fwdti_fa, fwdti_md, fwdti_fwf,
         dki_md, dki_awf, dki_mk, dti_ga, dti_rd, dti_ad, dki_ga, dki_rd,
         dki_ad, dki_rk, dki_ak, dti_params, dki_params, fwdti_params,
@@ -755,4 +953,22 @@ def get_data_plan(kwargs):
             else:
                 scalars.append(scalar)
         kwargs["scalars"] = scalars
+
+    bm_def = kwargs.get(
+        "brain_mask_definition", None)
+    if bm_def is not None:
+        if not isinstance(bm_def, Definition):
+            raise TypeError(
+                "brain_mask_definition must be a Definition")
+        if kwargs["bids_info"] is not None:
+            bm_def.find_path(
+                kwargs["bids_info"]["bids_layout"],
+                kwargs["dwi"],
+                kwargs["bids_info"]["subject"],
+                kwargs["bids_info"]["session"])
+        data_tasks["brain_mask_res"] = pimms.calc("brain_mask")(
+            as_file((
+                f'_desc-{str_to_desc(bm_def.get_name())}'
+                '_dwi.nii.gz'))(bm_def.get_image_getter("data")))
+
     return pimms.plan(**data_tasks)
