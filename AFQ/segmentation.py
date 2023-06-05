@@ -968,7 +968,8 @@ class Segmentation:
         self.logger.info("Assigning Streamlines to Bundles")
         for bundle in bundle_list:
             self.logger.info(f"Finding streamlines for {bundle}")
-            model_sl = self.bundle_dict[bundle]['sl']
+            b_info = self.bundle_dict[bundle]
+            model_sl = b_info['sl']
 
             # If doing a presegmentation based on ROIs then initialize rb after
             # Filtering the whole brain tractogram to pass through ROIs
@@ -1047,7 +1048,7 @@ class Segmentation:
                     recognized_sl = tg.streamlines[rec_labels]
                 else:
                     recognized_sl = indiv_tg.streamlines[rec_labels]
-            standard_sl = next(iter(self.bundle_dict[bundle]['centroid']))
+            standard_sl = next(iter(b_info['centroid']))
             oriented_sl = dts.orient_by_streamline(recognized_sl, standard_sl)
 
             self.logger.info(

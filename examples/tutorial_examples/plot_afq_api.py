@@ -112,6 +112,7 @@ tracking_params = dict(n_seeds=25000,
 myafq = GroupAFQ(
     bids_path=op.join(afd.afq_home, 'stanford_hardi'),
     preproc_pipeline='vistasoft',
+    tracking_params=tracking_params,
     viz_backend_spec='plotly_no_gif')
 
 ##########################################################################
