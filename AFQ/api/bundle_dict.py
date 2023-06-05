@@ -381,6 +381,12 @@ class BundleDict(MutableMapping):
         else:
             return roi_or_sl
 
+    def get_b_info(self, b_name):
+        if b_name not in self._dict and b_name in self.bundle_names:
+            # generate all in one go, so templates are not kept in memory
+            self.gen_all()
+        return self._dict[b_name]
+
     def __getitem__(self, key):
         if key not in self._dict and key in self.bundle_names:
             # generate all in one go, so templates are not kept in memory

@@ -68,11 +68,11 @@ class _SlsBeingRecognized:
         return np.zeros(len(self.selected_fiber_idxs), dtype=np.bool8)
 
     def select(self, idx, clean_name, cut=False):
-        self.selected_fiber_idxs = self.selected_fiber_idxs[idx].copy()
-        self.sls_flipped = self.sls_flipped[idx].copy()
-        self.bundle_vote = self.bundle_vote[idx].copy()
+        self.selected_fiber_idxs = self.selected_fiber_idxs[idx]
+        self.sls_flipped = self.sls_flipped[idx]
+        self.bundle_vote = self.bundle_vote[idx]
         if hasattr(self, "roi_dists"):
-            self.roi_dists = self.roi_dists[idx].copy()
+            self.roi_dists = self.roi_dists[idx]
         time_taken = time() - self.start_time
         self.logger.info(
             f"After filtering by {clean_name} (time: {time_taken}s), "
@@ -556,7 +556,7 @@ class Segmentation:
             self.logger.info(f"Finding Streamlines for {bundle_name}")
 
             # Warp ROIs
-            bundle_def = dict(self.bundle_dict[bundle_name])
+            bundle_def = dict(self.bundle_dict.get_b_info(bundle_name))
             bundle_def.update(self.bundle_dict.transform_rois(
                 bundle_name,
                 self.mapping,
@@ -841,8 +841,9 @@ class Segmentation:
 
             if len(select_idx) == 0:
                 # There's nothing here, set and move to the next bundle:
-                if "bundlesection" in self.bundle_dict[bundle]:
-                    for sb_name in self.bundle_dict[bundle]["bundlesection"]:
+                if "bundlesection" in self.bundle_dict.get_b_info(bundle):
+                    for sb_name in self.bundle_dict.get_b_info(bundle)[
+                            "bundlesection"]:
                         self._return_empty(sb_name)
                 else:
                     self._return_empty(bundle)
@@ -862,11 +863,11 @@ class Segmentation:
                     self.logger.info("Clipping Streamlines by ROI")
                     _cut_sls_by_dist(
                         select_sl, select_idx, roi_dists,
-                        (0, len(self.bundle_dict[
-                            bundle]["include"]) - 1), in_place=True)
+                        (0, len(self.bundle_dict.get_b_info(
+                            bundle)["include"]) - 1), in_place=True)
             if "bundlesection" in self.bundle_dict[bundle]:
-                for sb_name, sb_include_cuts in self.bundle_dict[bundle][
-                        "bundlesection"].items():
+                for sb_name, sb_include_cuts in self.bundle_dict.get_b_info(
+                        bundle)["bundlesection"].items():
                     bundlesection_select_sl = _cut_sls_by_dist(
                         select_sl, select_idx, roi_dists,
                         sb_include_cuts, in_place=False)
