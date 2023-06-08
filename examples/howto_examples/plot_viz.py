@@ -50,7 +50,7 @@ afq_path = op.join(
     'ses-HBNsiteRU')
 
 bundle_path = op.join(afq_path,
-                      'clean_bundles')
+                      'bundles')
 
 
 #############################################################################

@@ -110,6 +110,8 @@ def streamlines(data_imap, seed, stop,
         params_file = data_imap["csd_params"]
     elif odf_model == "DKI":
         params_file = data_imap["dki_params"]
+    elif odf_model == "GQ":
+        params_file = data_imap["gq_params"]
     else:
         raise TypeError((
             f"The ODF model you gave ({odf_model}) was not recognized"))
@@ -293,13 +295,13 @@ def get_tractography_plan(kwargs):
         tractography_tasks["export_stop_mask_res"] = \
             export_stop_mask_pft
     elif isinstance(stop_mask, Definition):
-        tractography_tasks["export_stop_mask_res"] =\
-            pimms.calc("stop")(as_file('_desc-stop_mask.nii.gz')(
+        tractography_tasks["export_stop_mask_res"] = pimms.calc("stop")(
+            as_file('_desc-stop_mask.nii.gz', include_track=True)(
                 stop_mask.get_image_getter("tractography")))
 
     if isinstance(seed_mask, Definition):
         tractography_tasks["export_seed_mask_res"] = pimms.calc("seed")(
-            as_file('_desc-seed_mask.nii.gz')(
+            as_file('_desc-seed_mask.nii.gz', include_track=True)(
                 seed_mask.get_image_getter("tractography")))
 
     return pimms.plan(**tractography_tasks)

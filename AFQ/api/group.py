@@ -330,7 +330,7 @@ class GroupAFQ(object):
                 sub = self.valid_sub_list[subses_idx]
                 ses = self.valid_ses_list[subses_idx]
                 this_bundles_file = self.export(
-                    "clean_bundles", collapse=False)[sub][ses]
+                    "bundles", collapse=False)[sub][ses]
                 this_mapping = self.export("mapping", collapse=False)[sub][ses]
                 this_img = nib.load(self.export(
                     "dwi", collapse=False)[sub][ses])
@@ -559,13 +559,11 @@ class GroupAFQ(object):
 
         best_scalar = self.export("best_scalar", collapse=False)[
             self.valid_sub_list[0]][self.valid_ses_list[0]]
-        bundle_dict = self.export("bundle_dict", collapse=False)[
-            self.valid_sub_list[0]][self.valid_ses_list[0]]
 
         viz_backend_dict = self.export("viz_backend", collapse=False)
         b0_backend_dict = self.export("b0", collapse=False)
         dwi_affine_dict = self.export("dwi_affine", collapse=False)
-        clean_bundles_dict = self.export("clean_bundles", collapse=False)
+        bundles_dict = self.export("bundles", collapse=False)
         best_scalar_dict = self.export(best_scalar, collapse=False)
 
         all_fnames = []
@@ -576,7 +574,7 @@ class GroupAFQ(object):
             viz_backend = viz_backend_dict[this_sub][this_ses]
             b0 = b0_backend_dict[this_sub][this_ses]
             dwi_affine = dwi_affine_dict[this_sub][this_ses]
-            clean_bundles = clean_bundles_dict[this_sub][this_ses]
+            bundles = bundles_dict[this_sub][this_ses]
             best_scalar = best_scalar_dict[this_sub][this_ses]
 
             flip_axes = [False, False, False]
@@ -608,9 +606,8 @@ class GroupAFQ(object):
                 figure = None
 
             figure = viz_backend.visualize_bundles(
-                clean_bundles,
+                bundles,
                 shade_by_volume=best_scalar,
-                bundle_dict=bundle_dict,
                 flip_axes=flip_axes,
                 bundle=bundle_name,
                 interact=False,
@@ -739,7 +736,7 @@ class GroupAFQ(object):
 
         reg_template = self.export("reg_template", collapse=False)[
             self.valid_sub_list[0]][self.valid_ses_list[0]]
-        clean_bundles_dict = self.export("clean_bundles", collapse=False)
+        bundles_dict = self.export("bundles", collapse=False)
         mapping_dict = self.export("mapping", collapse=False)
 
         sls_mni = []
@@ -747,7 +744,7 @@ class GroupAFQ(object):
         for ii in tqdm(range(len(self.valid_ses_list))):
             this_sub = self.valid_sub_list[ii]
             this_ses = self.valid_ses_list[ii]
-            seg_sft = aus.SegmentedSFT.fromfile(clean_bundles_dict[
+            seg_sft = aus.SegmentedSFT.fromfile(bundles_dict[
                 this_sub][this_ses])
             seg_sft.sft.to_vox()
             sls = seg_sft.get_bundle(bundle_name).streamlines

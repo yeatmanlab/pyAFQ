@@ -1,6 +1,11 @@
 import logging
-from collections.abc import MutableMapping
+from collections.abc import MutableMapping, Mapping
+
 import AFQ.data.fetch as afd
+import AFQ.utils.volume as auv
+from AFQ.tasks.utils import get_fname, str_to_desc
+from AFQ.definitions.utils import find_file
+
 import numpy as np
 import nibabel as nib
 
@@ -59,6 +64,28 @@ PEDIATRIC_BUNDLES = [
 PEDIATRIC_BUNDLES = append_l_r(PEDIATRIC_BUNDLES, ["FA", "FP"])
 
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
+
+
+class _BundleEntry(Mapping):
+    """Describes how to recognize a single bundle, immutable"""
+
+    def __init__(self, data):
+        self._data = data
+
+    def __getitem__(self, key):
+        return self._data[key]
+
+    def __len__(self):
+        return len(self._data)
+
+    def __iter__(self):
+        return iter(self._data)
+
+    def __setitem__(self, key, value):
+        raise RuntimeError((
+            "You cannot modify the properties of a bundle's definition. "
+            "To modify a bundle's definition, replace that bundle's entry "
+            "in the BundleDict."))
 
 
 class BundleDict(MutableMapping):
@@ -156,6 +183,8 @@ class BundleDict(MutableMapping):
         self.resample_to = resample_to
         self.resample_subject_to = resample_subject_to
         self.keep_in_memory = keep_in_memory
+        self.has_bids_info = False
+        self.max_includes = 3
 
         self._dict = {}
         self.bundle_names = []
@@ -192,6 +221,10 @@ class BundleDict(MutableMapping):
                     " Only AntFrontal will be used."))
                 self.bundle_names.remove("FA")
 
+    def update_max_includes(self, new_max):
+        if new_max > self.max_includes:
+            self.max_includes = new_max
+
     def load_templates(self):
         """
         Loads templates for generating bundle dictionaries
@@ -208,12 +241,9 @@ class BundleDict(MutableMapping):
             self.templates['ARC_roi2_R'] = self.templates['SLFt_roi2_R']
             callosal_templates =\
                 afd.read_callosum_templates(as_img=False)
-            endpoint_templates =\
-                afd.bundles_to_aal(self.bundle_names)
             self.templates = {
                 **self.templates,
-                **callosal_templates,
-                **endpoint_templates}
+                **callosal_templates}
         elif self.seg_algo.startswith("reco"):
             if self.seg_algo.endswith("80"):
                 self.templates = afd.read_hcp_atlas(80, as_file=True)
@@ -311,44 +341,79 @@ class BundleDict(MutableMapping):
             del self.templates
         self.templates_loaded = False
 
+    def set_bids_info(self, bids_layout, bids_path, subject, session):
+        """
+        Provide the bids_layout, a nearest path,
+        and the subject and session information
+        to load ROIS from BIDS
+        """
+        self.has_bids_info = True
+        self._bids_info = bids_layout
+        self._bids_path = bids_path
+        self._subject = subject
+        self._session = session
+
+    def _cond_load(self, roi_or_sl, resample_to):
+        """
+        Load ROI or streamline if not already loaded
+        """
+        if isinstance(roi_or_sl, dict):
+            if not self.has_bids_info:
+                raise ValueError((
+                    "Attempted to load an ROI using BIDS description without "
+                    "First providing BIDS information."))
+            suffix = roi_or_sl.pop("suffix", "dwi")
+            roi_or_sl = find_file(
+                self._bids_info, self._bids_path,
+                roi_or_sl,
+                suffix,
+                self._session, self._subject)
+        if isinstance(roi_or_sl, str):
+            if self.seg_algo == "afq":
+                return afd.read_resample_roi(
+                    roi_or_sl,
+                    resample_to=resample_to)
+            elif self.seg_algo.startswith("reco"):
+                return load_tractogram(
+                    roi_or_sl,
+                    'same',
+                    bbox_valid_check=False).streamlines
+        else:
+            return roi_or_sl
+
+    def get_b_info(self, b_name):
+        if b_name not in self._dict and b_name in self.bundle_names:
+            # generate all in one go, so templates are not kept in memory
+            self.gen_all()
+        return self._dict[b_name]
+
     def __getitem__(self, key):
         if key not in self._dict and key in self.bundle_names:
             # generate all in one go, so templates are not kept in memory
             self.gen_all()
-        if self.seg_algo == "afq":
-            def cond_load(roi): return nib.load(roi) if isinstance(
-                roi, str) else roi
-        elif self.seg_algo.startswith("reco"):
-            def cond_load(sl): return load_tractogram(
-                sl,
-                'same',
-                bbox_valid_check=False).streamlines
         if not self.keep_in_memory:
-            old_vals = self.apply_to_rois(key, cond_load)
-            self._resample_roi(key)
+            _item = self._dict[key].copy()
+            _res = self._cond_load_bundle(key, dry_run=True)
+            if _res is not None:
+                _item.update(_res)
+            _item = _BundleEntry(_item)
         else:
             if "loaded" not in self._dict[key] or\
                     not self._dict[key]["loaded"]:
-                self.apply_to_rois(key, cond_load)
+                self._cond_load_bundle(key)
                 self._dict[key]["loaded"] = True
-            old_vals = None
             if "resampled" not in self._dict[key] or not self._dict[
                     key]["resampled"]:
                 self._resample_roi(key)
-        _item = self._dict[key].copy()
-        if old_vals is not None:
-            if isinstance(old_vals, dict):
-                for roi_type, roi in old_vals.items():
-                    self._dict[key][roi_type] = roi
-            else:
-                self._dict[key] = old_vals
+            _item = _BundleEntry(self._dict[key].copy())
         return _item
 
     def __setitem__(self, key, item):
-        if isinstance(item, str):
-            item = nib.load(item)
         self._dict[key] = item
-        self.bundle_names.append(key)
+        if hasattr(item, "get"):
+            self.update_max_includes(len(item.get("include", [])))
+        if key not in self.bundle_names:
+            self.bundle_names.append(key)
 
     def __len__(self):
         return len(self.bundle_names)
@@ -393,7 +458,9 @@ class BundleDict(MutableMapping):
             resample_subject_to=self.resample_subject_to,
             keep_in_memory=self.keep_in_memory)
 
-    def apply_to_rois(self, b_name, func, *args, **kwargs):
+    def apply_to_rois(self, b_name, func, *args,
+                      dry_run=False,
+                      **kwargs):
         """
         Applies some transformation to all ROIs (include, exclude, end, start)
         and the prob_map in a given bundle.
@@ -405,6 +472,9 @@ class BundleDict(MutableMapping):
         func : function
             function whose first argument must be a Nifti1Image and which
             returns a Nifti1Image
+        dry_run : bool
+            Whether to actually apply changes returned by `func` to the ROIs.
+            If has_return is False, dry_run is not used.
         *args :
             Additional arguments for func
         **kwargs
@@ -412,36 +482,37 @@ class BundleDict(MutableMapping):
 
         Returns
         -------
-        Dictionary containing the old values of all ROIs and prob_map
+        A dictionary where keys are
+        the roi type and values are the transformed ROIs.
         """
-        old_vals = {}
+        return_vals = {}
         if self.seg_algo == "afq":
             for roi_type in ["include", "exclude", "start", "end", "prob_map"]:
                 if roi_type in self._dict[b_name]:
-                    roi = self._dict[b_name][roi_type]
-                    old_vals[roi_type] = roi
                     if roi_type in ["start", "end", "prob_map"]:
-                        self._dict[b_name][roi_type] = func(
-                            roi, *args, **kwargs)
+                        return_vals[roi_type] = func(
+                            self._dict[b_name][roi_type], *args, **kwargs)
                     else:
                         changed_rois = []
-                        for _roi in roi:
-                            changed_rois.append(func(_roi, *args, **kwargs))
-                        self._dict[b_name][roi_type] = changed_rois
+                        for _roi in self._dict[b_name][roi_type]:
+                            changed_rois.append(func(
+                                _roi, *args, **kwargs))
+                        return_vals[roi_type] = changed_rois
         elif self.seg_algo.startswith("reco"):
             if b_name == "whole_brain":
-                old_vals = self._dict[b_name]
-                self._dict[b_name] = func(
+                return_vals = func(
                     self._dict[b_name], *args, **kwargs)
             else:
                 for sl_type in ["sl", "centroid"]:
-                    sl = self._dict[b_name][sl_type]
-                    old_vals[sl_type] = sl
-                    self._dict[b_name][sl_type] = func(
-                        sl, *args, **kwargs)
-        return old_vals
+                    return_vals[sl_type] = func(
+                        self._dict[b_name][sl_type],
+                        *args, **kwargs)
+        if not dry_run:
+            for roi_type, roi in return_vals.items():
+                self._dict[b_name][roi_type] = roi
+        return return_vals
 
-    def _resample_roi(self, b_name):
+    def _cond_load_bundle(self, b_name, dry_run=False):
         """
         Given a bundle name, resample all ROIs and prob maps
         into either template or subject space for that bundle,
@@ -453,23 +524,95 @@ class BundleDict(MutableMapping):
             Name of the bundle to be resampled.
         """
         if self.seg_algo == "afq":
-            if "space" not in self._dict[b_name]\
-                    or self._dict[b_name]["space"] == "template":
+            if self.is_bundle_in_template(b_name):
                 resample_to = self.resample_to
             else:
                 resample_to = self.resample_subject_to
-            if resample_to:
-                try:
-                    self.apply_to_rois(
-                        b_name,
-                        afd.read_resample_roi,
-                        resample_to=resample_to)
-                    self._dict[b_name]["resampled"] = True
-                except AttributeError as e:
-                    if "'ImageFile' object" in str(e):
-                        self._dict[b_name]["resampled"] = False
-                    else:
-                        raise
+        else:
+            resample_to = None
+        return self.apply_to_rois(
+            b_name,
+            self._cond_load,
+            resample_to,
+            dry_run=dry_run)
+
+    def is_bundle_in_template(self, bundle_name):
+        return "space" not in self._dict[bundle_name]\
+            or self._dict[bundle_name]["space"] == "template"
+
+    def _roi_transform_helper(self, roi, mapping, new_affine, bundle_name):
+        roi = afd.read_resample_roi(roi, self.resample_to)
+        warped_img = auv.transform_inverse_roi(
+            roi.get_fdata(),
+            mapping,
+            bundle_name=bundle_name)
+        warped_img = nib.Nifti1Image(warped_img, new_affine)
+        return warped_img
+
+    def transform_rois(self, bundle_name, mapping, new_affine,
+                       base_fname=None):
+        """
+        Get the bundle definition with transformed ROIs
+        for a given bundle into a
+        given subject space using a given mapping.
+        Will only run on bundles which are in template
+        space, otherwise will just return the bundle
+        definition without transformation.
+
+        Parameters
+        ----------
+        bundle_name : str
+            Name of the bundle to be transformed.
+        mapping : DiffeomorphicMap object
+            A mapping between DWI space and a template.
+        new_affine : array
+            Affine of space transformed into.
+        base_fname : str, optional
+            Base file path to save ROIs too. Additional BIDS
+            descriptors will be added to this file path. If None, 
+            do not save the ROIs.
+
+        Returns
+        -------
+        If base_fname is None, a dictionary where keys are
+        the roi type and values are the transformed ROIs.
+        Otherwise, a list of file names where the transformed
+        ROIs are saved.
+        """
+        if self.is_bundle_in_template(bundle_name):
+            transformed_rois = self.apply_to_rois(
+                bundle_name,
+                self._roi_transform_helper,
+                mapping,
+                new_affine,
+                bundle_name,
+                dry_run=True)
+        else:
+            transformed_rois = self.apply_to_rois(
+                bundle_name,
+                self._cond_load,
+                self.resample_subject_to,
+                dry_run=True)
+
+        if base_fname is not None:
+            fnames = []
+            for roi_type, rois in transformed_rois.items():
+                if not isinstance(rois, list):
+                    rois = [rois]
+                for ii, roi in enumerate(rois):
+                    fname = get_fname(
+                        base_fname,
+                        '_space-subject_desc-'
+                        f'{str_to_desc(bundle_name)}{roi_type}{ii}'
+                        '_mask.nii.gz')
+                    nib.save(
+                        nib.Nifti1Image(
+                            roi.get_fdata().astype(np.float32),
+                            roi.affine), fname)
+                    fnames.append(fname)
+            return fnames
+        else:
+            return transformed_rois
 
     def __add__(self, other):
         self.gen_all()

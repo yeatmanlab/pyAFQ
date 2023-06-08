@@ -1,29 +1,31 @@
 import os.path as op
 import os
 import logging
+from time import time
 
 import numpy as np
 from scipy.spatial.distance import cdist
 from scipy.stats import zscore
 
-import nibabel as nib
-from tqdm.auto import tqdm
-
 import dipy.tracking.streamline as dts
 import dipy.tracking.streamlinespeed as dps
 from dipy.segment.bundles import RecoBundles
-from dipy.align.streamlinear import whole_brain_slr
 from dipy.stats.analysis import gaussian_weights
-import dipy.core.gradients as dpg
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
-from dipy.io.streamline import save_tractogram
+from dipy.io.streamline import save_tractogram, load_tractogram
+from dipy.utils.parallel import paramap
+from dipy.segment.clustering import QuickBundles
+from dipy.segment.metricspeed import AveragePointwiseEuclideanMetric
+from dipy.segment.featurespeed import ResampleFeature
 
-import AFQ.registration as reg
 import AFQ.utils.models as ut
-import AFQ.utils.volume as auv
 import AFQ.data.fetch as afd
 from AFQ.data.utils import BUNDLE_RECO_2_AFQ
-from dipy.utils.parallel import paramap
+from AFQ.api.bundle_dict import BundleDict
+from AFQ.definitions.mapping import ConformedFnirtMapping
+
+from geomstats.geometry.euclidean import Euclidean
+from geomstats.geometry.discrete_curves import DiscreteCurves
 
 __all__ = ["Segmentation", "clean_bundle", "clean_by_endpoints"]
 
@@ -37,10 +39,79 @@ def _resample_tg(tg, n_points):
         if len(tg.shape) > 2:
             streamlines = tg.tolist()
             streamlines = [np.asarray(item) for item in streamlines]
-    else:
+    elif hasattr(tg, "streamlines"):
         streamlines = tg.streamlines
+    else:
+        streamlines = tg
 
     return dps.set_number_of_points(streamlines, n_points)
+
+
+class _SlsBeingRecognized:
+    def __init__(self, sls, logger, save_intermediates, b_name, ref,
+                 n_roi_dists):
+        self.oriented_yet = False
+        self.selected_fiber_idxs = np.arange(len(sls), dtype=np.uint32)
+        self.sls_flipped = np.zeros(len(sls), dtype=np.bool8)
+        self.bundle_vote = np.full(len(sls), -np.inf, dtype=np.float32)
+        self.logger = logger
+        self.start_time = -1
+        self.save_intermediates = save_intermediates
+        self.b_name = b_name
+        self.ref_sls = sls
+        self.ref = ref
+        self.n_roi_dists = n_roi_dists
+
+    def initiate_selection(self, clean_name):
+        self.start_time = time()
+        self.logger.info(f"Filtering by {clean_name}")
+        return np.zeros(len(self.selected_fiber_idxs), dtype=np.bool8)
+
+    def select(self, idx, clean_name, cut=False):
+        self.selected_fiber_idxs = self.selected_fiber_idxs[idx]
+        self.sls_flipped = self.sls_flipped[idx]
+        self.bundle_vote = self.bundle_vote[idx]
+        if hasattr(self, "roi_dists"):
+            self.roi_dists = self.roi_dists[idx]
+        time_taken = time() - self.start_time
+        self.logger.info(
+            f"After filtering by {clean_name} (time: {time_taken}s), "
+            f"{len(self)} streamlines remain.")
+        if self.save_intermediates is not None:
+            save_tractogram(
+                StatefulTractogram(
+                    self.get_selected_sls(cut=cut),
+                    self.ref, Space.VOX),
+                op.join(self.save_intermediates,
+                        f'sls_after_{clean_name}_for_{self.b_name}.trk'),
+                bbox_valid_check=False)
+
+    def get_selected_sls(self, cut=False):
+        if cut:
+            cut_sls = [None] * len(self)
+            for idx, sl_idx in enumerate(self.selected_fiber_idxs):
+                cut_sls[idx] = self.ref_sls[sl_idx][
+                    self.roi_dists[idx, 0]:
+                    self.roi_dists[idx, self.n_roi_dists - 1] + 1]
+            return cut_sls
+        else:
+            return self.ref_sls[self.selected_fiber_idxs]
+
+    def reorient(self, idx):
+        if self.oriented_yet:
+            raise RuntimeError((
+                "Attempted to oriented streamlines "
+                "that were already oriented. "
+                "This is a bug in the implementation of a "
+                "bundle recognition procedure. "))
+        self.oriented_yet = True
+        self.sls_flipped[idx] = True
+
+    def __bool__(self):
+        return len(self) > 0
+
+    def __len__(self):
+        return len(self.selected_fiber_idxs)
 
 
 class Segmentation:
@@ -48,10 +119,9 @@ class Segmentation:
                  nb_points=False,
                  nb_streamlines=False,
                  seg_algo='AFQ',
-                 reg_algo=None,
                  clip_edges=False,
                  parallel_segmentation={
-                     "n_jobs": -1, "engine": "joblib",
+                     "n_jobs": 4, "engine": "joblib",
                      "backend": "loky"},
                  progressive=True,
                  greater_than=50,
@@ -89,13 +159,6 @@ class Segmentation:
             'Reco': Segment streamlines using the RecoBundles algorithm
             [Garyfallidis2017].
             Default: 'AFQ'
-        reg_algo : string or None, optional
-            Algorithm for streamline registration (case-insensitive):
-            'slr' : Use Streamlinear Registration [Garyfallidis2015]_
-            'syn' : Use image-based nonlinear registration
-            If None, will use SyN if a mapping is provided, slr otherwise.
-            If  seg_algo="AFQ", SyN is always used.
-            Default: None
         clip_edges : bool
             Whether to clip the streamlines to be only in between the ROIs.
             Default: False
@@ -218,9 +281,6 @@ class Segmentation:
             self.rng = rng
 
         self.seg_algo = seg_algo.lower()
-        if reg_algo is not None:
-            reg_algo = reg_algo.lower()
-        self.reg_algo = reg_algo
         self.prob_threshold = prob_threshold
         self.roi_dist_tie_break = roi_dist_tie_break
         self.dist_to_waypoint = dist_to_waypoint
@@ -263,9 +323,10 @@ class Segmentation:
 
         return tg
 
-    def segment(self, bundle_dict, tg, fdata=None, fbval=None,
-                fbvec=None, mapping=None, reg_prealign=None,
-                reg_template=None, img_affine=None, reset_tg_space=False):
+    def segment(self, bundle_dict, tg, mapping, fdata=None, fbval=None,
+                fbvec=None, reg_prealign=None,
+                reg_template=None, img_affine=None, reset_tg_space=False,
+                clean_params={}):
         """
         Segment streamlines into bundles based on either waypoint ROIs
         [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
@@ -281,11 +342,10 @@ class Segmentation:
                     'end': img5}}
         tg : StatefulTractogram
             Bundles to segment
+        mapping : DiffeomorphicMap, or equivalent interface 
+            A mapping between DWI space and a template.
         fdata, fbval, fbvec : str
             Full path to data, bvals, bvecs
-        mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.
-            A mapping between DWI space and a template. If None, mapping will
-            be registered from data used in prepare_img. Default: None.
         reg_prealign : array, optional.
             The linear transformation to be applied to align input images to
             the reference space before warping under the deformation field.
@@ -298,6 +358,8 @@ class Segmentation:
         reset_tg_space : bool, optional
             Whether to reset the space of the input tractogram after
             segmentation is complete. Default: False.
+        clean_params : dict, optional
+            Parameters for Mahalanobis cleaning. Default: {}
 
         Returns
         -------
@@ -336,13 +398,20 @@ class Segmentation:
                 dps.set_number_of_points(self.tg.streamlines, self.nb_points),
                 self.tg, self.tg.space)
 
-        self.prepare_map(mapping, reg_prealign, reg_template)
+        if reg_template is None:
+            reg_template = afd.read_mni_template()
+
+        self.reg_prealign = reg_prealign
+        self.reg_template = reg_template
+        self.mapping = mapping
         self.bundle_dict = bundle_dict
+        if not isinstance(self.bundle_dict, BundleDict):
+            self.bundle_dict = BundleDict(self.bundle_dict)
 
         if self.seg_algo == "afq":
             # We only care about midline crossing if we use AFQ:
             self.cross_streamlines()
-            fiber_groups = self.segment_afq()
+            fiber_groups = self.segment_afq(clean_params=clean_params)
         elif self.seg_algo.startswith("reco"):
             fiber_groups = self.segment_reco()
         else:
@@ -371,53 +440,6 @@ class Segmentation:
         self.fdata = fdata
         self.fbval = fbval
         self.fbvec = fbvec
-
-    def prepare_map(self, mapping=None, reg_prealign=None, reg_template=None):
-        """
-        Set mapping between DWI space and a template.
-        Parameters
-        ----------
-        mapping : DiffeomorphicMap object, str or nib.Nifti1Image, optional.
-            A mapping between DWI space and a template.
-            If None, mapping will be registered from data used in prepare_img.
-            Default: None.
-        reg_template : str or nib.Nifti1Image, optional.
-            Template to use for registration (defaults to the MNI T2)
-            Default: None.
-        reg_prealign : array, optional.
-            The linear transformation to be applied to align input images to
-            the reference space before warping under the deformation field.
-            Default: None.
-        """
-        if reg_template is None:
-            reg_template = afd.read_mni_template()
-
-        self.reg_prealign = reg_prealign
-        self.reg_template = reg_template
-
-        if mapping is None:
-            if self.seg_algo == "afq" or self.reg_algo == "syn":
-                gtab = dpg.gradient_table(self.fbval, self.fbvec)
-                self.mapping = reg.syn_register_dwi(self.fdata, gtab,
-                                                    template=reg_template)[1]
-            else:
-                self.mapping = None
-        elif isinstance(mapping, str) or isinstance(mapping, nib.Nifti1Image):
-            if reg_prealign is None:
-                reg_prealign = np.eye(4)
-            if self.img is None:
-                self.img, _, _, _ = \
-                    ut.prepare_data(self.fdata,
-                                    self.fbval,
-                                    self.fbvec,
-                                    b0_threshold=self.b0_threshold)
-            self.mapping = reg.read_mapping(
-                mapping,
-                self.img,
-                reg_template,
-                prealign=np.linalg.inv(reg_prealign))
-        else:
-            self.mapping = mapping
 
     def cross_streamlines(self, tg=None, template=None, low_coord=10):
         """
@@ -451,101 +473,6 @@ class Segmentation:
             else:
                 self.crosses[sl_idx] = False
 
-    def _get_bundle_info(self, bundle, vox_dim, tol):
-        """
-        Get fiber probabilites and ROIs for a given bundle.
-        """
-        bundle_entry = self.bundle_dict[bundle]
-        include_rois = []
-        include_roi_tols = []
-        exclude_rois = []
-        exclude_roi_tols = []
-        for roi_type in ['include', 'exclude']:
-            if roi_type == 'exclude' and roi_type not in bundle_entry:
-                continue
-            # if no include ROIs, use endpoint ROIs
-            if roi_type == 'include' and (
-                roi_type not in bundle_entry
-                    or len(bundle_entry[roi_type]) < 2):
-                if "include" in bundle_entry:
-                    rois = bundle_entry["include"]
-                else:
-                    rois = []
-                if "start" in bundle_entry:
-                    rois.insert(0, bundle_entry["start"])
-                if "end" in bundle_entry and len(rois) < 2:
-                    rois.append(bundle_entry["end"])
-                if len(rois) < 2:
-                    raise ValueError((
-                        f"In bundle {bundle}, of include ROIs, "
-                        "start or endpoint ROIs, less than two are found. "
-                        "At least two of these is required"))
-            else:
-                rois = bundle_entry[roi_type]
-            for roi_idx, roi in enumerate(rois):
-                if f'{roi_type[:3]}_addtol' in bundle_entry:
-                    this_tol = (
-                        bundle_entry[f'{roi_type[:3]}_addtol'][
-                            roi_idx] / vox_dim + tol)**2
-                else:
-                    this_tol = tol**2
-
-                if "space" not in self.bundle_dict[bundle]\
-                        or self.bundle_dict[bundle][
-                            "space"] == "template":
-                    warped_roi = auv.transform_inverse_roi(
-                        roi,
-                        self.mapping,
-                        bundle_name=bundle)
-                else:
-                    if isinstance(roi, str):
-                        roi = nib.load(roi)
-                    if isinstance(roi, nib.Nifti1Image):
-                        roi = roi.get_fdata()
-                    warped_roi = roi
-
-                if roi_type == 'include':
-                    # include ROI:
-                    include_roi_tols.append(this_tol)
-                    include_rois.append(np.array(np.where(warped_roi)).T)
-                else:
-                    # Exclude ROI:
-                    exclude_roi_tols.append(this_tol)
-                    exclude_rois.append(np.array(np.where(warped_roi)).T)
-
-                # For debugging purposes, we can save the variable as it is:
-                if self.save_intermediates is not None:
-                    os.makedirs(
-                        op.join(self.save_intermediates,
-                                'warpedROI_',
-                                bundle),
-                        exist_ok=True)
-                    nib.save(
-                        nib.Nifti1Image(warped_roi.astype(np.float32),
-                                        self.img_affine),
-                        op.join(self.save_intermediates,
-                                'warpedROI_',
-                                bundle,
-                                'as_used.nii.gz'))
-
-        # The probability map if doesn't exist is all ones with the same
-        # shape as the ROIs:
-        prob_map = bundle_entry.get(
-            'prob_map', np.ones(roi.shape))
-
-        if not isinstance(prob_map, np.ndarray):
-            prob_map = prob_map.get_fdata()
-        if "space" in bundle_entry\
-                and bundle_entry["space"] == "subject":
-            warped_prob_map = prob_map.copy()
-        else:
-            warped_prob_map = \
-                self.mapping.transform_inverse(
-                    prob_map.copy(),
-                    interpolation='nearest')
-        return warped_prob_map, include_rois, exclude_rois,\
-            include_roi_tols, exclude_roi_tols
-
     def _return_empty(self, bundle):
         """
         Helper function for segment_afq, to return an empty dict under
@@ -561,7 +488,24 @@ class Segmentation:
             self.fiber_groups[bundle] = StatefulTractogram(
                 [], self.img, Space.VOX)
 
-    def segment_afq(self, tg=None):
+    def _add_bundle_to_fiber_group(self, b_name, sl, idx):
+        """
+        Helper function for segment_afq, to add a bundle
+        to a fiber group.
+        """
+        sl = StatefulTractogram(
+            sl,
+            self.img,
+            Space.VOX)
+
+        if self.return_idx:
+            self.fiber_groups[b_name] = {}
+            self.fiber_groups[b_name]['sl'] = sl
+            self.fiber_groups[b_name]['idx'] = idx
+        else:
+            self.fiber_groups[b_name] = sl
+
+    def segment_afq(self, clean_params={}, tg=None):
         """
         Assign streamlines to bundles using the waypoint ROI approach
         Parameters
@@ -571,23 +515,26 @@ class Segmentation:
         tg = self._read_tg(tg=tg)
         tg.to_vox()
 
-        # For expedience, we approximate each streamline as a 100 point curve.
-        # This is only used in extracting the values from the probability map,
-        # so will not affect measurement of distance from the waypoint ROIs
-        fgarray = np.array(_resample_tg(tg, 100))
-        n_streamlines = fgarray.shape[0]
+        clean_params["return_idx"] = True
 
-        streamlines_in_bundles = np.empty(
-            (n_streamlines, len(self.bundle_dict)))
-        streamlines_in_bundles.fill(np.nan)
-        min_dist_coords = np.empty(
-            (n_streamlines, len(self.bundle_dict), 2))
-        min_dist_coords.fill(np.nan)
+        fgarray = np.array(_resample_tg(tg, 20))  # for prob map
+        n_streamlines = len(tg)
+
+        bundle_votes = np.full(
+            (n_streamlines, len(self.bundle_dict)),
+            -np.inf, dtype=np.float32)
+        bundle_to_flip = np.zeros(
+            (n_streamlines, len(self.bundle_dict)),
+            dtype=np.bool8)
+
+        bundle_roi_dists = -np.ones(
+            (
+                n_streamlines,
+                len(self.bundle_dict),
+                self.bundle_dict.max_includes),
+            dtype=np.uint32)
 
         self.fiber_groups = {}
-
-        if self.return_idx:
-            out_idx = np.arange(n_streamlines, dtype=int)
 
         # We need to calculate the size of a voxel, so we can transform
         # from mm to voxel units:
@@ -604,314 +551,377 @@ class Segmentation:
         dist_to_atlas = self.dist_to_atlas / vox_dim
 
         self.logger.info("Assigning Streamlines to Bundles")
-        for bundle_idx, bundle in enumerate(self.bundle_dict):
-            self.logger.info(f"Finding Streamlines for {bundle}")
-            warped_prob_map, include_roi, exclude_roi,\
-                include_roi_tols, exclude_roi_tols =\
-                self._get_bundle_info(bundle, vox_dim, tol)
-            if self.save_intermediates is not None:
-                os.makedirs(
-                    op.join(self.save_intermediates,
-                            'warpedprobmap',
-                            bundle),
-                    exist_ok=True)
-                nib.save(
-                    nib.Nifti1Image(warped_prob_map.astype(np.float32),
-                                    self.img_affine),
-                    op.join(self.save_intermediates,
-                            'warpedprobmap',
-                            bundle,
-                            'as_used.nii.gz'))
+        for bundle_idx, bundle_name in enumerate(
+                self.bundle_dict.bundle_names):
+            self.logger.info(f"Finding Streamlines for {bundle_name}")
 
-            fiber_probabilities = dts.values_from_volume(
-                warped_prob_map,
-                fgarray, np.eye(4))
-            fiber_probabilities = np.mean(fiber_probabilities, -1)
-            idx_above_prob = np.where(
-                fiber_probabilities > self.prob_threshold)
-            self.logger.info((f"{len(idx_above_prob[0])} streamlines exceed"
-                              " the probability threshold."))
-            if 'cross_midline' in self.bundle_dict[bundle]:
-                crosses_midline = self.bundle_dict[bundle]['cross_midline']
-            else:
-                crosses_midline = None
+            # Warp ROIs
+            bundle_def = dict(self.bundle_dict.get_b_info(bundle_name))
+            bundle_def.update(self.bundle_dict.transform_rois(
+                bundle_name,
+                self.mapping,
+                self.img_affine))
 
-            # with parallel segmentation, the first for loop will
-            # only collect streamlines and does not need tqdm
-            if self.parallel_segmentation["engine"] != "serial":
-                in_list = []
-                sl_idxs = idx_above_prob[0]
-                parallelizing = True
-            else:
-                sl_idxs = tqdm(idx_above_prob[0])
-                parallelizing = False
+            if "curvature" in bundle_def:
+                ref_curve = load_tractogram(
+                    bundle_def["curvature"]["path"], "same",
+                    bbox_valid_check=False)
+                moved_ref_curve = self.move_streamlines(
+                    ref_curve, "subject")
+                moved_ref_curve.to_vox()
+                moved_ref_curve = np.asarray(
+                    moved_ref_curve.streamlines[0])
 
-            for sl_idx in sl_idxs:
-                if fiber_probabilities[sl_idx] > self.prob_threshold:
-                    if crosses_midline is not None:
-                        if self.crosses[sl_idx]:
-                            # This means that the streamline does
-                            # cross the midline:
-                            if crosses_midline:
-                                # This is what we want, keep going
-                                pass
-                            else:
-                                # This is not what we want,
-                                # skip to next streamline
-                                continue
-                sl = tg.streamlines[sl_idx]
-                fiber_prob = fiber_probabilities[sl_idx]
+            b_sls = _SlsBeingRecognized(
+                tg.streamlines, self.logger,
+                self.save_intermediates, bundle_name,
+                self.img, len(bundle_def.get("include", [])))
 
-                # if parallel, collect the streamlines now
-                if parallelizing:
-                    in_list.append((sl, fiber_prob, sl_idx))
+            # filter by probability map
+            if "prob_map" in bundle_def:
+                b_sls.initiate_selection("Prob. Map")
+                # using entire fgarray here only because it is the first step
+                fiber_probabilities = dts.values_from_volume(
+                    bundle_def["prob_map"].get_fdata(),
+                    fgarray, np.eye(4))
+                fiber_probabilities = np.mean(fiber_probabilities, -1)
+                if not self.roi_dist_tie_break:
+                    b_sls.bundle_vote = fiber_probabilities
+                b_sls.select(
+                    fiber_probabilities > self.prob_threshold,
+                    "Prob. Map")
+            elif not self.roi_dist_tie_break:
+                b_sls.bundle_vote = np.ones(len(b_sls))
+
+            if b_sls and "cross_midline" in bundle_def:
+                b_sls.initiate_selection("Cross Mid.")
+                accepted = self.crosses[b_sls.selected_fiber_idxs]
+                if not bundle_def["cross_midline"]:
+                    accepted = np.invert(accepted)
+                b_sls.select(accepted, "Cross Mid.")
+
+            if b_sls and "start" in bundle_def:
+                accept_idx = b_sls.initiate_selection("startpoint")
+                clean_by_endpoints(
+                    b_sls.get_selected_sls(),
+                    bundle_def["start"],
+                    0,
+                    tol=dist_to_atlas,
+                    flip_sls=b_sls.sls_flipped,
+                    accepted_idxs=accept_idx)
+                if not b_sls.oriented_yet:
+                    accepted_idx_flipped = clean_by_endpoints(
+                        b_sls.get_selected_sls(),
+                        bundle_def["start"],
+                        -1,
+                        tol=dist_to_atlas)
+                    b_sls.reorient(accepted_idx_flipped)
+                    accept_idx = np.logical_xor(
+                        accepted_idx_flipped, accept_idx)
+                b_sls.select(accept_idx, "startpoint")
+
+            if b_sls and "end" in bundle_def:
+                accept_idx = b_sls.initiate_selection("endpoint")
+                cleaned_idx = clean_by_endpoints(
+                    b_sls.get_selected_sls(),
+                    bundle_def["end"],
+                    -1,
+                    tol=dist_to_atlas,
+                    flip_sls=b_sls.sls_flipped,
+                    accepted_idxs=accept_idx)
+                if not b_sls.oriented_yet:
+                    accepted_idx_flipped = clean_by_endpoints(
+                        b_sls.get_selected_sls(),
+                        bundle_def["end"],
+                        0,
+                        tol=dist_to_atlas)
+                    b_sls.reorient(accepted_idx_flipped)
+                    accept_idx = np.logical_xor(
+                        accepted_idx_flipped, accept_idx)
+                b_sls.select(accept_idx, "endpoint")
+
+            if b_sls and (
+                    ("min_len" in bundle_def) or ("max_len" in bundle_def)):
+                accept_idx = b_sls.initiate_selection("length")
+                min_len = bundle_def.get("min_len", 0) / vox_dim
+                max_len = bundle_def.get("max_len", np.inf) / vox_dim
+                for idx, sl in enumerate(b_sls.get_selected_sls()):
+                    sl_len = np.sum(
+                        np.linalg.norm(np.diff(sl, axis=0), axis=1))
+                    if sl_len >= min_len and sl_len <= max_len:
+                        accept_idx[idx] = 1
+                b_sls.select(accept_idx, "length")
+
+            if b_sls and "primary_axis" in bundle_def:
+                b_sls.initiate_selection("orientation")
+                accept_idx = clean_by_orientation(
+                    b_sls.get_selected_sls(),
+                    bundle_def["primary_axis"],
+                    bundle_def.get(
+                        "primary_axis_percentage", None))
+                b_sls.select(accept_idx, "orientation")
+
+            if b_sls and "include" in bundle_def:
+                accept_idx = b_sls.initiate_selection("include")
+                flip_using_include = len(bundle_def["include"]) > 1\
+                    and not b_sls.oriented_yet
+
+                if f'inc_addtol' in bundle_def:
+                    include_roi_tols = []
+                    for inc_tol in bundle_def["inc_addtol"]:
+                        include_roi_tols.append((inc_tol / vox_dim + tol)**2)
                 else:
-                    min_dist_coords[sl_idx, bundle_idx, 0],\
-                        min_dist_coords[sl_idx, bundle_idx, 1],\
-                        streamlines_in_bundles[sl_idx, bundle_idx] =\
-                        _is_streamline_in_ROIs(
-                            sl, tol, include_roi,
-                            include_roi_tols, exclude_roi,
-                            exclude_roi_tols, fiber_prob)
+                    include_roi_tols = [tol**2] * len(bundle_def["include"])
 
-            # collects results from the submitted streamlines
-            if parallelizing:
-                results = paramap(
-                    _is_streamline_in_ROIs_parallel, in_list,
-                    func_args=[
-                        tol, include_roi, include_roi_tols, exclude_roi,
-                        exclude_roi_tols, bundle_idx],
-                    **self.parallel_segmentation)
-                for result in results:
-                    sl_idx, bundle_idx, min_dist_coords_0,\
-                        min_dist_coords_1, sl_in_bundles =\
-                        result
-                    min_dist_coords[sl_idx, bundle_idx, 0] = min_dist_coords_0
-                    min_dist_coords[sl_idx, bundle_idx, 1] = min_dist_coords_1
-                    streamlines_in_bundles[sl_idx, bundle_idx] = sl_in_bundles
+                include_rois = []
+                for include_roi in bundle_def["include"]:
+                    include_rois.append(np.array(
+                        np.where(include_roi.get_fdata())).T)
 
-            self.logger.info(
-                (f"{np.nansum(streamlines_in_bundles[:, bundle_idx] > 0)} "
-                 "streamlines selected with waypoint ROIs"))
+                # with parallel segmentation, the first for loop will
+                # only collect streamlines and does not need tqdm
+                if self.parallel_segmentation["engine"] != "serial":
+                    inc_results = paramap(
+                        _check_sl_with_inclusion, b_sls.get_selected_sls(),
+                        func_args=[
+                            include_rois, include_roi_tols],
+                        **self.parallel_segmentation)
 
-            possible_fibers = streamlines_in_bundles[:, bundle_idx] > 0
-            possible_fibers = np.where(possible_fibers)[0]
-            if len(possible_fibers) > 0:
-                og_possible_fibers = possible_fibers.copy()
+                else:
+                    inc_results = _check_sls_with_inclusion(
+                        b_sls.get_selected_sls(),
+                        include_rois,
+                        include_roi_tols)
 
-                if "primary_axis" in self.bundle_dict[bundle]:
-                    self.logger.info((
-                        "Before filtering by orientation: "
-                        f"{len(possible_fibers)} streamlines"))
+                if self.roi_dist_tie_break:
+                    min_dist_coords = np.ones(len(b_sls))
+                roi_dists = -np.ones(
+                    (len(b_sls), self.bundle_dict.max_includes),
+                    dtype=np.int32)
+                if flip_using_include:
+                    to_flip = np.ones_like(accept_idx, dtype=np.bool8)
+                for sl_idx, inc_result in enumerate(inc_results):
+                    sl_accepted, sl_dist = inc_result
 
-                    # get candidate streamlines
-                    select_sl = tg.streamlines[possible_fibers]
+                    if sl_accepted:
+                        if self.roi_dist_tie_break:
+                            min_dist_coords[sl_idx] = np.min(sl_dist)
 
-                    # clean by orientation
-                    cleaned_idx, _, _ = clean_by_orientation(
-                        select_sl,
-                        self.bundle_dict[bundle]["primary_axis"],
-                        self.bundle_dict[bundle].get(
-                            "primary_axis_percentage", None))
-
-                    # update candidate streamlines
-                    possible_fibers = possible_fibers[cleaned_idx]
-
-                    self.logger.info((
-                        "After filtering by orientation: "
-                        f"{len(possible_fibers)} streamlines"))
-
-                if self.filter_by_endpoints:
-                    self.logger.info("Filtering by endpoints")
-                    select_sl = tg.streamlines[possible_fibers]
-                    min_dist_sl = min_dist_coords[possible_fibers, bundle_idx]
-                    self.logger.info("Before filtering "
-                                     f"{len(select_sl)} streamlines")
-                    # We use definitions of endpoints provided
-                    # through this dict:
-                    atlas_idx = []
-                    for end_type in ['start', 'end']:
-                        if end_type in self.bundle_dict[bundle]:
-                            warped_roi = self.bundle_dict[bundle][end_type]
-                            # Create binary masks and warp these into
-                            # subject's DWI space:
-                            if "space" not in self.bundle_dict[bundle]\
-                                    or self.bundle_dict[bundle][
-                                        "space"] == "template":
-                                warped_roi = self.mapping.transform_inverse(
-                                    warped_roi.get_fdata(),
-                                    interpolation='nearest')
-
-                                if self.save_intermediates is not None:
-                                    os.makedirs(op.join(
-                                        self.save_intermediates,
-                                        'endpoint_ROI',
-                                        bundle), exist_ok=True)
-
-                                    nib.save(
-                                        nib.Nifti1Image(
-                                            warped_roi,
-                                            self.img_affine),
-                                        op.join(
-                                            self.save_intermediates,
-                                            'endpoint_ROI',
-                                            bundle,
-                                            f'{end_type}point_as_used.nii.gz'))
-                            else:
-                                warped_roi = warped_roi.get_fdata()
-                            atlas_idx.append(
-                                np.array(np.where(warped_roi > 0)).T)
+                        if len(sl_dist) > 1:
+                            roi_dist1 = np.argmin(sl_dist[0], 0)[0]
+                            roi_dist2 = np.argmin(sl_dist[
+                                len(sl_dist) - 1], 0)[0]
+                            roi_dists[sl_idx, :len(sl_dist)] = [
+                                np.argmin(dist, 0)[0]
+                                for dist in sl_dist]
+                            # Only accept SLs that, when cut, are meaningful
+                            if (len(sl_dist) < 2) or abs(
+                                roi_dists[sl_idx, 0] - roi_dists[
+                                    sl_idx, len(sl_dist) - 1]) > 1:
+                                # Flip sl if it is close to second ROI
+                                # before its close to the first ROI
+                                if flip_using_include:
+                                    this_flips = roi_dist1 > roi_dist2
+                                    to_flip[sl_idx] = this_flips
+                                    if this_flips:
+                                        roi_dists[sl_idx, :len(sl_dist)] =\
+                                            np.flip(
+                                                roi_dists[sl_idx, :len(sl_dist)])
+                                accept_idx[sl_idx] = 1
                         else:
-                            atlas_idx.append(None)
+                            accept_idx[sl_idx] = 1
+                # see https://github.com/joblib/joblib/issues/945
+                if (
+                    (self.parallel_segmentation.get(
+                        "engine", "joblib") != "serial")
+                    and (self.parallel_segmentation.get(
+                        "backend", "loky") == "loky")):
+                    from joblib.externals.loky import get_reusable_executor
+                    get_reusable_executor().shutdown(wait=True)
+                if self.roi_dist_tie_break:
+                    b_sls.bundle_vote = -min_dist_coords
+                b_sls.roi_dists = roi_dists
+                if flip_using_include:
+                    b_sls.reorient(to_flip)
+                b_sls.select(accept_idx, "include")
 
-                    cleaned_idx = clean_by_endpoints(
-                        select_sl,
-                        atlas_idx[0],
-                        atlas_idx[1],
-                        tol=dist_to_atlas,
-                        flip_sls=np.greater(
-                            min_dist_sl[:, 0], min_dist_sl[:, 1]))
-                    cleaned_idx = list(cleaned_idx)
-                    possible_fibers = possible_fibers[cleaned_idx]
+            # Filters streamlines by how well they match
+            # a curve in orientation and shape but not scale
+            if b_sls and "curvature" in bundle_def:
+                accept_idx = b_sls.initiate_selection("curvature")
+                ref_curve_threshold = bundle_def["curvature"].get("thresh", 5)
+                curves_r3 = DiscreteCurves(ambient_manifold=Euclidean(dim=3))
+                cut = bundle_def["curvature"].get("cut", False)
+                for idx, sl in enumerate(b_sls.get_selected_sls(cut=cut)):
+                    sl = dps.set_number_of_points(
+                        sl, moved_ref_curve.shape[0])
+                    dist = curves_r3.square_root_velocity_metric.dist(
+                        moved_ref_curve, sl)
+                    if dist <= ref_curve_threshold:
+                        accept_idx[idx] = 1
+                b_sls.select(accept_idx, "curvature", cut=cut)
 
-                    self.logger.info(
-                        "After filtering by endpoints, "
-                        f"{len(cleaned_idx)} streamlines")
+            if b_sls and "exclude" in bundle_def:
+                accept_idx = b_sls.initiate_selection("exclude")
+                if f'exc_addtol' in bundle_def:
+                    exclude_roi_tols = []
+                    for exc_tol in bundle_def["exc_addtol"]:
+                        exclude_roi_tols.append((exc_tol / vox_dim + tol)**2)
+                else:
+                    exclude_roi_tols = [tol**2] * len(bundle_def["exclude"])
+                exclude_rois = []
+                for exclude_roi in bundle_def["exclude"]:
+                    exclude_rois.append(np.array(
+                        np.where(exclude_roi.get_fdata())).T)
+                for sl_idx, sl in enumerate(b_sls.get_selected_sls()):
+                    if _check_sl_with_exclusion(
+                            sl, exclude_rois, exclude_roi_tols):
+                        accept_idx[sl_idx] = 1
+                b_sls.select(accept_idx, "exclude")
 
-                removed_fibers = list(set(og_possible_fibers).difference(
-                    possible_fibers))
-                if len(removed_fibers) > 0:
-                    streamlines_in_bundles[
-                        removed_fibers, bundle_idx] = np.nan
-                    min_dist_coords[
-                        removed_fibers, bundle_idx, :] = np.nan
+            if b_sls and "qb_thresh" in bundle_def:
+                b_sls.initiate_selection("qb_thresh")
+                cut = self.clip_edges or ("bundlesection" in bundle_def)
+                qbx = QuickBundles(
+                    bundle_def["qb_thresh"] / vox_dim,
+                    AveragePointwiseEuclideanMetric(
+                        ResampleFeature(nb_points=12)))
+                clusters = qbx.cluster(b_sls.get_selected_sls(cut=cut))
+                cleaned_idx = clusters[np.argmax(
+                    clusters.clusters_sizes())].indices
+                b_sls.select(cleaned_idx, "qb_thresh", cut=cut)
 
-        # see https://github.com/joblib/joblib/issues/945
-        if (
-                self.parallel_segmentation["engine"] != "serial"
-                and "backend" in self.parallel_segmentation
-                and self.parallel_segmentation["backend"] == "loky"):
-            from joblib.externals.loky import get_reusable_executor
-            self.logger.info("Cleaning up Loky...")
-            get_reusable_executor().shutdown(wait=True)
-            self.logger.info("Loky Cleaned up")
+            if b_sls:
+                accept_idx = b_sls.initiate_selection("Mahalanobis")
+                cut = self.clip_edges or ("bundlesection" in bundle_def)
+                _, cleaned_idx = clean_bundle(
+                    b_sls.get_selected_sls(cut=cut),
+                    **clean_params)
+                b_sls.select(cleaned_idx, "Mahalanobis", cut=cut)
 
-        # Eliminate any fibers not selected:
-        possible_fibers = np.nansum(streamlines_in_bundles, -1) > 0
-        tg = StatefulTractogram(tg.streamlines[possible_fibers],
-                                self.img,
-                                Space.VOX)
-        if self.return_idx:
-            out_idx = out_idx[possible_fibers]
+            if b_sls and not b_sls.oriented_yet:
+                raise ValueError(
+                    "pyAFQ was unable to consistently orient streamlines "
+                    f"in bundle {bundle_name} using the provided ROIs. "
+                    "This can be fixed by including at least 2 "
+                    "waypoint ROIs, or by using "
+                    "endpoint ROIs.")
+
+            if b_sls:
+                bundle_votes[
+                    b_sls.selected_fiber_idxs,
+                    bundle_idx] = b_sls.bundle_vote.copy()
+                bundle_to_flip[
+                    b_sls.selected_fiber_idxs,
+                    bundle_idx] = b_sls.sls_flipped.copy()
+                if hasattr(b_sls, "roi_dists"):
+                    bundle_roi_dists[
+                        b_sls.selected_fiber_idxs,
+                        bundle_idx
+                    ] = b_sls.roi_dists.copy()
 
         if self.save_intermediates is not None:
             os.makedirs(self.save_intermediates, exist_ok=True)
             bc_path = op.join(self.save_intermediates,
-                              "sls_bundle_assignment.npy")
-            np.save(bc_path, streamlines_in_bundles)
+                              "sls_bundle_votes.npy")
+            np.save(bc_path, bundle_votes)
 
-        streamlines_in_bundles = streamlines_in_bundles[possible_fibers]
-        min_dist_coords = min_dist_coords[possible_fibers]
-        if self.roi_dist_tie_break:
-            bundle_choice = np.nanargmin(np.nanmin(min_dist_coords, -1), -1)
-        else:
-            bundle_choice = np.nanargmax(streamlines_in_bundles, -1)
+        bundle_choice = np.argmax(bundle_votes, -1)
+        bundle_choice[bundle_votes.max(-1) == -np.inf] = -1
 
         # We do another round through, so that we can orient all the
         # streamlines within a bundle in the same orientation with respect to
         # the ROIs. This order is ARBITRARY but CONSISTENT (going from ROI0
         # to ROI1).
         self.logger.info("Re-orienting streamlines to consistent directions")
-        for bundle_idx, bundle in enumerate(self.bundle_dict):
+        for bundle_idx, bundle in enumerate(self.bundle_dict.bundle_names):
             self.logger.info(f"Processing {bundle}")
 
-            select_idx = np.where(bundle_choice == bundle_idx)
+            select_idx = np.where(bundle_choice == bundle_idx)[0]
 
-            if len(select_idx[0]) == 0:
+            if len(select_idx) == 0:
                 # There's nothing here, set and move to the next bundle:
-                self._return_empty(bundle)
+                if "bundlesection" in self.bundle_dict.get_b_info(bundle):
+                    for sb_name in self.bundle_dict.get_b_info(bundle)[
+                            "bundlesection"]:
+                        self._return_empty(sb_name)
+                else:
+                    self._return_empty(bundle)
                 continue
 
             # Use a list here, because ArraySequence doesn't support item
             # assignment:
             select_sl = list(tg.streamlines[select_idx])
-            # Sub-sample min_dist_coords:
-            min_dist_coords_bundle = min_dist_coords[select_idx]
-            for idx in range(len(select_sl)):
-                min0 = min_dist_coords_bundle[idx, bundle_idx, 0]
-                min1 = min_dist_coords_bundle[idx, bundle_idx, 1]
-                if min0 > min1:
-                    select_sl[idx] = select_sl[idx][::-1]
+            to_flip = bundle_to_flip[select_idx, bundle_idx]
+            for ii, sl in enumerate(select_sl):
+                if to_flip[ii]:
+                    select_sl[ii] = sl[::-1]
 
+            roi_dists = bundle_roi_dists[:, bundle_idx, :]
             if self.clip_edges:
-                self.logger.info("Clipping Streamlines by ROI")
-                for idx in range(len(select_sl)):
-                    min0 = int(min_dist_coords_bundle[idx, bundle_idx, 0])
-                    min1 = int(min_dist_coords_bundle[idx, bundle_idx, 1])
-
-                    # If the point that is closest to the first ROI
-                    # is the same as the point closest to the second ROI,
-                    # include the surrounding points to make a streamline.
-                    if min0 == min1:
-                        min1 = min1 + 1
-                        min0 = min0 - 1
-
-                    select_sl[idx] = select_sl[idx][min0:min1]
-
-            select_sl = StatefulTractogram(select_sl,
-                                           self.img,
-                                           Space.VOX)
-
-            if self.return_idx:
-                self.fiber_groups[bundle] = {}
-                self.fiber_groups[bundle]['sl'] = select_sl
-                self.fiber_groups[bundle]['idx'] = out_idx[select_idx]
+                if np.sum(roi_dists == -1) == 0:
+                    self.logger.info("Clipping Streamlines by ROI")
+                    _cut_sls_by_dist(
+                        select_sl, select_idx, roi_dists,
+                        (0, len(self.bundle_dict.get_b_info(
+                            bundle)["include"]) - 1), in_place=True)
+            if "bundlesection" in self.bundle_dict[bundle]:
+                for sb_name, sb_include_cuts in self.bundle_dict.get_b_info(
+                        bundle)["bundlesection"].items():
+                    bundlesection_select_sl = _cut_sls_by_dist(
+                        select_sl, select_idx, roi_dists,
+                        sb_include_cuts, in_place=False)
+                    self._add_bundle_to_fiber_group(
+                        sb_name, bundlesection_select_sl, select_idx)
             else:
-                self.fiber_groups[bundle] = select_sl
+                self._add_bundle_to_fiber_group(bundle, select_sl, select_idx)
         return self.fiber_groups
 
-    def move_streamlines(self, tg, reg_algo='slr'):
+    def move_streamlines(self, tg, to="template"):
         """Streamline-based registration of a whole-brain tractogram to
         the MNI whole-brain atlas.
 
-        registration_algo : str
-            "slr" or "syn"
+        to : str
+            "template" or "subject"
         """
-        if reg_algo is None:
-            if self.mapping is None:
-                reg_algo = 'slr'
-            else:
-                reg_algo = 'syn'
-
-        if reg_algo == "slr":
-            self.logger.info("Registering tractogram with SLR")
-            atlas = self.bundle_dict['whole_brain']
-            self.moved_sl, _, _, _ = whole_brain_slr(
-                atlas, tg.streamlines, x0='affine', verbose=False,
-                progressive=self.progressive,
-                greater_than=self.greater_than,
-                rm_small_clusters=self.rm_small_clusters,
-                rng=self.rng)
-        elif reg_algo == "syn":
-            self.logger.info("Registering tractogram based on syn")
-            tg.to_rasmm()
-            delta = dts.values_from_volume(
-                self.mapping.forward,
-                tg.streamlines, np.eye(4))
-            self.moved_sl = dts.Streamlines(
-                [d + s for d, s in zip(delta, tg.streamlines)])
+        tg_og_space = tg.space
+        if isinstance(self.mapping, ConformedFnirtMapping):
+            if to != "subject":
+                raise ValueError(
+                    "Attempted to transform streamlines to template using "
+                    "unsupported mapping. "
+                    "Use something other than Fnirt.")
             tg.to_vox()
-
+            moved_sl = []
+            for sl in tg.streamlines:
+                moved_sl.append(self.mapping.transform_inverse_pts(sl))
+        else:
+            tg.to_rasmm()
+            if to == "template":
+                volume = self.mapping.forward
+            else:
+                volume = self.mapping.backward
+            delta = dts.values_from_volume(
+                volume,
+                tg.streamlines, np.eye(4))
+            moved_sl = dts.Streamlines(
+                [d + s for d, s in zip(delta, tg.streamlines)])
+        if to == "template":
+            ref = self.reg_template
+        else:
+            ref = self.img
+        moved_sft = StatefulTractogram(
+            moved_sl,
+            ref,
+            Space.RASMM)
         if self.save_intermediates is not None:
-            moved_sft = StatefulTractogram(
-                self.moved_sl,
-                self.reg_template,
-                Space.RASMM)
             save_tractogram(
                 moved_sft,
                 op.join(self.save_intermediates,
-                        'sls_in_mni.trk'),
+                        f'sls_in_{to}.trk'),
                 bbox_valid_check=False)
+        tg.to_space(tg_og_space)
+        return moved_sft
 
     def segment_reco(self, tg=None):
         """
@@ -940,16 +950,16 @@ class Segmentation:
             roiseg.segment(
                 self.presegment_bundle_dict,
                 self.tg,
+                self.mapping,
                 self.fdata,
                 self.fbval,
                 self.fbvec,
                 reg_template=self.reg_template,
-                mapping=self.mapping,
                 reg_prealign=self.reg_prealign)
             roiseg_fg = roiseg.fiber_groups
         else:
-            self.move_streamlines(tg, self.reg_algo)
-            rb = RecoBundles(self.moved_sl, verbose=False, rng=self.rng)
+            moved_sl = self.move_streamlines(tg).streamlines
+            rb = RecoBundles(moved_sl, verbose=False, rng=self.rng)
         # Next we'll iterate over bundles, registering each one:
         bundle_list = list(self.bundle_dict.keys())
         if 'whole_brain' in bundle_list:
@@ -958,7 +968,8 @@ class Segmentation:
         self.logger.info("Assigning Streamlines to Bundles")
         for bundle in bundle_list:
             self.logger.info(f"Finding streamlines for {bundle}")
-            model_sl = self.bundle_dict[bundle]['sl']
+            b_info = self.bundle_dict[bundle]
+            model_sl = b_info['sl']
 
             # If doing a presegmentation based on ROIs then initialize rb after
             # Filtering the whole brain tractogram to pass through ROIs
@@ -984,9 +995,9 @@ class Segmentation:
                     self.img,
                     Space.VOX)
                 indiv_tg.to_rasmm()
-                self.move_streamlines(indiv_tg, self.reg_algo)
+                moved_sl = self.move_streamlines(indiv_tg).streamlines
                 rb = RecoBundles(
-                    self.moved_sl,
+                    moved_sl,
                     verbose=False,
                     rng=self.rng)
             if self.save_intermediates is not None:
@@ -995,7 +1006,7 @@ class Segmentation:
                 else:
                     moved_fname = "whole_brain.trk"
                 moved_sft = StatefulTractogram(
-                    self.moved_sl,
+                    moved_sl,
                     self.reg_template,
                     Space.RASMM)
                 save_tractogram(
@@ -1037,7 +1048,7 @@ class Segmentation:
                     recognized_sl = tg.streamlines[rec_labels]
                 else:
                     recognized_sl = indiv_tg.streamlines[rec_labels]
-            standard_sl = next(iter(self.bundle_dict[bundle]['centroid']))
+            standard_sl = next(iter(b_info['centroid']))
             oriented_sl = dts.orient_by_streamline(recognized_sl, standard_sl)
 
             self.logger.info(
@@ -1065,7 +1076,7 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
 
     Parameters
     ----------
-    tg : StatefulTractogram class instance
+    tg : StatefulTractogram class instance or ArraySequence
         A whole-brain tractogram to be segmented.
     n_points : int, optional
         Number of points to resample streamlines to.
@@ -1098,23 +1109,29 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
     # Convert string to callable, if that's what you got.
     if isinstance(stat, str):
         stat = getattr(np, stat)
+
+    if hasattr(tg, "streamlines"):
+        streamlines = tg.streamlines
+    else:
+        streamlines = dts.Streamlines(tg)
+
     # We don't even bother if there aren't enough streamlines:
-    if len(tg.streamlines) < min_sl:
+    if len(streamlines) < min_sl:
         if return_idx:
-            return tg, np.arange(len(tg.streamlines))
+            return tg, np.arange(len(streamlines))
         else:
             return tg
 
     # Resample once up-front:
-    fgarray = _resample_tg(tg, n_points)
+    fgarray = _resample_tg(streamlines, n_points)
 
     # Keep this around, so you can use it for indexing at the very end:
     idx = np.arange(len(fgarray))
     # get lengths of each streamline
-    lengths = np.array([sl.shape[0] for sl in tg.streamlines])
+    lengths = np.array([sl.shape[0] for sl in streamlines])
     # We'll only do this for clean_rounds
     rounds_elapsed = 0
-    while rounds_elapsed < clean_rounds and len(tg.streamlines) > min_sl:
+    while rounds_elapsed < clean_rounds and len(streamlines) > min_sl:
         # This calculates the Mahalanobis for each streamline/node:
         m_dist = gaussian_weights(fgarray, return_mahalnobis=True, stat=stat)
         logger.debug(f"Shape of fgarray: {np.asarray(fgarray).shape}")
@@ -1162,7 +1179,10 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
         rounds_elapsed += 1
 
     # Select based on the variable that was keeping track of things for us:
-    out = StatefulTractogram(tg.streamlines[idx], tg, Space.VOX)
+    if hasattr(tg, "streamlines"):
+        out = StatefulTractogram(tg.streamlines[idx], tg, Space.VOX)
+    else:
+        out = streamlines[idx]
     if return_idx:
         return out, idx
     else:
@@ -1173,7 +1193,15 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
 # copies of the class to be parallelized
 
 
-def _check_sl_with_inclusion(sl, include_rois, tol,
+def _check_sls_with_inclusion(sls, include_rois, include_roi_tols):
+    for sl in sls:
+        yield _check_sl_with_inclusion(
+            sl,
+            include_rois,
+            include_roi_tols)
+
+
+def _check_sl_with_inclusion(sl, include_rois,
                              include_roi_tols):
     """
     Helper function to check that a streamline is close to a list of
@@ -1190,7 +1218,7 @@ def _check_sl_with_inclusion(sl, include_rois, tol,
     return True, dist
 
 
-def _check_sl_with_exclusion(sl, exclude_rois, tol,
+def _check_sl_with_exclusion(sl, exclude_rois,
                              exclude_roi_tols):
     """ Helper function to check that a streamline is not too close to a
     list of exclusion ROIs.
@@ -1203,45 +1231,46 @@ def _check_sl_with_exclusion(sl, exclude_rois, tol,
     return True
 
 
-def _is_streamline_in_ROIs(sl, tol, include_roi,
-                           include_roi_tols, exclude_roi,
-                           exclude_roi_tols, fiber_prob):
-    is_close, dist = \
-        _check_sl_with_inclusion(
-            sl,
-            include_roi,
-            tol,
-            include_roi_tols)
-    if is_close:
-        is_far = \
-            _check_sl_with_exclusion(
-                sl,
-                exclude_roi,
-                tol,
-                exclude_roi_tols)
-        if is_far:
-            if len(dist) > 1:
-                return np.argmin(dist[0], 0)[0],\
-                    np.argmin(dist[1], 0)[0], fiber_prob
-            else:
-                return np.argmin(dist[0], 0)[0],\
-                    np.argmin(dist[0], 0)[0], fiber_prob
-    return np.nan, np.nan, np.nan
+def _cut_sls_by_dist(select_sl, select_idx, roi_dists, roi_idxs,
+                     in_place=False):
+    """
+    Helper function to cut streamlines according to which points
+    are closest to certain rois.
 
+    Parameters
+    ----------
+    select_sl, streamlines to cut
+    select_idx, indices of these streamlines into the original tractography
+    roi_dists, distances from a given streamline to a given inclusion roi
+    roi_idxs, two indices into the list of inclusion rois to use for the cut
+    in_place, whether to modify select_sl
+    """
+    if in_place:
+        cut_sls = select_sl
+    else:
+        cut_sls = [None] * len(select_sl)
 
-def _is_streamline_in_ROIs_parallel(indiv_args, tol, include_roi,
-                                    include_roi_tols, exclude_roi,
-                                    exclude_roi_tols, bundle_idx):
-    sl, fiber_prob, sl_idx = indiv_args
-    min_dist_coords_0,\
-        min_dist_coords_1,\
-        streamlines_in_bundles = \
-        _is_streamline_in_ROIs(
-            sl, tol, include_roi,
-            include_roi_tols, exclude_roi,
-            exclude_roi_tols, fiber_prob)
-    return (sl_idx, bundle_idx, min_dist_coords_0, min_dist_coords_1,
-            streamlines_in_bundles)
+    for bundle_sl_idx, idx in enumerate(select_idx):
+        if roi_idxs[0] == -1:
+            min0 = 0
+        else:
+            min0 = int(roi_dists[idx, roi_idxs[0]])
+        if roi_idxs[1] == -1:
+            min1 = None
+        else:
+            min1 = int(roi_dists[idx, roi_idxs[1]])
+
+        # If the point that is closest to the first ROI
+        # is the same as the point closest to the second ROI,
+        # include the surrounding points to make a streamline.
+        if min0 == min1:
+            min1 = min1 + 1
+            min0 = min0 - 1
+
+        cut_sls[bundle_sl_idx] = select_sl[
+            bundle_sl_idx][min0:min1]
+
+    return cut_sls
 
 
 def clean_by_orientation(streamlines, primary_axis, tol=None):
@@ -1289,101 +1318,61 @@ def clean_by_orientation(streamlines, primary_axis, tol=None):
         along_accepted_idx,
         end_accepted_idx)
 
-    return cleaned_idx, along_accepted_idx, end_accepted_idx
+    return cleaned_idx
 
 
-def clean_by_endpoints(streamlines, targets0, targets1, tol=None, atlas=None,
-                       flip_sls=None):
+def clean_by_endpoints(streamlines, target, target_idx, tol=None,
+                       flip_sls=None, accepted_idxs=None):
     """
-    Clean a collection of streamlines based on their two endpoints
-    Filters down to only include items that have their starting points close to
-    the targets0 and ending points close to targets1
+    Clean a collection of streamlines based on an endpoint ROI.
+    Filters down to only include items that have their start or end points
+    close to the targets.
     Parameters
     ----------
     streamlines : sequence of N by 3 arrays
         Where N is number of nodes in the array, the collection of
         streamlines to filter down to.
-    targets0, target1: sequences or Nx3 arrays or None.
-        The targets. Numerical values in the atlas array for targets for the
-        first and last node in each streamline respectively, or NX3 arrays with
-        each row containing the indices for these locations in the atlas.
-        If provided a None, this means no restriction on that end.
+    target: Nifti1Image
+        Nifti1Image containing a boolean representation of the ROI.
+    target_idx: int.
+        Index within each streamline to check if within the target region.
+        Typically 0 for startpoint ROIs or -1 for endpoint ROIs.
+        If using flip_sls, this becomes (len(sl) - this_idx - 1) % len(sl)
     tol : float, optional A distance tolerance (in units that the coordinates
         of the streamlines are represented in). Default: 0, which means that
         the endpoint is exactly in the coordinate of the target ROI.
-    atlas : 3D array or Nifti1Image class instance with a 3D array, optional.
-        Contains numerical values for ROIs. Default: if not provided, assume
-        that targets0 and targets1 are both arrays of indices, and this
-        information is not needed.
     flip_sls : 1d array, optional
         Length is len(streamlines), whether to flip the streamline.
+    accepted_idxs : 1d array, optional
+        Boolean array, where entries correspond to eachs streamline,
+        and streamlines that pass cleaning will be set to 1.
     Yields
     -------
-    Generator of the indicies into streamlines that survive cleaning.
+    boolean array of streamlines that survive cleaning.
     """
     if tol is None:
         tol = 0
+
+    if accepted_idxs is None:
+        accepted_idxs = np.zeros(len(streamlines), dtype=np.bool8)
 
     # We square the tolerance, because below we are using the squared Euclidean
     # distance which is slightly faster:
     tol = tol ** 2
 
-    # Check whether it's already in the right format:
-    sp_is_idx = (targets0 is None
-                 or (isinstance(targets0, np.ndarray)
-                     and targets0.shape[1] == 3))
+    idxes = np.array(np.where(target.get_fdata() > 0)).T
 
-    ep_is_idx = (targets1 is None
-                 or (isinstance(targets1, np.ndarray)
-                     and targets1.shape[1] == 3))
-
-    if atlas is None and not (ep_is_idx and sp_is_idx):
-        e_s = "Need to provide endpoint and startpoint as "
-        e_s += "indices, or provide an atlas"
-        raise ValueError(e_s)
-
-    if sp_is_idx:
-        idxes0 = targets0
-    else:
-        # Otherwise, we'll need to derive it:
-        startpoint_roi = np.zeros(atlas.shape, dtype=bool)
-        for targ in targets0:
-            startpoint_roi[atlas == targ] = 1
-        idxes0 = np.array(np.where(startpoint_roi)).T
-
-    if ep_is_idx:
-        idxes1 = targets1
-    else:
-        endpoint_roi = np.zeros(atlas.shape, dtype=bool)
-        for targ in targets1:
-            endpoint_roi[atlas == targ] = 1
-        idxes1 = np.array(np.where(endpoint_roi)).T
-
-    any_found = False
     if flip_sls is None:
-        flip_sls = np.zeros_like(streamlines)
+        flip_sls = np.zeros(len(streamlines))
     flip_sls = flip_sls.astype(int)
+
     for ii, sl in enumerate(streamlines):
-        if targets0 is None:
-            # Nothing to check
-            dist0ok = True
-        else:
-            dist0ok = False
-            dist0 = np.min(cdist(
-                np.array([sl[-flip_sls[ii]]]), idxes0, 'sqeuclidean'))
-            if dist0 <= tol:
-                dist0ok = True
-        # Only proceed if conditions for one side are fulfilled:
-        if dist0ok:
-            if targets1 is None:
-                # Nothing to check on this end:
-                any_found = True
-                yield ii
-            else:
-                dist2 = np.min(cdist(
-                    np.array([sl[flip_sls[ii] - 1]]), idxes1, 'sqeuclidean'))
-                if dist2 <= tol:
-                    any_found = True
-                    yield ii
-    if not any_found:
-        return []
+        this_idx = target_idx
+        if flip_sls[ii]:
+            this_idx = (len(sl) - this_idx - 1) % len(sl)
+        dist = np.min(cdist(
+            [sl[this_idx]], idxes, 'sqeuclidean'))
+        if dist <= tol:
+            accepted_idxs[ii] = 1
+
+    return accepted_idxs
