@@ -1,4 +1,4 @@
-import cuslines.cuslines as cuslines
+import cuslines
 
 import numpy as np
 from math import radians

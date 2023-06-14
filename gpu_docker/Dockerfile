@@ -41,10 +41,11 @@ RUN cd /opt/GPUStreamlines && mkdir build && cd build \
 	.. \
     && make && make install
 
+# install cuslines as package
+RUN echo -e "from setuptools import setup, find_packages\nsetup(name='cuslines',version='0.0.1',packages=find_packages())" >> /opt/GPUStreamlines/build/cuslines/setup.py
+RUN cd /opt/GPUStreamlines/build/cuslines && pip install -e .
+
 # Install pyAFQ
 RUN cd /opt/pyAFQ && pip install -e .
-
-# Bring in cuslines
-RUN cp -r /opt/GPUStreamlines/build/* /opt/pyAFQ/bin/
 
 ENTRYPOINT ["/opt/pyAFQ/bin/pyAFQ"]
