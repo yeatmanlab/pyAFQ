@@ -560,15 +560,16 @@ class Segmentation:
                 self.img_affine))
 
             if "curvature" in bundle_def:
-                ref_curve = load_tractogram(
+                ref_sl = load_tractogram(
                     bundle_def["curvature"]["path"], "same",
                     bbox_valid_check=False)
-                moved_ref_curve = self.move_streamlines(
-                    ref_curve, "subject")
-                moved_ref_curve.to_vox()
-                moved_ref_curve = np.asarray(
-                    moved_ref_curve.streamlines[0])
-                moved_ref_curve_diff = np.diff(moved_ref_curve, axis=0)
+                moved_ref_sl = self.move_streamlines(
+                    ref_sl, "subject")
+                moved_ref_sl.to_vox()
+                moved_ref_sl = moved_ref_sl.streamlines[0]
+                moved_ref_curve = sl_curve(
+                    moved_ref_sl,
+                    len(moved_ref_sl))
 
             b_sls = _SlsBeingRecognized(
                 tg.streamlines, self.logger,
@@ -747,15 +748,22 @@ class Segmentation:
             # a curve in orientation and shape but not scale
             if b_sls and "curvature" in bundle_def:
                 accept_idx = b_sls.initiate_selection("curvature")
-                ref_curve_threshold = bundle_def["curvature"].get(
-                    "thresh", 5) / vox_dim
+                ref_curve_threshold = np.radians(bundle_def["curvature"].get(
+                    "thresh", 10))
                 cut = bundle_def["curvature"].get("cut", False)
                 for idx, sl in enumerate(b_sls.get_selected_sls(cut=cut)):
-                    sl = dps.set_number_of_points(
-                        sl, moved_ref_curve.shape[0])
-                    sl_diff = np.diff(sl, axis=0)
-                    dist = np.mean(np.linalg.norm(
-                        moved_ref_curve_diff - sl_diff))
+                    if b_sls.oriented_yet and b_sls.sls_flipped[idx]:
+                        sl = np.flip(sl)
+                    this_sl_curve = sl_curve(sl, len(moved_ref_sl))
+                    dist = sl_curve_dist(this_sl_curve, moved_ref_curve)
+                    # print(b_sls.sls_flipped[idx])
+                    # print(moved_ref_curve)
+                    # print(this_sl_curve)
+                    # print(dist)
+                    # print("=========")
+                    # print(moved_ref_sl[-1] - moved_ref_sl[0])
+                    # print(sl[-1] - sl[0])
+                    # print("=========")
                     if dist <= ref_curve_threshold:
                         accept_idx[idx] = 1
                 b_sls.select(accept_idx, "curvature", cut=cut)
@@ -1064,6 +1072,34 @@ class Segmentation:
                                                           Space.RASMM)
         self.fiber_groups = fiber_groups
         return fiber_groups
+
+
+def sl_curve(sl, n_points):
+    """
+    Calculate the direction of the displacement between
+    each point along a streamline
+    """
+    # Resample to a standardized number of points
+    resampled_sl = dps.set_number_of_points(
+        sl,
+        n_points)
+
+    # displacement at each point
+    resampled_sl_diff = np.diff(resampled_sl, axis=0)
+
+    # normalize this displacement
+    resampled_sl_diff = resampled_sl_diff / np.linalg.norm(
+        resampled_sl_diff, axis=1)[:, None]
+
+    return resampled_sl_diff
+
+
+def sl_curve_dist(curve1, curve2):
+    """
+    Calculate the mean angle using the directions of displacement
+    between two streamlines
+    """
+    return np.mean(np.arccos(np.sum(curve1 * curve2, axis=1)))
 
 
 def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
