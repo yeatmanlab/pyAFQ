@@ -24,9 +24,6 @@ from AFQ.data.utils import BUNDLE_RECO_2_AFQ
 from AFQ.api.bundle_dict import BundleDict
 from AFQ.definitions.mapping import ConformedFnirtMapping
 
-from geomstats.geometry.euclidean import Euclidean
-from geomstats.geometry.discrete_curves import DiscreteCurves
-
 __all__ = ["Segmentation", "clean_bundle", "clean_by_endpoints"]
 
 
@@ -571,6 +568,7 @@ class Segmentation:
                 moved_ref_curve.to_vox()
                 moved_ref_curve = np.asarray(
                     moved_ref_curve.streamlines[0])
+                moved_ref_curve_diff = np.diff(moved_ref_curve, axis=0)
 
             b_sls = _SlsBeingRecognized(
                 tg.streamlines, self.logger,
@@ -749,14 +747,14 @@ class Segmentation:
             # a curve in orientation and shape but not scale
             if b_sls and "curvature" in bundle_def:
                 accept_idx = b_sls.initiate_selection("curvature")
-                ref_curve_threshold = bundle_def["curvature"].get("thresh", 5)
-                curves_r3 = DiscreteCurves(ambient_manifold=Euclidean(dim=3))
+                ref_curve_threshold = bundle_def["curvature"].get(
+                    "thresh", 5) / vox_dim
                 cut = bundle_def["curvature"].get("cut", False)
                 for idx, sl in enumerate(b_sls.get_selected_sls(cut=cut)):
                     sl = dps.set_number_of_points(
                         sl, moved_ref_curve.shape[0])
-                    dist = curves_r3.square_root_velocity_metric.dist(
-                        moved_ref_curve, sl)
+                    sl_diff = np.diff(sl, axis=0)
+                    dist = np.mean(np.linalg.norm(moved_ref_curve - sl_diff))
                     if dist <= ref_curve_threshold:
                         accept_idx[idx] = 1
                 b_sls.select(accept_idx, "curvature", cut=cut)
@@ -1298,7 +1296,7 @@ def clean_by_orientation(streamlines, primary_axis, tol=None):
         # endpoint diff is between first and last
         endpoint_diff[ii, :] = np.abs(sl[0, :] - sl[-1, :])
         # axis diff is difference between the nodes, along
-        axis_diff[ii, :] = np.sum(np.abs(sl[0:-1, :] - sl[1:, :]), axis=0)
+        axis_diff[ii, :] = np.sum(np.abs(np.diff(sl, axis=0)), axis=0)
 
     orientation_along = np.argmax(axis_diff, axis=1)
     along_accepted_idx = orientation_along == primary_axis
