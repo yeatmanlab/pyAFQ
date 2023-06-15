@@ -754,7 +754,8 @@ class Segmentation:
                     sl = dps.set_number_of_points(
                         sl, moved_ref_curve.shape[0])
                     sl_diff = np.diff(sl, axis=0)
-                    dist = np.mean(np.linalg.norm(moved_ref_curve - sl_diff))
+                    dist = np.mean(np.linalg.norm(
+                        moved_ref_curve_diff - sl_diff))
                     if dist <= ref_curve_threshold:
                         accept_idx[idx] = 1
                 b_sls.select(accept_idx, "curvature", cut=cut)
