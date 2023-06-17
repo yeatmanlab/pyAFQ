@@ -229,23 +229,12 @@ class ItkMap(Definition):
         warp_filters={
             "scope": "qsiprep",
             "from": "MNI152NLin2009cAsym",
-            "to": "T1w"},
-        space_suffix="T1w",
-        space_filters={
-            "scope": "qsiprep",
-            "desc": "preproc"})
+            "to": "T1w"})
 
-    # set reg_template_spec to some file (from any subject)
-    # that it is in the same affine/space as the mapping
-    reg_template_spec = (
-        "my_bids/derivatives/qsiprep/sub-SUB/anat/"
-        "sub-SUB_space-MNI152NLin2009cAsym_desc-preproc_T1w.nii.gz")
-
-    api.GroupAFQ(mapping=itk_map, reg_template_spec=reg_template_spec)
+    api.GroupAFQ(mapping=itk_map, reg_subject_spec="b0")
     """
 
-    def __init__(self, warp_path=None, warp_suffix=None, warp_filters={},
-                 space_path=None, space_suffix=None, space_filters={}):
+    def __init__(self, warp_path=None, warp_suffix=None, warp_filters={}):
         if not has_antspyx:
             raise ImportError(
                 "Please install antspyx if you want to use ItkMap")
@@ -279,19 +268,7 @@ class ItkMap(Definition):
         else:
             nearest_warp = self.fnames[
                 bids_info['session']][bids_info['subject']]
-        tx = ants.read_transform(nearest_warp)
-        template_shape = reg_template.get_fdata().shape
-        forward = np.zeros((*template_shape, 3))
-        from tqdm import tqdm
-        for ii in tqdm(range(template_shape[0])):
-            for jj in range(template_shape[1]):
-                for kk in range(template_shape[2]):
-                    forward[ii, jj, kk, :] = np.asarray(tx.apply_to_point(
-                        (ii, jj, kk))) - np.asarray([ii, jj, kk])
-        forward = nib.Nifti1Image(forward, reg_template.affine)
-        mapping = reg.read_mapping(
-            forward, forward)
-        return ConformedITKMapping(tx, nib.load(b0), reg_template, mapping)
+        return ConformedITKMapping(nib.load(b0), reg_template, nearest_warp)
 
 
 class ConformedITKMapping():
@@ -299,22 +276,16 @@ class ConformedITKMapping():
         ConformedITKMapping which matches the generic mapping API.
     """
 
-    def __init__(self, tx, sub_ref, templ_ref, mapping):
-        self.tx = tx
+    def __init__(self, sub_ref, templ_ref, ants_mapping):
         self.sub_ref = sub_ref
         self.templ_ref = templ_ref
-        self.mapping = mapping
-        self.lps_ras = AffineMap(
-            np.diag([-1, -1, 1, 1]),
-            templ_ref.get_fdata().shape,
-            templ_ref.affine,
-            templ_ref.get_fdata().shape,
-            templ_ref.affine)
+        self.ants_mapping = ants_mapping
 
     def transform_inverse(self, data, **kwargs):
-        data = self.lps_ras.transform(data)
-        data = self.mapping.transform_inverse(data, **kwargs)
-        data = self.lps_ras.transform_inverse(data)
+        data = ants.apply_transforms(
+            ants.from_nibabel(nib.Nifti1Image(data, self.templ_ref.affine)),
+            ants.from_nibabel(self.templ_ref),
+            [self.ants_mapping]).numpy()
         return resample(
             nib.Nifti1Image(data, self.templ_ref.affine),
             self.sub_ref).get_fdata()
