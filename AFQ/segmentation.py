@@ -707,25 +707,24 @@ class Segmentation:
                             min_dist_coords[sl_idx] = np.min(sl_dist)
 
                         if len(sl_dist) > 1:
-                            roi_dist1 = np.argmin(sl_dist[0], 0)[0]
-                            roi_dist2 = np.argmin(sl_dist[
-                                len(sl_dist) - 1], 0)[0]
                             roi_dists[sl_idx, :len(sl_dist)] = [
                                 np.argmin(dist, 0)[0]
                                 for dist in sl_dist]
+                            first_roi_idx = roi_dists[sl_idx, 0]
+                            last_roi_idx = roi_dists[
+                                sl_idx, len(sl_dist) - 1]
                             # Only accept SLs that, when cut, are meaningful
                             if (len(sl_dist) < 2) or abs(
-                                roi_dists[sl_idx, 0] - roi_dists[
-                                    sl_idx, len(sl_dist) - 1]) > 1:
+                                    first_roi_idx - last_roi_idx) > 1:
                                 # Flip sl if it is close to second ROI
                                 # before its close to the first ROI
                                 if flip_using_include:
-                                    this_flips = roi_dist1 > roi_dist2
-                                    to_flip[sl_idx] = this_flips
-                                    if this_flips:
+                                    to_flip[sl_idx] =\
+                                        first_roi_idx > last_roi_idx
+                                    if to_flip[sl_idx]:
                                         roi_dists[sl_idx, :len(sl_dist)] =\
-                                            np.flip(
-                                                roi_dists[sl_idx, :len(sl_dist)])
+                                            np.flip(roi_dists[
+                                                sl_idx, :len(sl_dist)])
                                 accept_idx[sl_idx] = 1
                         else:
                             accept_idx[sl_idx] = 1
@@ -752,18 +751,11 @@ class Segmentation:
                     "thresh", 10))
                 cut = bundle_def["curvature"].get("cut", False)
                 for idx, sl in enumerate(b_sls.get_selected_sls(cut=cut)):
-                    if b_sls.oriented_yet and b_sls.sls_flipped[idx]:
-                        sl = np.flip(sl)
+                    if b_sls.oriented_yet\
+                            and b_sls.sls_flipped[idx]:
+                        sl = sl[::-1]
                     this_sl_curve = sl_curve(sl, len(moved_ref_sl))
                     dist = sl_curve_dist(this_sl_curve, moved_ref_curve)
-                    # print(b_sls.sls_flipped[idx])
-                    # print(moved_ref_curve)
-                    # print(this_sl_curve)
-                    # print(dist)
-                    # print("=========")
-                    # print(moved_ref_sl[-1] - moved_ref_sl[0])
-                    # print(sl[-1] - sl[0])
-                    # print("=========")
                     if dist <= ref_curve_threshold:
                         accept_idx[idx] = 1
                 b_sls.select(accept_idx, "curvature", cut=cut)
