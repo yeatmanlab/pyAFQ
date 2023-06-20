@@ -135,6 +135,19 @@ def test_segment_keep_space():
     npt.assert_equal(tg.space, orig_space)
 
 
+def test_segment_sl_curve():
+    sl_disp_0 = seg.sl_curve(streamlines[4], 4)
+    npt.assert_array_almost_equal(
+        sl_disp_0,
+        [[-0.236384, -0.763855,  0.60054 ],
+         [ 0.232594, -0.867859, -0.439   ],
+         [ 0.175343,  0.001082, -0.984507]])
+
+    sl_disp_1 = seg.sl_curve(streamlines[2], 4)
+    mean_angle_diff = seg.sl_curve_dist(sl_disp_0, sl_disp_1)
+    npt.assert_almost_equal(mean_angle_diff, 1.701458)
+
+
 def test_segment_clip_edges():
     sls = tg.streamlines
     idx = np.arange(len(tg.streamlines))
