@@ -1,4 +1,4 @@
-name: Build and Push pyAFQ Docker Image
+name: Build and Push pyAFQ CUDA12 Image
 
 on: [push, pull_request]
 
