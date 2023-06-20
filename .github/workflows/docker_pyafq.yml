@@ -27,13 +27,13 @@ jobs:
 
     - name: Build pyAFQ GPU docker image
       run: sh ./gpu_docker/docker-build.sh \
-        "${{github.sha}}" "nrdg"
+        "${{github.sha}}" "nrdg" "11.0.3-devel" "11"
 
     - name: Build a tagged GPU image
       if: startsWith(github.event.ref, 'refs/tags')
       run: |
         sh ./gpu_docker/docker-build.sh \
-          "${GITHUB_REF:10}" "nrdg"
+          "${GITHUB_REF:10}" "nrdg" "11.0.3-devel" "11"
 
     - name: Login to GHCR 
       if: github.ref == 'refs/heads/master' || startsWith(github.event.ref, 'refs/tags')
@@ -49,4 +49,4 @@ jobs:
 
     - name: Push pyAFQ GPU docker image
       if: github.ref == 'refs/heads/master' || startsWith(github.event.ref, 'refs/tags')
-      run: sh ./gpu_docker/docker-push.sh "nrdg"
+      run: sh ./gpu_docker/docker-push.sh "nrdg" "11"
