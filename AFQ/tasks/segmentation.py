@@ -69,13 +69,10 @@ def segment(dwi, data_imap, mapping_imap,
         mapping=mapping_imap["mapping"])
 
     seg_sft = aus.SegmentedSFT(bundles, Space.VOX)
-
-    trx = TrxFile.from_sft(seg_sft.sft, dtype_dict=dtype_dict)
-
     if len(seg_sft.sft) < 1:
         raise ValueError("Fatal: No bundles recognized.")
 
-    tgram, meta = seg_sft.get_sft_and_sidecar()
+    meta = seg_sft.get_sidecar()
 
     segmentation_params_out = {
         arg_name: value if isinstance(value, (int, float, bool, str)) or (
@@ -85,7 +82,10 @@ def segment(dwi, data_imap, mapping_imap,
     meta["source"] = streamlines
     meta["Parameters"] = segmentation_params_out
     meta["Timing"] = time() - start_time
-    return tgram, meta
+    trx = TrxFile.from_sft(seg_sft.sft)
+    trx.groups = seg_sft.bundle_idxs
+
+    return trx, meta
 
 
 @pimms.calc("clean_bundles")

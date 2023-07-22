@@ -128,7 +128,7 @@ def streamlines(data_imap, seed, stop,
     else:
         this_tracking_params['stop_mask'] = stop
 
-    is_trx = this_tracking_params.get("trx", False)
+    is_trx = this_tracking_params.pop("trx", False)
     if not is_trx:
         # perform tractography
         start_time = time()
@@ -139,6 +139,7 @@ def streamlines(data_imap, seed, stop,
             tracking_params, start_time,
             sft, seed, stop)
     else:
+        start_time = time()
         dtype_dict = {'positions': np.float32, 'offsets': np.uint32}
 
         trx = TrxFile.from_lazy_tractogram(
