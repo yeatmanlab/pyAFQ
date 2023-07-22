@@ -1,4 +1,5 @@
-FROM nvcr.io/nvidia/cuda:11.0.3-devel
+ARG NVIDIAVERSION=11.0.3-devel
+FROM nvidia/cuda:${NVIDIAVERSION}
 
 SHELL ["/bin/bash", "-c"]
 
@@ -6,7 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # upgrade
 RUN rm /etc/apt/sources.list.d/cuda.list
-RUN rm /etc/apt/sources.list.d/nvidia-ml.list
+RUN rm -f /etc/apt/sources.list.d/nvidia-ml.list
 RUN apt update && \
     apt install --assume-yes apt-transport-https \
     	ca-certificates gnupg \
@@ -17,10 +18,10 @@ RUN apt-add-repository "deb https://apt.kitware.com/ubuntu/ focal main"
 RUN apt install -y cmake libncurses5-dev libtinfo6
 
 # Anaconda
-RUN cd /opt && wget -P /tmp https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh \
-    && bash /tmp/Anaconda3-2022.10-Linux-x86_64.sh -b -p /opt/anaconda \
-    && rm -rf /tmp/Anaconda3-2022.10-Linux-x86_64.sh \
-    && eval "$(/opt/anaconda/bin/conda shell.bash hook)"
+RUN wget -P /tmp https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh
+RUN bash /tmp/Anaconda3-2022.10-Linux-x86_64.sh -b -p /opt/anaconda
+RUN rm -rf /tmp/Anaconda3-2022.10-Linux-x86_64.sh
+RUN cd /opt && eval "$(/opt/anaconda/bin/conda shell.bash hook)"
 ENV PATH /opt/anaconda/bin:${PATH}
 ENV LD_LIBRARY_PATH /opt/anaconda/lib:${LD_LIBRARY_PATH}
 
@@ -41,10 +42,11 @@ RUN cd /opt/GPUStreamlines && mkdir build && cd build \
 	.. \
     && make && make install
 
+# install cuslines as package
+RUN echo -e "from setuptools import setup, find_packages\nsetup(name='cuslines',version='0.0.1',packages=find_packages())" >> /opt/GPUStreamlines/build/cuslines/setup.py
+RUN cd /opt/GPUStreamlines/build/cuslines && pip install -e .
+
 # Install pyAFQ
 RUN cd /opt/pyAFQ && pip install -e .
-
-# Bring in cuslines
-RUN cp -r /opt/GPUStreamlines/build/* /opt/pyAFQ/bin/
 
 ENTRYPOINT ["/opt/pyAFQ/bin/pyAFQ"]

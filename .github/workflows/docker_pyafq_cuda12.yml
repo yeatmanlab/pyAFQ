@@ -1,4 +1,4 @@
-name: Build and Push pyAFQ Docker Image
+name: Build and Push pyAFQ CUDA12 Image
 
 on: [push, pull_request]
 
@@ -15,25 +15,15 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v1
 
-    - name: Build pyAFQ docker image
-      run: sh ./pyafq_docker/docker-build.sh \
-        "${{github.sha}}" "nrdg"
-
-    - name: Build a tagged image
-      if: startsWith(github.event.ref, 'refs/tags')
-      run: |
-        sh ./pyafq_docker/docker-build.sh \
-          "${GITHUB_REF:10}" "nrdg"
-
     - name: Build pyAFQ GPU docker image
       run: sh ./gpu_docker/docker-build.sh \
-        "${{github.sha}}" "nrdg" "11.0.3-devel" "11"
+        "${{github.sha}}" "nrdg" "12.0.1-devel-ubuntu20.04" "12"
 
     - name: Build a tagged GPU image
       if: startsWith(github.event.ref, 'refs/tags')
       run: |
         sh ./gpu_docker/docker-build.sh \
-          "${GITHUB_REF:10}" "nrdg" "11.0.3-devel" "11"
+          "${GITHUB_REF:10}" "nrdg" "12.0.1-devel-ubuntu20.04" "12"
 
     - name: Login to GHCR 
       if: github.ref == 'refs/heads/master' || startsWith(github.event.ref, 'refs/tags')
@@ -43,10 +33,6 @@ jobs:
         username: nrdg
         password: ${{secrets.CR_PAT_NRDG}}
 
-    - name: Push pyAFQ docker image
-      if: github.ref == 'refs/heads/master' || startsWith(github.event.ref, 'refs/tags')
-      run: sh ./pyafq_docker/docker-push.sh "nrdg"
-
     - name: Push pyAFQ GPU docker image
       if: github.ref == 'refs/heads/master' || startsWith(github.event.ref, 'refs/tags')
-      run: sh ./gpu_docker/docker-push.sh "nrdg" "11"
+      run: sh ./gpu_docker/docker-push.sh "nrdg" "12"
