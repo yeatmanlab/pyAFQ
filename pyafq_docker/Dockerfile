@@ -10,6 +10,5 @@ ARG COMMIT
 # Install pyAFQ
 RUN pip install --no-cache-dir git+https://github.com/yeatmanlab/pyAFQ.git@${COMMIT}
 RUN pip install fslpy
-RUN pip install antspyx
 
 ENTRYPOINT ["pyAFQ"]

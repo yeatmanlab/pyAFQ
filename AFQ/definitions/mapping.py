@@ -12,7 +12,6 @@ from AFQ.tasks.utils import get_fname
 
 from dipy.align.imaffine import AffineMap
 from dipy.align.imwarp import DiffeomorphicMap
-from dipy.align import resample
 
 try:
     from fsl.data.image import Image
@@ -21,12 +20,6 @@ try:
     has_fslpy = True
 except ModuleNotFoundError:
     has_fslpy = False
-
-try:
-    import ants
-    has_antspyx = True
-except ModuleNotFoundError:
-    has_antspyx = False
 
 __all__ = ["FnirtMap", "SynMap", "SlrMap", "AffMap"]
 

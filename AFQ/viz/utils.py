@@ -309,9 +309,12 @@ def prepare_roi(roi, affine_or_mapping, static_img,
         The ROI information.
         If str, ROI will be loaded using the str as a path.
 
-    affine_or_mapping : ndarray, Nifti1Image, or str
+    affine_or_mapping : ndarray or tuple
        An affine transformation or mapping to apply to the ROI before
-       visualization. Default: no transform.
+       visualization. If mapping, it should be a tuple of filepaths
+       or nifti images representing the forward and backward
+       mappings.
+       Default: no transform.
 
     static_img: str or Nifti1Image
         Template to resample roi to.
@@ -347,16 +350,14 @@ def prepare_roi(roi, affine_or_mapping, static_img,
                            static_affine).get_fdata()
         else:
             # Assume it is  a mapping:
-            if (isinstance(affine_or_mapping, str)
-                    or isinstance(affine_or_mapping, nib.Nifti1Image)):
+            if isinstance(affine_or_mapping, tuple):
                 if reg_template is None or static_img is None:
                     raise ValueError(
                         "If using a mapping to transform an ROI, need to ",
                         "also specify all of the following inputs: ",
                         "`reg_template`, `static_img`")
-                affine_or_mapping = reg.read_mapping(affine_or_mapping,
-                                                     static_img,
-                                                     reg_template)
+                affine_or_mapping = reg.read_mapping(affine_or_mapping[0],
+                                                     affine_or_mapping[1])
 
             roi = auv.transform_inverse_roi(
                 roi,
