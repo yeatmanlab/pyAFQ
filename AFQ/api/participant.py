@@ -153,6 +153,25 @@ class ParticipantAFQ(object):
             return self.wf_dict[attr_name]
         return self.wf_dict[section][attr_name]
 
+    def export_up_to(self, attr_name="help"):
+        f"""
+        Export all derivatives necessary for a specific output.
+        To print a list of available outputs,
+        call export_up_to without arguments.
+        {valid_exports_string}
+
+        Parameters
+        ----------
+        attr_name : str
+            Name of the output to export up to. Default: "help"
+        """
+        section = check_attribute(attr_name)
+        wf_dict = self.wf_dict
+        if section is not None:
+            wf_dict = wf_dict[section]
+        for dependent in wf_dict.plan.dependencies[attr_name]:
+            self.export(dependent)
+
     def export_all(self, viz=True, xforms=True,
                    indiv=True):
         f""" Exports all the possible outputs

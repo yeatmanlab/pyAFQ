@@ -448,6 +448,26 @@ class GroupAFQ(object):
 
         return results
 
+    def export_up_to(self, attr_name="help"):
+        f"""
+        Export all derivatives necessary for a specific output.
+        To print a list of available outputs,
+        call export_up_to without arguments.
+        {valid_exports_string}
+
+        Parameters
+        ----------
+        attr_name : str
+            Name of the output to export up to. Default: "help"
+        """
+        section = check_attribute(attr_name)
+        wf_dict = self.wf_dict[
+            self.valid_sub_list[0]][self.valid_ses_list[0]]
+        if section is not None:
+            wf_dict = wf_dict[section]
+        for dependent in wf_dict.plan.dependencies[attr_name]:
+            self.export(dependent)
+
     def export_all(self, viz=True, afqbrowser=True, xforms=True,
                    indiv=True):
         """ Exports all the possible outputs
