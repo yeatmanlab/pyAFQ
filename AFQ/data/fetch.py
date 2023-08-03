@@ -794,13 +794,16 @@ def read_or_templates(as_img=True, resample_to=False):
     return template_dict
 
 
-stanford_hardi_tractography_remote_fnames = ["5325715", "5325718", "25289735"]
-stanford_hardi_tractography_hashes = ['6f4bdae702031a48d1cd3811e7a42ef9',
-                                      'f20854b4f710577c58bd01072cfb4de6',
+stanford_hardi_tractography_remote_fnames = [
+    "41836095", "41836125", "41836128", "25289735"]
+stanford_hardi_tractography_hashes = ['f20854b4f710577c58bd01072cfb4de6',
+                                      '8676e2ef04f57eaeaf78e4f5363387d9',
+                                      'e6aba38a995985ab186887f7172e3ca9',
                                       '294bfd1831861e8635eef8834ff18892']
 stanford_hardi_tractography_fnames = [
-    'mapping.nii.gz',
     'tractography_subsampled.trk',
+    'mapping_backward.nii.gz',
+    'mapping_forward.nii.gz',
     'full_segmented_cleaned_tractography.trk']
 
 fetch_stanford_hardi_tractography = _make_reusable_fetcher(
@@ -819,12 +822,16 @@ def read_stanford_hardi_tractography():
     """
     Reads a minimal tractography from the Stanford dataset.
     """
-    files, folder = fetch_stanford_hardi_tractography()
+    fetch_stanford_hardi_tractography()
     files_dict = {}
-    files_dict['mapping.nii.gz'] = nib.load(
+    files_dict['mapping_forward.nii.gz'] = nib.load(
         op.join(afq_home,
                 'stanford_hardi_tractography',
-                'mapping.nii.gz'))
+                'mapping_forward.nii.gz'))
+    files_dict['mapping_backward.nii.gz'] = nib.load(
+        op.join(afq_home,
+                'stanford_hardi_tractography',
+                'mapping_backward.nii.gz'))
 
     # We need the original data as reference
     dwi_img, gtab = dpd.read_stanford_hardi()

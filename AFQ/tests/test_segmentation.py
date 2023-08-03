@@ -24,9 +24,8 @@ hardi_fbval = op.join(hardi_dir, "HARDI150.bval")
 hardi_fbvec = op.join(hardi_dir, "HARDI150.bvec")
 file_dict = afd.read_stanford_hardi_tractography()
 mapping = reg.read_mapping(
-    file_dict['mapping.nii.gz'],
-    hardi_img,
-    afd.read_mni_template())
+    file_dict["mapping_forward.nii.gz"],
+    file_dict["mapping_backward.nii.gz"])
 streamlines = file_dict['tractography_subsampled.trk']
 tg = StatefulTractogram(streamlines, hardi_img, Space.RASMM)
 tg.to_vox()
@@ -275,11 +274,11 @@ def test_exclusion_ROI():
         np.asarray(
             [
                 [
-                    [8, 53, 39], [8, 50, 39], [8, 45, 39],
+                    [8, 52, 44], [8, 50, 39], [8, 45, 39],
                     [30, 41, 61], [28, 61, 38]],
                 [
-                    [8, 53, 39], [8, 50, 39], [8, 45, 39],
-                    [30, 41, 62], [20, 44, 34]]
+                    [8, 52, 44], [8, 50, 39], [8, 45, 39],
+                    [30, 41, 62], [14, 34, 38]]
             ]).astype(float),
         hardi_img, Space.VOX)
     fiber_groups = segmentation.segment(
