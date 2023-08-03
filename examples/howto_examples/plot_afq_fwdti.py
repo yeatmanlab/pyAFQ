@@ -19,7 +19,6 @@ import nibabel as nib
 from AFQ.api.group import GroupAFQ
 import AFQ.data.fetch as afd
 
-from AFQ.definitions.mapping import ItkMap
 from AFQ.definitions.image import ImageFile, RoiImage
 import AFQ.api.bundle_dict as abd
 
@@ -59,12 +58,6 @@ brain_mask_definition = ImageFile(
              'space': 'T1w',
              'scope': 'qsiprep'})
 
-mapping_definition = ItkMap(
-    warp_suffix='xfm',
-    warp_filters={'from': 'MNI152NLin2009cAsym',
-                  'to': 'T1w',
-                  'scope': 'qsiprep'})
-
 
 bundle_names = ["ARC_L", "ARC_R"]
 bundle_dict = abd.BundleDict(bundle_names)
@@ -79,7 +72,6 @@ myafq = GroupAFQ(
         "random_seeds": True,
         "seed_mask": RoiImage(use_waypoints=True, use_endpoints=True),
     },
-    mapping_definition=mapping_definition,
     brain_mask_definition=brain_mask_definition,
     scalars=["fwdti_fa", "fwdti_md", "fwdti_fwf", "dti_fa", "dti_md"])
 

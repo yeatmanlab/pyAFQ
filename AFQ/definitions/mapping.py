@@ -28,7 +28,7 @@ try:
 except ModuleNotFoundError:
     has_antspyx = False
 
-__all__ = ["FnirtMap", "SynMap", "SlrMap", "AffMap", "ItkMap"]
+__all__ = ["FnirtMap", "SynMap", "SlrMap", "AffMap"]
 
 
 logger = logging.getLogger('AFQ')
@@ -202,98 +202,6 @@ class IdentityMap(Definition):
             codomain_grid_shape=reg.reduce_shape(
                 reg_template.shape),
             codomain_grid2world=reg_template.affine)
-
-
-class ItkMap(Definition):
-    """
-    Use an existing Itk map (e.g., from ANTS). Expects the warp file
-    from MNI to T1.
-
-    Parameters
-    ----------
-    warp_path : str, optional
-        path to file to get warp from. Use this or warp_suffix.
-        Default: None
-    warp_suffix : str, optional
-        suffix to pass to bids_layout.get() to identify the warp file.
-    warp_filters : str, optional
-        Additional filters to pass to bids_layout.get() to identify
-        the warp file.
-        Default: {}
-
-    Examples
-    --------
-    # define ItkMap
-    itk_map = ItkMap(
-        warp_suffix="xfm",
-        warp_filters={
-            "scope": "qsiprep",
-            "from": "MNI152NLin2009cAsym",
-            "to": "T1w"})
-
-    api.GroupAFQ(mapping=itk_map, reg_subject_spec="b0")
-    """
-
-    def __init__(self, warp_path=None, warp_suffix=None, warp_filters={}):
-        if not has_antspyx:
-            raise ImportError(
-                "Please install antspyx if you want to use ItkMap")
-        if warp_path is None and warp_suffix is None:
-            raise ValueError((
-                "One of `warp_path` or `warp_suffix` should be set "
-                "to a value other than None."))
-        if warp_path is not None:
-            self._from_path = True
-            self.fname = warp_path
-        else:
-            self._from_path = False
-            self.warp_suffix = warp_suffix
-            self.warp_filters = warp_filters
-            self.fnames = {}
-
-    def find_path(self, bids_layout, from_path, subject, session):
-        if self._from_path:
-            return
-        if session not in self.fnames:
-            self.fnames[session] = {}
-
-        self.fnames[session][subject] = find_file(
-            bids_layout, from_path, self.warp_filters, self.warp_suffix,
-            session, subject, extension="h5")
-
-    def get_for_subses(self, base_fname, b0, bids_info, reg_subject,
-                       reg_template):
-        if self._from_path:
-            nearest_warp = self.fname
-        else:
-            nearest_warp = self.fnames[
-                bids_info['session']][bids_info['subject']]
-        return ConformedITKMapping(nib.load(b0), reg_template, nearest_warp)
-
-
-class ConformedITKMapping():
-    """
-        ConformedITKMapping which matches the generic mapping API.
-    """
-
-    def __init__(self, sub_ref, templ_ref, ants_mapping):
-        self.sub_ref = sub_ref
-        self.templ_ref = templ_ref
-        self.ants_mapping = ants_mapping
-
-    def transform_inverse(self, data, **kwargs):
-        data = ants.apply_transforms(
-            ants.from_nibabel(nib.Nifti1Image(data, self.templ_ref.affine)),
-            ants.from_nibabel(self.templ_ref),
-            [self.ants_mapping]).numpy()
-        return resample(
-            nib.Nifti1Image(data, self.templ_ref.affine),
-            self.sub_ref).get_fdata()
-
-    def transform(self, data, **kwargs):
-        raise NotImplementedError(
-            "ITK based mappings can currently"
-            + " only transform from template to subject space")
 
 
 class GeneratedMapMixin(object):
