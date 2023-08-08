@@ -26,7 +26,7 @@ ENV PATH /opt/anaconda/bin:${PATH}
 ENV LD_LIBRARY_PATH /opt/anaconda/lib:${LD_LIBRARY_PATH}
 
 # python prereqs
-RUN pip install numpy scipy cython nibabel dipy tqdm fslpy h5py
+RUN pip install numpy scipy cython nibabel dipy tqdm fslpy
 
 # clone pyAFQ GPUStreamlines
 RUN git clone https://github.com/yeatmanlab/pyAFQ.git /opt/pyAFQ
