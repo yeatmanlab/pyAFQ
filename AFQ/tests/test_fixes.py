@@ -1,5 +1,6 @@
 import nibabel.tmpdirs as nbtmp
 import nibabel as nib
+import numpy as np
 
 import os.path as op
 import numpy.testing as npt
@@ -9,7 +10,7 @@ from dipy.data import default_sphere
 from dipy.reconst.gqi import GeneralizedQSamplingModel
 
 from AFQ.utils.testing import make_dki_data
-from AFQ._fixes import gwi_odf
+from AFQ._fixes import gwi_odf, fast_mahal
 
 
 def test_GQI_fix():
@@ -30,3 +31,24 @@ def test_GQI_fix():
         odf_theirs = gqmodel.fit(data).odf(default_sphere)
 
         npt.assert_array_almost_equal(odf_ours, odf_theirs)
+
+
+def test_mahal_fix():
+    sls = np.asarray(
+            [
+                [
+                    [8, 53, 39], [8, 50, 39], [8, 45, 39],
+                    [30, 41, 61], [28, 61, 38]],
+                [
+                    [8, 53, 39], [8, 50, 39], [8, 45, 39],
+                    [30, 41, 62], [20, 44, 34]],
+                [
+                    [8, 53, 39], [8, 50, 39], [8, 45, 39],
+                    [50, 67, 88], [10, 10, 20]]
+            ]).astype(float)
+    results = np.asarray([
+        [0., 0., 0., 0.78747824, 2.1825342],
+        [0., 0., 0., 0.79234941, 0.49218687],
+        [0., 0., 0., 1.57406803, 2.54889886]])
+    npt.assert_array_almost_equal(
+        fast_mahal(sls, np.mean), results)
