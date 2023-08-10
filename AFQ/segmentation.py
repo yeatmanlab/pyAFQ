@@ -407,8 +407,6 @@ class Segmentation:
             self.bundle_dict = BundleDict(self.bundle_dict)
 
         if self.seg_algo == "afq":
-            # We only care about midline crossing if we use AFQ:
-            self.cross_streamlines()
             fiber_groups = self.segment_afq(clean_params=clean_params)
         elif self.seg_algo.startswith("reco"):
             fiber_groups = self.segment_reco()
@@ -439,7 +437,7 @@ class Segmentation:
         self.fbval = fbval
         self.fbvec = fbvec
 
-    def cross_streamlines(self, tg=None, template=None):
+    def cross_streamlines(self, fgarray, template=None):
         """
         Classify the streamlines by whether they cross the midline.
         Creates a crosses attribute which is an array of booleans. Each boolean
@@ -447,12 +445,10 @@ class Segmentation:
         crosses the midline.
         Parameters
         ----------
-        tg : StatefulTractogram class instance.
+        fgarray : streamlines resampled to the same length.
         template : nibabel.Nifti1Image class instance
             An affine transformation into a template space.
         """
-        if tg is None:
-            tg = self.tg
         if template is None:
             template_affine = self.img_affine
         else:
@@ -463,8 +459,8 @@ class Segmentation:
                             np.array([0, 0, 0, 1]))
 
         self.crosses = np.logical_and(
-            np.any(tg.streamlines[:, :, 0] > zero_coord[0], axis=1),
-            np.any(tg.streamlines[:, :, 0] < zero_coord[0], axis=1))
+            np.any(fgarray[:, :, 0] > zero_coord[0], axis=1),
+            np.any(fgarray[:, :, 0] < zero_coord[0], axis=1))
 
     def _return_empty(self, bundle):
         """
@@ -511,6 +507,7 @@ class Segmentation:
         clean_params["return_idx"] = True
 
         fgarray = np.array(_resample_tg(tg, 20))  # for prob map
+        self.cross_streamlines(fgarray)
         n_streamlines = len(tg)
 
         bundle_votes = np.full(
