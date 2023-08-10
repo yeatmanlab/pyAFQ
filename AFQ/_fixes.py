@@ -228,3 +228,28 @@ def tensor_odf(evals, evecs, sphere, num_batches=100):
     odf = np.zeros((evals.shape[:3] + (sphere.vertices.shape[0],)))
     odf[mask] = proj_norm.T
     return odf
+
+
+def fast_mahal(sls, stat):
+    """
+    Calculate an average streamline using stat,
+    then the Mahalonobis distance between every
+    streamline and that average streamline.
+
+    Parameters
+    ----------
+    sls : array-like of shape (n_sls, n_nodes, 3)
+        Streamlines
+    stat : function
+        function to calculate average (could be np.mean)
+
+    Returns
+    -------
+    nbrs : array-like of shape (n_sls, n_nodes)
+        Mahalonobis distance between each streamline and
+        the reference streamline.
+    """
+    ref_sl = stat(sls, axis=0)
+    v_inv = np.linalg.inv(np.cov(sls.reshape(-1, 3).T, ddof=0))
+    diff = ref_sl - sls
+    return np.sqrt(np.sum((diff @ v_inv) * diff, axis=2))

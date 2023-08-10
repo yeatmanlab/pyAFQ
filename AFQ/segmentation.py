@@ -23,6 +23,7 @@ import AFQ.data.fetch as afd
 from AFQ.data.utils import BUNDLE_RECO_2_AFQ
 from AFQ.api.bundle_dict import BundleDict
 from AFQ.definitions.mapping import ConformedFnirtMapping
+from AFQ._fixes import fast_mahal
 
 __all__ = ["Segmentation", "clean_bundle", "clean_by_endpoints"]
 
@@ -1171,7 +1172,7 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
             return tg
 
     # Resample once up-front:
-    fgarray = _resample_tg(streamlines, n_points)
+    fgarray = np.asarray(_resample_tg(streamlines, n_points))
 
     # Keep this around, so you can use it for indexing at the very end:
     idx = np.arange(len(fgarray))
@@ -1181,7 +1182,7 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
     rounds_elapsed = 0
     while rounds_elapsed < clean_rounds and len(streamlines) > min_sl:
         # This calculates the Mahalanobis for each streamline/node:
-        m_dist = gaussian_weights(fgarray, return_mahalnobis=True, stat=stat)
+        m_dist = fast_mahal(fgarray, stat)
         logger.debug(f"Shape of fgarray: {np.asarray(fgarray).shape}")
         logger.debug(f"Shape of m_dist: {m_dist.shape}")
         logger.debug(f"Maximum m_dist: {np.max(m_dist)}")
