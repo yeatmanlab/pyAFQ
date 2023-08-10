@@ -439,7 +439,7 @@ class Segmentation:
         self.fbval = fbval
         self.fbvec = fbvec
 
-    def cross_streamlines(self, tg=None, template=None, low_coord=10):
+    def cross_streamlines(self, tg=None, template=None):
         """
         Classify the streamlines by whether they cross the midline.
         Creates a crosses attribute which is an array of booleans. Each boolean
@@ -462,14 +462,9 @@ class Segmentation:
         zero_coord = np.dot(np.linalg.inv(template_affine),
                             np.array([0, 0, 0, 1]))
 
-        self.crosses = np.zeros(len(tg), dtype=bool)
-        # already_split = 0
-        for sl_idx, sl in enumerate(tg.streamlines):
-            if np.any(sl[:, 0] > zero_coord[0]) and \
-                    np.any(sl[:, 0] < zero_coord[0]):
-                self.crosses[sl_idx] = True
-            else:
-                self.crosses[sl_idx] = False
+        self.crosses = np.logical_and(
+            np.any(tg.streamlines[:, :, 0] > zero_coord[0], axis=1),
+            np.any(tg.streamlines[:, :, 0] < zero_coord[0], axis=1))
 
     def _return_empty(self, bundle):
         """
