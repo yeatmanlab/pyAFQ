@@ -249,7 +249,16 @@ def fast_mahal(sls, stat):
         Mahalonobis distance between each streamline and
         the reference streamline.
     """
-    ref_sl = stat(sls, axis=0)
-    v_inv = np.linalg.inv(np.cov(sls.reshape(-1, 3).T, ddof=0))
-    diff = ref_sl - sls
-    return np.sqrt(np.sum((diff @ v_inv) * diff, axis=2))
+    n_sls, n_nodes, n_dim = sls.shape
+    res = np.zeros((n_sls, n_nodes))
+    diff = stat(sls, axis=0) - sls
+    for i in range(n_nodes):
+        v_inv = np.triu(np.cov(sls[:, i, :].T, ddof=0))
+        if np.linalg.matrix_rank(v_inv) == n_dim:
+            v_inv = np.linalg.inv(v_inv)
+
+            dist = (diff[:, i, :] @ v_inv) * diff[:, i, :]
+            res[:, i] = np.sqrt(np.sum(dist, axis=1))
+        else:
+            res[:, i] = 0
+    return res
