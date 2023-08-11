@@ -24,7 +24,7 @@ fbvec = op.join(tmpdir.name, 'dti.bvec')
 fdata = op.join(tmpdir.name, 'dti.nii.gz')
 make_tracking_data(fbval, fbvec, fdata)
 
-min_length = 20
+max_length = 100
 step_size = 0.5
 
 
@@ -46,10 +46,10 @@ def test_csd_local_tracking():
                 n_seeds=seeds,
                 stop_mask=None,
                 step_size=step_size,
-                min_length=min_length,
+                max_length=max_length,
                 tracker="local").streamlines
 
-            npt.assert_(len(sl[0]) >= step_size * min_length)
+            npt.assert_(len(sl[0]) <= step_size * max_length)
 
 
 def test_dti_local_tracking():
@@ -63,10 +63,10 @@ def test_dti_local_tracking():
             seed_mask=None,
             n_seeds=1,
             step_size=step_size,
-            min_length=min_length,
+            max_length=max_length,
             odf_model="DTI",
             tracker="local").streamlines
-        npt.assert_(len(sl[0]) >= min_length * step_size)
+        npt.assert_(len(sl[0]) <= max_length * step_size)
 
 
 def test_pft_tracking():
@@ -99,10 +99,10 @@ def test_pft_tracking():
                     stop_threshold=stop_threshold,
                     n_seeds=1,
                     step_size=step_size,
-                    min_length=min_length,
+                    max_length=max_length,
                     odf_model=odf,
                     tracker="pft").streamlines
-                npt.assert_(len(sl[0]) >= min_length * step_size)
+                npt.assert_(len(sl[0]) <= max_length * step_size)
 
     # Test error handling:
     with pytest.raises(RuntimeError):
@@ -116,7 +116,7 @@ def test_pft_tracking():
             stop_threshold=stop_threshold,
             n_seeds=1,
             step_size=step_size,
-            min_length=min_length,
+            max_length=max_length,
             tracker="pft")
 
     with pytest.raises(RuntimeError):
@@ -130,5 +130,5 @@ def test_pft_tracking():
             stop_threshold=None,  # Stop threshold needs to be a string!
             n_seeds=1,
             step_size=step_size,
-            min_length=min_length,
+            max_length=max_length,
             tracker="pft")
