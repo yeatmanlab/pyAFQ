@@ -240,7 +240,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
                 pve_gm_data,
                 pve_csf_data)
 
-    logger.info("Tracking...")
+    logger.info(f"Tracking with {len(seeds)} seeds, 2 directions per seed...")
 
     return _tracking(my_tracker, seeds, dg, stopping_criterion, params_img,
                      step_size=step_size,
