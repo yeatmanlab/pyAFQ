@@ -741,15 +741,16 @@ class Segmentation:
                 accept_idx = b_sls.initiate_selection("curvature")
                 ref_curve_threshold = np.radians(bundle_def["curvature"].get(
                     "thresh", 10))
-                cut = bundle_def["curvature"].get("cut", False)
+                cut = bundle_def["curvature"].get("cut", True)
                 for idx, sl in enumerate(b_sls.get_selected_sls(cut=cut)):
                     if b_sls.oriented_yet\
                             and b_sls.sls_flipped[idx]:
                         sl = sl[::-1]
-                    this_sl_curve = sl_curve(sl, len(moved_ref_sl))
-                    dist = sl_curve_dist(this_sl_curve, moved_ref_curve)
-                    if dist <= ref_curve_threshold:
-                        accept_idx[idx] = 1
+                    if len(sl) > 1:
+                        this_sl_curve = sl_curve(sl, len(moved_ref_sl))
+                        dist = sl_curve_dist(this_sl_curve, moved_ref_curve)
+                        if dist <= ref_curve_threshold:
+                            accept_idx[idx] = 1
                 b_sls.select(accept_idx, "curvature", cut=cut)
 
             if b_sls and "exclude" in bundle_def:
