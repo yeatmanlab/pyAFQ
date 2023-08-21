@@ -36,6 +36,10 @@ and issue::
 
   pip install -e .[dev,fury,afqbrowser,plot]
 
+On some platforms, you may need to add quotes around the ``.[]`` part::
+
+  pip install -e .'[dev,fury,afqbrowser,plot]'
+
 which will install pyAFQ locally in editible mode and include extensions.
 
 .. note::
