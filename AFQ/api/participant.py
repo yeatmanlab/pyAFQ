@@ -209,7 +209,7 @@ class ParticipantAFQ(object):
         self.logger.info(
             f"Time taken for export all: {time() - start_time}")
 
-    def participant_montage(self, images_per_row=4):
+    def participant_montage(self, images_per_row=2):
         """
         Generate montage of all bundles for a given subject.
 
