@@ -7,8 +7,9 @@ from tqdm import tqdm
 import numpy as np
 import tempfile
 import math
+from matplotlib import font_manager
 
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 
 from AFQ.definitions.mapping import SlrMap
 from AFQ.api.utils import (
@@ -208,7 +209,7 @@ class ParticipantAFQ(object):
         self.logger.info(
             f"Time taken for export all: {time() - start_time}")
 
-    def participant_montage(self, images_per_row=5):
+    def participant_montage(self, images_per_row=4):
         """
         Generate montage of all bundles for a given subject.
 
@@ -228,17 +229,17 @@ class ParticipantAFQ(object):
         bundle_dict = self.export("bundle_dict")
         self.logger.info("Generating Montage...")
         size = (images_per_row, math.ceil(len(bundle_dict) / images_per_row))
-        for bundle_name in tqdm(bundle_dict):
+        for ii, bundle_name in enumerate(tqdm(bundle_dict)):
             view = BEST_BUNDLE_ORIENTATIONS.get(bundle_name, "Axial")
             flip_axes = [False, False, False]
             for i in range(3):
                 flip_axes[i] = (self.export("dwi_affine")[i, i] < 0)
-            vol = self.export("scalar_dict")[self.export("best_scalar")]
             figure = self.export("viz_backend").visualize_bundles(
                 self.export("bundles"),
-                shade_by_volume=vol,
+                color_by_direction=True,
                 flip_axes=flip_axes,
                 bundle=bundle_name,
+                opacity=0.2,
                 interact=False,
                 inline=False)
 
@@ -265,6 +266,9 @@ class ParticipantAFQ(object):
                 view_up["x"] = 0
                 view_up["y"] = 0
                 view_up["z"] = 1
+            else:
+                raise ValueError(
+                    "View must be one of: Sagittal, Coronal, or Axial")
 
             this_fname = tdir + f"/t{ii}.png"
             if "plotly" in self.export("viz_backend").backend:
@@ -290,23 +294,37 @@ class ParticipantAFQ(object):
                 figure.zoom(0.5)
                 window.snapshot(figure, fname=this_fname, size=(600, 600))
 
-        def _save_file(curr_img, curr_file_num):
+        def _save_file(curr_img):
             save_path = op.abspath(op.join(
-                self.afq_path,
-                (f"bundle-{bundle_name}_view-{view}"
-                    f"_idx-{curr_file_num}_montage.png")))
+                self.output_dir,
+                "bundle_montage.png"))
             curr_img.save(save_path)
             all_fnames.append(save_path)
 
         this_img_trimmed = {}
         max_height = 0
         max_width = 0
-        for ii in range(len(self.valid_ses_list)):
+        for ii, bundle_name in enumerate(bundle_dict):
             this_img = Image.open(tdir + f"/t{ii}.png")
             try:
                 this_img_trimmed[ii] = trim(trim(this_img))
             except IndexError:  # this_img is a picture of nothing
                 this_img_trimmed[ii] = this_img
+
+            text_sz = 70
+            width, height = this_img_trimmed[ii].size
+            height = height + text_sz
+            result = Image.new(
+                this_img_trimmed[ii].mode, (width, height),
+                color=(255, 255, 255))
+            result.paste(this_img_trimmed[ii], (0, text_sz))
+            this_img_trimmed[ii] = result
+
+            draw = ImageDraw.Draw(this_img_trimmed[ii])
+            draw.text(
+                (0, 0), bundle_name, (0, 0, 0),
+                font=ImageFont.truetype(
+                    "Arial", text_sz))
 
             if this_img_trimmed[ii].size[0] > max_width:
                 max_width = this_img_trimmed[ii].size[0]
@@ -317,26 +335,17 @@ class ParticipantAFQ(object):
             'RGB',
             (max_width * size[0], max_height * size[1]),
             color="white")
-        curr_file_num = 0
-        for ii in range(len(self.valid_ses_list)):
+
+        for ii in range(len(bundle_dict)):
             x_pos = ii % size[0]
             _ii = ii // size[0]
             y_pos = _ii % size[1]
             _ii = _ii // size[1]
-            file_num = _ii
-
-            if file_num != curr_file_num:
-                _save_file(curr_img, curr_file_num)
-                curr_img = Image.new(
-                    'RGB',
-                    (max_width * size[0], max_height * size[1]),
-                    color="white")
-                curr_file_num = file_num
             curr_img.paste(
                 this_img_trimmed[ii],
                 (x_pos * max_width, y_pos * max_height))
 
-        _save_file(curr_img, curr_file_num)
+        _save_file(curr_img)
         return all_fnames
 
     def cmd_outputs(self, cmd="rm", dependent_on=None, exceptions=[],

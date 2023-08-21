@@ -91,7 +91,18 @@ SCALAR_REMOVE_MODEL = \
 RECO_FLIP = ["IFO_L", "IFO_R", "UNC_L", "ILF_L", "ILF_R"]
 
 BEST_BUNDLE_ORIENTATIONS = {
-    "CST_L": "Axial", "CST_R": "Axial", }
+    "ATR_L": "Sagittal", "ATR_R": "Sagittal",
+    "CST_L": "Axial", "CST_R": "Axial",
+    "CGC_L": "Axial", "CGC_R": "Axial",
+    "FP": "Axial",
+    "FA": "Axial",
+    "IFO_L": "Sagittal", "IFO_R": "Sagittal",
+    "ILF_L": "Sagittal", "ILF_R": "Sagittal",
+    "SLF_L": "Sagittal", "SLF_R": "Sagittal",
+    "UNC_L": "Axial", "UNC_R": "Axial",
+    "ARC_L": "Sagittal", "ARC_R": "Sagittal",
+    "VOF_L": "Coronal", "VOF_R": "Coronal",
+    "pARC_L": "Coronal", "pARC_R": "Coronal"}
 
 
 def display_string(scalar_name):
