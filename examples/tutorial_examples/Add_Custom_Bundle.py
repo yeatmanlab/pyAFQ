@@ -1,6 +1,6 @@
 """
 =============================
-Adding new bundles into pyAFQ (Optic Radiations Example)
+Adding new bundles into pyAFQ (SLF 1/2/3 Example)
 =============================
 
 pyAFQ is designed to be customizable and extensible. This example shows how you
@@ -52,34 +52,40 @@ study_dir = afd.fetch_hbn_preproc(["NDARAA948VFH"])[1]
 # default template space in pyAFQ, but, in principle, other template spaces
 # could be used.
 #
-# The ROIs for the case can be downloaded using a custom fetcher which saves 
-# the ROIs to a folder and creates a dictionary of paths to the ROIs
+# This example shows how to use ROIs that are already saved to disk
 
-template_dir = '~/git//Users/jyeatman/git/pyAFQ/AFQ/data/templates/SLF123/'
+template_dir = '/Users/jyeatman/git/pyAFQ/AFQ/data/templates/SLF123/'
 
 bundles = abd.BundleDict({
     "L_SLF1": {
         "include": [
-            tempplate_dir + 'SFgL.nii.gz',
+            template_dir + 'SFgL.nii.gz',
             template_dir + 'PaL.nii.gz'],
         "exclude": [
-            template_dir + 'SLFt_roi2_L.nii.gz',
-        "start": or_rois['left_thal_MNI'],
-        "end": or_rois['left_V1_MNI'],
+            template_dir + 'SLFt_roi2_L.nii.gz'],
+
         "cross_midline": False,
     },
-    "R_OR": {
+    "L_SLF2": {
         "include": [
-            or_rois["right_OR_1"],
-            or_rois["right_OR_2"]],
+            template_dir + 'MFgL.nii.gz',
+            template_dir + 'PaL.nii.gz'],
         "exclude": [
-            or_rois["right_OP_MNI"],
-            or_rois["right_TP_MNI"],
-            or_rois["right_pos_thal_MNI"]],
-        "start": or_rois['right_thal_MNI'],
-        "end": or_rois['right_V1_MNI'],
-        "cross_midline": False
+            template_dir + 'SLFt_roi2_L.nii.gz'],
+
+        "cross_midline": False,
+    },
+    "L_SLF3": {
+        "include": [
+            template_dir + 'PrgL.nii.gz',
+            template_dir + 'PaL.nii.gz'],
+        "exclude": [
+            template_dir + 'SLFt_roi2_L.nii.gz'],
+
+        "cross_midline": False,
     }
+    
+
 })
 
 
@@ -119,13 +125,17 @@ brain_mask_definition = ImageFile(
 my_afq = GroupAFQ(
     bids_path=study_dir,
     preproc_pipeline="qsiprep",
-    output_dir=op.join(study_dir, "derivatives", "afq_or"),
+    output_dir=op.join(study_dir, "derivatives", "afq_slf"),
     brain_mask_definition=brain_mask_definition,
     tracking_params={"n_seeds": 4,
                      "directions": "prob",
                      "odf_model": "CSD",
                      "seed_mask": RoiImage()},
+    clean_params={"clean_rounds":20},
     bundle_info=bundles)
+
+# Redo everying related to bundle recognition. This is useful when changing the bundles
+my_afq.clobber(dependent_on='track') 
 
 my_afq.export_all()
 
@@ -142,8 +152,8 @@ my_afq.export_all()
 #   properly rendered into the web-page containing this example. It is not
 #   necessary to do this when running this type of analysis.
 
-my_afq.combine_bundle("L_OR")
-montage = my_afq.montage("L_OR", (1, 1), "Axial")
+my_afq.combine_bundle("L_SLF1")
+montage = my_afq.montage("L_SLF1", (1, 1), "Axial")
 shutil.copy(montage[0], op.split(montage[0])[-1])
 
 #############################################################################
@@ -155,15 +165,14 @@ shutil.copy(montage[0], op.split(montage[0])[-1])
 # be navigated, zoomed, rotated, etc.
 
 bundle_html = my_afq.export("indiv_bundles_figures")
-plotly.io.show(bundle_html["NDARAA948VFH"]["L_OR"])
+plotly.io.show(bundle_html["NDARAA948VFH"]["L_SLF1"])
 
 #############################################################################
 # References
 # ----------
-# .. [1] Caffarra S, Joo SJ, Bloom D, Kruper J, Rokem A, Yeatman JD. Development
-#     of the visual white matter pathways mediates development of
-#     electrophysiological responses in visual cortex. Hum Brain Mapp.
-#     2021;42(17):5785-5797.
+# .. [1] Romi Sagi1, J.S.H. Taylor, Kyriaki Neophytou, Tamar Cohen, 
+# Brenda Rapp, Kathleen Rastle, Michal Ben-Shachar.
+# White matter associations with spelling performance
 #
 # .. [2] Caffarra S, Kanopka K, Kruper J, Richie-Halford A, Roy E, Rokem A,
 #     Yeatman JD. Development of the alpha rhythm is linked to visual white
