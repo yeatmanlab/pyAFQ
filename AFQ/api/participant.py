@@ -3,6 +3,8 @@ import os.path as op
 import os
 from time import time
 import logging
+from tqdm import tqdm
+import numpy as np
 
 from AFQ.definitions.mapping import SlrMap
 from AFQ.api.utils import (
@@ -14,7 +16,8 @@ from AFQ.tasks.mapping import get_mapping_plan
 from AFQ.tasks.tractography import get_tractography_plan
 from AFQ.tasks.segmentation import get_segmentation_plan
 from AFQ.tasks.viz import get_viz_plan
-from AFQ.utils.path import drop_extension, apply_cmd_to_afq_derivs
+from AFQ.utils.path import drop_extension, apply_cmd_to_afq_derivs, read_json
+from AFQ.viz.utils import BEST_BUNDLE_ORIENTATIONS
 
 
 __all__ = ["ParticipantAFQ"]
@@ -200,6 +203,133 @@ class ParticipantAFQ(object):
         export_all_helper(self, seg_algo, xforms, indiv, viz)
         self.logger.info(
             f"Time taken for export all: {time() - start_time}")
+
+    def participant_montage(self):
+        """
+        Generate montage of all bundles for a given subject.
+
+        Returns
+        -------
+        filename of montage images
+        """
+        if view not in ["Sagittal", "Coronal", "Axial"]:
+            raise ValueError(
+                "View must be one of: Sagittal, Coronal, or Axial")
+
+        tdir = tempfile.gettempdir()
+
+        all_fnames = []
+        self.logger.info("Generating Montage...")
+        for bundle_name in tqdm(self.export("bundle_dict")):
+            view = BEST_BUNDLE_ORIENTATIONS.get(bundle_name, "Axial")
+            flip_axes = [False, False, False]
+            for i in range(3):
+                flip_axes[i] = (self.export("dwi_affine")[i, i] < 0)
+            vol = self.export("scalar_dict")[self.export("best_scalar")]
+            figure = self.export("viz_backend").visualize_bundles(
+                self.export("bundle_dict"),
+                shade_by_volume=vol,
+                flip_axes=flip_axes,
+                bundle=bundle_name,
+                interact=False,
+                inline=False)
+
+            eye = {}
+            view_up = {}
+            if view == "Sagittal":
+                eye["x"] = 1
+                eye["y"] = 0
+                eye["z"] = 0
+                view_up["x"] = 0
+                view_up["y"] = 0
+                view_up["z"] = 1
+            elif view == "Coronal":
+                eye["x"] = 0
+                eye["y"] = 1
+                eye["z"] = 0
+                view_up["x"] = 0
+                view_up["y"] = 0
+                view_up["z"] = 1
+            elif view == "Axial":
+                eye["x"] = 0
+                eye["y"] = 0
+                eye["z"] = 1
+                view_up["x"] = 0
+                view_up["y"] = 0
+                view_up["z"] = 1
+
+            this_fname = tdir + f"/t{ii}.png"
+            if "plotly" in self.export("viz_backend").backend:
+                figure.update_layout(scene_camera=dict(
+                    projection=dict(type="orthographic"),
+                    up=view_up,
+                    eye=eye,
+                    center=dict(x=0, y=0, z=0)))
+                figure.write_image(this_fname)
+
+                # temporary fix for memory leak
+                import plotly.io as pio
+                pio.kaleido.scope._shutdown_kaleido()
+            else:
+                from dipy.viz import window
+                direc = np.fromiter(eye.values(), dtype=int)
+                data_shape = np.asarray(
+                    nib.load(self.export("b0")).get_fdata().shape)
+                figure.set_camera(
+                    position=direc * data_shape,
+                    focal_point=data_shape // 2,
+                    view_up=tuple(view_up.values()))
+                figure.zoom(0.5)
+                window.snapshot(figure, fname=this_fname, size=(600, 600))
+
+        def _save_file(curr_img, curr_file_num):
+            save_path = op.abspath(op.join(
+                self.afq_path,
+                (f"bundle-{bundle_name}_view-{view}"
+                    f"_idx-{curr_file_num}_montage.png")))
+            curr_img.save(save_path)
+            all_fnames.append(save_path)
+
+        this_img_trimmed = {}
+        max_height = 0
+        max_width = 0
+        for ii in range(len(self.valid_ses_list)):
+            this_img = Image.open(tdir + f"/t{ii}.png")
+            try:
+                this_img_trimmed[ii] = trim(trim(this_img))
+            except IndexError:  # this_img is a picture of nothing
+                this_img_trimmed[ii] = this_img
+
+            if this_img_trimmed[ii].size[0] > max_width:
+                max_width = this_img_trimmed[ii].size[0]
+            if this_img_trimmed[ii].size[1] > max_height:
+                max_height = this_img_trimmed[ii].size[1]
+
+        curr_img = Image.new(
+            'RGB',
+            (max_width * size[0], max_height * size[1]),
+            color="white")
+        curr_file_num = 0
+        for ii in range(len(self.valid_ses_list)):
+            x_pos = ii % size[0]
+            _ii = ii // size[0]
+            y_pos = _ii % size[1]
+            _ii = _ii // size[1]
+            file_num = _ii
+
+            if file_num != curr_file_num:
+                _save_file(curr_img, curr_file_num)
+                curr_img = Image.new(
+                    'RGB',
+                    (max_width * size[0], max_height * size[1]),
+                    color="white")
+                curr_file_num = file_num
+            curr_img.paste(
+                this_img_trimmed[ii],
+                (x_pos * max_width, y_pos * max_height))
+
+        _save_file(curr_img, curr_file_num)
+        return all_fnames
 
     def cmd_outputs(self, cmd="rm", dependent_on=None, exceptions=[],
                     suffix=""):

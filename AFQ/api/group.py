@@ -549,7 +549,7 @@ class GroupAFQ(object):
 
     clobber = cmd_outputs  # alias for default of cmd_outputs
 
-    def montage(self, bundle_name, size, view, direc, slice_pos=None):
+    def group_montage(self, bundle_name, size, view, direc, slice_pos=None):
         """
         Generate montage file(s) of a given bundle at a given angle.
 
@@ -656,7 +656,7 @@ class GroupAFQ(object):
                     eye["x"] = 1
                 eye["y"] = 0
                 eye["z"] = 0
-            elif view == "coronal":
+            elif view == "Coronal":
                 eye["x"] = 0
                 if direc == "front":
                     eye["y"] = 1

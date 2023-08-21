@@ -90,6 +90,9 @@ SCALAR_REMOVE_MODEL = \
 
 RECO_FLIP = ["IFO_L", "IFO_R", "UNC_L", "ILF_L", "ILF_R"]
 
+BEST_BUNDLE_ORIENTATIONS = {
+    "CST_L": "Axial", "CST_R": "Axial", }
+
 
 def display_string(scalar_name):
     if isinstance(scalar_name, str):
