@@ -365,6 +365,10 @@ class GeneratedMapMixin(object):
                 meta["dependent"] = "dwi"
             else:
                 meta["dependent"] = "trk"
+            if isinstance(reg_subject, str):
+                meta["reg_subject"] = reg_subject
+            if isinstance(reg_template, str):
+                meta["reg_template"] = reg_template
             afs.write_json(meta_fname, meta)
         reg_prealign_inv = np.linalg.inv(reg_prealign) if self.use_prealign\
             else None

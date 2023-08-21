@@ -237,15 +237,23 @@ def get_tractography_plan(kwargs):
 
     # determine reasonable defaults
     best_scalar = kwargs["scalars"][0]
+    fa_found = False
     for scalar in kwargs["scalars"]:
         if isinstance(scalar, str):
             if "fa" in scalar:
                 best_scalar = scalar
+                fa_found = True
                 break
         else:
             if "fa" in scalar.get_name():
                 best_scalar = scalar
+                fa_found = True
                 break
+    if not fa_found:
+        logger.warning(
+            "FA not found in list of scalars, will use first scalar"
+            " for the seed and stop mask and visualizations"
+            " unless these are also specified")
     kwargs["best_scalar"] = best_scalar
 
     default_tracking_params = get_default_args(aft.track)
