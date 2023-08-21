@@ -225,9 +225,14 @@ class RoiImage(ImageDefinition):
         Can be useful to limit seed mask to the core white matter.
         Note: this must be a built-in tissue property.
         Default: None
+    tissue_property_n_voxel : int or None
+        Threshold `tissue_property` to a boolean mask with 
+        tissue_property_n_voxel number of voxels set to True.
+        Default: None
     tissue_property_threshold : int or None
         Threshold to threshold `tissue_property` if a boolean mask is
         desired. This threshold is interpreted as a percentile.
+        Overrides tissue_property_n_voxel.
         Default: None
     Examples
     --------
@@ -240,11 +245,13 @@ class RoiImage(ImageDefinition):
                  use_presegment=False,
                  use_endpoints=False,
                  tissue_property=None,
+                 tissue_property_n_voxel=None,
                  tissue_property_threshold=None):
         self.use_waypoints = use_waypoints
         self.use_presegment = use_presegment
         self.use_endpoints = use_endpoints
         self.tissue_property = tissue_property
+        self.tissue_property_n_voxel = tissue_property_n_voxel
         self.tissue_property_threshold = tissue_property_threshold
         if not np.logical_or(self.use_waypoints, np.logical_or(
                 self.use_endpoints, self.use_presegment)):
@@ -294,11 +301,15 @@ class RoiImage(ImageDefinition):
                 if self.tissue_property_threshold is not None:
                     zero_mask = image_data == 0
                     image_data[zero_mask] = np.nan
-                    tissue_property_threshold = np.nanpercentile(
+                    tp_thresh = np.nanpercentile(
                         image_data,
                         100 - self.tissue_property_threshold)
                     image_data[zero_mask] = 0
-                    image_data = image_data > tissue_property_threshold
+                    image_data = image_data > tp_thresh
+                elif self.tissue_property_n_voxel is not None:
+                    tp_thresh = np.sort(image_data.flatten())[
+                        -1 - self.tissue_property_n_voxel]
+                    image_data = image_data > tp_thresh
             if image_data is None:
                 raise ValueError((
                     "BundleDict does not have enough ROIs to generate "
