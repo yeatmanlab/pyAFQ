@@ -5,6 +5,10 @@ from time import time
 import logging
 from tqdm import tqdm
 import numpy as np
+import tempfile
+import math
+
+from PIL import Image
 
 from AFQ.definitions.mapping import SlrMap
 from AFQ.api.utils import (
@@ -17,7 +21,7 @@ from AFQ.tasks.tractography import get_tractography_plan
 from AFQ.tasks.segmentation import get_segmentation_plan
 from AFQ.tasks.viz import get_viz_plan
 from AFQ.utils.path import drop_extension, apply_cmd_to_afq_derivs, read_json
-from AFQ.viz.utils import BEST_BUNDLE_ORIENTATIONS
+from AFQ.viz.utils import BEST_BUNDLE_ORIENTATIONS, trim
 
 
 __all__ = ["ParticipantAFQ"]
@@ -204,30 +208,34 @@ class ParticipantAFQ(object):
         self.logger.info(
             f"Time taken for export all: {time() - start_time}")
 
-    def participant_montage(self):
+    def participant_montage(self, images_per_row=5):
         """
         Generate montage of all bundles for a given subject.
+
+        Parameters
+        ----------
+        images_per_row : int
+            Number of bundle images per row in output file.
+            Default: 5
 
         Returns
         -------
         filename of montage images
         """
-        if view not in ["Sagittal", "Coronal", "Axial"]:
-            raise ValueError(
-                "View must be one of: Sagittal, Coronal, or Axial")
-
         tdir = tempfile.gettempdir()
 
         all_fnames = []
+        bundle_dict = self.export("bundle_dict")
         self.logger.info("Generating Montage...")
-        for bundle_name in tqdm(self.export("bundle_dict")):
+        size = (images_per_row, math.ceil(len(bundle_dict) / images_per_row))
+        for bundle_name in tqdm(bundle_dict):
             view = BEST_BUNDLE_ORIENTATIONS.get(bundle_name, "Axial")
             flip_axes = [False, False, False]
             for i in range(3):
                 flip_axes[i] = (self.export("dwi_affine")[i, i] < 0)
             vol = self.export("scalar_dict")[self.export("best_scalar")]
             figure = self.export("viz_backend").visualize_bundles(
-                self.export("bundle_dict"),
+                self.export("bundles"),
                 shade_by_volume=vol,
                 flip_axes=flip_axes,
                 bundle=bundle_name,
