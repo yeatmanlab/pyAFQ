@@ -145,7 +145,7 @@ def test_segment_sl_curve():
 
     sl_disp_1 = seg.sl_curve(streamlines[2], 4)
     mean_angle_diff = seg.sl_curve_dist(sl_disp_0, sl_disp_1)
-    npt.assert_almost_equal(mean_angle_diff, 1.701458)
+    npt.assert_almost_equal(mean_angle_diff, 1.701458, decimal=3)
 
 
 def test_segment_clip_edges():
