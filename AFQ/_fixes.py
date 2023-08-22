@@ -13,6 +13,7 @@ import math
 
 from dipy.reconst.gqi import squared_radial_component
 from dipy.data import default_sphere
+from dipy.tracking.streamline import set_number_of_points
 from scipy.linalg import blas
 
 
@@ -228,3 +229,90 @@ def tensor_odf(evals, evecs, sphere, num_batches=100):
     odf = np.zeros((evals.shape[:3] + (sphere.vertices.shape[0],)))
     odf[mask] = proj_norm.T
     return odf
+
+
+def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
+                     stat=np.mean):
+    """
+    Calculate weights for each streamline/node in a bundle, based on a
+    Mahalanobis distance from the core the bundle, at that node (mean, per
+    default).
+
+    Parameters
+    ----------
+    bundle : Streamlines
+        The streamlines to weight.
+    n_points : int, optional
+        The number of points to resample to. *If the `bundle` is an array,
+        this input is ignored*. Default: 100.
+    return_mahalanobis : bool, optional
+        Whether to return the Mahalanobis distance instead of the weights.
+        Default: False.
+    stat : callable, optional.
+        The statistic used to calculate the central tendency of streamlines in
+        each node. Can be one of {`np.mean`, `np.median`} or other functions
+        that have similar API. Default: `np.mean`
+
+    Returns
+    -------
+    w : array of shape (n_streamlines, n_points)
+        Weights for each node in each streamline, calculated as its relative
+        inverse of the Mahalanobis distance, relative to the distribution of
+        coordinates at that node position across streamlines.
+
+    """
+
+    # Resample to same length for each streamline
+    # if necessary
+    resample = False
+    if isinstance(bundle, np.ndarray):
+        if len(bundle.shape) > 2:
+            if bundle.shape[1] != n_points:
+                sls = bundle.tolist()
+                sls = [np.asarray(item) for item in sls]
+                resample = True
+    else:
+        resample = True
+    if resample:
+        sls = set_number_of_points(bundle, n_points)
+    else:
+        sls = bundle
+
+    # If there's only one fiber here, it gets the entire weighting:
+    if len(bundle) == 1:
+        if return_mahalnobis:
+            return np.array([np.nan])
+        else:
+            return np.array([1])
+
+    n_sls, n_nodes, n_dim = sls.shape
+    weights = np.zeros((n_sls, n_nodes))
+    diff = stat(sls, axis=0) - sls
+    for i in range(n_nodes):
+        # This should come back as a 3D covariance matrix with the spatial
+        # variance covariance of this node across the different streamlines,
+        # reorganized as an upper diagonal matrix for expected Mahalanobis
+        v_inv = np.triu(np.cov(sls[:, i, :].T, ddof=0))
+
+        # calculate Mahalanobis for node in every fiber
+        if np.linalg.matrix_rank(v_inv) == n_dim:
+            v_inv = np.linalg.inv(v_inv)
+
+            dist = (diff[:, i, :] @ v_inv) * diff[:, i, :]
+            weights[:, i] = np.sqrt(np.sum(dist, axis=1))
+
+        # In the special case where all the streamlines have the exact same
+        # coordinate in this node, the covariance matrix is all zeros, so
+        # we can't calculate the Mahalanobis distance, we will instead give
+        # each streamline an identical weight, equal to the number of
+        # streamlines:
+        else:
+            weights[:, i] = 0
+    if return_mahalnobis:
+        return weights
+
+    # weighting is inverse to the distance (the further you are, the less you
+    # should be weighted)
+    weights = 1 / weights
+    # Normalize before returning, so that the weights in each node sum to 1:
+    return weights / np.sum(weights, 0)

@@ -23,6 +23,7 @@ import AFQ.data.fetch as afd
 from AFQ.data.utils import BUNDLE_RECO_2_AFQ
 from AFQ.api.bundle_dict import BundleDict
 from AFQ.definitions.mapping import ConformedFnirtMapping
+from AFQ._fixes import gaussian_weights
 
 __all__ = ["Segmentation", "clean_bundle", "clean_by_endpoints"]
 
@@ -406,8 +407,6 @@ class Segmentation:
             self.bundle_dict = BundleDict(self.bundle_dict)
 
         if self.seg_algo == "afq":
-            # We only care about midline crossing if we use AFQ:
-            self.cross_streamlines()
             fiber_groups = self.segment_afq(clean_params=clean_params)
         elif self.seg_algo.startswith("reco"):
             fiber_groups = self.segment_reco()
@@ -438,7 +437,7 @@ class Segmentation:
         self.fbval = fbval
         self.fbvec = fbvec
 
-    def cross_streamlines(self, tg=None, template=None, low_coord=10):
+    def cross_streamlines(self, fgarray, template=None):
         """
         Classify the streamlines by whether they cross the midline.
         Creates a crosses attribute which is an array of booleans. Each boolean
@@ -446,12 +445,10 @@ class Segmentation:
         crosses the midline.
         Parameters
         ----------
-        tg : StatefulTractogram class instance.
+        fgarray : streamlines resampled to the same length.
         template : nibabel.Nifti1Image class instance
             An affine transformation into a template space.
         """
-        if tg is None:
-            tg = self.tg
         if template is None:
             template_affine = self.img_affine
         else:
@@ -461,14 +458,9 @@ class Segmentation:
         zero_coord = np.dot(np.linalg.inv(template_affine),
                             np.array([0, 0, 0, 1]))
 
-        self.crosses = np.zeros(len(tg), dtype=bool)
-        # already_split = 0
-        for sl_idx, sl in enumerate(tg.streamlines):
-            if np.any(sl[:, 0] > zero_coord[0]) and \
-                    np.any(sl[:, 0] < zero_coord[0]):
-                self.crosses[sl_idx] = True
-            else:
-                self.crosses[sl_idx] = False
+        self.crosses = np.logical_and(
+            np.any(fgarray[:, :, 0] > zero_coord[0], axis=1),
+            np.any(fgarray[:, :, 0] < zero_coord[0], axis=1))
 
     def _return_empty(self, bundle):
         """
@@ -515,6 +507,7 @@ class Segmentation:
         clean_params["return_idx"] = True
 
         fgarray = np.array(_resample_tg(tg, 20))  # for prob map
+        self.cross_streamlines(fgarray)
         n_streamlines = len(tg)
 
         bundle_votes = np.full(
@@ -1171,7 +1164,7 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
             return tg
 
     # Resample once up-front:
-    fgarray = _resample_tg(streamlines, n_points)
+    fgarray = np.asarray(_resample_tg(streamlines, n_points))
 
     # Keep this around, so you can use it for indexing at the very end:
     idx = np.arange(len(fgarray))
@@ -1181,7 +1174,9 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
     rounds_elapsed = 0
     while rounds_elapsed < clean_rounds and len(streamlines) > min_sl:
         # This calculates the Mahalanobis for each streamline/node:
-        m_dist = gaussian_weights(fgarray, return_mahalnobis=True, stat=stat)
+        m_dist = gaussian_weights(
+            fgarray, return_mahalnobis=True,
+            n_points=n_points, stat=stat)
         logger.debug(f"Shape of fgarray: {np.asarray(fgarray).shape}")
         logger.debug(f"Shape of m_dist: {m_dist.shape}")
         logger.debug(f"Maximum m_dist: {np.max(m_dist)}")
