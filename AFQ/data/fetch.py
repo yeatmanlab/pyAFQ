@@ -947,7 +947,7 @@ def organize_stanford_data(path=None, clear_previous_afq=None):
     dmriprep_folder = op.join(derivatives_path, 'vistasoft')
     freesurfer_folder = op.join(derivatives_path, 'freesurfer')
 
-    if clear_previous_afq is not None:
+    if clear_previous_afq is not None and op.exists(derivatives_path):
         afq_folder = op.join(derivatives_path, 'afq')
         if clear_previous_afq == "all":
             if op.exists(afq_folder):
