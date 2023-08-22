@@ -46,6 +46,32 @@ import AFQ.data.fetch as afd
 
 afd.organize_stanford_data(clear_previous_afq=True)
 
+#  .. note::
+#    This Stanford data is organized in [BIDS format](https://bids.neuroimaging.io/),
+#    which is the format that ``pyAFQ`` is working with. Here's what the directory
+#    structure would look like:
+#    ```
+#       .dipy/stanford_hardi
+#       ├── derivatives
+#       │   ├── vistasoft
+#       │   │   ├── sub-01
+#       │   │   │   ├── ses-01
+#       │   │   │   │   ├── anat
+#       │   │   │   │   │   ├── T1.nii.gz
+#       │   │   │   │   │   └── T1.json
+#       │   │   │   │   └── dwi
+#       │   │   │   │       ├── dwi.nii.gz
+#       │   │   │   │       ├── dwi.bvec
+#       │   │   │   │       ├── dwi.bval
+#       │   │   │   │       └── dwi.json
+#       │   │   └── dataset_description.json
+#       │   └── afq (after run)
+#       └── dataset_description.json
+#    The ``bids_path`` parameter in the API corresponds to the folder containing 
+#    the "derivatives/" subfolder.
+#    ```
+#    
+
 ##########################################################################
 # Set tractography parameters (optional)
 # ---------------------
