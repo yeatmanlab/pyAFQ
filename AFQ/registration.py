@@ -1,22 +1,18 @@
 """
 Registration tools
 """
-import os
-import os.path as op
 import numpy as np
 import nibabel as nib
 from dipy.align.imwarp import DiffeomorphicMap
 
-from dipy.align import (syn_registration, center_of_mass, translation,
-                        rigid, affine, register_series, )
+from dipy.align import syn_registration
 
 import dipy.core.gradients as dpg
 from dipy.align.streamlinear import whole_brain_slr
 
-import AFQ.utils.models as mut
 
 __all__ = ["syn_register_dwi", "write_mapping", "read_mapping",
-           "register_dwi", "slr_registration"]
+           "slr_registration"]
 
 
 def reduce_shape(shape):
@@ -148,58 +144,6 @@ def read_mapping(disp, domain_img, codomain_img, prealign=None):
             codomain_grid2world=codomain_img.affine)
 
     return mapping
-
-
-def register_dwi(data_files, bval_files, bvec_files,
-                 b0_ref=0,
-                 pipeline=[center_of_mass, translation, rigid, affine],
-                 out_dir=None):
-    """
-    Register a DWI data-set
-
-    Parameters
-    ----------
-    data_files : str or list
-        Files containing DWI data. If this is a str, that's the full path to a
-        single file. If it's a list, each entry is a full path.
-    bval_files : str or list
-        Equivalent to `data_files`.
-    bvec_files : str or list
-        Equivalent to `data_files`.
-
-
-    """
-    img, data, gtab, mask = mut.prepare_data(data_files,
-                                             bval_files,
-                                             bvec_files)
-    if np.sum(gtab.b0s_mask) > 1:
-        # First, register the b0s into one image:
-        b0_img = nib.Nifti1Image(data[..., gtab.b0s_mask], img.affine)
-        trans_b0 = register_series(b0_img, ref=b0_ref, pipeline=pipeline)
-        ref_data = np.mean(trans_b0, -1)
-    else:
-        ref_data = data[..., gtab.b0s_mask]
-
-    # Construct a series out of the DWI and the registered mean B0:
-    series = nib.Nifti1Image(np.concatenate([ref_data,
-                                             data[...,
-                                                  ~gtab.b0s_mask]], -1),
-                             img.affine)
-
-    transformed_list, affine_list = register_series(series, ref=0,
-                                                    pipeline=pipeline)
-    reg_img = nib.Nifti1Image(np.array(transformed_list),
-                              img.affine)
-
-    if out_dir is None:
-        out_dir = op.join(op.split(data_files)[0], 'registered')
-
-    if not op.exists(out_dir):
-        os.makedirs(out_dir)
-
-    path = op.join(out_dir, 'registered.nii.gz')
-    nib.save(reg_img, path)
-    return path
 
 
 def slr_registration(moving_data, static_data,

@@ -8,7 +8,7 @@ import nibabel.tmpdirs as nbtmp
 
 import dipy.data as dpd
 
-from AFQ.registration import (register_dwi, write_mapping,
+from AFQ.registration import (write_mapping,
                               read_mapping, syn_register_dwi,
                               slr_registration)
 
@@ -89,23 +89,3 @@ def test_syn_register_dwi():
                                           radius=1)
     npt.assert_equal(isinstance(mapping, DiffeomorphicMap), True)
     npt.assert_equal(warped_b0.shape, subset_t2_img.shape)
-
-
-def test_register_dwi():
-    fdata, fbval, fbvec = dpd.get_fnames('small_64D')
-    with nbtmp.InTemporaryDirectory() as tmpdir:
-        # Use an abbreviated data-set:
-        img = nib.load(fdata)
-        data = img.get_fdata()[..., :10]
-        nib.save(nib.Nifti1Image(data, img.affine),
-                 op.join(tmpdir, 'data.nii.gz'))
-        # Save a subset:
-        bvals = np.loadtxt(fbval)
-        bvecs = np.loadtxt(fbvec)
-        np.savetxt(op.join(tmpdir, 'bvals.txt'), bvals[:10])
-        np.savetxt(op.join(tmpdir, 'bvecs.txt'), bvecs[:10])
-        reg_file = register_dwi(op.join(tmpdir, 'data.nii.gz'),
-                                op.join(tmpdir, 'bvals.txt'),
-                                op.join(tmpdir, 'bvecs.txt'))
-        npt.assert_(op.exists(reg_file))
-
