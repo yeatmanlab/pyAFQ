@@ -11,10 +11,12 @@ import dipy.core.gradients as dpg
 from dipy.data import default_sphere
 from dipy.reconst.gqi import GeneralizedQSamplingModel
 from dipy.tracking.streamline import set_number_of_points
+
+from AFQ._fixes import gaussian_weights as gaussian_weights_fast
 from dipy.stats.analysis import gaussian_weights
 
 from AFQ.utils.testing import make_dki_data
-from AFQ._fixes import gwi_odf, fast_mahal
+from AFQ._fixes import gwi_odf
 
 
 def test_GQI_fix():
@@ -55,13 +57,16 @@ def test_mahal_fix():
         [0.      , 0.      , 0.      , 0.687989, 0.358011],
         [0.      , 0.      , 0.      , 1.414214, 1.347267]])
     npt.assert_array_almost_equal(
-        fast_mahal(sls_array, np.mean), results)
-    
+        gaussian_weights_fast(
+            sls_array, n_points=5,
+            return_mahalnobis=True, stat=np.mean), results)
+
     sls = Streamlines(sls)
     dipy_res = gaussian_weights(
         sls, n_points=5, return_mahalnobis=True, stat=np.mean)
     sls = np.asarray(set_number_of_points(sls, 5))
-    our_res = fast_mahal(sls, np.mean)
+    our_res = gaussian_weights_fast(
+        sls, n_points=5, return_mahalnobis=True, stat=np.mean)
 
     # note the current dipy version
     # handles 0 variance differently than this implementation
