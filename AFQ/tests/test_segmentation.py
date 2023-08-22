@@ -32,6 +32,19 @@ tg = StatefulTractogram(streamlines, hardi_img, Space.RASMM)
 tg.to_vox()
 streamlines = tg.streamlines
 templates = afd.read_templates()
+cst_r_curve_ref = StatefulTractogram([[
+    [42.04966593, 46.06975174, 25.71087408],
+    [42.09489753, 46.34944736, 26.12285035],
+    [42.15973876, 46.60566324, 26.54603757],
+    [42.24418948, 46.83839793, 26.98043672],
+    [42.37009694, 47.02417091, 27.42724283],
+    [42.49600454, 47.20994467, 27.87404857],
+    [42.64862057, 47.41022106, 28.30464259],
+    [42.85090856, 47.63950257, 28.69880374],
+    [43.05373764, 47.90676785, 29.06806475],
+    [43.28025007, 48.24102211, 29.36127198]]],
+    hardi_img, Space.VOX)
+
 bundles = {'CST_L': {
                     'include': [
                         templates['CST_roi1_L'],
@@ -43,8 +56,8 @@ bundles = {'CST_L': {
                         templates['CST_roi1_R'],
                         templates['CST_roi2_R']],
                     'prob_map': templates['CST_R_prob_map'],
+                    "curvature": {"sft": cst_r_curve_ref, "cut": True},
                     'cross_midline': None}}
-
 
 def test_segment():
     segmentation = seg.Segmentation()
@@ -60,6 +73,8 @@ def test_segment():
     npt.assert_equal(len(fiber_groups), 2)
     # Here's one of them:
     CST_R_sl = fiber_groups['CST_R']
+    import dipy.tracking.streamlinespeed as dps
+
     # Let's make sure there are streamlines in there:
     npt.assert_(len(CST_R_sl) > 0)
     # Calculate the tract profile for a volume of all-ones:

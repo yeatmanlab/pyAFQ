@@ -552,9 +552,12 @@ class Segmentation:
                 self.img_affine))
 
             if "curvature" in bundle_def:
-                ref_sl = load_tractogram(
-                    bundle_def["curvature"]["path"], "same",
-                    bbox_valid_check=False)
+                if "sft" in bundle_def["curvature"]:
+                    ref_sl = bundle_def["curvature"]["sft"]
+                else:
+                    ref_sl = load_tractogram(
+                        bundle_def["curvature"]["path"], "same",
+                        bbox_valid_check=False)
                 moved_ref_sl = self.move_streamlines(
                     ref_sl, "subject")
                 moved_ref_sl.to_vox()
