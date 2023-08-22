@@ -29,19 +29,52 @@ import AFQ.api.bundle_dict as abd
 import AFQ.data.fetch as afd
 from AFQ.definitions.image import ImageFile, RoiImage
 import AFQ.utils.streamlines as aus
+import wget
+import os
 np.random.seed(1234)
 
 
 #############################################################################
 # Get dMRI data
 # ---------------
-# We will analyze one subject from the Healthy Brain Network Processed Open
+# We will analyze eight subject from the Healthy Brain Network Processed Open
 # Diffusion Derivatives dataset (HBN-POD2) [3]_, [4]_. We'll use a fetcher to
-# get preprocessed dMRI data for one of the >2,000 subjects in that study. The
+# get preprocessed dMRI data for eight of the >2,000 subjects in that study. The
 # data gets organized into a BIDS-compatible format in the `~/AFQ_data/HBN`
-# folder:
+# folder. The fether returns this directory as study_dir:
 
-study_dir = afd.fetch_hbn_preproc(["NDARAA948VFH"])[1]
+_, study_dir = afd.fetch_hbn_preproc([
+    'NDARAA948VFH', 'NDARXT727MD7', 'NDARXT822TAA', 'NDARXU376FDN', 
+    'NDARXU437UFZ', 'NDARXU679ZE8', 'NDARXU883NMY', 'NDARXV094ZHH'])
+
+
+
+roi_urls = ['https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/MFgL.nii.gz',
+            'https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/MFgR.nii.gz',
+            'https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/PaL.nii.gz',
+            'https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/PaR.nii.gz',
+            'https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/PrgL.nii.gz',
+            'https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/PrgR.nii.gz',
+            'https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/SFgL.nii.gz',
+            'https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/SFgR.nii.gz',
+            'https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/SLFt_roi2_L.nii.gz',
+            'https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/SLFt_roi2_R.nii.gz']
+
+
+#############################################################################
+# Get ROIs and save to disk
+# --------------------------------
+# The goal of this tutorial is to demostrate how to segment new pathways based 
+# on ROIs that are saved to disk. We'll start off by donwloading some ROIs that are saved online
+
+# Define and create the directory for the template ROIs
+template_dir = '/Users/Shared/SLF_ROIs/'
+os.makedirs(template_dir, exist_ok=True)
+
+# Download the ROI files
+for roi_url in roi_urls:
+    wget.download(roi_url,template_dir)
+
 
 #############################################################################
 # Define custom `BundleDict` object
@@ -50,11 +83,7 @@ study_dir = afd.fetch_hbn_preproc(["NDARAA948VFH"])[1]
 # as well as endpoint ROIS, and whether the bundle crosses the midline. In this
 # case, the ROIs are all defined in the MNI template space that is used as the
 # default template space in pyAFQ, but, in principle, other template spaces
-# could be used.
-#
-# This example shows how to use ROIs that are already saved to disk
-
-template_dir = '/Users/jyeatman/git/pyAFQ/AFQ/data/templates/SLF123/'
+# could be used. In this example, we provide paths to the ROIs to populate the BundleDict
 
 bundles = abd.BundleDict({
     "L_SLF1": {
@@ -85,25 +114,24 @@ bundles = abd.BundleDict({
         "cross_midline": False,
     }
     
-
 })
 
 
 #############################################################################
-# Custom bundle definitions such as the OR, and the standard BundleDict can be
-# combined through addition. To get both the OR and the standard bundles, we
+# Custom bundle definitions such as the SLF or OR, and the standard BundleDict can be
+# combined through addition. To get both the SLF and the standard bundles, we
 # would execute the following code::
 #
 #     bundles = bundles + abd.BundleDict()
 #
-# In this case, we will skip this and generate just the OR.
+# In this case, we will skip this and generate just the SLF.
 
 
 #############################################################################
 # Define GroupAFQ object
 # ----------------------
 # HBN POD2 have been processed with qsiprep [5]_. This means that a brain mask
-# has already been computer for them. As you can see in other examples, these
+# has already been computed for them. As you can see in other examples, these
 # data also have a mapping calculated for them, which can also be incorporated
 # into processing. However, in this case, we will let pyAFQ calculate its own
 # SyN-based mapping so that the `combine_bundle` method can be used below to
@@ -143,8 +171,7 @@ my_afq.export_all()
 # Visualize a montage
 # ----------------------
 # One way to examine the output of the pyAFQ pipeline is by creating a montage
-# of images of a particular bundle across a group of participants (or, in this
-# case, the one participant that was analyzed).
+# of images of a particular bundle across a group of participants 
 #
 # .. note::
 #
@@ -152,8 +179,11 @@ my_afq.export_all()
 #   properly rendered into the web-page containing this example. It is not
 #   necessary to do this when running this type of analysis.
 
-my_afq.combine_bundle("L_SLF1")
-montage = my_afq.montage("L_SLF1", (1, 1), "Axial")
+montage = my_afq.montage("L_SLF1", (1, 1), "Sagittal")
+shutil.copy(montage[0], op.split(montage[0])[-1])
+montage = my_afq.montage("L_SLF2", (1, 1), "Sagittal")
+shutil.copy(montage[0], op.split(montage[0])[-1])
+montage = my_afq.montage("L_SLF3", (1, 1), "Sagittal")
 shutil.copy(montage[0], op.split(montage[0])[-1])
 
 #############################################################################
@@ -170,9 +200,9 @@ plotly.io.show(bundle_html["NDARAA948VFH"]["L_SLF1"])
 #############################################################################
 # References
 # ----------
-# .. [1] Romi Sagi1, J.S.H. Taylor, Kyriaki Neophytou, Tamar Cohen, 
-# Brenda Rapp, Kathleen Rastle, Michal Ben-Shachar.
-# White matter associations with spelling performance
+# .. [1] Romi Sagi, J.S.H. Taylor, Kyriaki Neophytou, Tamar Cohen, 
+#     Brenda Rapp, Kathleen Rastle, Michal Ben-Shachar.
+#     White matter associations with spelling performance
 #
 # .. [2] Caffarra S, Kanopka K, Kruper J, Richie-Halford A, Roy E, Rokem A,
 #     Yeatman JD. Development of the alpha rhythm is linked to visual white
