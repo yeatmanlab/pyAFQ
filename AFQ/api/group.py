@@ -179,7 +179,11 @@ class GroupAFQ(object):
                     extension="json")) < 1:
             raise ValueError((
                 f"No non-json files recognized by "
-                f"pyBIDS in the pipeline: {preproc_pipeline}"))
+                f"pyBIDS in the pipeline: {preproc_pipeline}. "
+                f"This could be caused by the `dataset_descrition.json` "
+                f"having the wrong name in 'GeneratedBy'. It "
+                f"should match with the pipeline name: '{preproc_pipeline}'."
+                ))
 
         # Add required metadata file at top level (inheriting as needed):
         pipeline_description = {
