@@ -79,12 +79,13 @@ def find_file(bids_layout, path, filters, suffix, session, subject,
     """
     if "extension" not in filters:
         filters["extension"] = extension
+    if "suffix" not in filters:
+        filters["suffix"] = suffix
 
     # First, try to match the session.
     nearest = bids_layout.get_nearest(
         path,
         **filters,
-        suffix=suffix,
         session=session,
         subject=subject,
         full_search=True,
@@ -96,7 +97,6 @@ def find_file(bids_layout, path, filters, suffix, session, subject,
         nearest = bids_layout.get_nearest(
             path,
             **filters,
-            suffix=suffix,
             subject=subject,
             full_search=True,
             strict=False,

@@ -14,8 +14,7 @@ from AFQ.tasks.mapping import get_mapping_plan
 from AFQ.tasks.tractography import get_tractography_plan
 from AFQ.tasks.segmentation import get_segmentation_plan
 from AFQ.tasks.viz import get_viz_plan
-from AFQ.utils.path import drop_extension
-from AFQ.data.s3bids import read_json
+from AFQ.utils.path import drop_extension, apply_cmd_to_afq_derivs
 
 
 __all__ = ["ParticipantAFQ"]
@@ -230,17 +229,6 @@ class ParticipantAFQ(object):
             Parts of command that are used after the filename.
             Default: ""
         """
-        if dependent_on is None:
-            dependent_on_list = ["trk", "rec", "dwi"]
-        elif dependent_on.lower() == "track":
-            dependent_on_list = ["trk", "rec"]
-        elif dependent_on.lower() == "recog":
-            dependent_on_list = ["rec"]
-        else:
-            raise ValueError((
-                "dependent_on must be one of "
-                "None, 'track', or 'recog'."))
-
         exception_file_names = []
         for exception in exceptions:
             file_name = self.export(exception)
@@ -251,27 +239,13 @@ class ParticipantAFQ(object):
                     f"The exception '{exception}' does not correspond"
                     " to a filename and will be ignored."))
 
-        for filename in os.listdir(self.output_dir):
-            full_path = os.path.join(self.output_dir, filename)
-            if (full_path in exception_file_names)\
-                    or (not full_path.startswith(self.export("base_fname")))\
-                    or filename.endswith("json"):
-                continue
-            if os.path.isfile(full_path) or os.path.islink(full_path):
-                sidecar_file = f'{drop_extension(full_path)}.json'
-                if op.exists(sidecar_file):
-                    sidecar_info = read_json(sidecar_file)
-                    if "dependent" in sidecar_info\
-                        and sidecar_info["dependent"]\
-                            in dependent_on_list:
-                        os.system(f"{cmd} {full_path} {suffix}")
-                        os.system(f"{cmd} {sidecar_file} {suffix}")
-                else:
-                    os.system(f"{cmd} {full_path} {suffix}")
-            elif os.path.isdir(full_path):
-                # other than ROIs, folders are dependent on everything
-                if dependent_on is None or filename != "ROIs":
-                    os.system(f"{cmd} -r {full_path} {suffix}")
+        apply_cmd_to_afq_derivs(
+            self.output_dir,
+            self.export("base_fname"),
+            exception_file_names=exception_file_names,
+            suffix=suffix,
+            dependent_on=dependent_on
+        )
 
         # do not assume previous calculations are still valid
         # after file operations

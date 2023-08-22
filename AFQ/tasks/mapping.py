@@ -8,9 +8,7 @@ import pimms
 from AFQ.tasks.decorators import as_file
 from AFQ.tasks.utils import with_name, str_to_desc
 import AFQ.data.fetch as afd
-from AFQ.data.s3bids import write_json
-from AFQ.utils.path import drop_extension
-import AFQ.utils.volume as auv
+from AFQ.utils.path import drop_extension, write_json
 from AFQ.definitions.mapping import SynMap
 from AFQ.definitions.utils import Definition
 from AFQ.definitions.image import ImageDefinition

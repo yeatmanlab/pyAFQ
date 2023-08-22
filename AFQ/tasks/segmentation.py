@@ -11,10 +11,9 @@ import pimms
 from AFQ.tasks.decorators import as_file, as_img
 from AFQ.tasks.utils import get_fname, with_name, str_to_desc
 import AFQ.segmentation as seg
-from AFQ.utils.path import drop_extension
+from AFQ.utils.path import drop_extension, write_json
 import AFQ.utils.streamlines as aus
 from AFQ.tasks.utils import get_default_args
-from AFQ.data.s3bids import write_json
 import AFQ.utils.volume as auv
 
 from dipy.io.streamline import load_tractogram, save_tractogram

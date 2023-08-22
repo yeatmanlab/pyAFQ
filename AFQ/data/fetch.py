@@ -6,7 +6,7 @@ from dipy.io.streamline import (
     load_tractogram, save_tractogram, StatefulTractogram, Space)
 from dipy.data.fetcher import _make_fetcher
 import dipy.data as dpd
-from AFQ.utils.path import drop_extension
+from AFQ.utils.path import drop_extension, apply_cmd_to_afq_derivs
 
 import os
 import os.path as op
@@ -895,7 +895,7 @@ def organize_cfin_data(path=None):
            "PipelineDescription": {"Name": "dipy"}})
 
 
-def organize_stanford_data(path=None, clear_previous_afq=False):
+def organize_stanford_data(path=None, clear_previous_afq=None):
     """
     If necessary, downloads the Stanford HARDI dataset into DIPY directory and
     creates a BIDS compliant file-system structure in AFQ data directory:
@@ -921,8 +921,14 @@ def organize_stanford_data(path=None, clear_previous_afq=False):
                         ├── sub-01_ses-01_dwi.bvec
                         └── sub-01_ses-01_dwi.nii.gz
 
-    If clear_previous_afq is True and there is an afq folder in derivatives,
-    it will be removed.
+    Parameters
+    ----------
+    path : str or None
+        Path to download dataset to, by default it is ~/AFQ_data/.
+    clear_previous_afq : str or None
+        Whether to clear previous afq results in the stanford
+        hardi dataset. If not None, can be "all", "track", or "recog".
+        Default: None
     """
     logger = logging.getLogger('AFQ')
 
@@ -941,10 +947,16 @@ def organize_stanford_data(path=None, clear_previous_afq=False):
     dmriprep_folder = op.join(derivatives_path, 'vistasoft')
     freesurfer_folder = op.join(derivatives_path, 'freesurfer')
 
-    if clear_previous_afq:
+    if clear_previous_afq is not None:
         afq_folder = op.join(derivatives_path, 'afq')
-        if op.exists(afq_folder):
-            shutil.rmtree(afq_folder)
+        if clear_previous_afq == "all":
+            if op.exists(afq_folder):
+                shutil.rmtree(afq_folder)
+        else:
+            apply_cmd_to_afq_derivs(
+                op.join(afq_folder, "sub-01/ses-01"),
+                op.join(afq_folder, "sub-01/ses-01/sub-01_ses-01_dwi"),
+                dependent_on=clear_previous_afq)
 
     if not op.exists(derivatives_path):
         logger.info(f'creating derivatives directory: {derivatives_path}')

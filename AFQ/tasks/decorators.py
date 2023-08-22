@@ -7,12 +7,11 @@ from time import time
 import nibabel as nib
 from dipy.io.streamline import save_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram
-from AFQ.data.s3bids import write_json
 
 import numpy as np
 
 from AFQ.tasks.utils import get_fname
-from AFQ.utils.path import drop_extension
+from AFQ.utils.path import drop_extension, write_json
 
 
 # These should only be used with pimms.calc

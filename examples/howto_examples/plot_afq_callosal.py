@@ -23,7 +23,7 @@ import AFQ.data.fetch as afd
 # Retrieves `Stanford HARDI dataset <https://purl.stanford.edu/ng782rw8378>`_.
 #
 
-afd.organize_stanford_data(clear_previous_afq=True)
+afd.organize_stanford_data(clear_previous_afq="track")
 
 ##########################################################################
 # Set tractography parameters (optional)
