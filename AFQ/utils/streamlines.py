@@ -31,6 +31,8 @@ class SegmentedSFT():
             idx_count = new_idx_count
             self.bundle_names.append(b_name)
 
+        if reference is None:
+            reference = "same"
         self.sft = StatefulTractogram(sls, reference, space)
         self.sft.dtype_dict = {'positions': np.float32,
                                'offsets': np.uint32}

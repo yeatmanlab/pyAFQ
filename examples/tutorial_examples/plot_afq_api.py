@@ -100,7 +100,8 @@ afd.organize_stanford_data()
 myafq = GroupAFQ(
     bids_path=op.join(afd.afq_home, 'stanford_hardi'),
     preproc_pipeline='vistasoft',
-    viz_backend_spec='plotly_no_gif')
+    viz_backend_spec='plotly_no_gif',
+    tracking_params={"trx": True})
 
 ##########################################################################
 # Reading in DTI FA (Diffusion Tensor Imaging Fractional Anisotropy)
