@@ -53,6 +53,11 @@ which will install pyAFQ locally in editible mode and include extensions.
   It is also recommended that you utilize python virtual environment and
   package mangagement tools and begin with a clean environment.
 
+.. note::
+
+  You should also install the following optional packages before working through
+  the examples: jupyter, fury, plot, AFQ-browser, matplotlib, pingouin, cloudknot, docker
+
 
 How to install using Docker
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
