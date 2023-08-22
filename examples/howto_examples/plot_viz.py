@@ -322,7 +322,7 @@ core_arc_actor = lines_as_tubes(
 core_cst_actor = lines_as_tubes(
     [core_cst],
     40,
-    colors=create_colormap(arc_profile, 'viridis')
+    colors=create_colormap(cst_profile, 'viridis')
 )
 
 scene.clear()

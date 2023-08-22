@@ -20,13 +20,7 @@ try:
 except ModuleNotFoundError:
     has_fslpy = False
 
-try:
-    import h5py
-    has_h5py = True
-except ModuleNotFoundError:
-    has_h5py = False
-
-__all__ = ["FnirtMap", "SynMap", "SlrMap", "AffMap", "ItkMap"]
+__all__ = ["FnirtMap", "SynMap", "SlrMap", "AffMap"]
 
 
 logger = logging.getLogger('AFQ')
@@ -200,105 +194,6 @@ class IdentityMap(Definition):
             codomain_grid_shape=reg.reduce_shape(
                 reg_template.shape),
             codomain_grid2world=reg_template.affine)
-
-
-class ItkMap(Definition):
-    """
-    Use an existing Itk map (e.g., from ANTS). Expects the warp file
-    from MNI to T1.
-
-    Parameters
-    ----------
-    warp_path : str, optional
-        path to file to get warp from. Use this or warp_suffix.
-        Default: None
-    warp_suffix : str, optional
-        suffix to pass to bids_layout.get() to identify the warp file.
-    warp_filters : str, optional
-        Additional filters to pass to bids_layout.get() to identify
-        the warp file.
-        Default: {}
-
-
-    Examples
-    --------
-    itk_map = ItkMap(
-        warp_suffix="xfm",
-        warp_filters={
-            "scope": "qsiprep",
-            "from": "MNI152NLin2009cAsym",
-            "to": "T1w"})
-    api.GroupAFQ(mapping=itk_map)
-    """
-
-    def __init__(self, warp_path=None, warp_suffix=None, warp_filters={}):
-        if not has_h5py:
-            raise ImportError(
-                "Please install h5py if you want to use ItkMap")
-        if warp_path is None and warp_suffix is None:
-            raise ValueError((
-                "One of `warp_path` or `warp_suffix` should be set "
-                "to a value other than None."))
-
-        if warp_path is not None:
-            self._from_path = True
-            self.fname = warp_path
-        else:
-            self._from_path = False
-            self.warp_suffix = warp_suffix
-            self.warp_filters = warp_filters
-            self.fnames = {}
-
-    def find_path(self, bids_layout, from_path, subject, session):
-        if self._from_path:
-            return
-        if session not in self.fnames:
-            self.fnames[session] = {}
-
-        self.fnames[session][subject] = find_file(
-            bids_layout, from_path, self.warp_filters, self.warp_suffix,
-            session, subject, extension="h5")
-
-    def get_for_subses(self, base_fname, dwi, bids_info, reg_subject,
-                       reg_template):
-        if self._from_path:
-            nearest_warp = self.fname
-        else:
-            nearest_warp = self.fnames[
-                bids_info['session']][bids_info['subject']]
-        warp_f5 = h5py.File(nearest_warp)
-        their_shape = np.asarray(warp_f5["TransformGroup"]['1'][
-            'TransformFixedParameters'], dtype=int)[:3]
-        our_shape = reg_template.get_fdata().shape
-        if (our_shape != their_shape).any():
-            raise ValueError((
-                f"The shape of your ITK mapping ({their_shape})"
-                f" is not the same as your template for registration"
-                f" ({our_shape})"))
-        their_forward = np.asarray(warp_f5["TransformGroup"]['1'][
-            'TransformParameters']).reshape([*their_shape, 3])
-        their_disp = np.zeros((*their_shape, 3, 2))
-        their_disp[..., 0] = their_forward
-        their_disp = nib.Nifti1Image(
-            their_disp, reg_template.affine)
-        their_prealign = np.zeros((4, 4))
-        their_prealign[:3, :3] = np.asarray(warp_f5["TransformGroup"]["2"][
-            "TransformParameters"])[:9].reshape((3, 3))
-        their_prealign[:3, 3] = np.asarray(warp_f5["TransformGroup"]["2"][
-            "TransformParameters"])[9:]
-        their_prealign[3, 3] = 1.0
-        warp_f5.close()
-        mapping = reg.read_mapping(
-            their_disp, dwi,
-            reg_template, prealign=their_prealign)
-
-        def transform(self, data, **kwargs):
-            raise NotImplementedError(
-                "ITK based mappings can currently"
-                + " only transform from template to subject space")
-
-        mapping.transform = transform
-        return mapping
 
 
 class GeneratedMapMixin(object):
