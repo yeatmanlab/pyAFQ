@@ -33,7 +33,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
           seed_mask=None, seed_threshold=0, thresholds_as_percentages=False,
           n_seeds=1, random_seeds=False, rng_seed=None, stop_mask=None,
           stop_threshold=0, step_size=0.5, min_length=50, max_length=250,
-          odf_model="CSD", tracker="local"):
+          odf_model="CSD", tracker="local", lazy=False):
     """
     Tractography
 
@@ -247,12 +247,13 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
 
     return _tracking(my_tracker, seeds, dg, stopping_criterion, params_img,
                      step_size=step_size, min_length=min_length,
-                     max_length=max_length, random_seed=rng_seed)
+                     max_length=max_length, random_seed=rng_seed,
+                     lazy=lazy)
 
 
 def _tracking(tracker, seeds, dg, stopping_criterion, params_img,
               step_size=0.5, min_length=40, max_length=200,
-              random_seed=None):
+              random_seed=None, lazy=False):
     """
     Helper function
     """
@@ -269,5 +270,8 @@ def _tracking(tracker, seeds, dg, stopping_criterion, params_img,
         max_length=max_length,
         random_seed=random_seed)
 
-    return LazyTractogram(lambda: tracker,
-                          affine_to_rasmm=params_img.affine)
+    if lazy:
+        return LazyTractogram(lambda: tracker,
+                              affine_to_rasmm=params_img.affine)
+    else:
+        return StatefulTractogram(tracker, params_img, Space.RASMM)
