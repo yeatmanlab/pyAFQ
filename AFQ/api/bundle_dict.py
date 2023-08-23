@@ -762,7 +762,7 @@ class PediatricBundleDict(BundleDict):
             self._dict["pARC_L"] = {
                 "include": [self.templates["SLFt_roi2_L"]],
                 "exclude": [self.templates["SLF_roi1_L"]],
-                "start": self.templates["VOF_box_L"],
+                "start": self.templates["LH_Parietal"],
                 "primary_axis": 2,
                 "primary_axis_percentage": 40,
                 "cross_midline": False
@@ -771,23 +771,21 @@ class PediatricBundleDict(BundleDict):
             self._dict["pARC_R"] = {
                 "include": [self.templates["SLFt_roi2_R"]],
                 "exclude": [self.templates["SLF_roi1_R"]],
-                "start": self.templates["VOF_box_R"],
+                "start": self.templates["RH_Parietal"],
                 "primary_axis": 2,
                 "primary_axis_percentage": 40,
                 "cross_midline": False
             }
         elif bundle_name == "VOF_L":
             self._dict["VOF_L"] = {
-                "start": self.templates["VOF_box_L"],
-                "end": self.templates["LH_Parietal"],
+                "end": self.templates["VOF_box_L"],
                 "primary_axis": 2,
                 "primary_axis_percentage": 40,
                 "cross_midline": False
             }
         elif bundle_name == "VOF_R":
             self._dict["VOF_R"] = {
-                "start": self.templates["VOF_box_R"],
-                "end": self.templates["RH_Parietal"],
+                "end": self.templates["VOF_box_R"],
                 "primary_axis": 2,
                 "primary_axis_percentage": 40,
                 "cross_midline": False
