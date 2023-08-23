@@ -16,8 +16,12 @@ import AFQ.utils.streamlines as aus
 from AFQ.tasks.utils import get_default_args
 import AFQ.utils.volume as auv
 
-from trx.io import load as load_trx
-from trx.trx_file_memmap import TrxFile
+try:
+    from trx.io import load as load_trx
+    from trx.trx_file_memmap import TrxFile
+    has_trx = True
+except ModuleNotFoundError:
+    has_trx = False
 
 from dipy.io.streamline import load_tractogram, save_tractogram
 from dipy.io.stateful_tractogram import Space

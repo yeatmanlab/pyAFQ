@@ -4,7 +4,12 @@ import numpy as np
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 import os.path as op
 
-from trx.io import load as load_trx
+
+try:
+    from trx.io import load as load_trx
+    has_trx = True
+except ModuleNotFoundError:
+    has_trx = False
 
 from AFQ.utils.path import drop_extension
 

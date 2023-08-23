@@ -8,8 +8,12 @@ import nibabel as nib
 from dipy.io.streamline import save_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram
 
-from trx.trx_file_memmap import TrxFile
-from trx.io import save as save_trx
+try:
+    from trx.trx_file_memmap import TrxFile
+    from trx.io import save as save_trx
+    has_trx = True
+except ModuleNotFoundError:
+    has_trx = False
 
 import numpy as np
 
