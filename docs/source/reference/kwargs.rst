@@ -65,6 +65,18 @@ csd_tau: float, optional.
 	by default)
 	(see [1]_). Default: 0.1
 
+gq_sampling_length: float
+	Diffusion sampling length.
+	Default: 1.2
+
+opdt_sh_order: int
+	Spherical harmonics order for OPDT model. Must be even.
+	Default: 8
+
+csa_sh_order: int
+	Spherical harmonics order for CSA model. Must be even.
+	Default: 8
+
 sphere: Sphere class instance, optional
 	The sphere providing sample directions for the initial
 	search of the maximal value of kurtosis.

@@ -59,8 +59,64 @@ csd_params:
     full path to a nifti file containing parameters for the CSD fit
 
 
-pmap:
+csd_pmap:
     full path to a nifti file containing the anisotropic power map
+
+
+csd_ai:
+    full path to a nifti file containing the anisotropic index
+
+
+gq_params:
+    full path to a nifti file containing parameters for the Generalized Q-Sampling shm_coeff
+
+
+gq_iso:
+    full path to a nifti file containing isotropic diffusion component
+
+
+gq_aso:
+    full path to a nifti file containing anisotropic diffusion component
+
+
+gq_pmap:
+    full path to a nifti file containing the anisotropic power map from GQ
+
+
+gq_ai:
+    full path to a nifti file containing the anisotropic index from GQ
+
+
+opdt_params:
+    full path to a nifti file containing parameters for the Orientation Probability Density Transform shm_coeff
+
+
+opdt_gfa:
+    full path to a nifti file containing GFA
+
+
+opdt_pmap:
+    full path to a nifti file containing the anisotropic power map from OPDT
+
+
+opdt_ai:
+    full path to a nifti file containing the anisotropic index from OPDT
+
+
+csa_params:
+    full path to a nifti file containing parameters for the Constant Solid Angle shm_coeff
+
+
+csa_gfa:
+    full path to a nifti file containing GFA
+
+
+csa_pmap:
+    full path to a nifti file containing the anisotropic power map from CSA
+
+
+csa_ai:
+    full path to a nifti file containing the anisotropic index from CSA
 
 
 fwdti_fa:
@@ -283,10 +339,6 @@ bundles:
     full path to a trk file containing containting segmented streamlines, labeled by bundle
 
 
-clean_bundles:
-    full path to a trk file containting segmented streamlines, cleaned using the Mahalanobis distance, and labeled by bundle
-
-
 indiv_bundles:
     dictionary of paths, where each path is a full path to a trk file containing the streamlines of a given bundle, cleaned or uncleaned
 
@@ -320,7 +372,7 @@ stop:
 
 
 streamlines:
-    full path to the complete, unsegmented tractography file
+    full path to the complete, unsegmented tractography file Parameters ---------- tractography_ngpus : int, optional Number of GPUs to use in tractography. If non-0, this algorithm is used for tractography, https://github.com/dipy/GPUStreamlines Default: 0
 
 
 all_bundles_figure:
