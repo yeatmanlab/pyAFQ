@@ -13,6 +13,7 @@ from dipy.tracking.stopping_criterion import (ThresholdStoppingCriterion,
                                               CmcStoppingCriterion,
                                               ActStoppingCriterion)
 
+from nibabel.streamlines.tractogram import LazyTractogram
 
 from AFQ._fixes import (VerboseLocalTracking, VerboseParticleFilteringTracking,
                         tensor_odf)
@@ -90,7 +91,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         Interpret seed_threshold and stop_threshold as percentages of the
         total non-nan voxels in the seed and stop mask to include
         (between 0 and 100), instead of as a threshold on the
-        values themselves. 
+        values themselves.
         Default: False
     step_size : float, optional.
         The size of a step (in mm) of tractography. Default: 0.5
@@ -268,4 +269,5 @@ def _tracking(tracker, seeds, dg, stopping_criterion, params_img,
         max_length=max_length,
         random_seed=random_seed)
 
-    return StatefulTractogram(tracker, params_img, Space.RASMM)
+    return LazyTractogram(lambda: tracker,
+                          affine_to_rasmm=params_img.affine)
