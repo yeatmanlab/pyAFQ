@@ -105,6 +105,10 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         Which strategy to use in tracking. This can be the standard local
         tracking ("local") or Particle Filtering Tracking ([Girard2014]_).
         One of {"local", "pft"}. Default: "local"
+    trx : bool, optional
+        Whether to return the streamlines compatible with input to TRX file
+        (i.e., as a LazyTractogram class instance).
+        Default: False
 
     Returns
     -------
@@ -248,12 +252,12 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
     return _tracking(my_tracker, seeds, dg, stopping_criterion, params_img,
                      step_size=step_size, min_length=min_length,
                      max_length=max_length, random_seed=rng_seed,
-                     lazy=lazy)
+                     trx=trx)
 
 
 def _tracking(tracker, seeds, dg, stopping_criterion, params_img,
               step_size=0.5, min_length=40, max_length=200,
-              random_seed=None, lazy=False):
+              random_seed=None, trx=False):
     """
     Helper function
     """
@@ -270,7 +274,7 @@ def _tracking(tracker, seeds, dg, stopping_criterion, params_img,
         max_length=max_length,
         random_seed=random_seed)
 
-    if lazy:
+    if trx:
         return LazyTractogram(lambda: tracker,
                               affine_to_rasmm=params_img.affine)
     else:
