@@ -25,7 +25,7 @@ DATA
 	The b-value depends on the strength, duration, and spacing 
 	of these pulsed gradients. A larger b-value is achieved with 
 	increasing the gradient amplitude and duration and by widening the 
-	interval between gradient pulses. b-values should be expressed as 
+	interval between gradient pulses. b-values should be expressed in units of 
 	time/area, typically s/mm2. 
 
 min_bval: float, optional
