@@ -1,4 +1,5 @@
 import nibabel as nib
+import numpy as np
 from time import time
 import logging
 
@@ -12,6 +13,12 @@ from AFQ.tasks.utils import get_default_args
 from AFQ.definitions.image import ScalarImage
 
 try:
+    from trx.trx_file_memmap import TrxFile
+    has_trx = True
+except ModuleNotFoundError:
+    has_trx = False
+
+try:
     from AFQ.tractography.gputractography import gpu_track
     has_gputrack = True
 except ModuleNotFoundError:
@@ -22,7 +29,7 @@ logger = logging.getLogger('AFQ')
 
 def _meta_from_tracking_params(
         tracking_params, start_time,
-        sft, seed, stop):
+        n_streamlines, seed, stop):
     meta_directions = {
         "det": "deterministic",
         "prob": "probabilistic"}
@@ -31,7 +38,7 @@ def _meta_from_tracking_params(
         TractographyMethod=meta_directions.get(
             tracking_params["directions"],
             tracking_params["directions"]),
-        Count=len(sft.streamlines),
+        Count=n_streamlines,
         Seeding=dict(
             ROI=seed,
             n_seeds=tracking_params["n_seeds"],
@@ -83,7 +90,7 @@ def export_stop_mask_pft(pve_wm, pve_gm, pve_csf):
 
 
 @pimms.calc("streamlines")
-@as_file('_tractography.trk', include_track=True)
+@as_file('_tractography', include_track=True)
 def streamlines(data_imap, seed, stop,
                 tracking_params):
     """
@@ -123,14 +130,27 @@ def streamlines(data_imap, seed, stop,
     else:
         this_tracking_params['stop_mask'] = stop
 
-    # perform tractography
-    start_time = time()
-    sft = aft.track(params_file, **this_tracking_params)
-    sft.to_vox()
+    is_trx = this_tracking_params.pop("trx", False)
+
+    if is_trx:
+        start_time = time()
+        dtype_dict = {'positions': np.float16, 'offsets': np.uint16}
+
+        sft = TrxFile.from_lazy_tractogram(
+            aft.track(params_file, **this_tracking_params),
+            seed,
+            dtype_dict=dtype_dict)
+        n_streamlines = len(sft)
+
+    else:
+        start_time = time()
+        sft = aft.track(params_file, **this_tracking_params)
+        sft.to_vox()
+        n_streamlines = len(sft.streamlines)
 
     return sft, _meta_from_tracking_params(
         tracking_params, start_time,
-        sft, seed, stop)
+        n_streamlines, seed, stop)
 
 
 @pimms.calc("streamlines")
