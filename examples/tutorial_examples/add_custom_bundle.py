@@ -163,7 +163,7 @@ my_afq = GroupAFQ(
     bundle_info=bundles)
 
 # Redo everying related to bundle recognition. This is useful when changing the bundles
-my_afq.clobber(dependent_on='track') 
+# my_afq.clobber(dependent_on='track') 
 
 my_afq.export_all()
 
@@ -171,7 +171,9 @@ my_afq.export_all()
 # Visualize a montage
 # ----------------------
 # One way to examine the output of the pyAFQ pipeline is by creating a montage
-# of images of a particular bundle across a group of participants 
+# of images of a particular bundle across a group of participants. In the montage function
+# the first input refers to a key in the bundlediect and the second gives the layout
+# of the figure (eg. 2 rows 4 coluns) and finally is the view.
 #
 # .. note::
 #
@@ -179,11 +181,11 @@ my_afq.export_all()
 #   properly rendered into the web-page containing this example. It is not
 #   necessary to do this when running this type of analysis.
 
-montage = my_afq.montage("L_SLF1", (1, 1), "Sagittal")
+montage = my_afq.montage("L_SLF1", (2, 4), "Sagittal")
 shutil.copy(montage[0], op.split(montage[0])[-1])
-montage = my_afq.montage("L_SLF2", (1, 1), "Sagittal")
+montage = my_afq.montage("L_SLF2", (2, 4), "Sagittal")
 shutil.copy(montage[0], op.split(montage[0])[-1])
-montage = my_afq.montage("L_SLF3", (1, 1), "Sagittal")
+montage = my_afq.montage("L_SLF3", (2, 4), "Sagittal")
 shutil.copy(montage[0], op.split(montage[0])[-1])
 
 #############################################################################
@@ -194,8 +196,8 @@ shutil.copy(montage[0], op.split(montage[0])[-1])
 # bundle. This is an html file, which contains an interactive figure that can
 # be navigated, zoomed, rotated, etc.
 
-bundle_html = my_afq.export("indiv_bundles_figures")
-plotly.io.show(bundle_html["NDARAA948VFH"]["L_SLF1"])
+bundle_html = my_afq.export("all_bundles_figure")
+plotly.io.show(bundle_html["NDARAA948VFH"]['HBNsiteRU'])
 
 #############################################################################
 # References
