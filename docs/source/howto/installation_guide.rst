@@ -51,7 +51,7 @@ which will install pyAFQ locally in editible mode and include extensions.
 .. note::
 
   It is also recommended that you utilize python virtual environment and
-  package mangagement tools (e.g. conda) and begin with a clean environment.
+  package mangagement tools (e.g., conda) and begin with a clean environment.
 
 .. note::
 
