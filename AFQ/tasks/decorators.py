@@ -8,6 +8,9 @@ import nibabel as nib
 from dipy.io.streamline import save_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram
 
+from trx.trx_file_memmap import TrxFile
+from trx.io import save as save_trx
+
 import numpy as np
 
 from AFQ.tasks.utils import get_fname
@@ -129,18 +132,22 @@ def as_file(suffix, include_track=False, include_seg=False):
                 tracking_params=tracking_params,
                 segmentation_params=segmentation_params)
             if not op.exists(this_file):
-                img_trk_np_or_csv, meta = func(*args[:og_arg_count], **kwargs)
+                gen, meta = func(*args[:og_arg_count], **kwargs)
 
                 logger.info(f"Saving {this_file}")
-                if isinstance(img_trk_np_or_csv, nib.Nifti1Image):
-                    nib.save(img_trk_np_or_csv, this_file)
-                elif isinstance(img_trk_np_or_csv, StatefulTractogram):
+                if isinstance(gen, nib.Nifti1Image):
+                    nib.save(gen, this_file)
+                elif isinstance(gen, StatefulTractogram):
+                    this_file = this_file + ".trk"
                     save_tractogram(
-                        img_trk_np_or_csv, this_file, bbox_valid_check=False)
-                elif isinstance(img_trk_np_or_csv, np.ndarray):
-                    np.save(this_file, img_trk_np_or_csv)
+                        gen, this_file, bbox_valid_check=False)
+                elif isinstance(gen, np.ndarray):
+                    np.save(this_file, gen)
+                elif isinstance(gen, TrxFile):
+                    this_file = this_file + ".trx"
+                    save_trx(gen, this_file)
                 else:
-                    img_trk_np_or_csv.to_csv(this_file)
+                    gen.to_csv(this_file)
 
                 if include_seg:
                     meta["dependent"] = "rec"
