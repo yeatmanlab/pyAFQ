@@ -33,7 +33,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
           seed_mask=None, seed_threshold=0, thresholds_as_percentages=False,
           n_seeds=1, random_seeds=False, rng_seed=None, stop_mask=None,
           stop_threshold=0, step_size=0.5, min_length=50, max_length=250,
-          odf_model="CSD", tracker="local", lazy=False):
+          odf_model="CSD", tracker="local", trx=False):
     """
     Tractography
 
