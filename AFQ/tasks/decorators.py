@@ -131,19 +131,24 @@ def as_file(suffix, include_track=False, include_seg=False):
                 base_fname, suffix,
                 tracking_params=tracking_params,
                 segmentation_params=segmentation_params)
-            if not op.exists(this_file):
+            exists = (op.exists(this_file)
+                      or op.exists(this_file + ".trk")
+                      or op.exists(this_file + ".trx"))
+            if not exists:
                 gen, meta = func(*args[:og_arg_count], **kwargs)
 
                 logger.info(f"Saving {this_file}")
                 if isinstance(gen, nib.Nifti1Image):
                     nib.save(gen, this_file)
                 elif isinstance(gen, StatefulTractogram):
+                    is_trx = False
                     this_file = this_file + ".trk"
                     save_tractogram(
                         gen, this_file, bbox_valid_check=False)
                 elif isinstance(gen, np.ndarray):
                     np.save(this_file, gen)
                 elif isinstance(gen, TrxFile):
+                    is_trx = True
                     this_file = this_file + ".trx"
                     save_trx(gen, this_file)
                 else:
@@ -152,7 +157,10 @@ def as_file(suffix, include_track=False, include_seg=False):
                 if include_seg:
                     meta["dependent"] = "rec"
                 elif include_track:
-                    meta["dependent"] = "trk"
+                    if is_trx:
+                        meta["dependent"] = "trx"
+                    else:
+                        meta["dependent"] = "trk"
                 else:
                     meta["dependent"] = "dwi"
 
