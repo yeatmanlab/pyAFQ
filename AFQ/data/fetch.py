@@ -801,6 +801,7 @@ more_pediatric_fnames = [
     "OR_leftV1.nii.gz",
     "OR_leftThal.nii.gz",
     "OR_left_roi3.nii.gz",
+    "VOF_box_small_L.nii.gz"
 ]
 
 more_pediatric_remote_fnames = [
@@ -810,6 +811,7 @@ more_pediatric_remote_fnames = [
     "42120489",
     "42120492",
     "42120495",
+    "42121626"
 ]
 
 more_pediatric_md5_hashes = [
@@ -819,6 +821,7 @@ more_pediatric_md5_hashes = [
     "bc6d4f880d3eb281358af1c764779704",
     "a3b6a7be067aa12af273482baee1498d",
     "f035813314960eb91f3a4dae508a68e5",
+    "8ffbd65ae986c8196b7776fe98e66722"
 ]
 
 fetch_more_pediatric_templates = _make_reusable_fetcher(
