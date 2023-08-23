@@ -145,7 +145,7 @@ my_afq.export_all()
 #   necessary to do this when running this type of analysis.
 
 my_afq.combine_bundle("L_OR")
-montage = my_afq.montage("L_OR", (1, 1), "Axial")
+montage = my_afq.montage("L_OR", (1, 1), "Axial", "left")
 shutil.copy(montage[0], op.split(montage[0])[-1])
 
 #############################################################################

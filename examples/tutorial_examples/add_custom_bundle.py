@@ -178,11 +178,11 @@ my_afq.export_all()
 #   properly rendered into the web-page containing this example. It is not
 #   necessary to do this when running this type of analysis.
 
-montage = my_afq.montage("L_SLF1", (2, 4), "Sagittal")
+montage = my_afq.montage("L_SLF1", (2, 4), "Sagittal", "left")
 shutil.copy(montage[0], op.split(montage[0])[-1])
-montage = my_afq.montage("L_SLF2", (2, 4), "Sagittal")
+montage = my_afq.montage("L_SLF2", (2, 4), "Sagittal", "left")
 shutil.copy(montage[0], op.split(montage[0])[-1])
-montage = my_afq.montage("L_SLF3", (2, 4), "Sagittal")
+montage = my_afq.montage("L_SLF3", (2, 4), "Sagittal", "left")
 shutil.copy(montage[0], op.split(montage[0])[-1])
 
 #############################################################################
