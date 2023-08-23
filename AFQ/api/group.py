@@ -561,7 +561,10 @@ class GroupAFQ(object):
         size : tuple of int
             The number of columns and rows for each file.
         view : str
-            Which view to display. Can be one of Sagittal, Coronal, or Axial.
+            Which view to display. Can be one of sagittal, coronal, or axial.
+        dir : str
+            Which direction to views. Can be one of left, right, top, bottom, 
+            front, back
         slice_pos : float, or None
             If float, indicates the fractional position along the
             perpendicular axis to the slice. Currently only works with plotly.
@@ -571,9 +574,15 @@ class GroupAFQ(object):
         -------
         list of filenames of montage images
         """
-        if view not in ["Sagittal", "Coronal", "Axial"]:
+
+        view = view.lower()
+        if view in ["sagital", "saggital"]:
+            self.logger.warning("You don't know how to spell sagggitttal!")
+            view = "sagittal"
+
+        if view not in ["sagittal", "coronal", "axial"]:
             raise ValueError(
-                "View must be one of: Sagittal, Coronal, or Axial")
+                "View must be one of: sagittal, coronal, or axial")
 
         tdir = tempfile.gettempdir()
 
@@ -603,15 +612,15 @@ class GroupAFQ(object):
 
             if slice_pos is not None:
                 slice_kwargs = {}
-                if view == "Sagittal":
+                if view == "sagittal":
                     slice_kwargs["x_pos"] = slice_pos
                     slice_kwargs["y_pos"] = None
                     slice_kwargs["z_pos"] = None
-                elif view == "Coronal":
+                elif view == "coronal":
                     slice_kwargs["x_pos"] = None
                     slice_kwargs["y_pos"] = slice_pos
                     slice_kwargs["z_pos"] = None
-                elif view == "Axial":
+                elif view == "zxial":
                     slice_kwargs["x_pos"] = None
                     slice_kwargs["y_pos"] = None
                     slice_kwargs["z_pos"] = slice_pos
@@ -636,21 +645,21 @@ class GroupAFQ(object):
 
             eye = {}
             view_up = {}
-            if view == "Sagittal":
+            if view == "sagittal":
                 eye["x"] = 1
                 eye["y"] = 0
                 eye["z"] = 0
                 view_up["x"] = 0
                 view_up["y"] = 1
                 view_up["z"] = 0
-            elif view == "Coronal":
+            elif view == "coronal":
                 eye["x"] = 0
                 eye["y"] = 1
                 eye["z"] = 0
                 view_up["x"] = 0
                 view_up["y"] = 0
                 view_up["z"] = 1
-            elif view == "Axial":
+            elif view == "axial":
                 eye["x"] = 0
                 eye["y"] = 0
                 eye["z"] = 1
