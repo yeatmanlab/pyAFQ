@@ -716,7 +716,9 @@ class PediatricBundleDict(BundleDict):
         #     to separate ILF and mdLF
         #   - Addition of pAF and VOF ROIs
         #   - SLF ROIs are restricted to parietal cortex
-        self.templates = afd.read_pediatric_templates()
+        self.templates = {
+            **afd.read_pediatric_templates(),
+            **afd.read_more_pediatric_templates()}
 
         # pediatric probability maps
         prob_map_order = [
@@ -740,3 +742,21 @@ class PediatricBundleDict(BundleDict):
         # reuse probability map from ILF
         self.templates["MdLF_L_prob_map"] = self.templates["ILF_L_prob_map"]
         self.templates["MdLF_R_prob_map"] = self.templates["ILF_R_prob_map"]
+
+    def _gen(self, bundle_name):
+        if bundle_name == "OR_L":
+            self._dict["OR_L"] = {
+                "include": [self.templates["OR_left_roi3"]],
+                "start": self.templates["OR_leftThal"],
+                "end": self.templates["OR_leftV1"],
+                "cross_midline": False
+            }
+        elif bundle_name == "OR_R":
+            self._dict["OR_R"] = {
+                "include": [self.templates["OR_right_roi3"]],
+                "start": self.templates["OR_rightThal"],
+                "end": self.templates["OR_rightV1"],
+                "cross_midline": False
+            }
+        else:
+            super()._gen(bundle_name)
