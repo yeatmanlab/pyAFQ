@@ -675,7 +675,7 @@ class GroupAFQ(object):
 
                 figure.update_layout(scene_camera=dict(
                     projection=dict(type="orthographic"),
-                    up=(0, 0, 1),
+                    up={"x": 0, "y": 0, "z": 1},
                     eye=eye,
                     center=dict(x=0, y=0, z=0)))
                 figure.write_image(this_fname)
