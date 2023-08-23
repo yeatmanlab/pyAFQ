@@ -54,6 +54,7 @@ def segment(dwi, data_imap, mapping_imap,
         tg = load_tractogram(
             streamlines, img, Space.VOX,
             bbox_valid_check=False)
+        is_trx = False
     elif streamlines.endswith(".trx"):
         is_trx = True
         tg = load_trx(streamlines, img).to_sft()
@@ -245,7 +246,6 @@ def tract_profiles(bundles,
     profiles = np.empty((len(scalar_dict), 0)).tolist()
     this_profile = np.zeros((len(scalar_dict), 100))
     reference = nib.load(scalar_dict[list(scalar_dict.keys())[0]])
-    print(type(reference))
     seg_sft = aus.SegmentedSFT.fromfile(
         bundles,
         reference=reference)

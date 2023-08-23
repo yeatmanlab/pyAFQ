@@ -135,13 +135,13 @@ def as_file(suffix, include_track=False, include_seg=False):
                       or op.exists(this_file + ".trk")
                       or op.exists(this_file + ".trx"))
             if not exists:
+                is_trx = False
                 gen, meta = func(*args[:og_arg_count], **kwargs)
 
                 logger.info(f"Saving {this_file}")
                 if isinstance(gen, nib.Nifti1Image):
                     nib.save(gen, this_file)
                 elif isinstance(gen, StatefulTractogram):
-                    is_trx = False
                     this_file = this_file + ".trk"
                     save_tractogram(
                         gen, this_file, bbox_valid_check=False)
