@@ -1,22 +1,17 @@
 """
-=============================
+=================================================
 Adding new bundles into pyAFQ (SLF 1/2/3 Example)
-=============================
+=================================================
 
 pyAFQ is designed to be customizable and extensible. This example shows how you
 can customize it to define a new bundle based on a definition of waypoint and
 endpoint ROIs of your design.
 
-In this case, we add the optic radiations, based on work by Caffara et al. [1]_,
-[2]_. The optic radiations (OR) are the primary projection of visual information
-from the lateral geniculate nucleus of the thalamus to the primary visual
-cortex. Studying the optic radiations with dMRI provides a linkage between white
-matter tissue properties, visual perception and behavior, and physiological
-responses of the visual cortex to visual stimulation.
+In this case, we add sub-bundles of the superior longitudinal fasciculus,
+based on work by Rami et al [1]_.
 
 We start by importing some of the components that we need for this example and
 fixing the random seed for reproducibility
-
 """
 
 import os.path as op
@@ -28,7 +23,6 @@ from AFQ.api.group import GroupAFQ
 import AFQ.api.bundle_dict as abd
 import AFQ.data.fetch as afd
 from AFQ.definitions.image import ImageFile, RoiImage
-import AFQ.utils.streamlines as aus
 import wget
 import os
 np.random.seed(1234)
@@ -38,15 +32,14 @@ np.random.seed(1234)
 # Get dMRI data
 # ---------------
 # We will analyze eight subject from the Healthy Brain Network Processed Open
-# Diffusion Derivatives dataset (HBN-POD2) [3]_, [4]_. We'll use a fetcher to
+# Diffusion Derivatives dataset (HBN-POD2) [2]_, [3]_. We'll use a fetcher to
 # get preprocessed dMRI data for eight of the >2,000 subjects in that study. The
 # data gets organized into a BIDS-compatible format in the `~/AFQ_data/HBN`
 # folder. The fether returns this directory as study_dir:
 
 _, study_dir = afd.fetch_hbn_preproc([
-    'NDARAA948VFH', 'NDARXT727MD7', 'NDARXT822TAA', 'NDARXU376FDN', 
+    'NDARAA948VFH', 'NDARXT727MD7', 'NDARXT822TAA', 'NDARXU376FDN',
     'NDARXU437UFZ', 'NDARXU679ZE8', 'NDARXU883NMY', 'NDARXV094ZHH'])
-
 
 
 roi_urls = ['https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/MFgL.nii.gz',
@@ -64,16 +57,20 @@ roi_urls = ['https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4
 #############################################################################
 # Get ROIs and save to disk
 # --------------------------------
-# The goal of this tutorial is to demostrate how to segment new pathways based 
+# The goal of this tutorial is to demostrate how to segment new pathways based
 # on ROIs that are saved to disk. We'll start off by donwloading some ROIs that are saved online
 
 # Define and create the directory for the template ROIs
-template_dir = '/Users/Shared/SLF_ROIs/'
+# op.expanduser("~") expands your ~ directory into the full string
+# and op.join joins these paths, to make ~/AFQ_data/SLF_ROIs/
+template_dir = op.join(
+    op.expanduser("~"),
+    'AFQ_data/SLF_ROIs/')
 os.makedirs(template_dir, exist_ok=True)
 
 # Download the ROI files
 for roi_url in roi_urls:
-    wget.download(roi_url,template_dir)
+    wget.download(roi_url, template_dir)
 
 
 #############################################################################
@@ -113,7 +110,7 @@ bundles = abd.BundleDict({
 
         "cross_midline": False,
     }
-    
+
 })
 
 
@@ -130,7 +127,7 @@ bundles = abd.BundleDict({
 #############################################################################
 # Define GroupAFQ object
 # ----------------------
-# HBN POD2 have been processed with qsiprep [5]_. This means that a brain mask
+# HBN POD2 have been processed with qsiprep [4]_. This means that a brain mask
 # has already been computed for them. As you can see in other examples, these
 # data also have a mapping calculated for them, which can also be incorporated
 # into processing. However, in this case, we will let pyAFQ calculate its own
@@ -159,11 +156,11 @@ my_afq = GroupAFQ(
                      "directions": "prob",
                      "odf_model": "CSD",
                      "seed_mask": RoiImage()},
-    clean_params={"clean_rounds":20},
+    clean_params={"clean_rounds": 20},
     bundle_info=bundles)
 
 # Redo everying related to bundle recognition. This is useful when changing the bundles
-# my_afq.clobber(dependent_on='track') 
+# my_afq.clobber(dependent_on='track')
 
 my_afq.export_all()
 
@@ -202,23 +199,18 @@ plotly.io.show(bundle_html["NDARAA948VFH"]['HBNsiteRU'])
 #############################################################################
 # References
 # ----------
-# .. [1] Romi Sagi, J.S.H. Taylor, Kyriaki Neophytou, Tamar Cohen, 
+# .. [1] Romi Sagi, J.S.H. Taylor, Kyriaki Neophytou, Tamar Cohen,
 #     Brenda Rapp, Kathleen Rastle, Michal Ben-Shachar.
 #     White matter associations with spelling performance
 #
-# .. [2] Caffarra S, Kanopka K, Kruper J, Richie-Halford A, Roy E, Rokem A,
-#     Yeatman JD. Development of the alpha rhythm is linked to visual white
-#     matter pathways and visual detection performance. bioRxiv.
-#     doi:10.1101/2022.09.03.506461
-#
-# .. [3] Alexander LM, Escalera J, Ai L, et al. An open resource for
+# .. [2] Alexander LM, Escalera J, Ai L, et al. An open resource for
 #     transdiagnostic research in pediatric mental health and learning
 #     disorders. Sci Data. 2017;4:170181.
 #
-# .. [4] Richie-Halford A, Cieslak M, Ai L, et al. An analysis-ready and quality
+# .. [3] Richie-Halford A, Cieslak M, Ai L, et al. An analysis-ready and quality
 #     controlled resource for pediatric brain white-matter research. Scientific
 #     Data. 2022;9(1):1-27.
 #
-# .. [5] Cieslak M, Cook PA, He X, et al. QSIPrep: an integrative platform for
+# .. [4] Cieslak M, Cook PA, He X, et al. QSIPrep: an integrative platform for
 #     preprocessing and reconstructing diffusion MRI data. Nat Methods.
 #     2021;18(7):775-778.
