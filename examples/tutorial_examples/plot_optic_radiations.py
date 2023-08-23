@@ -1,6 +1,6 @@
 """
 =============================
-Plotting the Optic Radiations
+Adding new bunldes into pyAFQ (Optic Radiations Example)
 =============================
 
 pyAFQ is designed to be customizable and extensible. This example shows how you
@@ -52,8 +52,8 @@ study_dir = afd.fetch_hbn_preproc(["NDARAA948VFH"])[1]
 # default template space in pyAFQ, but, in principle, other template spaces
 # could be used.
 #
-# The ROIs for the case can be downloaded using a custom fetcher and then read
-# into a dict as follows:
+# The ROIs for the case can be downloaded using a custom fetcher which saves
+# the ROIs to a folder and creates a dictrionary of paths to the ROIs:
 
 or_rois = afd.read_or_templates()
 
