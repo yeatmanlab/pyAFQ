@@ -56,7 +56,7 @@ robust_tensor_fitting: bool, optional
 	Constrained Spherical Deconvolution (CSD) aims to solve an equation 
 	that partials out the effect of the scanner's response function 
 	and noise to estimate the underlying fiber orientation. Alternative
-	model-free and model-based methods are not implemented within pyAFQ.  
+	a plethora of model-free and model-based methods is implemented in `DIPY <https://dipy.org>`_.
 
 csd_response: tuple or None, optional.
 	The response function to be used by CSD, as a tuple with two elements.
