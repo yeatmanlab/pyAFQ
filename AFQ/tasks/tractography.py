@@ -134,10 +134,11 @@ def streamlines(data_imap, seed, stop,
 
     if is_trx:
         start_time = time()
-        dtype_dict = {'positions': np.float16, 'offsets': np.uint16}
+        dtype_dict = {'positions': np.float32, 'offsets': np.uint32}
         this_tracking_params['lazy'] = True
+        lazyt = aft.track(params_file, **this_tracking_params)
         sft = TrxFile.from_lazy_tractogram(
-            aft.track(params_file, **this_tracking_params),
+            lazyt,
             seed,
             dtype_dict=dtype_dict)
         n_streamlines = len(sft)

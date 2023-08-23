@@ -16,6 +16,9 @@ import AFQ.utils.streamlines as aus
 from AFQ.tasks.utils import get_default_args
 import AFQ.utils.volume as auv
 
+from trx.io import load as load_trx
+from trx.trx_file_memmap import TrxFile
+
 from dipy.io.streamline import load_tractogram, save_tractogram
 from dipy.io.stateful_tractogram import Space
 from dipy.stats.analysis import afq_profile, gaussian_weights
@@ -26,11 +29,11 @@ logger = logging.getLogger('AFQ')
 
 
 @pimms.calc("bundles")
-@as_file('_tractography.trk', include_track=True, include_seg=True)
+@as_file('_tractography', include_track=True, include_seg=True)
 def segment(dwi, data_imap, mapping_imap,
             tractography_imap, segmentation_params, clean_params):
     """
-    full path to a trk file containing containting
+    full path to a trk/trx file containing containing
     segmented streamlines, labeled by bundle
 
     Parameters
@@ -47,9 +50,14 @@ def segment(dwi, data_imap, mapping_imap,
     reg_template = data_imap["reg_template"]
     streamlines = tractography_imap["streamlines"]
     img = nib.load(dwi)
-    tg = load_tractogram(
-        streamlines, img, Space.VOX,
-        bbox_valid_check=False)
+    if streamlines.endswith(".trk"):
+        tg = load_tractogram(
+            streamlines, img, Space.VOX,
+            bbox_valid_check=False)
+    elif streamlines.endswith(".trx"):
+        is_trx = True
+        tg = load_trx(streamlines, img).to_sft()
+
     indices_to_remove, _ = tg.remove_invalid_streamlines()
     if len(indices_to_remove) > 0:
         logger.warning(f"{len(indices_to_remove)} invalid streamlines removed")
@@ -71,18 +79,25 @@ def segment(dwi, data_imap, mapping_imap,
     if len(seg_sft.sft) < 1:
         raise ValueError("Fatal: No bundles recognized.")
 
-    tgram, meta = seg_sft.get_sft_and_sidecar()
+    if is_trx:
+        meta = seg_sft.get_sidecar()
+        trx = TrxFile.from_sft(seg_sft.sft)
+        trx.groups = seg_sft.bundle_idxs
 
-    segmentation_params_out = {
-        arg_name: value if isinstance(value, (int, float, bool, str)) or (
-            value is None) else str(value)
-        for arg_name, value in segmentation_params.items()}
+        return trx, meta
+    else:
+        tgram, meta = seg_sft.get_sft_and_sidecar()
 
-    meta["source"] = streamlines
-    meta["Recognition Parameters"] = segmentation_params_out
-    meta["Cleaning Parameters"] = clean_params
-    meta["Timing"] = time() - start_time
-    return tgram, meta
+        segmentation_params_out = {
+            arg_name: value if isinstance(value, (int, float, bool, str)) or (
+                value is None) else str(value)
+            for arg_name, value in segmentation_params.items()}
+
+        meta["source"] = streamlines
+        meta["Recognition Parameters"] = segmentation_params_out
+        meta["Cleaning Parameters"] = clean_params
+        meta["Timing"] = time() - start_time
+        return tgram, meta
 
 
 @pimms.calc("indiv_bundles")
