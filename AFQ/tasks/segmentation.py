@@ -113,9 +113,15 @@ def export_bundles(base_fname, results_dir,
                    segmentation_params):
     """
     dictionary of paths, where each path is
-    a full path to a trk file containing the streamlines of a given bundle,
-    cleaned or uncleaned
+    a full path to a trk file containing the streamlines of a given bundle.
     """
+    is_trx = tracking_params.get("trx", False)
+    if is_trx:
+        raise ValueError(
+            "Cannot export individual bundles when using trx format")
+    else:
+        bundles = bundles + ".trk"
+
     bundles_dir = op.join(results_dir, "bundles")
     os.makedirs(bundles_dir, exist_ok=True)
     seg_sft = aus.SegmentedSFT.fromfile(bundles)
