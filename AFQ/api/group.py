@@ -630,7 +630,8 @@ class GroupAFQ(object):
                     slice_kwargs["z_pos"] = slice_pos
 
                 figure = viz_backend.visualize_volume(
-                    b0,
+                    best_scalar,
+                    opacity=1.0,
                     flip_axes=flip_axes,
                     interact=False,
                     inline=False,
@@ -650,9 +651,9 @@ class GroupAFQ(object):
             eye = {}
             if view == "sagittal":
                 if direc == "left":
-                    eye["x"] = 1
-                else:
                     eye["x"] = -1
+                else:
+                    eye["x"] = 1
                 eye["y"] = 0
                 eye["z"] = 0
             elif view == "coronal":
