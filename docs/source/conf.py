@@ -226,7 +226,7 @@ sphinx_gallery_conf = {
     'examples_dirs': ['../../examples/howto_examples', '../../examples/tutorial_examples'],
     # path where to save gallery generated examples
     'gallery_dirs': ['howto/howto_examples', 'tutorials/tutorial_examples'],
-    'ignore_pattern': 'plot_baby_afq.py|cloudknot_hcp_example.py|cloudknot_example.py',
+    'ignore_pattern': 'plot_baby_afq.py|cloudknot_hcp_example.py|cloudknot_example.py|add_custom_bundle.py',  # noqa
     'image_scrapers': image_scrapers,
     'reset_modules': (reset_progressbars),
     'show_memory': True,
