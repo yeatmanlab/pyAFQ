@@ -62,6 +62,7 @@ extensions = [
     'kwargsdocs',
     'methodsdocs',
     'myst_nb',
+    'nbsphinx',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
