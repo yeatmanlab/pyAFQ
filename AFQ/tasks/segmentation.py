@@ -243,9 +243,12 @@ def tract_profiles(bundles,
     node_numbers = []
     profiles = np.empty((len(scalar_dict), 0)).tolist()
     this_profile = np.zeros((len(scalar_dict), 100))
-
+    reference = nib.load(scalar_dict[list(scalar_dict.keys())[0]])
+    print(type(reference))
     seg_sft = aus.SegmentedSFT.fromfile(
-        bundles)
+        bundles,
+        reference=reference)
+
     seg_sft.sft.to_rasmm()
     for bundle_name in seg_sft.bundle_names:
         this_sl = seg_sft.get_bundle(bundle_name).streamlines

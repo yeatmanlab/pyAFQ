@@ -4,7 +4,9 @@ import numpy as np
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 import os.path as op
 
-from AFQ.utils.path import drop_extension, read_json
+from trx.io import load as load_trx
+
+from AFQ.utils.path import drop_extension
 
 
 class SegmentedSFT():
@@ -70,17 +72,21 @@ class SegmentedSFT():
         return self.sft[self.bundle_idxs[b_name]]
 
     @classmethod
-    def fromfile(cls, trk_file, reference="same", sidecar_file=None):
+    def fromfile(cls, trk_or_trx_file, reference="same", sidecar_file=None):
         if sidecar_file is None:
             # assume json sidecar has the same name as trk_file,
             # but with json suffix
-            sidecar_file = f'{drop_extension(trk_file)}.json'
+            sidecar_file = f'{drop_extension(trk_or_trx_file)}.json'
             if not op.exists(sidecar_file):
                 raise ValueError((
                     "JSON sidecars are required for trk files. "
                     f"JSON sidecar not found for: {sidecar_file}"))
         sidecar_info = read_json(sidecar_file)
-        sft = load_tractogram(trk_file, reference, Space.RASMM)
+        if trk_or_trx_file.endswith(".trx"):
+            sft = load_trx(trk_or_trx_file, reference).to_sft()
+        else:
+            sft = load_tractogram(trk_or_trx_file, reference, Space.RASMM)
+
         if reference == "same":
             reference = sft
         bundles = {}
