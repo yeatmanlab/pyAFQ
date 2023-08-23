@@ -33,9 +33,6 @@ class SegmentedSFT():
             self.bundle_names.append(b_name)
 
         self.sft = StatefulTractogram(sls, reference, space)
-        self.sft.dtype_dict = {'positions': np.float32,
-                               'offsets': np.uint32}
-
         self.bundle_idxs = idxs
         if len(this_tracking_idxs) > 1:
             self.this_tracking_idxs = this_tracking_idxs
@@ -55,18 +52,7 @@ class SegmentedSFT():
             for ii in range(len(self.this_tracking_idxs)):
                 self.this_tracking_idxs[ii] = int(self.this_tracking_idxs[ii])
             sidecar_info["tracking_idx"] = self.this_tracking_idxs
-
         return self.sft, sidecar_info
-
-    def get_sidecar(self):
-        sidecar_info = {}
-        sidecar_info["bundle_ids"] = {}
-        if self.this_tracking_idxs is not None:
-            for ii in range(len(self.this_tracking_idxs)):
-                self.this_tracking_idxs[ii] = int(self.this_tracking_idxs[ii])
-            sidecar_info["tracking_idx"] = self.this_tracking_idxs
-
-        return sidecar_info
 
     def get_bundle(self, b_name):
         return self.sft[self.bundle_idxs[b_name]]

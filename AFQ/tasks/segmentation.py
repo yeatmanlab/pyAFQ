@@ -80,24 +80,25 @@ def segment(dwi, data_imap, mapping_imap,
         raise ValueError("Fatal: No bundles recognized.")
 
     if is_trx:
-        meta = seg_sft.get_sidecar()
-        trx = TrxFile.from_sft(seg_sft.sft)
-        trx.groups = seg_sft.bundle_idxs
+        seg_sft.sft.dtype_dict = {'positions': np.float32,
+                                  'offsets': np.uint32}
+        tgram = TrxFile.from_sft(seg_sft.sft)
+        tgram.groups = seg_sft.bundle_idxs
+        meta = {}
 
-        return trx, meta
     else:
         tgram, meta = seg_sft.get_sft_and_sidecar()
 
-        segmentation_params_out = {
-            arg_name: value if isinstance(value, (int, float, bool, str)) or (
-                value is None) else str(value)
-            for arg_name, value in segmentation_params.items()}
+    segmentation_params_out = {
+        arg_name: value if isinstance(value, (int, float, bool, str)) or (
+            value is None) else str(value)
+        for arg_name, value in segmentation_params.items()}
 
-        meta["source"] = streamlines
-        meta["Recognition Parameters"] = segmentation_params_out
-        meta["Cleaning Parameters"] = clean_params
-        meta["Timing"] = time() - start_time
-        return tgram, meta
+    meta["source"] = streamlines
+    meta["Recognition Parameters"] = segmentation_params_out
+    meta["Cleaning Parameters"] = clean_params
+    meta["Timing"] = time() - start_time
+    return tgram, meta
 
 
 @pimms.calc("indiv_bundles")
