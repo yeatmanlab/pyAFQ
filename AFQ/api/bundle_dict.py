@@ -716,9 +716,7 @@ class PediatricBundleDict(BundleDict):
         #     to separate ILF and mdLF
         #   - Addition of pAF and VOF ROIs
         #   - SLF ROIs are restricted to parietal cortex
-        self.templates = {
-            **afd.read_pediatric_templates(),
-            **afd.read_more_pediatric_templates()}
+        self.templates = afd.read_pediatric_templates()
 
         # pediatric probability maps
         prob_map_order = [

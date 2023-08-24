@@ -237,6 +237,18 @@ pediatric_fnames = [
     "UNCNeo-withCerebellum-for-babyAFQ.nii.gz",
     "UNCNeo_JHU_tracts_prob-for-babyAFQ.nii.gz",
     "mid-saggital.nii.gz"
+    "OR_rightV1.nii.gz",
+    "OR_rightThal.nii.gz",
+    "OR_right_roi3.nii.gz",
+    "OR_leftV1.nii.gz",
+    "OR_leftThal.nii.gz",
+    "OR_left_roi3.nii.gz",
+    "pARC_R_start.nii.gz",
+    "pARC_L_start.nii.gz",
+    "VOF_box_small_L.nii.gz",
+    "VOF_box_small_R.nii.gz",
+    "VOF_L_start.nii.gz",
+    "VOF_R_start.nii.gz",
 ]
 
 pediatric_md5_hashes = [
@@ -270,6 +282,18 @@ pediatric_md5_hashes = [
     "bf81a23d80f55e5f1eb0c16717193105",
     "6f8bf8f70216788d14d9a49a3c664b16",
     "19df0297d6a2ac21da5e432645d63174",
+    "b4ffb957a2adbb8b76966e4ea28dbdf1",
+    "3de1bc5aae4c76164f34515e2e84939c",
+    "705ba1cbfc42ce64a54dda2b732f81f2",
+    "bc6d4f880d3eb281358af1c764779704",
+    "a3b6a7be067aa12af273482baee1498d",
+    "f035813314960eb91f3a4dae508a68e5",
+    "728461f81fcfa8f02ff3af969ab6499c",
+    "5c1c87ee71c512b38a0711b93bb7e9fe",
+    "4652bcf7a1f2b7cdeec52956eb884795",
+    "e1c4bf76d2c98dcf6ffe00399a6e8b07",
+    "0ecabd68fa9c56614e2a694359c0a545",
+    "4c93bea7a72ac2b7475201acef5a1fc4",
 ]
 
 pediatric_remote_fnames = [
@@ -282,7 +306,19 @@ pediatric_remote_fnames = [
     "24880739", "24880742", "24880754", "24880757", "24880760", "24880763",
     "24880769", "24880772", "24880775", "24880778", "24880781", "24880787",
     "24880790", "24880793", "24880796", "24880802", "24880805", "24880808",
-    "24880616", "24880613", "24986396"
+    "24880616", "24880613", "24986396",
+    "42120480",
+    "42120483",
+    "42120486",
+    "42120489",
+    "42120492",
+    "42120495",
+    "42121791",
+    "42121794",
+    "42121836",
+    "42121839",
+    "42121803",
+    "42121806",
 ]
 
 fetch_pediatric_templates = _make_reusable_fetcher(
@@ -785,95 +821,6 @@ def read_or_templates(as_img=True, resample_to=False):
 
     template_dict = _fetcher_to_template(
         fetch_or_templates,
-        as_img=as_img,
-        resample_to=resample_to)
-
-    toc = time.perf_counter()
-    logger.debug(f'or templates loaded in {toc - tic:0.4f} seconds')
-
-    return template_dict
-
-
-more_pediatric_fnames = [
-    "OR_rightV1.nii.gz",
-    "OR_rightThal.nii.gz",
-    "OR_right_roi3.nii.gz",
-    "OR_leftV1.nii.gz",
-    "OR_leftThal.nii.gz",
-    "OR_left_roi3.nii.gz",
-    "VOF_box_small_L.nii.gz",
-    "VOF_box_small_R.nii.gz",
-    "pARC_L_start.nii.gz",
-    "VOF_L_start.nii.gz",
-    "pARC_R_start.nii.gz",
-    "VOF_R_start.nii.gz",
-]
-
-more_pediatric_remote_fnames = [
-    "42120480",
-    "42120483",
-    "42120486",
-    "42120489",
-    "42120492",
-    "42120495",
-    "42121695",
-    "42121698"
-    "42121650",
-    "42121656",
-    "42121653",
-    "42121659"
-]
-
-more_pediatric_md5_hashes = [
-    "b4ffb957a2adbb8b76966e4ea28dbdf1",
-    "3de1bc5aae4c76164f34515e2e84939c",
-    "705ba1cbfc42ce64a54dda2b732f81f2",
-    "bc6d4f880d3eb281358af1c764779704",
-    "a3b6a7be067aa12af273482baee1498d",
-    "f035813314960eb91f3a4dae508a68e5",
-    "5481d26816ecb612c2514a03cc3a5ef4",
-    "e4e34212b813dd2c5c156727a45c59a7"
-    "a04d645bbc3ff4be412c9efbcc3d1ff2",
-    "4714e00a31cbee58cfd86bd935c36f43",
-    "6205fe06ab28586179245d294d9c5c7a",
-    "5d573e948706e5de5f1b27cddcfc0e08"
-]
-
-fetch_more_pediatric_templates = _make_reusable_fetcher(
-    "fetch_more_pediatric_templates",
-    op.join(afq_home,
-            'pediatric_templates'),
-    baseurl, more_pediatric_remote_fnames,
-    more_pediatric_fnames,
-    md5_list=more_pediatric_md5_hashes,
-    doc="Download additional pediatric templates")
-
-
-def read_more_pediatric_templates(as_img=True, resample_to=False):
-    """Load additional pediatric templates from file
-
-    Parameters
-    ----------
-    as_img : bool, optional
-        If True, values are `Nifti1Image`. Otherwise, values are
-        paths to Nifti files. Default: True
-    resample_to : str or nibabel image class instance, optional
-        A template image to resample to. Typically, this should be the
-        template to which individual-level data are registered. Defaults to
-        the MNI template. Default: False
-
-    Returns
-    -------
-    dict with: keys: names of template ROIs and values: nibabel Nifti1Image
-    objects from each of the ROI nifti files.
-    """
-    logger = logging.getLogger('AFQ')
-
-    logger.debug('loading additional pediatric templates')
-    tic = time.perf_counter()
-
-    template_dict = _fetcher_to_template(
-        fetch_more_pediatric_templates,
         as_img=as_img,
         resample_to=resample_to)
 
