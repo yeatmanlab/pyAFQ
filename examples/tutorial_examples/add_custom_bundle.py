@@ -156,11 +156,16 @@ my_afq = GroupAFQ(
                      "directions": "prob",
                      "odf_model": "CSD",
                      "seed_mask": RoiImage()},
-    clean_params={"clean_rounds": 20},
+    clean_params={"clean_rounds": 20,
+                  "length_threshold": 2,
+                  "distance_threshold" : 3,
+                  },
     bundle_info=bundles)
 
-# Redo everying related to bundle recognition. This is useful when changing the bundles
-# my_afq.clobber(dependent_on='track')
+# Redo everying related to bundle recognition. This is useful when changing the bundles.
+# The options for dependent_on are 'track' (to start over from tractography) or 'recog'
+# to start over from bundle recognition
+my_afq.clobber(dependent_on='recog')
 
 my_afq.export_all()
 
