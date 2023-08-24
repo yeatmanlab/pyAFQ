@@ -801,7 +801,12 @@ more_pediatric_fnames = [
     "OR_leftV1.nii.gz",
     "OR_leftThal.nii.gz",
     "OR_left_roi3.nii.gz",
-    "VOF_box_small_L.nii.gz"
+    "VOF_box_small_L.nii.gz",
+    "VOF_box_small_R.nii.gz",
+    "pARC_L_start.nii.gz",
+    "VOF_L_start.nii.gz",
+    "pARC_R_start.nii.gz",
+    "VOF_R_start.nii.gz",
 ]
 
 more_pediatric_remote_fnames = [
@@ -811,7 +816,12 @@ more_pediatric_remote_fnames = [
     "42120489",
     "42120492",
     "42120495",
-    "42121626"
+    "42121695",
+    "42121698"
+    "42121650",
+    "42121656",
+    "42121653",
+    "42121659"
 ]
 
 more_pediatric_md5_hashes = [
@@ -821,7 +831,12 @@ more_pediatric_md5_hashes = [
     "bc6d4f880d3eb281358af1c764779704",
     "a3b6a7be067aa12af273482baee1498d",
     "f035813314960eb91f3a4dae508a68e5",
-    "8ffbd65ae986c8196b7776fe98e66722"
+    "5481d26816ecb612c2514a03cc3a5ef4",
+    "e4e34212b813dd2c5c156727a45c59a7"
+    "a04d645bbc3ff4be412c9efbcc3d1ff2",
+    "4714e00a31cbee58cfd86bd935c36f43",
+    "6205fe06ab28586179245d294d9c5c7a",
+    "5d573e948706e5de5f1b27cddcfc0e08"
 ]
 
 fetch_more_pediatric_templates = _make_reusable_fetcher(

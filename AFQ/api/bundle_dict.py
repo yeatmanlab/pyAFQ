@@ -762,7 +762,8 @@ class PediatricBundleDict(BundleDict):
             self._dict["pARC_L"] = {
                 "include": [self.templates["SLFt_roi2_L"]],
                 "exclude": [self.templates["SLF_roi1_L"]],
-                "start": self.templates["LH_Parietal"],
+                "start": self.templates["pARC_L_start"],
+                "end": self.templates["VOF_box_small_L"],
                 "primary_axis": 2,
                 "primary_axis_percentage": 40,
                 "cross_midline": False
@@ -771,21 +772,24 @@ class PediatricBundleDict(BundleDict):
             self._dict["pARC_R"] = {
                 "include": [self.templates["SLFt_roi2_R"]],
                 "exclude": [self.templates["SLF_roi1_R"]],
-                "start": self.templates["RH_Parietal"],
+                "start": self.templates["pARC_R_start"],
+                "end": self.templates["VOF_box_small_R"],
                 "primary_axis": 2,
                 "primary_axis_percentage": 40,
                 "cross_midline": False
             }
         elif bundle_name == "VOF_L":
             self._dict["VOF_L"] = {
-                "end": self.templates["VOF_box_L"],
+                "start": self.templates["VOF_L_start"],
+                "end": self.templates["VOF_box_small_L"],
                 "primary_axis": 2,
                 "primary_axis_percentage": 40,
                 "cross_midline": False
             }
         elif bundle_name == "VOF_R":
             self._dict["VOF_R"] = {
-                "end": self.templates["VOF_box_R"],
+                "start": self.templates["VOF_R_start"],
+                "end": self.templates["VOF_box_small_R"],
                 "primary_axis": 2,
                 "primary_axis_percentage": 40,
                 "cross_midline": False
