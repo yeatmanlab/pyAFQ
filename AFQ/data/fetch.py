@@ -236,7 +236,7 @@ pediatric_fnames = [
     "VOF_box_L.nii.gz", "VOF_box_R.nii.gz",
     "UNCNeo-withCerebellum-for-babyAFQ.nii.gz",
     "UNCNeo_JHU_tracts_prob-for-babyAFQ.nii.gz",
-    "mid-saggital.nii.gz"
+    "mid-saggital.nii.gz",
     "OR_rightV1.nii.gz",
     "OR_rightThal.nii.gz",
     "OR_right_roi3.nii.gz",
