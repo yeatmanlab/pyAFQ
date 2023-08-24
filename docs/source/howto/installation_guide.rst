@@ -55,10 +55,9 @@ which will install pyAFQ locally in editible mode and include extensions.
 
 .. note::
 
-  You should also install the following optional packages before working through
-  the examples: jupyter, fury, AFQ-browser, matplotlib, cloudknot, "pyAFQ[plot]" (with the quotation marks).
-
-  Docker should also be running in the background for the examples involving cloudknot.
+  Some of the examples in the documentation require additional dependencies. To install these, you can run `pip 
+  install pyAFQ[plot]`, which will include visualization tools that are required in these examples. For examples 
+  involving the cloudknot distributed computing library, you will also need to set up an [AWS account]([Create Account - aws.amazon.com](https://aws.amazon.com/resources/create-account/)) and have [docker](https://www.docker.com/) installed.
 
 
 How to install using Docker
