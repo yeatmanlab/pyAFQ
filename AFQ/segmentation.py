@@ -119,8 +119,7 @@ class Segmentation:
                  seg_algo='AFQ',
                  clip_edges=False,
                  parallel_segmentation={
-                     "n_jobs": 4, "engine": "joblib",
-                     "backend": "loky"},
+                     "n_jobs": 4, "engine": "dask"},
                  progressive=True,
                  greater_than=50,
                  rm_small_clusters=50,
@@ -340,7 +339,7 @@ class Segmentation:
                     'end': img5}}
         tg : StatefulTractogram
             Bundles to segment
-        mapping : DiffeomorphicMap, or equivalent interface 
+        mapping : DiffeomorphicMap, or equivalent interface
             A mapping between DWI space and a template.
         fdata, fbval, fbvec : str
             Full path to data, bvals, bvecs
@@ -1099,7 +1098,7 @@ def sl_curve_dist(curve1, curve2):
     Parameters
     ----------
     curve1, curve2 : 2d array-like
-        Two curves calculated from sl_curve. 
+        Two curves calculated from sl_curve.
 
     Returns
     -------
