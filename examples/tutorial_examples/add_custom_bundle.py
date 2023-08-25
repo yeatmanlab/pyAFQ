@@ -35,11 +35,22 @@ np.random.seed(1234)
 # Diffusion Derivatives dataset (HBN-POD2) [2]_, [3]_. We'll use a fetcher to
 # get preprocessed dMRI data for eight of the >2,000 subjects in that study. The
 # data gets organized into a BIDS-compatible format in the `~/AFQ_data/HBN`
-# folder. The fether returns this directory as study_dir:
+# folder. These 12 subjects have very high quality data.
+# The fether returns this directory as study_dir:
 
-_, study_dir = afd.fetch_hbn_preproc([
-    'NDARAA948VFH', 'NDARXT727MD7', 'NDARXT822TAA', 'NDARXU376FDN',
-    'NDARXU437UFZ', 'NDARXU679ZE8', 'NDARXU883NMY', 'NDARXV094ZHH'])
+_, study_dir = afd.fetch_hbn_preproc(['NDARKP893TWU',
+'NDAREP505XAD',
+'NDARKT540ZW0',
+'NDARAG340ERT',
+'NDAREM757NBG',
+'NDARLL894HC3',
+'NDARFY525TL2',
+'NDARKV461KGZ',
+'NDARUC851WHU',
+'NDARMJ333WJM',
+'NDARJG687YYX',
+'NDARJA157YB3',
+])
 
 
 roi_urls = ['https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/MFgL.nii.gz',
@@ -157,15 +168,16 @@ my_afq = GroupAFQ(
                      "odf_model": "CSD",
                      "seed_mask": RoiImage()},
     clean_params={"clean_rounds": 20,
-                  "length_threshold": 2,
+                  "length_threshold": 3,
                   "distance_threshold" : 3,
                   },
+    segmentation_params = {"parallel_segmentation": {"engine":"serial"}},
     bundle_info=bundles)
 
 # Redo everying related to bundle recognition. This is useful when changing the bundles.
 # The options for dependent_on are 'track' (to start over from tractography) or 'recog'
 # to start over from bundle recognition
-my_afq.clobber(dependent_on='recog')
+# my_afq.clobber(dependent_on='recog')
 
 my_afq.export_all()
 
@@ -183,11 +195,11 @@ my_afq.export_all()
 #   properly rendered into the web-page containing this example. It is not
 #   necessary to do this when running this type of analysis.
 
-montage = my_afq.montage("L_SLF1", (2, 4), "Sagittal", "left", slice_pos=0.4)
+montage = my_afq.montage("L_SLF1", (3, 4), "Sagittal", "left", slice_pos=0.5)
 shutil.copy(montage[0], op.split(montage[0])[-1])
-montage = my_afq.montage("L_SLF2", (2, 4), "Sagittal", "left", slice_pos=0.4)
+montage = my_afq.montage("L_SLF2", (3, 4), "Sagittal", "left", slice_pos=0.5)
 shutil.copy(montage[0], op.split(montage[0])[-1])
-montage = my_afq.montage("L_SLF3", (2, 4), "Sagittal", "left", slice_pos=0.4)
+montage = my_afq.montage("L_SLF3", (3, 4), "Sagittal", "left", slice_pos=0.5)
 shutil.copy(montage[0], op.split(montage[0])[-1])
 
 #############################################################################
@@ -199,7 +211,7 @@ shutil.copy(montage[0], op.split(montage[0])[-1])
 # be navigated, zoomed, rotated, etc.
 
 bundle_html = my_afq.export("all_bundles_figure")
-plotly.io.show(bundle_html["NDARAA948VFH"]['HBNsiteRU'])
+# plotly.io.show(bundle_html["NDARAA948VFH"]['HBNsiteRU'])
 
 #############################################################################
 # References
