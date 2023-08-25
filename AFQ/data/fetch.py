@@ -236,7 +236,19 @@ pediatric_fnames = [
     "VOF_box_L.nii.gz", "VOF_box_R.nii.gz",
     "UNCNeo-withCerebellum-for-babyAFQ.nii.gz",
     "UNCNeo_JHU_tracts_prob-for-babyAFQ.nii.gz",
-    "mid-saggital.nii.gz"
+    "mid-saggital.nii.gz",
+    "OR_rightV1.nii.gz",
+    "OR_rightThal.nii.gz",
+    "OR_right_roi3.nii.gz",
+    "OR_leftV1.nii.gz",
+    "OR_leftThal.nii.gz",
+    "OR_left_roi3.nii.gz",
+    "pARC_R_start.nii.gz",
+    "pARC_L_start.nii.gz",
+    "VOF_box_small_L.nii.gz",
+    "VOF_box_small_R.nii.gz",
+    "VOF_L_start.nii.gz",
+    "VOF_R_start.nii.gz",
 ]
 
 pediatric_md5_hashes = [
@@ -270,6 +282,18 @@ pediatric_md5_hashes = [
     "bf81a23d80f55e5f1eb0c16717193105",
     "6f8bf8f70216788d14d9a49a3c664b16",
     "19df0297d6a2ac21da5e432645d63174",
+    "b4ffb957a2adbb8b76966e4ea28dbdf1",
+    "3de1bc5aae4c76164f34515e2e84939c",
+    "705ba1cbfc42ce64a54dda2b732f81f2",
+    "bc6d4f880d3eb281358af1c764779704",
+    "a3b6a7be067aa12af273482baee1498d",
+    "f035813314960eb91f3a4dae508a68e5",
+    "728461f81fcfa8f02ff3af969ab6499c",
+    "5c1c87ee71c512b38a0711b93bb7e9fe",
+    "4652bcf7a1f2b7cdeec52956eb884795",
+    "e1c4bf76d2c98dcf6ffe00399a6e8b07",
+    "0ecabd68fa9c56614e2a694359c0a545",
+    "4c93bea7a72ac2b7475201acef5a1fc4",
 ]
 
 pediatric_remote_fnames = [
@@ -282,7 +306,19 @@ pediatric_remote_fnames = [
     "24880739", "24880742", "24880754", "24880757", "24880760", "24880763",
     "24880769", "24880772", "24880775", "24880778", "24880781", "24880787",
     "24880790", "24880793", "24880796", "24880802", "24880805", "24880808",
-    "24880616", "24880613", "24986396"
+    "24880616", "24880613", "24986396",
+    "42120480",
+    "42120483",
+    "42120486",
+    "42120489",
+    "42120492",
+    "42120495",
+    "42121791",
+    "42121794",
+    "42121836",
+    "42121839",
+    "42121803",
+    "42121806",
 ]
 
 fetch_pediatric_templates = _make_reusable_fetcher(
