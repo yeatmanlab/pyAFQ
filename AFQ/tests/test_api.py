@@ -300,6 +300,7 @@ def test_AFQ_fury():
         viz_backend_spec="fury")
     myafq.export("all_bundles_figure")
 
+
 def test_AFQ_trx():
     tmpdir = tempfile.TemporaryDirectory()
     bids_path = op.join(tmpdir.name, "stanford_hardi")
