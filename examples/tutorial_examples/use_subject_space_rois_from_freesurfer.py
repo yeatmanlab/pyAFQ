@@ -1,11 +1,12 @@
 """
-==========================
-AFQ API
-==========================
+========================================
+Using Subject Space ROIs from Freesurfer
+========================================
 
-An example using the AFQ API
-
-
+An example using the AFQ API to find bundles
+as defined by endpoint ROIs from freesurfer.
+This example can be modified to work with ROIs
+in subject space from pipelines other than freesurfer.
 """
 import os.path as op
 
@@ -42,8 +43,14 @@ import AFQ.api.bundle_dict as abd
 # intializing the GroupAFQ object (which we will do next)
 #
 # The clear_previous_afq is used to remove any previous runs of the afq object
-# stored in the AFQ_data/stanford_hardi/ BIDS directory. Set it to false if
-# you want to use the results of previous runs.
+# stored in the AFQ_data/stanford_hardi/ BIDS directory. Set it to None if
+# you want to use the results of previous runs. Setting it to "track"
+# as here will only clear derivatives that depend on the tractography stage
+# (i.e., bundle delination and tract profile calculation),
+# as well as the tractography itself, to save time on recomputation.
+# If you want to only clear derivatives that depend on bundle delineation,
+# and keep the tractography, you can set clear_previous_afq to
+# "recog" instead.
 
 afd.organize_stanford_data(clear_previous_afq="track")
 
@@ -55,9 +62,9 @@ afd.organize_stanford_data(clear_previous_afq="track")
 # 2. Identify the left thalamus within the file, which has the label
 #    number 41
 # 3. Create a Nifti image representing the left thalamus ROI:
-#    - Assign a value of 1 to the pixels that Freesurfer
+#    - Assign a value of 1 to the voxels that Freesurfer
 #      has labeled as 41 (i.e., the left thalamus).
-#    - Assign a value of 0 to all other pixels.
+#    - Assign a value of 0 to all other voxels.
 # This binary mask format is the expected input for pyAFQ when
 # dealing with subject space ROIs. If it's already in binary format,
 # there is no need to do this step.
@@ -99,7 +106,7 @@ tracking_params = dict(n_seeds=10000,
 # Define custom `BundleDict` object
 # --------------------------------
 # In a typical `BundleDict` object, ROIs are passed as paths to Nifti files.
-# Here, we define ROIs as dictionary instead, containing BIDS filters.
+# Here, we define ROIs as dictionaries instead, containing BIDS filters.
 # Then pyAFQ can find the respective ROI for each subject and session.
 
 bundles = abd.BundleDict({
