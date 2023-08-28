@@ -8,7 +8,7 @@ can customize it to define a new bundle based on a definition of waypoint and
 endpoint ROIs of your design.
 
 In this case, we add sub-bundles of the superior longitudinal fasciculus,
-based on work by Rami et al [1]_.
+based on work by Sami et al [1]_.
 
 We start by importing some of the components that we need for this example and
 fixing the random seed for reproducibility
@@ -38,7 +38,8 @@ np.random.seed(1234)
 # folder. These 12 subjects have very high quality data.
 # The fether returns this directory as study_dir:
 
-_, study_dir = afd.fetch_hbn_preproc(['NDARKP893TWU',
+_, study_dir = afd.fetch_hbn_preproc([
+'NDARKP893TWU',
 'NDAREP505XAD',
 'NDARKT540ZW0',
 'NDARAG340ERT',
@@ -121,9 +122,7 @@ bundles = abd.BundleDict({
 
         "cross_midline": False,
     }
-
 })
-
 
 #############################################################################
 # Custom bundle definitions such as the SLF or OR, and the standard BundleDict can be
@@ -134,16 +133,11 @@ bundles = abd.BundleDict({
 #
 # In this case, we will skip this and generate just the SLF.
 
-
 #############################################################################
 # Define GroupAFQ object
 # ----------------------
 # HBN POD2 have been processed with qsiprep [4]_. This means that a brain mask
-# has already been computed for them. As you can see in other examples, these
-# data also have a mapping calculated for them, which can also be incorporated
-# into processing. However, in this case, we will let pyAFQ calculate its own
-# SyN-based mapping so that the `combine_bundle` method can be used below to
-# create a montage visualization.
+# has already been computed for them.
 #
 # For tractography, we use CSD-based probabilistic tractography seeding
 # extensively (`n_seeds=4` means 81 seeds per voxel!), but only within the ROIs
@@ -168,16 +162,18 @@ my_afq = GroupAFQ(
                      "odf_model": "CSD",
                      "seed_mask": RoiImage()},
     clean_params={"clean_rounds": 20,
-                  "length_threshold": 3,
-                  "distance_threshold" : 3,
+                  "length_threshold": 4,
+                  "distance_threshold" : 2,
                   },
     segmentation_params = {"parallel_segmentation": {"engine":"serial"}},
     bundle_info=bundles)
 
-# Redo everying related to bundle recognition. This is useful when changing the bundles.
+# If you want to redo different stages you can use the clobber fla
+# To redo everying related to bundle recognition set my_afq.clobber(dependent_on='recog'). 
+# This is useful when changing the bundles.
 # The options for dependent_on are 'track' (to start over from tractography) or 'recog'
 # to start over from bundle recognition
-# my_afq.clobber(dependent_on='recog')
+my_afq.clobber(dependent_on='recog')
 
 my_afq.export_all()
 
@@ -219,6 +215,7 @@ bundle_html = my_afq.export("all_bundles_figure")
 # .. [1] Romi Sagi, J.S.H. Taylor, Kyriaki Neophytou, Tamar Cohen,
 #     Brenda Rapp, Kathleen Rastle, Michal Ben-Shachar.
 #     White matter associations with spelling performance
+#     https://doi.org/10.21203/rs.3.rs-3282349/v1
 #
 # .. [2] Alexander LM, Escalera J, Ai L, et al. An open resource for
 #     transdiagnostic research in pediatric mental health and learning
