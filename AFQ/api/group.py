@@ -624,7 +624,7 @@ class GroupAFQ(object):
                     slice_kwargs["x_pos"] = None
                     slice_kwargs["y_pos"] = slice_pos
                     slice_kwargs["z_pos"] = None
-                elif view == "zxial":
+                elif view == "axial":
                     slice_kwargs["x_pos"] = None
                     slice_kwargs["y_pos"] = None
                     slice_kwargs["z_pos"] = slice_pos
