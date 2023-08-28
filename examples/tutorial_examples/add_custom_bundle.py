@@ -53,6 +53,9 @@ _, study_dir = afd.fetch_hbn_preproc([
 'NDARJA157YB3',
 ])
 
+# ROIs can be a) files created by the user and saved to the local disk, b) files stored somewhere on the internet
+# (as is the case here) or c) Files that are accessed with a fetcher. In this example we download these files from
+# a spot they live online but this code could be commented out and paths could be used to local ROIs on disk
 
 roi_urls = ['https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/MFgL.nii.gz',
             'https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/MFgR.nii.gz',
