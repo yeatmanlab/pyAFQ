@@ -242,6 +242,7 @@ class ParticipantAFQ(object):
         apply_cmd_to_afq_derivs(
             self.output_dir,
             self.export("base_fname"),
+            cmd=cmd,
             exception_file_names=exception_file_names,
             suffix=suffix,
             dependent_on=dependent_on
