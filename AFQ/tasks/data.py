@@ -560,12 +560,23 @@ def dti_fa(dti_tf):
 @pimms.calc("dti_lt0", "dti_lt1", "dti_lt2", "dti_lt3", "dti_lt4", "dti_lt5")
 def dti_lt(dti_tf, dwi_affine):
     """
-    Image of first element in the DTI tensor,
-    Image of second element in the DTI tensor,
-    Image of third element in the DTI tensor,
-    Image of fourth element in the DTI tensor,
-    Image of fifth element in the DTI tensor,
-    Image of sixth element in the DTI tensor
+    Image of first element in the DTI tensor according to DIPY convention
+    i.e. Dxx (rate of diffusion from the left to right side of the brain),
+    Image of second element in the DTI tensor according to DIPY convention
+    i.e. Dyy (rate of diffusion from the posterior to anterior part of 
+    the brain),
+    Image of third element in the DTI tensor according to DIPY convention
+    i.e. Dzz (rate of diffusion from the inferior to superior part of the
+    brain),
+    Image of fourth element in the DTI tensor according to DIPY convention
+    i.e. Dxy (rate of diffusion in the xy plane indicating the 
+    relationship between the x and y directions),
+    Image of fifth element in the DTI tensor according to DIPY convention
+    i.e. Dxz (rate of diffusion in the xz plane indicating the
+    relationship between the x and z directions),
+    Image of sixth element in the DTI tensor according to DIPY convention
+    i.e. Dyz (rate of diffusion in the yz plane indicating the
+    relationship between the y and z directions)
     """
     dti_lt_dict = {}
     for ii in range(6):
@@ -661,7 +672,7 @@ def dki_kt(dki_tf, dwi_affine):
     Image of ninth element in the DKI kurtosis model,
     Image of tenth element in the DKI kurtosis model,
     Image of eleventh element in the DKI kurtosis model,
-    Image of twelf element in the DKI kurtosis model,
+    Image of twelfth element in the DKI kurtosis model,
     Image of thirteenth element in the DKI kurtosis model,
     Image of fourteenth element in the DKI kurtosis model,
     Image of fifteenth element in the DKI kurtosis model

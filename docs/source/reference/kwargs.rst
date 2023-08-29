@@ -65,6 +65,18 @@ csd_tau: float, optional.
 	by default)
 	(see [1]_). Default: 0.1
 
+gq_sampling_length: float
+	Diffusion sampling length.
+	Default: 1.2
+
+opdt_sh_order: int
+	Spherical harmonics order for OPDT model. Must be even.
+	Default: 8
+
+csa_sh_order: int
+	Spherical harmonics order for CSA model. Must be even.
+	Default: 8
+
 sphere: Sphere class instance, optional
 	The sphere providing sample directions for the initial
 	search of the maximal value of kurtosis.
@@ -172,6 +184,12 @@ import_tract: dict or str or None, optional
 	or a path to the tractography file. If None, DIPY is used
 	to generate the tractography.
 	Default: None
+
+tractography_ngpus: int, optional
+	Number of GPUs to use in tractography. If non-0,
+	this algorithm is used for tractography,
+	https://github.com/dipy/GPUStreamlines
+	Default: 0
 
 
 ==========================================================

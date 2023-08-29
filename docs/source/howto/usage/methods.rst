@@ -80,27 +80,38 @@ dti_fa:
 
 
 dti_lt0:
-    Image of first element in the DTI tensor
+    Image of first element in the DTI tensor according to DIPY convention
+    i.e. Dxx (rate of diffusion from the left to right side of the brain)
 
 
 dti_lt1:
-    Image of second element in the DTI tensor
+    Image of second element in the DTI tensor according to DIPY convention
+    i.e. Dyy (rate of diffusion from the posterior to anterior part of 
+    the brain)
 
 
 dti_lt2:
-    Image of third element in the DTI tensor
+    Image of third element in the DTI tensor according to DIPY convention
+    i.e. Dzz (rate of diffusion from the inferior to superior part of the
+    brain)
 
 
 dti_lt3:
-    Image of fourth element in the DTI tensor
+    Image of fourth element in the DTI tensor according to DIPY convention
+    i.e. Dxy (rate of diffusion in the xy plane, indicating the 
+    relationship between the x and y directions)
 
 
 dti_lt4:
-    Image of fifth element in the DTI tensor
+    Image of fifth element in the DTI tensor according to DIPY convention
+    i.e. Dxz (rate of diffusion in the xz plane, indicating the
+    relationship between the x and z directions)
 
 
 dti_lt5:
-    Image of sixth element in the DTI tensor
+    Image of sixth element in the DTI tensor according to DIPY convention
+    i.e. Dyz (rate of diffusion in the yz plane, indicating the
+    relationship between the y and z directions)
 
 
 dti_cfa:
@@ -128,19 +139,19 @@ dti_ad:
 
 
 dki_kt0:
-    Image of first element in the DKI kurtosis model
-
+    Image of first element in the DKI kurtosis model 
+    
 
 dki_kt1:
-    Image of second element in the DKI kurtosis model
+    Image of second element in the DKI kurtosis model 
 
 
 dki_kt2:
-    Image of third element in the DKI kurtosis model
+    Image of third element in the DKI kurtosis model 
 
 
 dki_kt3:
-    Image of fourth element in the DKI kurtosis model
+    Image of fourth element in the DKI kurtosis model 
 
 
 dki_kt4:
@@ -172,7 +183,7 @@ dki_kt10:
 
 
 dki_kt11:
-    Image of twelf element in the DKI kurtosis model
+    Image of twelfth element in the DKI kurtosis model
 
 
 dki_kt12:

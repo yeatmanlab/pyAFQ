@@ -5,9 +5,11 @@ Automated Fiber Quantification in Python (pyAFQ)
 -------------------------------------------------
 
 pyAFQ is an open-source software tool for the analysis of brain white matter in
-diffusion MRI measurements. It implements a pipeline for tractometry:
-quantification of tissue properties along the length of the major long-range
-brain white matter connections.
+diffusion MRI measurements. It implements a complete and automated data
+processing pipeline for tractometry, from raw DTI data to white matter tract identification
+, as well as quantification of tissue properties along the length of the 
+major long-range brain white matter connections.
+
 
 .. todo::
   create and link to page that lists the `major fiber tracts` supported by
@@ -17,10 +19,14 @@ brain white matter connections.
   create and link to page that identifies the supported `tissue properties`
   (believe this includes both dti and dki? fa, md, cfa?, and pdd?)
 
+.. note::
 
-.. todo::
-  include detailed page that distguished tractometry versus tractography
-  and benefits
+  Tractography is concerned with the visualization and mapping of white matter
+  tracts in the brain, while tractometry involves the quantitative analysis of 
+  the structural properties of these tracts. Both techniques are valuable in 
+  understanding the brain's connectivity and can provide insights into various 
+  neurological conditions and cognitive processes. More information can be found in
+  the Explanations page.
 
 .. toctree::
     :maxdepth: 2

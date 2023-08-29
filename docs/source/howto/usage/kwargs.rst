@@ -17,6 +17,17 @@ Here are the arguments you can pass to kwargs, to customize the tractometry pipe
 ==========================================================
 DATA
 ==========================================================
+.. note::
+
+	The b value is a factor that reflects the strength and 
+	timing of the gradients used to generate diffusion-weighted images. 
+	The higher the b-value, the stronger the diffusion effects. 
+	The b-value depends on the strength, duration, and spacing 
+	of these pulsed gradients. A larger b-value is achieved with 
+	increasing the gradient amplitude and duration and by widening the 
+	interval between gradient pulses. b-values should be expressed in units of 
+	time/area, typically s/mm2. 
+
 min_bval: float, optional
 	Minimum b value you want to use
 	from the dataset (other than b0), inclusive.
@@ -39,6 +50,13 @@ robust_tensor_fitting: bool, optional
 	Whether to use robust_tensor_fitting when
 	doing dti. Only applies to dti.
 	Default: False
+
+.. note::
+
+	Constrained Spherical Deconvolution (CSD) aims to solve an equation 
+	that partials out the effect of the scanner's response function 
+	and noise to estimate the underlying fiber orientation. Alternative
+	a plethora of model-free and model-based methods is implemented in `DIPY <https://dipy.org>`_.
 
 csd_response: tuple or None, optional.
 	The response function to be used by CSD, as a tuple with two elements.
@@ -143,7 +161,8 @@ profile_weights: str, 1D array, 2D array callable, optional
 	How to weight each streamline (1D) or each node (2D)
 	when calculating the tract-profiles. If callable, this is a
 	function that calculates weights. If None, no weighting will
-	be applied. If "gauss", gaussian weights will be used.
+	be applied. If "gauss", gaussian weights will be used, with streamlines 
+	and nodes further away from the profile downweighted.
 	If "median", the median of values at each node will be used
 	instead of a mean or weighted mean.
 	Default: "gauss"
