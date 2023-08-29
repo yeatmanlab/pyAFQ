@@ -191,6 +191,7 @@ def gpu_tractography(data_imap, tracking_params, seed, stop,
                      tractography_ngpus=0):
     """
     full path to the complete, unsegmented tractography file
+
     Parameters
     ----------
     tractography_ngpus : int, optional

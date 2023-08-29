@@ -59,8 +59,64 @@ csd_params:
     full path to a nifti file containing parameters for the CSD fit
 
 
-pmap:
+csd_pmap:
     full path to a nifti file containing the anisotropic power map
+
+
+csd_ai:
+    full path to a nifti file containing the anisotropic index
+
+
+gq_params:
+    full path to a nifti file containing parameters for the Generalized Q-Sampling shm_coeff
+
+
+gq_iso:
+    full path to a nifti file containing isotropic diffusion component
+
+
+gq_aso:
+    full path to a nifti file containing anisotropic diffusion component
+
+
+gq_pmap:
+    full path to a nifti file containing the anisotropic power map from GQ
+
+
+gq_ai:
+    full path to a nifti file containing the anisotropic index from GQ
+
+
+opdt_params:
+    full path to a nifti file containing parameters for the Orientation Probability Density Transform shm_coeff
+
+
+opdt_gfa:
+    full path to a nifti file containing GFA
+
+
+opdt_pmap:
+    full path to a nifti file containing the anisotropic power map from OPDT
+
+
+opdt_ai:
+    full path to a nifti file containing the anisotropic index from OPDT
+
+
+csa_params:
+    full path to a nifti file containing parameters for the Constant Solid Angle shm_coeff
+
+
+csa_gfa:
+    full path to a nifti file containing GFA
+
+
+csa_pmap:
+    full path to a nifti file containing the anisotropic power map from CSA
+
+
+csa_ai:
+    full path to a nifti file containing the anisotropic index from CSA
 
 
 fwdti_fa:
@@ -80,27 +136,27 @@ dti_fa:
 
 
 dti_lt0:
-    Image of first element in the DTI tensor
+    Image of first element in the DTI tensor according to DIPY convention i.e. Dxx (rate of diffusion from the left to right side of the brain)
 
 
 dti_lt1:
-    Image of second element in the DTI tensor
+    Image of second element in the DTI tensor according to DIPY convention i.e. Dyy (rate of diffusion from the posterior to anterior part of  the brain)
 
 
 dti_lt2:
-    Image of third element in the DTI tensor
+    Image of third element in the DTI tensor according to DIPY convention i.e. Dzz (rate of diffusion from the inferior to superior part of the brain)
 
 
 dti_lt3:
-    Image of fourth element in the DTI tensor
+    Image of fourth element in the DTI tensor according to DIPY convention i.e. Dxy (rate of diffusion in the xy plane indicating the  relationship between the x and y directions)
 
 
 dti_lt4:
-    Image of fifth element in the DTI tensor
+    Image of fifth element in the DTI tensor according to DIPY convention i.e. Dxz (rate of diffusion in the xz plane indicating the relationship between the x and z directions)
 
 
 dti_lt5:
-    Image of sixth element in the DTI tensor
+    Image of sixth element in the DTI tensor according to DIPY convention i.e. Dyz (rate of diffusion in the yz plane indicating the relationship between the y and z directions)
 
 
 dti_cfa:
@@ -172,7 +228,7 @@ dki_kt10:
 
 
 dki_kt11:
-    Image of twelf element in the DKI kurtosis model
+    Image of twelfth element in the DKI kurtosis model
 
 
 dki_kt12:
@@ -281,10 +337,6 @@ reg_subject:
 
 bundles:
     full path to a trk file containing containting segmented streamlines, labeled by bundle
-
-
-clean_bundles:
-    full path to a trk file containting segmented streamlines, cleaned using the Mahalanobis distance, and labeled by bundle
 
 
 indiv_bundles:
