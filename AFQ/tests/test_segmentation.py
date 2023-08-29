@@ -23,10 +23,11 @@ hardi_img = nib.load(hardi_fdata)
 hardi_fbval = op.join(hardi_dir, "HARDI150.bval")
 hardi_fbvec = op.join(hardi_dir, "HARDI150.bvec")
 file_dict = afd.read_stanford_hardi_tractography()
+reg_template = afd.read_mni_template()
 mapping = reg.read_mapping(
     file_dict['mapping.nii.gz'],
     hardi_img,
-    afd.read_mni_template())
+    reg_template)
 streamlines = file_dict['tractography_subsampled.trk']
 tg = StatefulTractogram(streamlines, hardi_img, Space.RASMM)
 tg.to_vox()
@@ -43,7 +44,7 @@ cst_r_curve_ref = StatefulTractogram([[
     [5.70181712, -24.72099485, -2.60239253],
     [6.10747528, -24.18646430, -1.8638705 ],
     [6.56050014, -23.51795578, -1.27745605]]],
-    hardi_img, Space.VOX)
+    reg_template, Space.RASMM)
 
 bundles = {'CST_L': {
                     'include': [
@@ -56,7 +57,9 @@ bundles = {'CST_L': {
                         templates['CST_roi1_R'],
                         templates['CST_roi2_R']],
                     'prob_map': templates['CST_R_prob_map'],
-                    "curvature": {"sft": cst_r_curve_ref, "cut": True},
+                    "curvature": {
+                        "sft": cst_r_curve_ref,
+                        "cut": True, "thresh": 20},
                     'cross_midline': None}}
 
 def test_segment():
