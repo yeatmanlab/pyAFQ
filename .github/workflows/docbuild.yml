@@ -27,7 +27,7 @@ jobs:
         XVFB: 1
       run: |
         cd docs
-        make html
+        python -m sphinx source build -j 4
     - name: Upload docs
       uses: actions/upload-artifact@v1
       with:
