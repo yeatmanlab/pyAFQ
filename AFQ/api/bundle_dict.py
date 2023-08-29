@@ -362,7 +362,7 @@ class BundleDict(MutableMapping):
                 raise ValueError((
                     "Attempted to load an ROI using BIDS description without "
                     "First providing BIDS information."))
-            suffix = roi_or_sl.pop("suffix", "dwi")
+            suffix = roi_or_sl.get("suffix", "dwi")
             roi_or_sl = find_file(
                 self._bids_info, self._bids_path,
                 roi_or_sl,

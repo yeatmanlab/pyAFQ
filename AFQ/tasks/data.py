@@ -17,8 +17,7 @@ from AFQ.tasks.decorators import as_file, as_img, as_fit_deriv
 from AFQ.tasks.utils import get_fname, with_name, str_to_desc
 import AFQ.api.bundle_dict as abd
 import AFQ.data.fetch as afd
-from AFQ.utils.path import drop_extension
-from AFQ.data.s3bids import write_json
+from AFQ.utils.path import drop_extension, write_json
 from AFQ._fixes import gwi_odf
 
 from AFQ.definitions.utils import Definition
