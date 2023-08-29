@@ -59,7 +59,7 @@ bundles = {'CST_L': {
                     'prob_map': templates['CST_R_prob_map'],
                     "curvature": {
                         "sft": cst_r_curve_ref,
-                        "cut": True, "thresh": 20},
+                        "cut": True, "thresh": 45},
                     'cross_midline': None}}
 
 def test_segment():
