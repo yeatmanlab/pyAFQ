@@ -73,8 +73,6 @@ def test_segment():
     npt.assert_equal(len(fiber_groups), 2)
     # Here's one of them:
     CST_R_sl = fiber_groups['CST_R']
-    import dipy.tracking.streamlinespeed as dps
-
     # Let's make sure there are streamlines in there:
     npt.assert_(len(CST_R_sl) > 0)
     # Calculate the tract profile for a volume of all-ones:
