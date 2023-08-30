@@ -1727,7 +1727,7 @@ def fetch_hbn_preproc(subjects, path=None):
             os.makedirs(os.path.join(ses_dir, 'anat'), exist_ok=True)
         for remote in file_list:
             full = remote.split("Projects")[-1][1:].replace("/BIDS_curated", "")
-            local = op.join(afq_home, full)
+            local = op.join(my_path, full)
             data_files[local] = remote
 
     download_files = {}
