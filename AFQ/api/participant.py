@@ -21,7 +21,7 @@ from AFQ.tasks.mapping import get_mapping_plan
 from AFQ.tasks.tractography import get_tractography_plan
 from AFQ.tasks.segmentation import get_segmentation_plan
 from AFQ.tasks.viz import get_viz_plan
-from AFQ.utils.path import drop_extension, apply_cmd_to_afq_derivs, read_json
+from AFQ.utils.path import drop_extension, apply_cmd_to_afq_derivs
 from AFQ.viz.utils import BEST_BUNDLE_ORIENTATIONS, trim
 
 
@@ -217,7 +217,7 @@ class ParticipantAFQ(object):
         ----------
         images_per_row : int
             Number of bundle images per row in output file.
-            Default: 5
+            Default: 2
 
         Returns
         -------
@@ -228,18 +228,27 @@ class ParticipantAFQ(object):
         all_fnames = []
         bundle_dict = self.export("bundle_dict")
         self.logger.info("Generating Montage...")
+        viz_backend = self.export("viz_backend")
+        best_scalar = self.export(self.export("best_scalar"))
         size = (images_per_row, math.ceil(len(bundle_dict) / images_per_row))
         for ii, bundle_name in enumerate(tqdm(bundle_dict)):
             view = BEST_BUNDLE_ORIENTATIONS.get(bundle_name, "Axial")
             flip_axes = [False, False, False]
             for i in range(3):
                 flip_axes[i] = (self.export("dwi_affine")[i, i] < 0)
-            figure = self.export("viz_backend").visualize_bundles(
+
+            figure = viz_backend.visualize_volume(
+                best_scalar,
+                flip_axes=flip_axes,
+                interact=False,
+                inline=False)
+            figure = viz_backend.visualize_bundles(
                 self.export("bundles"),
                 color_by_direction=True,
                 flip_axes=flip_axes,
                 bundle=bundle_name,
                 opacity=0.2,
+                figure=figure,
                 interact=False,
                 inline=False)
 
@@ -249,35 +258,28 @@ class ParticipantAFQ(object):
                 eye["x"] = 1
                 eye["y"] = 0
                 eye["z"] = 0
-                view_up["x"] = 0
-                view_up["y"] = 0
-                view_up["z"] = 1
             elif view == "Coronal":
                 eye["x"] = 0
                 eye["y"] = 1
                 eye["z"] = 0
-                view_up["x"] = 0
-                view_up["y"] = 0
-                view_up["z"] = 1
             elif view == "Axial":
                 eye["x"] = 0
                 eye["y"] = 0
                 eye["z"] = 1
-                view_up["x"] = 0
-                view_up["y"] = 0
-                view_up["z"] = 1
             else:
                 raise ValueError(
                     "View must be one of: Sagittal, Coronal, or Axial")
 
             this_fname = tdir + f"/t{ii}.png"
-            if "plotly" in self.export("viz_backend").backend:
-                figure.update_layout(scene_camera=dict(
-                    projection=dict(type="orthographic"),
-                    up=view_up,
-                    eye=eye,
-                    center=dict(x=0, y=0, z=0)))
-                figure.write_image(this_fname)
+            if "plotly" in viz_backend.backend:
+                figure.update_layout(
+                    scene_camera=dict(
+                        projection=dict(type="orthographic"),
+                        up={"x": 0, "y": 0, "z": 1},
+                        eye=eye,
+                        center=dict(x=0, y=0, z=0)),
+                    showlegend=False)
+                figure.write_image(this_fname, scale=4)
 
                 # temporary fix for memory leak
                 import plotly.io as pio
@@ -290,7 +292,7 @@ class ParticipantAFQ(object):
                 figure.set_camera(
                     position=direc * data_shape,
                     focal_point=data_shape // 2,
-                    view_up=tuple(view_up.values()))
+                    view_up=(0, 0, 1))
                 figure.zoom(0.5)
                 window.snapshot(figure, fname=this_fname, size=(600, 600))
 
@@ -307,7 +309,7 @@ class ParticipantAFQ(object):
         for ii, bundle_name in enumerate(bundle_dict):
             this_img = Image.open(tdir + f"/t{ii}.png")
             try:
-                this_img_trimmed[ii] = trim(trim(this_img))
+                this_img_trimmed[ii] = trim(this_img)
             except IndexError:  # this_img is a picture of nothing
                 this_img_trimmed[ii] = this_img
 
@@ -341,8 +343,9 @@ class ParticipantAFQ(object):
             _ii = ii // size[0]
             y_pos = _ii % size[1]
             _ii = _ii // size[1]
+            this_img = this_img_trimmed[ii].resize((max_width, max_height))
             curr_img.paste(
-                this_img_trimmed[ii],
+                this_img,
                 (x_pos * max_width, y_pos * max_height))
 
         _save_file(curr_img)

@@ -549,6 +549,23 @@ class GroupAFQ(object):
 
     clobber = cmd_outputs  # alias for default of cmd_outputs
 
+    def make_all_participant_montages(self, images_per_row=2):
+        """
+        Generate montage of all bundles for a all subjects.
+
+        Parameters
+        ----------
+        images_per_row : int
+            Number of bundle images per row in output file.
+            Default: 2
+
+        Returns
+        -------
+        filename of montage images
+        """
+        for pAFQ in self.pAFQ_list:
+            pAFQ.participant_montage(images_per_row=images_per_row)
+
     def group_montage(self, bundle_name, size, view, direc, slice_pos=None):
         """
         Generate montage file(s) of a given bundle at a given angle.
