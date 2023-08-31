@@ -92,7 +92,7 @@ for roi_url in roi_urls:
 # Define custom `BundleDict` object
 # --------------------------------
 # The `BundleDict` object holds information about "include" and "exclude" ROIs,
-# as well as endpoint ROIS, and whether the bundle crosses the midline. In this
+# as well as endpoint ROIs, and whether the bundle crosses the midline. In this
 # case, the ROIs are all defined in the MNI template space that is used as the
 # default template space in pyAFQ, but, in principle, other template spaces
 # could be used. In this example, we provide paths to the ROIs to populate the BundleDict
