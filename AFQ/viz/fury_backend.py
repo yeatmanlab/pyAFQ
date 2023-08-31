@@ -37,12 +37,12 @@ def _inline_interact(scene, inline, interact):
 
 
 def visualize_bundles(sft, n_points=None, bundle_dict=None,
-                      bundle=None, colors=None, shade_by_volume=None,
-                      color_by_streamline=None,
-                      sbv_lims=[None, None], include_profiles=(None, None),
-                      flip_axes=[False, False, False], opacity=1.0,
+                      bundle=None, colors=None,
+                      color_by_direction=False,
+                      opacity=1.0,
+                      flip_axes=[False, False, False],
                       figure=None, background=(1, 1, 1), interact=False,
-                      inline=False):
+                      inline=False, **kwargs):
     """
     Visualize bundles in 3D using VTK.
     Parameters not described below are extras to conform fury and plotly APIs.
@@ -75,18 +75,12 @@ def visualize_bundles(sft, n_points=None, bundle_dict=None,
         with Tableau 20 RGB values if bundle_dict is None, or dict from
         bundles to Tableau 20 RGB values if bundle_dict is not None.
 
-    shade_by_volume : ndarray or str, optional
-        3d volume use to shade the bundles. If None, no shading
-        is performed. Only works when using the plotly backend.
-        Default: None
+    color_by_direction : bool
+        Whether to color by direction instead of by bundle. Default: False
 
-    sbv_lims : ndarray
-        Of the form (lower bound, upper bound). Shading based on
-        shade_by_volume will only differentiate values within these bounds.
-        If lower bound is None, will default to 0.
-        If upper bound is None, will default to the maximum value in
-        shade_by_volume.
-        Default: [None, None]
+    opacity : float
+        Float between 0 and 1 defining the opacity of the bundle.
+        Default: 1.0
 
     background : tuple, optional
         RGB values for the background. Default: (1, 1, 1), which is white
@@ -127,7 +121,10 @@ def visualize_bundles(sft, n_points=None, bundle_dict=None,
             if flip_axes[2]:
                 sl[:, 2] = dimensions[2] - sl[:, 2]
 
-        sl_actor = actor.line(sls, color)
+        if color_by_direction:
+            sl_actor = actor.line(sls, opacity=opacity)
+        else:
+            sl_actor = actor.line(sls, color, opacity=opacity)
         figure.add(sl_actor)
         sl_actor.GetProperty().SetRenderLinesAsTubes(1)
         sl_actor.GetProperty().SetLineWidth(6)

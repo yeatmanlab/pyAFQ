@@ -3,6 +3,13 @@ import os.path as op
 import os
 from time import time
 import logging
+from tqdm import tqdm
+import numpy as np
+import tempfile
+import math
+from matplotlib import font_manager
+
+from PIL import Image, ImageDraw, ImageFont
 
 from AFQ.definitions.mapping import SlrMap
 from AFQ.api.utils import (
@@ -15,6 +22,7 @@ from AFQ.tasks.tractography import get_tractography_plan
 from AFQ.tasks.segmentation import get_segmentation_plan
 from AFQ.tasks.viz import get_viz_plan
 from AFQ.utils.path import drop_extension, apply_cmd_to_afq_derivs
+from AFQ.viz.utils import BEST_BUNDLE_ORIENTATIONS, trim, get_eye
 
 
 __all__ = ["ParticipantAFQ"]
@@ -200,6 +208,133 @@ class ParticipantAFQ(object):
         export_all_helper(self, seg_algo, xforms, indiv, viz)
         self.logger.info(
             f"Time taken for export all: {time() - start_time}")
+
+    def participant_montage(self, images_per_row=2):
+        """
+        Generate montage of all bundles for a given subject.
+
+        Parameters
+        ----------
+        images_per_row : int
+            Number of bundle images per row in output file.
+            Default: 2
+
+        Returns
+        -------
+        filename of montage images
+        """
+        tdir = tempfile.gettempdir()
+
+        all_fnames = []
+        bundle_dict = self.export("bundle_dict")
+        self.logger.info("Generating Montage...")
+        viz_backend = self.export("viz_backend")
+        best_scalar = self.export(self.export("best_scalar"))
+        size = (images_per_row, math.ceil(len(bundle_dict) / images_per_row))
+        for ii, bundle_name in enumerate(tqdm(bundle_dict)):
+            flip_axes = [False, False, False]
+            for i in range(3):
+                flip_axes[i] = (self.export("dwi_affine")[i, i] < 0)
+
+            figure = viz_backend.visualize_volume(
+                best_scalar,
+                flip_axes=flip_axes,
+                interact=False,
+                inline=False)
+            figure = viz_backend.visualize_bundles(
+                self.export("bundles"),
+                shade_by_volume=best_scalar,
+                color_by_direction=True,
+                flip_axes=flip_axes,
+                bundle=bundle_name,
+                figure=figure,
+                interact=False,
+                inline=False)
+
+            view, direc = BEST_BUNDLE_ORIENTATIONS.get(
+                bundle_name, ("Axial", "Top"))
+            eye = get_eye(view, direc)
+
+            this_fname = tdir + f"/t{ii}.png"
+            if "plotly" in viz_backend.backend:
+                figure.update_layout(
+                    scene_camera=dict(
+                        projection=dict(type="orthographic"),
+                        up={"x": 0, "y": 0, "z": 1},
+                        eye=eye,
+                        center=dict(x=0, y=0, z=0)),
+                    showlegend=False)
+                figure.write_image(this_fname, scale=4)
+
+                # temporary fix for memory leak
+                import plotly.io as pio
+                pio.kaleido.scope._shutdown_kaleido()
+            else:
+                from dipy.viz import window
+                direc = np.fromiter(eye.values(), dtype=int)
+                data_shape = np.asarray(
+                    nib.load(self.export("b0")).get_fdata().shape)
+                figure.set_camera(
+                    position=direc * data_shape,
+                    focal_point=data_shape // 2,
+                    view_up=(0, 0, 1))
+                figure.zoom(0.5)
+                window.snapshot(figure, fname=this_fname, size=(600, 600))
+
+        def _save_file(curr_img):
+            save_path = op.abspath(op.join(
+                self.output_dir,
+                "bundle_montage.png"))
+            curr_img.save(save_path)
+            all_fnames.append(save_path)
+
+        this_img_trimmed = {}
+        max_height = 0
+        max_width = 0
+        for ii, bundle_name in enumerate(bundle_dict):
+            this_img = Image.open(tdir + f"/t{ii}.png")
+            try:
+                this_img_trimmed[ii] = trim(this_img)
+            except IndexError:  # this_img is a picture of nothing
+                this_img_trimmed[ii] = this_img
+
+            text_sz = 70
+            width, height = this_img_trimmed[ii].size
+            height = height + text_sz
+            result = Image.new(
+                this_img_trimmed[ii].mode, (width, height),
+                color=(255, 255, 255))
+            result.paste(this_img_trimmed[ii], (0, text_sz))
+            this_img_trimmed[ii] = result
+
+            draw = ImageDraw.Draw(this_img_trimmed[ii])
+            draw.text(
+                (0, 0), bundle_name, (0, 0, 0),
+                font=ImageFont.truetype(
+                    "Arial", text_sz))
+
+            if this_img_trimmed[ii].size[0] > max_width:
+                max_width = this_img_trimmed[ii].size[0]
+            if this_img_trimmed[ii].size[1] > max_height:
+                max_height = this_img_trimmed[ii].size[1]
+
+        curr_img = Image.new(
+            'RGB',
+            (max_width * size[0], max_height * size[1]),
+            color="white")
+
+        for ii in range(len(bundle_dict)):
+            x_pos = ii % size[0]
+            _ii = ii // size[0]
+            y_pos = _ii % size[1]
+            _ii = _ii // size[1]
+            this_img = this_img_trimmed[ii].resize((max_width, max_height))
+            curr_img.paste(
+                this_img,
+                (x_pos * max_width, y_pos * max_height))
+
+        _save_file(curr_img)
+        return all_fnames
 
     def cmd_outputs(self, cmd="rm", dependent_on=None, exceptions=[],
                     suffix=""):

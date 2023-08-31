@@ -229,7 +229,7 @@ def visualize_bundles(sft, n_points=None,
                       sbv_lims=[None, None], include_profiles=(None, None),
                       flip_axes=[False, False, False], opacity=1.0,
                       figure=None, background=(1, 1, 1), interact=False,
-                      inline=False):
+                      inline=False, **kwargs):
     """
     Visualize bundles in 3D
 
