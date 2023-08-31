@@ -171,7 +171,7 @@ my_afq = GroupAFQ(
     segmentation_params = {"parallel_segmentation": {"engine":"serial"}},
     bundle_info=bundles)
 
-# If you want to redo different stages you can use the clobber flag
+# If you want to redo different stages you can use the clobber method.
 # To redo everying related to bundle recognition set my_afq.clobber(dependent_on='recog'). 
 # This is useful when changing the bundles.
 # The options for dependent_on are 'track' (to start over from tractography) or 'recog'
