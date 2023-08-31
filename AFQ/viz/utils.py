@@ -98,7 +98,7 @@ BEST_BUNDLE_ORIENTATIONS = {
     "FA": "Axial",
     "IFO_L": "Sagittal", "IFO_R": "Sagittal",
     "ILF_L": "Sagittal", "ILF_R": "Sagittal",
-    "SLF_L": "Sagittal", "SLF_R": "Sagittal",
+    "SLF_L": "Axial", "SLF_R": "Axial",
     "UNC_L": "Axial", "UNC_R": "Axial",
     "ARC_L": "Sagittal", "ARC_R": "Sagittal",
     "VOF_L": "Coronal", "VOF_R": "Coronal",
