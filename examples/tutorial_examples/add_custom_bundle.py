@@ -83,7 +83,7 @@ template_dir = op.join(
     'AFQ_data/SLF_ROIs/')
 os.makedirs(template_dir, exist_ok=True)
 
-# Download the ROI files
+# Download the ROI files (the wget library functions like the `wget` unix command)
 for roi_url in roi_urls:
     wget.download(roi_url, template_dir)
 
