@@ -76,7 +76,7 @@ roi_urls = ['https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4
 # on ROIs that are saved to disk. We'll start off by donwloading some ROIs that are saved online
 
 # Define and create the directory for the template ROIs
-# op.expanduser("~") expands your ~ directory into the full string
+# op.expanduser("~") expands the user's home directory into the full path
 # and op.join joins these paths, to make ~/AFQ_data/SLF_ROIs/
 template_dir = op.join(
     op.expanduser("~"),
