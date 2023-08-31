@@ -51,16 +51,16 @@ _, study_dir = afd.fetch_hbn_preproc([
     'NDARMJ333WJM',
     'NDARJG687YYX',
     'NDARJA157YB3',
-            ])
+])
 
 #############################################################################
 # Get ROIs and save to disk
 # --------------------------------
 # The goal of this tutorial is to demostrate how to segment new pathways based
-# on ROIs that are saved to disk. In principle, ROIs can be a) files created by 
+# on ROIs that are saved to disk. In principle, ROIs can be a) files created by
 # the user and saved to the local disk, b) files stored somewhere on the internet
-# (as is the case here) or c) Files that are accessed with a fetcher. In this 
-# example we download these files from the MATLAB AFQ website, but this code could 
+# (as is the case here) or c) Files that are accessed with a fetcher. In this
+# example we download these files from the MATLAB AFQ website, but this code could
 # be commented out and paths could be used to local ROIs on disk
 
 roi_urls = ['https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/MFgL.nii.gz',
@@ -75,8 +75,8 @@ roi_urls = ['https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4
             'https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/SLFt_roi2_R.nii.gz']
 
 # We proceed to download the files. First, we define and create the directory
-# for the template ROIs. In the code below, ``op.expanduser("~")`` expands the 
-# user's home directory into the full path and ``op.join`` joins these paths, 
+# for the template ROIs. In the code below, ``op.expanduser("~")`` expands the
+# user's home directory into the full path and ``op.join`` joins these paths,
 # to make the path `~/AFQ_data/SLF_ROIs/`
 
 template_dir = op.join(
@@ -84,7 +84,7 @@ template_dir = op.join(
     'AFQ_data/SLF_ROIs/')
 os.makedirs(template_dir, exist_ok=True)
 
-# The `wget` Python library works like the `wget` unix command and downloads 
+# The `wget` Python library works like the `wget` unix command and downloads
 # each file into the directory created just above.
 
 for roi_url in roi_urls:
@@ -94,12 +94,12 @@ for roi_url in roi_urls:
 #############################################################################
 # Define custom `BundleDict` object
 # ---------------------------------
-# A `BundleDict` is a custom object that holds information about "include" and 
-# "exclude" ROIs, as well as endpoint ROIs, and whether the bundle crosses the 
+# A `BundleDict` is a custom object that holds information about "include" and
+# "exclude" ROIs, as well as endpoint ROIs, and whether the bundle crosses the
 # midline. In this case, the ROIs are all defined in the MNI template space that
-# is used as the default template space in pyAFQ, but, in principle, other 
-# template spaces could be used. In this example, we provide paths to the ROIs 
-# to populate the `BundleDict`, but we could also provide already-loaded nifti 
+# is used as the default template space in pyAFQ, but, in principle, other
+# template spaces could be used. In this example, we provide paths to the ROIs
+# to populate the `BundleDict`, but we could also provide already-loaded nifti
 # objects, as demonstrated in other examples.
 
 bundles = abd.BundleDict({
@@ -133,8 +133,8 @@ bundles = abd.BundleDict({
 })
 
 #############################################################################
-# Custom bundle definitions such as the SLF or OR, and the standard BundleDict 
-# can be combined through addition. To get both the SLF and the standard 
+# Custom bundle definitions such as the SLF or OR, and the standard BundleDict
+# can be combined through addition. To get both the SLF and the standard
 # bundles, we would execute the following code::
 #
 #     bundles = bundles + abd.BundleDict()
@@ -171,16 +171,16 @@ my_afq = GroupAFQ(
                      "seed_mask": RoiImage()},
     clean_params={"clean_rounds": 20,
                   "length_threshold": 4,
-                  "distance_threshold" : 2,
+                  "distance_threshold": 2,
                   },
-    segmentation_params = {"parallel_segmentation": {"engine":"serial"}},
+    segmentation_params={"parallel_segmentation": {"engine": "serial"}},
     bundle_info=bundles)
 
 # If you want to redo different stages you can use the `clobber` method.
-# The options for dependent_on are 'track' (to start over from tractography) 
-# or 'recog' to start over from bundle recognition. For example, to redo everying 
-# related  to bundle recognition: `my_afq.clobber(dependent_on='recog')`. 
-# This is useful when changing something about how the bundles are recognized. 
+# The options for dependent_on are 'track' (to start over from tractography)
+# or 'recog' to start over from bundle recognition. For example, to redo everying
+# related  to bundle recognition: `my_afq.clobber(dependent_on='recog')`.
+# This is useful when changing something about how the bundles are recognized.
 # For example, the cleaning parameters.
 
 my_afq.clobber(dependent_on='recog')
@@ -195,9 +195,12 @@ my_afq.export_all()
 # the first input refers to a key in the bundlediect and the second gives the layout
 # of the figure (eg. 3 rows 4 columns) and finally is the view.
 
-montage = my_afq.montage("L_SLF1", (3, 4), "Sagittal", "left", slice_pos=0.5)
-montage = my_afq.montage("L_SLF2", (3, 4), "Sagittal", "left", slice_pos=0.5)
-montage = my_afq.montage("L_SLF3", (3, 4), "Sagittal", "left", slice_pos=0.5)
+montage = my_afq.group_montage(
+    "L_SLF1", (3, 4), "Sagittal", "left", slice_pos=0.5)
+montage = my_afq.group_montage(
+    "L_SLF2", (3, 4), "Sagittal", "left", slice_pos=0.5)
+montage = my_afq.group_montage(
+    "L_SLF3", (3, 4), "Sagittal", "left", slice_pos=0.5)
 
 #############################################################################
 # Interactive bundle visualization

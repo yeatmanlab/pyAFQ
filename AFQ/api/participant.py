@@ -22,7 +22,7 @@ from AFQ.tasks.tractography import get_tractography_plan
 from AFQ.tasks.segmentation import get_segmentation_plan
 from AFQ.tasks.viz import get_viz_plan
 from AFQ.utils.path import drop_extension, apply_cmd_to_afq_derivs
-from AFQ.viz.utils import BEST_BUNDLE_ORIENTATIONS, trim
+from AFQ.viz.utils import BEST_BUNDLE_ORIENTATIONS, trim, get_eye
 
 
 __all__ = ["ParticipantAFQ"]
@@ -232,7 +232,6 @@ class ParticipantAFQ(object):
         best_scalar = self.export(self.export("best_scalar"))
         size = (images_per_row, math.ceil(len(bundle_dict) / images_per_row))
         for ii, bundle_name in enumerate(tqdm(bundle_dict)):
-            view = BEST_BUNDLE_ORIENTATIONS.get(bundle_name, "Axial")
             flip_axes = [False, False, False]
             for i in range(3):
                 flip_axes[i] = (self.export("dwi_affine")[i, i] < 0)
@@ -244,31 +243,20 @@ class ParticipantAFQ(object):
                 inline=False)
             figure = viz_backend.visualize_bundles(
                 self.export("bundles"),
+                shade_by_volume=best_scalar,
                 color_by_direction=True,
                 flip_axes=flip_axes,
                 bundle=bundle_name,
                 opacity=0.2,
                 figure=figure,
+                n_points=1000,
+                #colors=[(0.0, 0.0, 1.0)],
                 interact=False,
                 inline=False)
 
-            eye = {}
-            view_up = {}
-            if view == "Sagittal":
-                eye["x"] = 1
-                eye["y"] = 0
-                eye["z"] = 0
-            elif view == "Coronal":
-                eye["x"] = 0
-                eye["y"] = 1
-                eye["z"] = 0
-            elif view == "Axial":
-                eye["x"] = 0
-                eye["y"] = 0
-                eye["z"] = 1
-            else:
-                raise ValueError(
-                    "View must be one of: Sagittal, Coronal, or Axial")
+            view, direc = BEST_BUNDLE_ORIENTATIONS.get(
+                bundle_name, ("Axial", "Top"))
+            eye = get_eye(view, direc)
 
             this_fname = tdir + f"/t{ii}.png"
             if "plotly" in viz_backend.backend:

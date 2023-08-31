@@ -91,18 +91,58 @@ SCALAR_REMOVE_MODEL = \
 RECO_FLIP = ["IFO_L", "IFO_R", "UNC_L", "ILF_L", "ILF_R"]
 
 BEST_BUNDLE_ORIENTATIONS = {
-    "ATR_L": "Sagittal", "ATR_R": "Sagittal",
-    "CST_L": "Sagittal", "CST_R": "Sagittal",
-    "CGC_L": "Sagittal", "CGC_R": "Sagittal",
-    "FP": "Axial",
-    "FA": "Axial",
-    "IFO_L": "Sagittal", "IFO_R": "Sagittal",
-    "ILF_L": "Sagittal", "ILF_R": "Sagittal",
-    "SLF_L": "Axial", "SLF_R": "Axial",
-    "UNC_L": "Axial", "UNC_R": "Axial",
-    "ARC_L": "Sagittal", "ARC_R": "Sagittal",
-    "VOF_L": "Coronal", "VOF_R": "Coronal",
-    "pARC_L": "Coronal", "pARC_R": "Coronal"}
+    "ATR_L": ("Sagittal", "Left"), "ATR_R": ("Sagittal", "Right"),
+    "CST_L": ("Sagittal", "Left"), "CST_R": ("Sagittal", "Right"),
+    "CGC_L": ("Sagittal", "Left"), "CGC_R": ("Sagittal", "Right"),
+    "FP": ("Axial", "Top"), "FA": ("Axial", "Top"),
+    "IFO_L": ("Sagittal", "Left"), "IFO_R": ("Sagittal", "Right"),
+    "ILF_L": ("Sagittal", "Left"), "ILF_R": ("Sagittal", "Right"),
+    "SLF_L": ("Axial", "Top"), "SLF_R": ("Axial", "Top"),
+    "UNC_L": ("Axial", "Bottom"), "UNC_R": ("Axial", "Bottom"),
+    "ARC_L": ("Sagittal", "Left"), "ARC_R": ("Sagittal", "Right"),
+    "VOF_L": ("Coronal", "Back"), "VOF_R": ("Coronal", "Back"),
+    "pARC_L": ("Coronal", "Back"), "pARC_R": ("Coronal", "Back")}
+
+
+def get_eye(view, direc):
+    direc = direc.lower()
+    view = view.lower()
+
+    if view in ["sagital", "saggital"]:
+        viz_logger.warning("You don't know how to spell sagggitttal!")
+        view = "sagittal"
+
+    if view not in ["sagittal", "coronal", "axial"]:
+        raise ValueError(
+            "View must be one of: sagittal, coronal, or axial")
+
+    if direc not in ["left", "right", "top", "bottom", "front", "back"]:
+        raise ValueError(
+            "View must be one of: left, right, top, bottom, front, back")
+
+    eye = {}
+    if view == "sagittal":
+        if direc == "left":
+            eye["x"] = -1
+        else:
+            eye["x"] = 1
+        eye["y"] = 0
+        eye["z"] = 0
+    elif view == "coronal":
+        eye["x"] = 0
+        if direc == "front":
+            eye["y"] = 1
+        else:
+            eye["y"] = -1
+        eye["z"] = 0
+    elif view == "axial":
+        eye["x"] = 0
+        eye["y"] = 0
+        if direc == "top":
+            eye["z"] = 1
+        else:
+            eye["z"] = -1
+    return eye
 
 
 def display_string(scalar_name):

@@ -12,6 +12,7 @@ from AFQ.api.utils import (
     check_attribute, AFQclass_doc,
     export_all_helper, valid_exports_string)
 import AFQ.utils.streamlines as aus
+from AFQ.viz.utils import get_eye
 
 from dipy.utils.parallel import paramap
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
@@ -591,20 +592,6 @@ class GroupAFQ(object):
         -------
         list of filenames of montage images
         """
-        direc = direc.lower()
-        view = view.lower()
-        if view in ["sagital", "saggital"]:
-            self.logger.warning("You don't know how to spell sagggitttal!")
-            view = "sagittal"
-
-        if view not in ["sagittal", "coronal", "axial"]:
-            raise ValueError(
-                "View must be one of: sagittal, coronal, or axial")
-
-        if direc not in ["left", "right", "top", "bottom", "front", "back"]:
-            raise ValueError(
-                "View must be one of: left, right, top, bottom, front, back")
-
         tdir = tempfile.gettempdir()
 
         best_scalar = self.export("best_scalar", collapse=False)[
@@ -665,28 +652,7 @@ class GroupAFQ(object):
                 inline=False,
                 figure=figure)
 
-            eye = {}
-            if view == "sagittal":
-                if direc == "left":
-                    eye["x"] = -1
-                else:
-                    eye["x"] = 1
-                eye["y"] = 0
-                eye["z"] = 0
-            elif view == "Coronal":
-                eye["x"] = 0
-                if direc == "front":
-                    eye["y"] = 1
-                else:
-                    eye["y"] = -1
-                eye["z"] = 0
-            elif view == "axial":
-                eye["x"] = 0
-                eye["y"] = 0
-                if direc == "top":
-                    eye["z"] = 1
-                else:
-                    eye["z"] = -1
+            eye = get_eye(view, direc)
 
             this_fname = tdir + f"/t{ii}.png"
             if "plotly" in viz_backend.backend:
