@@ -247,10 +247,7 @@ class ParticipantAFQ(object):
                 color_by_direction=True,
                 flip_axes=flip_axes,
                 bundle=bundle_name,
-                opacity=0.2,
                 figure=figure,
-                n_points=1000,
-                #colors=[(0.0, 0.0, 1.0)],
                 interact=False,
                 inline=False)
 
