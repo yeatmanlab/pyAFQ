@@ -549,7 +549,7 @@ class GroupAFQ(object):
 
     clobber = cmd_outputs  # alias for default of cmd_outputs
 
-    def montage(self, bundle_name, size, view, slice_pos=None):
+    def montage(self, bundle_name, size, view, direc, slice_pos=None):
         """
         Generate montage file(s) of a given bundle at a given angle.
 
@@ -561,7 +561,10 @@ class GroupAFQ(object):
         size : tuple of int
             The number of columns and rows for each file.
         view : str
-            Which view to display. Can be one of Sagittal, Coronal, or Axial.
+            Which view to display. Can be one of sagittal, coronal, or axial.
+        direc : str
+            Which direction to views. Can be one of left, right, top, bottom, 
+            front, back
         slice_pos : float, or None
             If float, indicates the fractional position along the
             perpendicular axis to the slice. Currently only works with plotly.
@@ -571,9 +574,19 @@ class GroupAFQ(object):
         -------
         list of filenames of montage images
         """
-        if view not in ["Sagittal", "Coronal", "Axial"]:
+        direc = direc.lower()
+        view = view.lower()
+        if view in ["sagital", "saggital"]:
+            self.logger.warning("You don't know how to spell sagggitttal!")
+            view = "sagittal"
+
+        if view not in ["sagittal", "coronal", "axial"]:
             raise ValueError(
-                "View must be one of: Sagittal, Coronal, or Axial")
+                "View must be one of: sagittal, coronal, or axial")
+
+        if direc not in ["left", "right", "top", "bottom", "front", "back"]:
+            raise ValueError(
+                "View must be one of: left, right, top, bottom, front, back")
 
         tdir = tempfile.gettempdir()
 
@@ -603,21 +616,22 @@ class GroupAFQ(object):
 
             if slice_pos is not None:
                 slice_kwargs = {}
-                if view == "Sagittal":
+                if view == "sagittal":
                     slice_kwargs["x_pos"] = slice_pos
                     slice_kwargs["y_pos"] = None
                     slice_kwargs["z_pos"] = None
-                elif view == "Coronal":
+                elif view == "coronal":
                     slice_kwargs["x_pos"] = None
                     slice_kwargs["y_pos"] = slice_pos
                     slice_kwargs["z_pos"] = None
-                elif view == "Axial":
+                elif view == "axial":
                     slice_kwargs["x_pos"] = None
                     slice_kwargs["y_pos"] = None
                     slice_kwargs["z_pos"] = slice_pos
 
                 figure = viz_backend.visualize_volume(
-                    b0,
+                    best_scalar,
+                    opacity=1.0,
                     flip_axes=flip_axes,
                     interact=False,
                     inline=False,
@@ -635,35 +649,34 @@ class GroupAFQ(object):
                 figure=figure)
 
             eye = {}
-            view_up = {}
-            if view == "Sagittal":
-                eye["x"] = 1
+            if view == "sagittal":
+                if direc == "left":
+                    eye["x"] = -1
+                else:
+                    eye["x"] = 1
                 eye["y"] = 0
                 eye["z"] = 0
-                view_up["x"] = 0
-                view_up["y"] = 1
-                view_up["z"] = 0
-            elif view == "Coronal":
+            elif view == "coronal":
                 eye["x"] = 0
-                eye["y"] = 1
+                if direc == "front":
+                    eye["y"] = 1
+                else:
+                    eye["y"] = -1
                 eye["z"] = 0
-                view_up["x"] = 0
-                view_up["y"] = 0
-                view_up["z"] = 1
-            elif view == "Axial":
+            elif view == "axial":
                 eye["x"] = 0
                 eye["y"] = 0
-                eye["z"] = 1
-                view_up["x"] = 1
-                view_up["y"] = 0
-                view_up["z"] = 0
+                if direc == "top":
+                    eye["z"] = 1
+                else:
+                    eye["z"] = -1
 
             this_fname = tdir + f"/t{ii}.png"
             if "plotly" in viz_backend.backend:
 
                 figure.update_layout(scene_camera=dict(
                     projection=dict(type="orthographic"),
-                    up=view_up,
+                    up={"x": 0, "y": 0, "z": 1},
                     eye=eye,
                     center=dict(x=0, y=0, z=0)))
                 figure.write_image(this_fname)
@@ -678,7 +691,7 @@ class GroupAFQ(object):
                 figure.set_camera(
                     position=direc * data_shape,
                     focal_point=data_shape // 2,
-                    view_up=tuple(view_up.values()))
+                    view_up=(0, 0, 1))
                 figure.zoom(0.5)
                 window.snapshot(figure, fname=this_fname, size=(600, 600))
 

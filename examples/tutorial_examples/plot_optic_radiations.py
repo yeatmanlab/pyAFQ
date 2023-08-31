@@ -1,7 +1,7 @@
 """
-=============================
-Plotting the Optic Radiations
-=============================
+========================================================
+Adding new bundles into pyAFQ (Optic Radiations Example)
+========================================================
 
 pyAFQ is designed to be customizable and extensible. This example shows how you
 can customize it to define a new bundle based on a definition of waypoint and
@@ -52,8 +52,8 @@ study_dir = afd.fetch_hbn_preproc(["NDARAA948VFH"])[1]
 # default template space in pyAFQ, but, in principle, other template spaces
 # could be used.
 #
-# The ROIs for the case can be downloaded using a custom fetcher and then read
-# into a dict as follows:
+# The ROIs for the case can be downloaded using a custom fetcher which saves
+# the ROIs to a folder and creates a dictionary of paths to the ROIs:
 
 or_rois = afd.read_or_templates()
 
@@ -145,7 +145,7 @@ my_afq.export_all()
 #   necessary to do this when running this type of analysis.
 
 my_afq.combine_bundle("L_OR")
-montage = my_afq.montage("L_OR", (1, 1), "Axial")
+montage = my_afq.montage("L_OR", (1, 1), "Axial", "left")
 shutil.copy(montage[0], op.split(montage[0])[-1])
 
 #############################################################################
