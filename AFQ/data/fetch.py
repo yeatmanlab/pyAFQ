@@ -735,6 +735,98 @@ def read_templates(as_img=True, resample_to=False):
     return template_dict
 
 
+cp_fnames = [
+    "ICP_L_inferior_prob.nii.gz",
+    "ICP_L_superior_prob.nii.gz",
+    "ICP_R_inferior_prob.nii.gz",
+    "ICP_R_superior_prob.nii.gz",
+    "MCP_L_inferior_prob.nii.gz",
+    "MCP_L_superior_prob.nii.gz",
+    "MCP_R_inferior_prob.nii.gz",
+    "MCP_R_superior_prob.nii.gz",
+    "SCP_L_inferior_prob.nii.gz",
+    "SCP_L_inter_prob.nii.gz",
+    "SCP_L_superior_prob.nii.gz",
+    "SCP_R_inferior_prob.nii.gz",
+    "SCP_R_inter_prob.nii.gz",
+    "SCP_R_superior_prob.nii.gz"]
+
+cp_remote_fnames = [
+    "40897772",
+    "40897787",
+    "40897805",
+    "40897769",
+    "40897778",
+    "40897799",
+    "40897784",
+    "40897808",
+    "40897772",
+    "40897781",
+    "40897793",
+    "40897790",
+    "40897775",
+    "40897796"]
+
+cp_md5_hashes = [
+    "7ec3a78f30aefe8c7e2a99773941b8f4",
+    "fc6b088f359201aff480d8e2f7b17eef",
+    "e9688ff4554b768f79a64731705107f9",
+    "f1959600d6aaae58d7ba4ce5e63c5e3b",
+    "e68c669d58bd2cbb3490bd952957009e",
+    "eb7643fd54f6046cd71b7ac085679594",
+    "746da79d0639630c1eb872b2895814ee",
+    "3f69b20a8a7dec4839cef461667d18a5",
+    "4d95b3d3804352eae6e66fe024f1baf5",
+    "a9410ab5fe3240cc8ef929062d54cc9e",
+    "531babda0dd284bda4a5b4b1303f8266",
+    "dde4907d7914dfe71ed07436b073bd75",
+    "c02f2fcb48c33fe4b2988087075e9566",
+    "62e32e090cd326790c3fdbc6acb8eb75"]
+
+fetch_cp_templates = _make_reusable_fetcher(
+    "fetch_cb_templates",
+    op.join(afq_home,
+            'cp_templates'),
+    baseurl, cp_remote_fnames,
+    cp_fnames,
+    md5_list=cp_md5_hashes,
+    doc="Download AFQ cerebellar penducles templates")
+
+
+def read_cp_templates(as_img=True, resample_to=False):
+    """Load AFQ Cerebellar penducles templates from file
+
+    Parameters
+    ----------
+    as_img : bool, optional
+        If True, values are `Nifti1Image`. Otherwise, values are
+        paths to Nifti files. Default: True
+    resample_to : str or nibabel image class instance, optional
+        A template image to resample to. Typically, this should be the
+        template to which individual-level data are registered. Defaults to
+        the MNI template. Default: False
+
+    Returns
+    -------
+    dict with: keys: names of template ROIs and values: nibabel Nifti1Image
+    objects from each of the ROI nifti files.
+    """
+    logger = logging.getLogger('AFQ')
+
+    logger.debug('loading or templates')
+    tic = time.perf_counter()
+
+    template_dict = _fetcher_to_template(
+        fetch_cp_templates,
+        as_img=as_img,
+        resample_to=resample_to)
+
+    toc = time.perf_counter()
+    logger.debug(f'Cerebellar peduncles templates loaded in {toc - tic:0.4f} seconds')
+
+    return template_dict
+
+
 or_fnames = [
     "left_thal_MNI.nii.gz",
     "left_V1_MNI.nii.gz",
