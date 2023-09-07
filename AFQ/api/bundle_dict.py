@@ -664,6 +664,25 @@ class BundleDict(MutableMapping):
             resample_subject_to=self.resample_subject_to,
             keep_in_memory=self.keep_in_memory)
 
+    def sub(self, bundle_names):
+        """
+        Generates a copy of this BundleDict with only the bundle names
+        from the list
+        """
+        new_bd = {}
+        for b_name in bundle_names:
+            if b_name in self._dict:
+                new_bd[b_name] = self._dict[b_name]
+            else:
+                raise ValueError(f"{b_name} is not in this BundleDict")
+
+        return self.__class__(
+            new_bd,
+            seg_algo=self.seg_algo,
+            resample_to=self.resample_to,
+            resample_subject_to=self.resample_subject_to,
+            keep_in_memory=self.keep_in_memory)
+
     def apply_to_rois(self, b_name, func, *args,
                       dry_run=False,
                       **kwargs):

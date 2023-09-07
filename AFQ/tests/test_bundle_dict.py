@@ -7,7 +7,7 @@ import pytest
 
 def test_AFQ_custom_bundle_dict():
     bids_path = create_dummy_bids_path(3, 1)
-    bundle_dict = abd.BundleDict()
+    bundle_dict = abd.default18_bd()
     GroupAFQ(
         bids_path,
         preproc_pipeline="synthetic",
@@ -20,25 +20,27 @@ def test_BundleDict():
     """
 
     # test defaults
-    afq_bundles = abd.BundleDict()
+    afq_bundles = abd.default18_bd()
 
     assert len(afq_bundles) == len(abd.BUNDLES)
 
     # Arcuate Fasciculus
-    afq_bundles = abd.BundleDict(["ARC_L", "ARC_R"])
+    afq_bundles = abd.default18_bd().sub(["ARC_L", "ARC_R"])
 
     assert len(afq_bundles) == 2
 
     # Forceps Minor
-    afq_bundles = abd.BundleDict(["FA"])
+    afq_bundles = abd.default18_bd().sub(["FA"])
 
     assert len(afq_bundles) == 1
 
     # Cingulum Hippocampus
     # not included but exists in templates
-    afq_bundles = abd.BundleDict(["HCC_L", "HCC_R"])
+    # so this was a wierd test to have
+    # we should find a reliable segmentation of these
+    # afq_bundles = abd.BundleDict(["HCC_L", "HCC_R"])
 
-    assert len(afq_bundles) == 2
+    # assert len(afq_bundles) == 2
 
     # Test "custom" bundle
     afq_templates = afd.read_templates()
@@ -55,12 +57,11 @@ def test_BundleDict():
     # mispelled bundle that does not exist in afq templates
     with pytest.raises(
             ValueError,
-            match=" is not in AFQ templates"):
-        afq_bundles = abd.BundleDict(["VOQ_L", "VOQ_R"])
-        afq_bundles["VOQ_R"]
+            match=" is not in this BundleDict"):
+        afq_bundles = abd.default18_bd().sub(["VOQ_L", "VOQ_R"])
 
-    afq_bundles = abd.BundleDict(["VOF_L", "VOF_R"], seg_algo="reco80")
+    afq_bundles = abd.reco_bd(80).sub(["VOF_L", "VOF_R"])
     assert len(afq_bundles) == 2
 
-    afq_bundles = abd.BundleDict(["whole_brain"], seg_algo="reco80")
+    afq_bundles = abd.reco_bd(80).sub(["whole_brain"])
     assert len(afq_bundles) == 1

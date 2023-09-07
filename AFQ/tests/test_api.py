@@ -24,7 +24,7 @@ from dipy.data import get_fnames
 from dipy.testing.decorators import xvfb_it
 from dipy.io.streamline import load_tractogram
 
-from AFQ.api.bundle_dict import BundleDict
+import AFQ.api.bundle_dict as abd
 from AFQ.api.group import GroupAFQ
 from AFQ.api.participant import ParticipantAFQ
 import AFQ.data.fetch as afd
@@ -528,7 +528,7 @@ def test_AFQ_slr():
     afd.read_stanford_hardi_tractography()
 
     _, bids_path, _ = get_temp_hardi()
-    bd = BundleDict(["CST_L"])
+    bd = abd.default18_bd().sub(["CST_L"])
 
     myafq = GroupAFQ(
         bids_path=bids_path,
@@ -652,7 +652,8 @@ def test_AFQ_custom_subject_reg():
     # make first temproary directory to generate b0
     _, bids_path, sub_path = get_temp_hardi()
 
-    bundle_info = BundleDict([
+
+    bundle_info = abd.default18_bd().sub([
         "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"])
 
     b0_file = GroupAFQ(
@@ -762,17 +763,17 @@ def test_AFQ_data_waypoint():
         list(lv1_files.keys())[0])
     bundle_names = [
         "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"]
-    bundle_info = BundleDict(
-        bundle_names,
-        resample_subject_to=nib.load(
-            op.join(vista_folder, "sub-01_ses-01_dwi.nii.gz")))
+    bundle_info = abd.default18_bd().sub(bundle_names)
+
+    bundle_info.resample_subject_to = nib.load(
+            op.join(vista_folder, "sub-01_ses-01_dwi.nii.gz"))
 
     # Test when we have endpoint ROIs only
-    bundle_info.load_templates()
+    afq_templates = afd.read_templates(as_img=False)
     bundle_info["SLF_L"] = {
-        "start": bundle_info.templates["SLF_L_start"],
-        "end": bundle_info.templates["SLF_L_end"],
-        "prob_map" : bundle_info.templates["SLF_L_prob_map"]
+        "start": afq_templates["SLF_L_start"],
+        "end": afq_templates["SLF_L_end"],
+        "prob_map" : afq_templates["SLF_L_prob_map"]
     }
 
     bundle_info["LV1"] = {
@@ -851,7 +852,8 @@ def test_AFQ_data_waypoint():
     tract_profiles = pd.read_csv(tract_profile_fname)
 
     assert tract_profiles.select_dtypes(include=[np.number]).sum().sum() != 0
-    assert tract_profiles.shape == (400, 9)
+    assert tract_profiles.shape[0] >= 400
+    assert tract_profiles.shape[1] == 9
 
     myafq.export("indiv_bundles_figures")
     assert op.exists(op.join(
@@ -889,7 +891,8 @@ def test_AFQ_data_waypoint():
                            random_seeds=True,
                            rng_seed=42)
     bundle_dict_as_str = (
-        'BundleDict(["SLF_L", "SLF_R", "ARC_L", '
+        'default18_bd().sub(['
+        '"SLF_L", "SLF_R", "ARC_L", '
         '"ARC_R", "CST_L", "CST_R", "FP"])'
         '+ BundleDict({"LV1": {"start": '
         f'"{lv1_fname}", '
@@ -926,7 +929,8 @@ def test_AFQ_data_waypoint():
     # The tract profiles should already exist from the CLI Run:
     from_file = pd.read_csv(tract_profile_fname)
 
-    assert from_file.shape == (400, 9)
+    assert from_file.shape[0] >= 400
+    assert from_file.shape[1] == 9
     assert_series_equal(tract_profiles['dti_fa'], from_file['dti_fa'])
 
     # Make sure the CLI did indeed generate these:

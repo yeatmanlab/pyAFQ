@@ -59,7 +59,7 @@ brain_mask_definition = ImageFile(
              'scope': 'qsiprep'})
 
 bundle_names = ["ARC_L", "ARC_R"]
-bundle_dict = abd.BundleDict(bundle_names)
+bundle_dict = abd.default18_bd().sub(bundle_names)
 
 myafq = GroupAFQ(
     bids_path=study_dir,
