@@ -139,7 +139,6 @@ def as_file(suffix, include_track=False, include_seg=False):
                       or op.exists(this_file + ".trk")
                       or op.exists(this_file + ".trx"))
             if not exists:
-                is_trx = False
                 gen, meta = func(*args[:og_arg_count], **kwargs)
 
                 logger.info(f"Saving {this_file}")
@@ -152,19 +151,17 @@ def as_file(suffix, include_track=False, include_seg=False):
                 elif isinstance(gen, np.ndarray):
                     np.save(this_file, gen)
                 elif isinstance(gen, TrxFile):
-                    is_trx = True
                     this_file = this_file + ".trx"
                     save_trx(gen, this_file)
                 else:
                     gen.to_csv(this_file)
 
+                # these are used to determine dependencies
+                # when clobbering derivatives
                 if include_seg:
                     meta["dependent"] = "rec"
                 elif include_track:
-                    if is_trx:
-                        meta["dependent"] = "trx"
-                    else:
-                        meta["dependent"] = "trk"
+                    meta["dependent"] = "trk"
                 else:
                     meta["dependent"] = "dwi"
 

@@ -85,7 +85,7 @@ def segment(dwi, data_imap, mapping_imap,
         raise ValueError("Fatal: No bundles recognized.")
 
     if is_trx:
-        seg_sft.sft.dtype_dict = {'positions': np.float32,
+        seg_sft.sft.dtype_dict = {'positions': np.float16,
                                   'offsets': np.uint32}
         tgram = TrxFile.from_sft(seg_sft.sft)
         tgram.groups = seg_sft.bundle_idxs
@@ -119,8 +119,6 @@ def export_bundles(base_fname, results_dir,
     if is_trx:
         raise ValueError(
             "Cannot export individual bundles when using trx format")
-    else:
-        bundles = bundles + ".trk"
 
     bundles_dir = op.join(results_dir, "bundles")
     os.makedirs(bundles_dir, exist_ok=True)

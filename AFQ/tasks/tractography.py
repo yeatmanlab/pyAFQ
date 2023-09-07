@@ -206,7 +206,7 @@ def custom_tractography(bids_info, import_tract=None):
 
 
 @pimms.calc("streamlines")
-@as_file('_tractography.trk', include_track=True)
+@as_file('_tractography', include_track=True)
 def gpu_tractography(data_imap, tracking_params, seed, stop,
                      tractography_ngpus=0):
     """
