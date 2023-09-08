@@ -62,11 +62,11 @@ def apply_cmd_to_afq_derivs(
 
     for filename in os.listdir(derivs_dir):
         full_path = os.path.join(derivs_dir, filename)
-        if (full_path in exception_file_names)\
-                or (not full_path.startswith(base_fname))\
-                or filename.endswith("json"):
-            continue
         if os.path.isfile(full_path) or os.path.islink(full_path):
+            if (full_path in exception_file_names)\
+                    or (not full_path.startswith(base_fname))\
+                    or filename.endswith("json"):
+                continue
             sidecar_file = f'{drop_extension(full_path)}.json'
             if op.exists(sidecar_file):
                 sidecar_info = read_json(sidecar_file)
