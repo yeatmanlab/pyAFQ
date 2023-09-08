@@ -183,7 +183,7 @@ compliant data.
 
  .. code-block:: none
 
-    /opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/bids/layout/validation.py:122: UserWarning:
+    /opt/hostedtoolcache/Python/3.9.18/x64/lib/python3.9/site-packages/bids/layout/validation.py:122: UserWarning:
 
     The PipelineDescription field was superseded by GeneratedBy in BIDS 1.4.0. You can use ``pybids upgrade`` to update your derivative dataset.
 
@@ -335,8 +335,8 @@ To make this plots, it is required that you install with
 
  .. code-block:: none
 
-      0%|          | 0/21 [00:00<?, ?it/s]     19%|█▉        | 4/21 [00:00<00:00, 36.01it/s]     38%|███▊      | 8/21 [00:00<00:00, 37.28it/s]     57%|█████▋    | 12/21 [00:00<00:00, 38.05it/s]     76%|███████▌  | 16/21 [00:00<00:00, 38.16it/s]     95%|█████████▌| 20/21 [00:01<00:00, 11.34it/s]    100%|██████████| 21/21 [00:01<00:00, 14.29it/s]
-      0%|          | 0/21 [00:00<?, ?it/s]     19%|█▉        | 4/21 [00:00<00:00, 38.48it/s]     38%|███▊      | 8/21 [00:00<00:00, 39.32it/s]     57%|█████▋    | 12/21 [00:00<00:00, 39.38it/s]     76%|███████▌  | 16/21 [00:00<00:00, 39.32it/s]     95%|█████████▌| 20/21 [00:01<00:00, 11.22it/s]    100%|██████████| 21/21 [00:01<00:00, 14.21it/s]
+      0%|          | 0/21 [00:00<?, ?it/s]     14%|█▍        | 3/21 [00:00<00:00, 28.59it/s]     33%|███▎      | 7/21 [00:00<00:00, 31.77it/s]     52%|█████▏    | 11/21 [00:00<00:00, 33.07it/s]     71%|███████▏  | 15/21 [00:00<00:00, 33.63it/s]     90%|█████████ | 19/21 [00:01<00:00, 12.82it/s]    100%|██████████| 21/21 [00:01<00:00, 12.39it/s]
+      0%|          | 0/21 [00:00<?, ?it/s]     19%|█▉        | 4/21 [00:00<00:00, 34.60it/s]     38%|███▊      | 8/21 [00:00<00:00, 35.14it/s]     57%|█████▋    | 12/21 [00:00<00:00, 35.49it/s]     76%|███████▌  | 16/21 [00:00<00:00, 35.31it/s]     95%|█████████▌| 20/21 [00:01<00:00, 10.06it/s]    100%|██████████| 21/21 [00:01<00:00, 12.79it/s]
 
 
 
@@ -377,9 +377,9 @@ every bundle is found with a reasonable amount of streamlines.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (5 minutes 42.713 seconds)
+   **Total running time of the script:** (6 minutes 23.708 seconds)
 
-**Estimated memory usage:**  2754 MB
+**Estimated memory usage:**  2568 MB
 
 
 .. _sphx_glr_download_tutorials_tutorial_examples_plot_afq_api.py:

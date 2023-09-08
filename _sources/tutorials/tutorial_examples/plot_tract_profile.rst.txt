@@ -458,9 +458,9 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (14 minutes 26.119 seconds)
+   **Total running time of the script:** (15 minutes 20.599 seconds)
 
-**Estimated memory usage:**  4833 MB
+**Estimated memory usage:**  4609 MB
 
 
 .. _sphx_glr_download_tutorials_tutorial_examples_plot_tract_profile.py:

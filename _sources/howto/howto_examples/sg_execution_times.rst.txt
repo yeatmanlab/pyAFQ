@@ -6,18 +6,18 @@
 
 Computation times
 =================
-**75:27.244** total execution time for **howto_howto_examples** files:
+**79:41.538** total execution time for **howto_howto_examples** files:
 
 +----------------------------------------------------------------------------------------------------------+-----------+-----------+
-| :ref:`sphx_glr_howto_howto_examples_plot_afq_fwdti.py` (``plot_afq_fwdti.py``)                           | 26:44.340 | 4343.0 MB |
+| :ref:`sphx_glr_howto_howto_examples_plot_afq_fwdti.py` (``plot_afq_fwdti.py``)                           | 28:13.586 | 4208.4 MB |
 +----------------------------------------------------------------------------------------------------------+-----------+-----------+
-| :ref:`sphx_glr_howto_howto_examples_plot_afq_callosal.py` (``plot_afq_callosal.py``)                     | 17:38.324 | 3193.5 MB |
+| :ref:`sphx_glr_howto_howto_examples_plot_afq_callosal.py` (``plot_afq_callosal.py``)                     | 18:38.331 | 3200.8 MB |
 +----------------------------------------------------------------------------------------------------------+-----------+-----------+
-| :ref:`sphx_glr_howto_howto_examples_plot_recobundles.py` (``plot_recobundles.py``)                       | 15:45.213 | 4852.1 MB |
+| :ref:`sphx_glr_howto_howto_examples_plot_recobundles.py` (``plot_recobundles.py``)                       | 16:45.952 | 4785.2 MB |
 +----------------------------------------------------------------------------------------------------------+-----------+-----------+
-| :ref:`sphx_glr_howto_howto_examples_plot_callosal_tract_profile.py` (``plot_callosal_tract_profile.py``) | 14:18.309 | 4603.8 MB |
+| :ref:`sphx_glr_howto_howto_examples_plot_callosal_tract_profile.py` (``plot_callosal_tract_profile.py``) | 15:01.752 | 4500.5 MB |
 +----------------------------------------------------------------------------------------------------------+-----------+-----------+
-| :ref:`sphx_glr_howto_howto_examples_plot_viz.py` (``plot_viz.py``)                                       | 01:01.058 | 1055.8 MB |
+| :ref:`sphx_glr_howto_howto_examples_plot_viz.py` (``plot_viz.py``)                                       | 01:01.917 | 1084.8 MB |
 +----------------------------------------------------------------------------------------------------------+-----------+-----------+
 | :ref:`sphx_glr_howto_howto_examples_cerebellar_peduncles.py` (``cerebellar_peduncles.py``)               | 00:00.000 | 0.0 MB    |
 +----------------------------------------------------------------------------------------------------------+-----------+-----------+

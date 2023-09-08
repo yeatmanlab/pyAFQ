@@ -119,7 +119,7 @@ segmentation step.
 
  .. code-block:: none
 
-    /opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/bids/layout/validation.py:122: UserWarning:
+    /opt/hostedtoolcache/Python/3.9.18/x64/lib/python3.9/site-packages/bids/layout/validation.py:122: UserWarning:
 
     The PipelineDescription field was superseded by GeneratedBy in BIDS 1.4.0. You can use ``pybids upgrade`` to update your derivative dataset.
 
@@ -154,9 +154,9 @@ new browser window.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (14 minutes 40.146 seconds)
+   **Total running time of the script:** (13 minutes 41.682 seconds)
 
-**Estimated memory usage:**  3296 MB
+**Estimated memory usage:**  3155 MB
 
 
 .. _sphx_glr_download_tutorials_tutorial_examples_plot_afq_reco80.py:

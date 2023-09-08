@@ -762,11 +762,11 @@ contains the following keys:
     Assigning Streamlines to Bundles
     Finding Streamlines for AntFrontal
     Filtering by Cross Mid.
-    After filtering by Cross Mid. (time: 0.0005049705505371094s), 211 streamlines remain.
+    After filtering by Cross Mid. (time: 0.0011203289031982422s), 211 streamlines remain.
     Filtering by include
-    After filtering by include (time: 2.865355968475342s), 126 streamlines remain.
+    After filtering by include (time: 4.88866925239563s), 126 streamlines remain.
     Filtering by Mahalanobis
-    After filtering by Mahalanobis (time: 0.09717893600463867s), 76 streamlines remain.
+    After filtering by Mahalanobis (time: 0.11053657531738281s), 76 streamlines remain.
     Re-orienting streamlines to consistent directions
     Processing AntFrontal
 
@@ -951,9 +951,9 @@ References:
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (14 minutes 18.309 seconds)
+   **Total running time of the script:** (15 minutes 1.752 seconds)
 
-**Estimated memory usage:**  4604 MB
+**Estimated memory usage:**  4500 MB
 
 
 .. _sphx_glr_download_howto_howto_examples_plot_callosal_tract_profile.py:
