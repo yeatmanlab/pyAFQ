@@ -1,0 +1,825 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The pyAFQ API methods &#8212; AFQ 1.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/methods';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Usage tracking with Google Analytics" href="tracking.html" />
+    <link rel="prev" title="The pyAFQ API optional arguments" href="kwargs.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../howto/index.html">
+                        How To
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../tutorials/index.html">
+                        Tutorials
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../explanations/index.html">
+                        Explanations
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        Reference Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../howto/index.html">
+                        How To
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../tutorials/index.html">
+                        Tutorials
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../explanations/index.html">
+                        Explanations
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        Reference Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="api/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="api/AFQ/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/AFQ/api/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/api/bundle_dict/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.bundle_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/api/group/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.group</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/api/participant/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.participant</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/api/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.utils</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/AFQ/data/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/data/fetch/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data.fetch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/data/s3bids/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data.s3bids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/data/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data.utils</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/AFQ/definitions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/definitions/image/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.image</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/definitions/mapping/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.mapping</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/definitions/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.utils</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/AFQ/models/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/models/QBallTP/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.QBallTP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/models/csd/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.csd</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/models/dki/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.dki</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/models/dti/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.dti</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/models/fwdti/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.fwdti</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/AFQ/tasks/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/tasks/data/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/tasks/decorators/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.decorators</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/tasks/mapping/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.mapping</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/tasks/segmentation/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.segmentation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/tasks/tractography/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.tractography</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/tasks/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.utils</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/tasks/viz/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.viz</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/AFQ/tractography/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/tractography/gputractography/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography.gputractography</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/tractography/tractography/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography.tractography</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/AFQ/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/utils/bin/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.bin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/utils/docs/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.docs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/utils/models/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/utils/path/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/utils/stats/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.stats</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/utils/streamlines/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.streamlines</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/utils/volume/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.volume</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/AFQ/viz/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/viz/fury_backend/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.fury_backend</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/viz/plot/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.plot</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/viz/plotly_backend/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.plotly_backend</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/viz/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.utils</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/AFQ/registration/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.registration</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AFQ/segmentation/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.segmentation</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bundledict.html">Defining Custom Bundle Dictionaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kwargs.html">The pyAFQ API optional arguments</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">The pyAFQ API methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tracking.html">Usage tracking with Google Analytics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="viz_backend.html">Visualization Backends</a></li>
+
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Reference Documentation</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">The pyAFQ API methods</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <div class="section" id="the-pyafq-api-methods">
+<span id="methods-docs"></span><h1>The pyAFQ API methods<a class="headerlink" href="#the-pyafq-api-methods" title="Permalink to this heading">#</a></h1>
+<p>After defining your pyAFQ API object, you can ask for the output of
+any step of the pipeline. It is common for users to just call export_all
+(for example, <cite>myafq.export_all()</cite>). However, if the user only wants the
+tractography, the user can instead call <cite>myafq.export(“streamlines”)</cite>. Here
+is a list of all of pyAFQ’s possible outputs:</p>
+<dl class="simple">
+<dt>data:</dt><dd><p>DWI data as an ndarray for selected b values</p>
+</dd>
+<dt>gtab:</dt><dd><p>A DIPY GradientTable with all the gradient information</p>
+</dd>
+<dt>img:</dt><dd><p>unaltered DWI data in a Nifti1Image.</p>
+</dd>
+<dt>b0:</dt><dd><p>full path to a nifti file containing the mean b0</p>
+</dd>
+<dt>masked_b0:</dt><dd><p>full path to a nifti file containing the mean b0 after applying the brain mask</p>
+</dd>
+<dt>dti_tf:</dt><dd><p>DTI TensorFit object</p>
+</dd>
+<dt>dti_params:</dt><dd><p>full path to a nifti file containing parameters for the DTI fit</p>
+</dd>
+<dt>fwdti_tf:</dt><dd><p>Free-water DTI TensorFit object</p>
+</dd>
+<dt>fwdti_params:</dt><dd><p>Full path to a nifti file containing parameters for the free-water DTI fit.</p>
+</dd>
+<dt>dki_tf:</dt><dd><p>DKI DiffusionKurtosisFit object</p>
+</dd>
+<dt>dki_params:</dt><dd><p>full path to a nifti file containing parameters for the DKI fit</p>
+</dd>
+<dt>csd_params:</dt><dd><p>full path to a nifti file containing parameters for the CSD fit</p>
+</dd>
+<dt>csd_pmap:</dt><dd><p>full path to a nifti file containing the anisotropic power map</p>
+</dd>
+<dt>csd_ai:</dt><dd><p>full path to a nifti file containing the anisotropic index</p>
+</dd>
+<dt>gq_params:</dt><dd><p>full path to a nifti file containing parameters for the Generalized Q-Sampling shm_coeff</p>
+</dd>
+<dt>gq_iso:</dt><dd><p>full path to a nifti file containing isotropic diffusion component</p>
+</dd>
+<dt>gq_aso:</dt><dd><p>full path to a nifti file containing anisotropic diffusion component</p>
+</dd>
+<dt>gq_pmap:</dt><dd><p>full path to a nifti file containing the anisotropic power map from GQ</p>
+</dd>
+<dt>gq_ai:</dt><dd><p>full path to a nifti file containing the anisotropic index from GQ</p>
+</dd>
+<dt>opdt_params:</dt><dd><p>full path to a nifti file containing parameters for the Orientation Probability Density Transform shm_coeff</p>
+</dd>
+<dt>opdt_gfa:</dt><dd><p>full path to a nifti file containing GFA</p>
+</dd>
+<dt>opdt_pmap:</dt><dd><p>full path to a nifti file containing the anisotropic power map from OPDT</p>
+</dd>
+<dt>opdt_ai:</dt><dd><p>full path to a nifti file containing the anisotropic index from OPDT</p>
+</dd>
+<dt>csa_params:</dt><dd><p>full path to a nifti file containing parameters for the Constant Solid Angle shm_coeff</p>
+</dd>
+<dt>csa_gfa:</dt><dd><p>full path to a nifti file containing GFA</p>
+</dd>
+<dt>csa_pmap:</dt><dd><p>full path to a nifti file containing the anisotropic power map from CSA</p>
+</dd>
+<dt>csa_ai:</dt><dd><p>full path to a nifti file containing the anisotropic index from CSA</p>
+</dd>
+<dt>fwdti_fa:</dt><dd><p>full path to a nifti file containing the Free-water DTI fractional anisotropy</p>
+</dd>
+<dt>fwdti_md:</dt><dd><p>full path to a nifti file containing the Free-water DTI mean diffusivity</p>
+</dd>
+<dt>fwdti_fwf:</dt><dd><p>full path to a nifti file containing the Free-water DTI free water fraction</p>
+</dd>
+<dt>dti_fa:</dt><dd><p>full path to a nifti file containing the DTI fractional anisotropy</p>
+</dd>
+<dt>dti_lt0:</dt><dd><p>Image of first element in the DTI tensor according to DIPY convention i.e. Dxx (rate of diffusion from the left to right side of the brain)</p>
+</dd>
+<dt>dti_lt1:</dt><dd><p>Image of second element in the DTI tensor according to DIPY convention i.e. Dyy (rate of diffusion from the posterior to anterior part of  the brain)</p>
+</dd>
+<dt>dti_lt2:</dt><dd><p>Image of third element in the DTI tensor according to DIPY convention i.e. Dzz (rate of diffusion from the inferior to superior part of the brain)</p>
+</dd>
+<dt>dti_lt3:</dt><dd><p>Image of fourth element in the DTI tensor according to DIPY convention i.e. Dxy (rate of diffusion in the xy plane indicating the  relationship between the x and y directions)</p>
+</dd>
+<dt>dti_lt4:</dt><dd><p>Image of fifth element in the DTI tensor according to DIPY convention i.e. Dxz (rate of diffusion in the xz plane indicating the relationship between the x and z directions)</p>
+</dd>
+<dt>dti_lt5:</dt><dd><p>Image of sixth element in the DTI tensor according to DIPY convention i.e. Dyz (rate of diffusion in the yz plane indicating the relationship between the y and z directions)</p>
+</dd>
+<dt>dti_cfa:</dt><dd><p>full path to a nifti file containing the DTI color fractional anisotropy</p>
+</dd>
+<dt>dti_pdd:</dt><dd><p>full path to a nifti file containing the DTI principal diffusion direction</p>
+</dd>
+<dt>dti_md:</dt><dd><p>full path to a nifti file containing the DTI mean diffusivity</p>
+</dd>
+<dt>dti_ga:</dt><dd><p>full path to a nifti file containing the DTI geodesic anisotropy</p>
+</dd>
+<dt>dti_rd:</dt><dd><p>full path to a nifti file containing the DTI radial diffusivity</p>
+</dd>
+<dt>dti_ad:</dt><dd><p>full path to a nifti file containing the DTI axial diffusivity</p>
+</dd>
+<dt>dki_kt0:</dt><dd><p>Image of first element in the DKI kurtosis model</p>
+</dd>
+<dt>dki_kt1:</dt><dd><p>Image of second element in the DKI kurtosis model</p>
+</dd>
+<dt>dki_kt2:</dt><dd><p>Image of third element in the DKI kurtosis model</p>
+</dd>
+<dt>dki_kt3:</dt><dd><p>Image of fourth element in the DKI kurtosis model</p>
+</dd>
+<dt>dki_kt4:</dt><dd><p>Image of fifth element in the DKI kurtosis model</p>
+</dd>
+<dt>dki_kt5:</dt><dd><p>Image of sixth element in the DKI kurtosis model</p>
+</dd>
+<dt>dki_kt6:</dt><dd><p>Image of seventh element in the DKI kurtosis model</p>
+</dd>
+<dt>dki_kt7:</dt><dd><p>Image of eighth element in the DKI kurtosis model</p>
+</dd>
+<dt>dki_kt8:</dt><dd><p>Image of ninth element in the DKI kurtosis model</p>
+</dd>
+<dt>dki_kt9:</dt><dd><p>Image of tenth element in the DKI kurtosis model</p>
+</dd>
+<dt>dki_kt10:</dt><dd><p>Image of eleventh element in the DKI kurtosis model</p>
+</dd>
+<dt>dki_kt11:</dt><dd><p>Image of twelfth element in the DKI kurtosis model</p>
+</dd>
+<dt>dki_kt12:</dt><dd><p>Image of thirteenth element in the DKI kurtosis model</p>
+</dd>
+<dt>dki_kt13:</dt><dd><p>Image of fourteenth element in the DKI kurtosis model</p>
+</dd>
+<dt>dki_kt14:</dt><dd><p>Image of fifteenth element in the DKI kurtosis model</p>
+</dd>
+<dt>dki_lt0:</dt><dd><p>Image of first element in the DTI tensor from DKI</p>
+</dd>
+<dt>dki_lt1:</dt><dd><p>Image of second element in the DTI tensor from DKI</p>
+</dd>
+<dt>dki_lt2:</dt><dd><p>Image of third element in the DTI tensor from DKI</p>
+</dd>
+<dt>dki_lt3:</dt><dd><p>Image of fourth element in the DTI tensor from DKI</p>
+</dd>
+<dt>dki_lt4:</dt><dd><p>Image of fifth element in the DTI tensor from DKI</p>
+</dd>
+<dt>dki_lt5:</dt><dd><p>Image of sixth element in the DTI tensor from DKI</p>
+</dd>
+<dt>dki_fa:</dt><dd><p>full path to a nifti file containing the DKI fractional anisotropy</p>
+</dd>
+<dt>dki_md:</dt><dd><p>full path to a nifti file containing the DKI mean diffusivity</p>
+</dd>
+<dt>dki_awf:</dt><dd><p>full path to a nifti file containing the DKI axonal water fraction</p>
+</dd>
+<dt>dki_mk:</dt><dd><p>full path to a nifti file containing the DKI mean kurtosis file</p>
+</dd>
+<dt>dki_ga:</dt><dd><p>full path to a nifti file containing the DKI geodesic anisotropy</p>
+</dd>
+<dt>dki_rd:</dt><dd><p>full path to a nifti file containing the DKI radial diffusivity</p>
+</dd>
+<dt>dki_ad:</dt><dd><p>full path to a nifti file containing the DKI axial diffusivity</p>
+</dd>
+<dt>dki_rk:</dt><dd><p>full path to a nifti file containing the DKI radial kurtosis</p>
+</dd>
+<dt>dki_ak:</dt><dd><p>full path to a nifti file containing the DKI axial kurtosis file</p>
+</dd>
+<dt>brain_mask:</dt><dd><p>full path to a nifti file containing the brain mask</p>
+</dd>
+<dt>bundle_dict:</dt><dd><p>Dictionary defining the different bundles to be segmented</p>
+</dd>
+<dt>reg_template:</dt><dd><p>a Nifti1Image containing the template for registration</p>
+</dd>
+<dt>b0_warped:</dt><dd><p>full path to a nifti file containing b0 transformed to template space</p>
+</dd>
+<dt>template_xform:</dt><dd><p>full path to a nifti file containing registration template transformed to subject space</p>
+</dd>
+<dt>rois:</dt><dd><p>dictionary of full paths to Nifti1Image files of ROIs transformed to subject space</p>
+</dd>
+<dt>mapping:</dt><dd><p>mapping from subject to template space.</p>
+</dd>
+<dt>reg_subject:</dt><dd><p>Nifti1Image which represents this subject when registering the subject to the template</p>
+</dd>
+<dt>bundles:</dt><dd><p>full path to a trk file containing containting segmented streamlines, labeled by bundle</p>
+</dd>
+<dt>indiv_bundles:</dt><dd><p>dictionary of paths, where each path is a full path to a trk file containing the streamlines of a given bundle, cleaned or uncleaned</p>
+</dd>
+<dt>sl_counts:</dt><dd><p>full path to a JSON file containing streamline counts</p>
+</dd>
+<dt>median_bundle_lengths:</dt><dd><p>full path to a JSON file containing median bundle lengths</p>
+</dd>
+<dt>density_maps:</dt><dd><p>full path to 4d nifti file containing streamline counts per voxel per bundle, where the 4th dimension encodes the bundle</p>
+</dd>
+<dt>profiles:</dt><dd><p>full path to a CSV file containing tract profiles</p>
+</dd>
+<dt>scalar_dict:</dt><dd><p>dicionary mapping scalar names to their respective file paths</p>
+</dd>
+<dt>seed:</dt><dd><p>full path to a nifti file containing the tractography seed mask</p>
+</dd>
+<dt>stop:</dt><dd><p>full path to a nifti file containing the tractography stop mask</p>
+</dd>
+<dt>streamlines:</dt><dd><p>full path to the complete, unsegmented tractography file</p>
+</dd>
+<dt>all_bundles_figure:</dt><dd><p>figure for the visualizaion of the recognized bundles in the subject’s brain.</p>
+</dd>
+<dt>indiv_bundles_figures:</dt><dd><p>list of full paths to html or gif files containing visualizaions of individual bundles</p>
+</dd>
+<dt>tract_profile_plots:</dt><dd><p>list of full paths to png files, where files contain plots of the tract profiles</p>
+</dd>
+<dt>viz_backend:</dt><dd><p>An instance of the <cite>AFQ.viz.utils.viz_backend</cite> class.</p>
+</dd>
+</dl>
+</div>
+
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="kwargs.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">The pyAFQ API optional arguments</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="tracking.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Usage tracking with Google Analytics</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/yeatmanlab/pyAFQ/edit/master/docs/source/reference/methods.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div class="tocsection sourcelink">
+    <a href="../_sources/reference/methods.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2018--, The pyAFQ Contributors.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

@@ -1,0 +1,118 @@
+:py:mod:`AFQ.definitions.utils`
+===============================
+
+.. py:module:: AFQ.definitions.utils
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.definitions.utils.Definition
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.definitions.utils.name_from_path
+   AFQ.definitions.utils.find_file
+
+
+
+.. py:class:: Definition
+
+
+   Bases: :py:obj:`object`
+
+   
+   All Definitions should inherit this.
+   For a given subject and session within the API, the definition is used
+   to create a given image or map.
+   Definitions have an init function which the users uses to specify
+   how they want the definition to behave.
+   The find_path function is called by the AFQ API.
+   The api calls find_path to let the definition find relevant files
+   for the given subject and session.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: find_path(bids_layout, from_path, subject, session)
+      :abstractmethod:
+
+
+   .. py:method:: str_for_toml()
+
+      
+      Uses __init__ in str_for_toml to make string that will instantiate
+      itself. Assumes object will have attributes of same name as
+      __init__ args. This is important for reading/writing definitions
+      as arguments to config files.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:function:: name_from_path(path)
+
+
+.. py:function:: find_file(bids_layout, path, filters, suffix, session, subject, extension='.nii.gz')
+
+   
+   Helper function
+   Generic calls to get_nearest to find a file
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

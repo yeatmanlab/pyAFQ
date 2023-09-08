@@ -1,4 +1,70 @@
 tbody, tr, td
 {
     border: 0 !important;
+    height: 100%;
+    width: 100%;
+}
+
+.sd-card {
+    margin-bottom: 20px
+}
+
+.sd-card-header {
+    text-align: center;
+    background-color: white;
+    color: #150458 !important;
+    font-size: var(--pst-font-size-h5);
+    font-weight: bold;
+
+}
+
+.sd-card-footer {
+    display: none;
+}
+
+.top-image {
+    float: left;
+    width: 25%;
+    height: 100%;
+}
+
+.bottom-image {
+    float: right;
+    width: 25%;
+    height: 100%;
+    clear: left;
+}
+
+.right-arrow {
+    float: left;
+    width: 10%;
+}
+
+.left-arrow {
+    float: right;
+    width: 10%;
+}
+
+/* fitting down arrow */
+.reference.internal.image-reference {
+    margin-left: 20%;
+}
+
+/* fitting right arrows */
+.right-arrow.figure.align-default {
+    margin-top: 5%;
+}
+
+/* fitting left arrows */
+.left-arrow.figure.align-default {
+    margin-top: 5%;
+}
+
+/* fitting bottom images to match top images.. shift bottom rightmost image to the left*/
+#id5.bottom-image.figure.align-default {
+    margin-right: 5%;
+}
+
+.top-image.figure.align-default {
+    margin-bottom: 0px;
 }

@@ -1,0 +1,1317 @@
+:py:mod:`AFQ.tasks.data`
+========================
+
+.. py:module:: AFQ.tasks.data
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.tasks.data.get_data_gtab
+   AFQ.tasks.data.b0
+   AFQ.tasks.data.b0_mask
+   AFQ.tasks.data.dti_fit
+   AFQ.tasks.data.dti_params
+   AFQ.tasks.data.fwdti_fit
+   AFQ.tasks.data.fwdti_params
+   AFQ.tasks.data.dki_fit
+   AFQ.tasks.data.dki_params
+   AFQ.tasks.data.csd_params
+   AFQ.tasks.data.anisotropic_power_map
+   AFQ.tasks.data.csd_anisotropic_index
+   AFQ.tasks.data.gq
+   AFQ.tasks.data.gq_pmap
+   AFQ.tasks.data.gq_ai
+   AFQ.tasks.data.opdt_params
+   AFQ.tasks.data.opdt_pmap
+   AFQ.tasks.data.opdt_ai
+   AFQ.tasks.data.csa_params
+   AFQ.tasks.data.csa_pmap
+   AFQ.tasks.data.csa_ai
+   AFQ.tasks.data.fwdti_fa
+   AFQ.tasks.data.fwdti_md
+   AFQ.tasks.data.fwdti_fwf
+   AFQ.tasks.data.dti_fa
+   AFQ.tasks.data.dti_lt
+   AFQ.tasks.data.dti_cfa
+   AFQ.tasks.data.dti_pdd
+   AFQ.tasks.data.dti_md
+   AFQ.tasks.data.dti_ga
+   AFQ.tasks.data.dti_rd
+   AFQ.tasks.data.dti_ad
+   AFQ.tasks.data.dki_kt
+   AFQ.tasks.data.dki_lt
+   AFQ.tasks.data.dki_fa
+   AFQ.tasks.data.dki_md
+   AFQ.tasks.data.dki_awf
+   AFQ.tasks.data.dki_mk
+   AFQ.tasks.data.dki_ga
+   AFQ.tasks.data.dki_rd
+   AFQ.tasks.data.dki_ad
+   AFQ.tasks.data.dki_rk
+   AFQ.tasks.data.dki_ak
+   AFQ.tasks.data.brain_mask
+   AFQ.tasks.data.get_bundle_dict
+   AFQ.tasks.data.get_data_plan
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.tasks.data.DIPY_GH
+
+
+.. py:data:: DIPY_GH
+   :value: 'https://github.com/dipy/dipy/blob/master/dipy/'
+
+   
+
+.. py:function:: get_data_gtab(dwi, bval, bvec, min_bval=None, max_bval=None, filter_b=True, b0_threshold=50)
+
+   
+   DWI data as an ndarray for selected b values,
+   A DIPY GradientTable with all the gradient information,
+   and unaltered DWI data in a Nifti1Image.
+
+
+   :Parameters:
+
+       **min_bval** : float, optional
+           Minimum b value you want to use
+           from the dataset (other than b0), inclusive.
+           If None, there is no minimum limit. Default: None
+
+       **max_bval** : float, optional
+           Maximum b value you want to use
+           from the dataset (other than b0), inclusive.
+           If None, there is no maximum limit. Default: None
+
+       **filter_b** : bool, optional
+           Whether to filter the DWI data based on min or max bvals.
+           Default: True
+
+       **b0_threshold** : int, optional
+           The value of b under which
+           it is considered to be b0. Default: 50.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: b0(dwi, data, gtab, img)
+
+   
+   full path to a nifti file containing the mean b0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: b0_mask(base_fname, b0, brain_mask)
+
+   
+   full path to a nifti file containing the
+   mean b0 after applying the brain mask
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dti_fit(dti_params, gtab)
+
+   
+   DTI TensorFit object
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dti_params(brain_mask, data, gtab, bval, bvec, b0_threshold=50, robust_tensor_fitting=False)
+
+   
+   full path to a nifti file containing parameters
+   for the DTI fit
+
+
+   :Parameters:
+
+       **robust_tensor_fitting** : bool, optional
+           Whether to use robust_tensor_fitting when
+           doing dti. Only applies to dti.
+           Default: False
+
+       **b0_threshold** : int, optional
+           The value of b under which
+           it is considered to be b0. Default: 50.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: fwdti_fit(fwdti_params, gtab)
+
+   
+   Free-water DTI TensorFit object
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: fwdti_params(brain_mask, data, gtab)
+
+   
+   Full path to a nifti file containing parameters
+   for the free-water DTI fit.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_fit(dki_params, gtab)
+
+   
+   DKI DiffusionKurtosisFit object
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_params(brain_mask, gtab, data)
+
+   
+   full path to a nifti file containing
+   parameters for the DKI fit
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: csd_params(dwi, brain_mask, gtab, data, csd_response=None, csd_sh_order=None, csd_lambda_=1, csd_tau=0.1)
+
+   
+   full path to a nifti file containing
+   parameters for the CSD fit
+
+
+   :Parameters:
+
+       **csd_response** : tuple or None, optional.
+           The response function to be used by CSD, as a tuple with two elements.
+           The first is the eigen-values as an (3,) ndarray and the second is
+           the signal value for the response function without diffusion-weighting
+           (i.e. S0). If not provided, auto_response will be used to calculate
+           these values.
+           Default: None
+
+       **csd_sh_order** : int or None, optional.
+           default: infer the number of parameters from the number of data
+           volumes, but no larger than 8.
+           Default: None
+
+       **csd_lambda_** : float, optional.
+           weight given to the constrained-positivity regularization part of
+           the deconvolution equation. Default: 1
+
+       **csd_tau** : float, optional.
+           threshold controlling the amplitude below which the corresponding
+           fODF is assumed to be zero.  Ideally, tau should be set to
+           zero. However, to improve the stability of the algorithm, tau is
+           set to tau*100 percent of the mean fODF amplitude (here, 10 percent
+           by default)
+           (see [R528d7c93b1c5-1]_). Default: 0.1
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: References
+
+   .. [R528d7c93b1c5-1] Tournier, J.D., et al. NeuroImage 2007. Robust determination of
+           the fibre orientation distribution in diffusion MRI:
+           Non-negativity constrained super-resolved spherical
+           deconvolution
+
+   .. only:: latex
+
+      [R528d7c93b1c5-1]_
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: anisotropic_power_map(csd_params)
+
+   
+   full path to a nifti file containing
+   the anisotropic power map
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: csd_anisotropic_index(csd_params)
+
+   
+   full path to a nifti file containing
+   the anisotropic index
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: gq(base_fname, gtab, dwi_affine, data, gq_sampling_length=1.2)
+
+   
+   full path to a nifti file containing
+   parameters for the Generalized Q-Sampling
+   shm_coeff,
+   full path to a nifti file containing isotropic diffusion component,
+   full path to a nifti file containing anisotropic diffusion component
+
+
+   :Parameters:
+
+       **gq_sampling_length** : float
+           Diffusion sampling length.
+           Default: 1.2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: gq_pmap(gq_params)
+
+   
+   full path to a nifti file containing
+   the anisotropic power map from GQ
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: gq_ai(gq_params)
+
+   
+   full path to a nifti file containing
+   the anisotropic index from GQ
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: opdt_params(base_fname, data, gtab, dwi_affine, brain_mask, opdt_sh_order=8)
+
+   
+   full path to a nifti file containing
+   parameters for the Orientation Probability Density Transform
+   shm_coeff,
+   full path to a nifti file containing GFA
+
+
+   :Parameters:
+
+       **opdt_sh_order** : int
+           Spherical harmonics order for OPDT model. Must be even.
+           Default: 8
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: opdt_pmap(opdt_params)
+
+   
+   full path to a nifti file containing
+   the anisotropic power map from OPDT
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: opdt_ai(opdt_params)
+
+   
+   full path to a nifti file containing
+   the anisotropic index from OPDT
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: csa_params(base_fname, data, gtab, dwi_affine, brain_mask, csa_sh_order=8)
+
+   
+   full path to a nifti file containing
+   parameters for the Constant Solid Angle
+   shm_coeff,
+   full path to a nifti file containing GFA
+
+
+   :Parameters:
+
+       **csa_sh_order** : int
+           Spherical harmonics order for CSA model. Must be even.
+           Default: 8
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: csa_pmap(csa_params)
+
+   
+   full path to a nifti file containing
+   the anisotropic power map from CSA
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: csa_ai(csa_params)
+
+   
+   full path to a nifti file containing
+   the anisotropic index from CSA
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: fwdti_fa(fwdti_tf)
+
+   
+   full path to a nifti file containing the Free-water DTI fractional
+   anisotropy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: fwdti_md(fwdti_tf)
+
+   
+   full path to a nifti file containing the Free-water DTI mean diffusivity
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: fwdti_fwf(fwdti_tf)
+
+   
+   full path to a nifti file containing the Free-water DTI free water fraction
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dti_fa(dti_tf)
+
+   
+   full path to a nifti file containing
+   the DTI fractional anisotropy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dti_lt(dti_tf, dwi_affine)
+
+   
+   Image of first element in the DTI tensor according to DIPY convention
+   i.e. Dxx (rate of diffusion from the left to right side of the brain),
+   Image of second element in the DTI tensor according to DIPY convention
+   i.e. Dyy (rate of diffusion from the posterior to anterior part of 
+   the brain),
+   Image of third element in the DTI tensor according to DIPY convention
+   i.e. Dzz (rate of diffusion from the inferior to superior part of the
+   brain),
+   Image of fourth element in the DTI tensor according to DIPY convention
+   i.e. Dxy (rate of diffusion in the xy plane indicating the 
+   relationship between the x and y directions),
+   Image of fifth element in the DTI tensor according to DIPY convention
+   i.e. Dxz (rate of diffusion in the xz plane indicating the
+   relationship between the x and z directions),
+   Image of sixth element in the DTI tensor according to DIPY convention
+   i.e. Dyz (rate of diffusion in the yz plane indicating the
+   relationship between the y and z directions)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dti_cfa(dti_tf)
+
+   
+   full path to a nifti file containing
+   the DTI color fractional anisotropy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dti_pdd(dti_tf)
+
+   
+   full path to a nifti file containing
+   the DTI principal diffusion direction
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dti_md(dti_tf)
+
+   
+   full path to a nifti file containing
+   the DTI mean diffusivity
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dti_ga(dti_tf)
+
+   
+   full path to a nifti file containing
+   the DTI geodesic anisotropy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dti_rd(dti_tf)
+
+   
+   full path to a nifti file containing
+   the DTI radial diffusivity
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dti_ad(dti_tf)
+
+   
+   full path to a nifti file containing
+   the DTI axial diffusivity
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_kt(dki_tf, dwi_affine)
+
+   
+   Image of first element in the DKI kurtosis model,
+   Image of second element in the DKI kurtosis model,
+   Image of third element in the DKI kurtosis model,
+   Image of fourth element in the DKI kurtosis model,
+   Image of fifth element in the DKI kurtosis model,
+   Image of sixth element in the DKI kurtosis model,
+   Image of seventh element in the DKI kurtosis model,
+   Image of eighth element in the DKI kurtosis model,
+   Image of ninth element in the DKI kurtosis model,
+   Image of tenth element in the DKI kurtosis model,
+   Image of eleventh element in the DKI kurtosis model,
+   Image of twelfth element in the DKI kurtosis model,
+   Image of thirteenth element in the DKI kurtosis model,
+   Image of fourteenth element in the DKI kurtosis model,
+   Image of fifteenth element in the DKI kurtosis model
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_lt(dki_tf, dwi_affine)
+
+   
+   Image of first element in the DTI tensor from DKI,
+   Image of second element in the DTI tensor from DKI,
+   Image of third element in the DTI tensor from DKI,
+   Image of fourth element in the DTI tensor from DKI,
+   Image of fifth element in the DTI tensor from DKI,
+   Image of sixth element in the DTI tensor from DKI
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_fa(dki_tf)
+
+   
+   full path to a nifti file containing
+   the DKI fractional anisotropy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_md(dki_tf)
+
+   
+   full path to a nifti file containing
+   the DKI mean diffusivity
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_awf(dki_params, sphere='repulsion100', gtol=0.01)
+
+   
+   full path to a nifti file containing
+   the DKI axonal water fraction
+
+
+   :Parameters:
+
+       **sphere** : Sphere class instance, optional
+           The sphere providing sample directions for the initial
+           search of the maximal value of kurtosis.
+           Default: 'repulsion100'
+
+       **gtol** : float, optional
+           This input is to refine kurtosis maxima under the precision of
+           the directions sampled on the sphere class instance.
+           The gradient of the convergence procedure must be less than gtol
+           before successful termination.
+           If gtol is None, fiber direction is directly taken from the initial
+           sampled directions of the given sphere object.
+           Default: 1e-2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_mk(dki_tf)
+
+   
+   full path to a nifti file containing
+   the DKI mean kurtosis file
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_ga(dki_tf)
+
+   
+   full path to a nifti file containing
+   the DKI geodesic anisotropy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_rd(dki_tf)
+
+   
+   full path to a nifti file containing
+   the DKI radial diffusivity
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_ad(dki_tf)
+
+   
+   full path to a nifti file containing
+   the DKI axial diffusivity
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_rk(dki_tf)
+
+   
+   full path to a nifti file containing
+   the DKI radial kurtosis
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_ak(dki_tf)
+
+   
+   full path to a nifti file containing
+   the DKI axial kurtosis file
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: brain_mask(b0, brain_mask_definition=None)
+
+   
+   full path to a nifti file containing
+   the brain mask
+
+
+   :Parameters:
+
+       **brain_mask_definition** : instance from `AFQ.definitions.image`, optional
+           This will be used to create
+           the brain mask, which gets applied before registration to a
+           template.
+           If you want no brain mask to be applied, use FullImage.
+           If None, use B0Image()
+           Default: None
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: get_bundle_dict(segmentation_params, brain_mask, bids_info, b0, bundle_info=None, reg_template_spec='mni_T1')
+
+   
+   Dictionary defining the different bundles to be segmented,
+   and a Nifti1Image containing the template for registration
+
+
+   :Parameters:
+
+       **bundle_info** : list of strings, dict, or BundleDict, optional
+           List of bundle names to include in segmentation,
+           or a bundle dictionary (see BundleDict for inspiration),
+           or a BundleDict. See `Defining Custom Bundle Dictionaries`
+           in the `usage` section of pyAFQ's documentation for details.
+           If None, will get all appropriate bundles for the chosen
+           segmentation algorithm.
+           Default: None
+
+       **reg_template_spec** : str, or Nifti1Image, optional
+           The target image data for registration.
+           Can either be a Nifti1Image, a path to a Nifti1Image, or
+           if "mni_T2", "dti_fa_template", "hcp_atlas", or "mni_T1",
+           image data will be loaded automatically.
+           If "hcp_atlas" is used, slr registration will be used
+           and reg_subject should be "subject_sls".
+           Default: "mni_T1"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: get_data_plan(kwargs)
+
+

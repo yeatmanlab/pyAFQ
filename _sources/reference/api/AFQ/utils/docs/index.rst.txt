@@ -1,0 +1,51 @@
+:py:mod:`AFQ.utils.docs`
+========================
+
+.. py:module:: AFQ.utils.docs
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.utils.docs.PNGScraper
+
+
+
+
+.. py:class:: PNGScraper
+
+
+   Bases: :py:obj:`object`
+
+   .. py:method:: __repr__()
+
+      
+      Return repr(self).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: __call__(block, block_vars, gallery_conf)
+
+
+

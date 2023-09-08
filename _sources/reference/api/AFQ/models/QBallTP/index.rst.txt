@@ -1,0 +1,77 @@
+:py:mod:`AFQ.models.QBallTP`
+============================
+
+.. py:module:: AFQ.models.QBallTP
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.models.QBallTP.extract_odf
+   AFQ.models.QBallTP.anisotropic_index
+
+
+
+.. py:function:: extract_odf(odf, sphere=default_sphere, sh_order=8)
+
+   
+   Calculates spherical harmonics coefficients and
+   isotropic and anisotropic diffusion components
+   from an ODF. Could include GFA in future updates.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: anisotropic_index(shm)
+
+   
+   Calculates anisotropic index based on spherical harmonics coefficients.
+
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: References
+
+   .. [Rcd4a8b80b0d7-1] Jespersen, Sune N., et al. "Modeling dendrite density from
+       magnetic resonance diffusion measurements." Neuroimage 34.4 (2007):
+       1473-1486.
+
+   .. only:: latex
+
+      [Rcd4a8b80b0d7-1]_
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

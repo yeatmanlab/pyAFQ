@@ -1,0 +1,1041 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The pyAFQ configuration file &#8212; AFQ 1.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/config';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../howto/index.html">
+                        How To
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../tutorials/index.html">
+                        Tutorials
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../explanations/index.html">
+                        Explanations
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="index.html">
+                        Reference Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../howto/index.html">
+                        How To
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../tutorials/index.html">
+                        Tutorials
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../explanations/index.html">
+                        Explanations
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="index.html">
+                        Reference Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">The pyAFQ configuration file</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <div class="section" id="the-pyafq-configuration-file">
+<h1>The pyAFQ configuration file<a class="headerlink" href="#the-pyafq-configuration-file" title="Permalink to this heading">#</a></h1>
+<p>This file should be a <a class="reference external" href="https://github.com/toml-lang/toml">toml</a> file. At
+minimum, the file should contain the BIDS path:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">files</span><span class="p">]</span>
+<span class="n">bids_path</span> <span class="o">=</span> <span class="s2">&quot;path/to/study&quot;</span>
+</pre></div>
+</div>
+<p>But additional configuration options can be provided.
+See an example configuration file below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;My AFQ analysis&quot;</span>
+
+<span class="c1"># Initialize a GroupAFQ object from a BIDS dataset.</span>
+
+<span class="c1"># Use &#39;&#39; to indicate None</span>
+<span class="c1"># Wrap dictionaries in quotes</span>
+<span class="c1"># Wrap definition object instantiations in quotes</span>
+
+<span class="p">[</span><span class="n">BIDS_PARAMS</span><span class="p">]</span>
+
+<span class="c1"># The path to preprocessed diffusion data organized in a BIDS</span>
+<span class="c1"># dataset. This should contain a BIDS derivative dataset with</span>
+<span class="c1"># preprocessed dwi/bvals/bvecs.</span>
+<span class="n">bids_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># Filter to pass to bids_layout.get when finding DWI files.</span>
+<span class="c1"># Default: {&quot;suffix&quot;: &quot;dwi&quot;}</span>
+<span class="n">bids_filters</span> <span class="o">=</span> <span class="s2">&quot;{&#39;suffix&#39;: &#39;dwi&#39;}&quot;</span>
+
+<span class="c1"># The name of the pipeline used to preprocess the DWI data.</span>
+<span class="c1"># Default: &quot;all&quot;.</span>
+<span class="n">preproc_pipeline</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span>
+
+<span class="c1"># List of participant labels (subject IDs) to perform</span>
+<span class="c1"># processing on. If None, all subjects are used.</span>
+<span class="c1"># Default: None</span>
+<span class="n">participant_labels</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># Path to output directory. If None, outputs are put</span>
+<span class="c1"># in a AFQ pipeline folder in the derivatives folder of</span>
+<span class="c1"># the BIDS directory. pyAFQ will use existing derivatives</span>
+<span class="c1"># from the output directory if they exist, instead of recalculating</span>
+<span class="c1"># them (this means you need to clear the output folder if you want</span>
+<span class="c1"># to recalculate a derivative).</span>
+<span class="c1"># Default: None</span>
+<span class="n">output_dir</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># Parameters to pass to paramap in AFQ.utils.parallel,</span>
+<span class="c1"># to parallelize computations across subjects and sessions.</span>
+<span class="c1"># Set &quot;n_jobs&quot; to -1 to automatically parallelize as</span>
+<span class="c1"># the number of cpus. Here is an example for how to do</span>
+<span class="c1"># multiprocessing with 4 cpus:</span>
+<span class="c1"># {&quot;n_jobs&quot;: 4, &quot;engine&quot;: &quot;joblib&quot;, &quot;backend&quot;: &quot;loky&quot;}</span>
+<span class="c1"># Default: {&quot;engine&quot;: &quot;serial&quot;}</span>
+<span class="n">parallel_params</span> <span class="o">=</span> <span class="s2">&quot;{&#39;engine&#39;: &#39;serial&#39;}&quot;</span>
+
+<span class="c1"># Additional arguments to give to BIDSLayout from pybids.</span>
+<span class="c1"># For large datasets, try:</span>
+<span class="c1"># {&quot;validate&quot;: False, &quot;index_metadata&quot;: False}</span>
+<span class="c1"># Default: {}</span>
+<span class="n">bids_layout_kwargs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span>
+
+<span class="p">[</span><span class="n">TRACTOGRAPHY_PARAMS</span><span class="p">]</span>
+
+<span class="c1"># How tracking directions are determined.</span>
+<span class="c1"># One of: {&quot;det&quot; | &quot;prob&quot;}</span>
+<span class="c1"># Default: &quot;prob&quot;</span>
+<span class="n">directions</span> <span class="o">=</span> <span class="s2">&quot;prob&quot;</span>
+
+<span class="c1"># The maximum turning angle in each step. Default: 30</span>
+<span class="n">max_angle</span> <span class="o">=</span> <span class="mf">30.0</span>
+
+<span class="c1"># The discretization of direction getting. default:</span>
+<span class="c1"># dipy.data.default_sphere.</span>
+<span class="n">sphere</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># Float or binary mask describing the ROI within which we seed for</span>
+<span class="c1"># tracking.</span>
+<span class="c1"># Default to the entire volume (all ones).</span>
+<span class="n">seed_mask</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># A value of the seed_mask above which tracking is seeded.</span>
+<span class="c1"># Default to 0.</span>
+<span class="n">seed_threshold</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># Interpret seed_threshold and stop_threshold as percentages of the</span>
+<span class="c1"># total non-nan voxels in the seed and stop mask to include</span>
+<span class="c1"># (between 0 and 100), instead of as a threshold on the</span>
+<span class="c1"># values themselves.</span>
+<span class="c1"># Default: False</span>
+<span class="n">thresholds_as_percentages</span> <span class="o">=</span> <span class="n">false</span>
+
+<span class="c1"># The seeding density: if this is an int, it is is how many seeds in each</span>
+<span class="c1"># voxel on each dimension (for example, 2 =&gt; [2, 2, 2]). If this is a 2D</span>
+<span class="c1"># array, these are the coordinates of the seeds. Unless random_seeds is</span>
+<span class="c1"># set to True, in which case this is the total number of random seeds</span>
+<span class="c1"># to generate within the mask. Default: 1</span>
+<span class="n">n_seeds</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="c1"># Whether to generate a total of n_seeds random seeds in the mask.</span>
+<span class="c1"># Default: False.</span>
+<span class="n">random_seeds</span> <span class="o">=</span> <span class="n">false</span>
+
+<span class="c1"># random seed used to generate random seeds if random_seeds is</span>
+<span class="c1"># set to True. Default: None</span>
+<span class="n">rng_seed</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># If array: A float or binary mask that determines a stopping criterion</span>
+<span class="c1"># (e.g. FA).</span>
+<span class="c1"># If tuple: it contains a sequence that is interpreted as:</span>
+<span class="c1"># (pve_wm, pve_gm, pve_csf), each item of which is either a string</span>
+<span class="c1"># (full path) or a nibabel img to be used in particle filtering</span>
+<span class="c1"># tractography.</span>
+<span class="c1"># A tuple is required if tracker is set to &quot;pft&quot;.</span>
+<span class="c1"># Defaults to no stopping (all ones).</span>
+<span class="n">stop_mask</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># If float, this a value of the stop_mask below which tracking is</span>
+<span class="c1"># terminated (and stop_mask has to be an array).</span>
+<span class="c1"># If str, &quot;CMC&quot; for Continuous Map Criterion [Girard2014]_.</span>
+<span class="c1"># &quot;ACT&quot; for Anatomically-constrained tractography [Smith2012]_.</span>
+<span class="c1"># A string is required if the tracker is set to &quot;pft&quot;.</span>
+<span class="c1"># Defaults to 0 (this means that if no stop_mask is passed,</span>
+<span class="c1"># we will stop only at the edge of the image).</span>
+<span class="n">stop_threshold</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># The size of a step (in mm) of tractography. Default: 0.5</span>
+<span class="n">step_size</span> <span class="o">=</span> <span class="mf">0.5</span>
+
+<span class="c1"># The miminal length (mm) in a streamline. Default: 20</span>
+<span class="n">min_length</span> <span class="o">=</span> <span class="mi">50</span>
+
+<span class="c1"># The miminal length (mm) in a streamline. Default: 250</span>
+<span class="n">max_length</span> <span class="o">=</span> <span class="mi">250</span>
+
+<span class="c1"># One of {&quot;DTI&quot;, &quot;CSD&quot;, &quot;DKI&quot;}. Defaults to use &quot;DTI&quot;</span>
+<span class="n">odf_model</span> <span class="o">=</span> <span class="s2">&quot;CSD&quot;</span>
+
+<span class="c1"># Which strategy to use in tracking. This can be the standard local</span>
+<span class="c1"># tracking (&quot;local&quot;) or Particle Filtering Tracking ([Girard2014]_).</span>
+<span class="c1"># One of {&quot;local&quot;, &quot;pft&quot;}. Default: &quot;local&quot;</span>
+<span class="n">tracker</span> <span class="o">=</span> <span class="s2">&quot;local&quot;</span>
+
+<span class="p">[</span><span class="n">SEGMENTATION_PARAMS</span><span class="p">]</span>
+
+<span class="c1"># Resample streamlines to nb_points number of points.</span>
+<span class="c1"># If False, no resampling is done. Default: False</span>
+<span class="n">nb_points</span> <span class="o">=</span> <span class="n">false</span>
+
+<span class="c1"># Subsample streamlines to nb_streamlines.</span>
+<span class="c1"># If False, no subsampling is don. Default: False</span>
+<span class="n">nb_streamlines</span> <span class="o">=</span> <span class="n">false</span>
+
+<span class="c1"># Algorithm for segmentation (case-insensitive):</span>
+<span class="c1"># &#39;AFQ&#39;: Segment streamlines into bundles,</span>
+<span class="c1"># based on inclusion/exclusion ROIs.</span>
+<span class="c1"># &#39;Reco&#39;: Segment streamlines using the RecoBundles algorithm</span>
+<span class="c1"># [Garyfallidis2017].</span>
+<span class="c1"># Default: &#39;AFQ&#39;</span>
+<span class="n">seg_algo</span> <span class="o">=</span> <span class="s2">&quot;AFQ&quot;</span>
+
+<span class="c1"># Whether to clip the streamlines to be only in between the ROIs.</span>
+<span class="c1"># Default: False</span>
+<span class="n">clip_edges</span> <span class="o">=</span> <span class="n">false</span>
+
+<span class="c1"># How to parallelize segmentation across processes when performing</span>
+<span class="c1"># waypoint ROI segmentation. Set to {&quot;engine&quot;: &quot;serial&quot;} to not</span>
+<span class="c1"># perform parallelization. See ``AFQ.utils.parallel.pafor`` for</span>
+<span class="c1"># details.</span>
+<span class="c1"># Default: {&quot;n_jobs&quot;: -1, &quot;engine&quot;: &quot;joblib&quot;,</span>
+<span class="c1"># &quot;backend&quot;: &quot;loky&quot;}</span>
+<span class="n">parallel_segmentation</span> <span class="o">=</span> <span class="s2">&quot;{&#39;n_jobs&#39;: 4, &#39;engine&#39;: &#39;dask&#39;}&quot;</span>
+
+<span class="c1"># Using RecoBundles Algorithm.</span>
+<span class="c1"># Whether or not to use progressive technique</span>
+<span class="c1"># during whole brain SLR.</span>
+<span class="c1"># Default: True.</span>
+<span class="n">progressive</span> <span class="o">=</span> <span class="n">true</span>
+
+<span class="c1"># Using RecoBundles Algorithm.</span>
+<span class="c1"># Keep streamlines that have length greater than this value</span>
+<span class="c1"># during whole brain SLR.</span>
+<span class="c1"># Default: 50.</span>
+<span class="n">greater_than</span> <span class="o">=</span> <span class="mi">50</span>
+
+<span class="c1"># Using RecoBundles Algorithm.</span>
+<span class="c1"># Remove clusters that have less than this value</span>
+<span class="c1"># during whole brain SLR.</span>
+<span class="c1"># Default: 50</span>
+<span class="n">rm_small_clusters</span> <span class="o">=</span> <span class="mi">50</span>
+
+<span class="c1"># Parameter passed on to recognize for Recobundles.</span>
+<span class="c1"># See Recobundles documentation.</span>
+<span class="c1"># Default: 1.25</span>
+<span class="n">model_clust_thr</span> <span class="o">=</span> <span class="mf">1.25</span>
+
+<span class="c1"># Parameter passed on to recognize for Recobundles.</span>
+<span class="c1"># See Recobundles documentation.</span>
+<span class="c1"># Default: 25</span>
+<span class="n">reduction_thr</span> <span class="o">=</span> <span class="mi">25</span>
+
+<span class="c1"># Parameter passed on to recognize for Recobundles.</span>
+<span class="c1"># See Recobundles documentation.</span>
+<span class="c1"># Default: False</span>
+<span class="n">refine</span> <span class="o">=</span> <span class="n">false</span>
+
+<span class="c1"># Parameter passed on to recognize for Recobundles.</span>
+<span class="c1"># See Recobundles documentation.</span>
+<span class="c1"># Default: 12</span>
+<span class="n">pruning_thr</span> <span class="o">=</span> <span class="mi">12</span>
+
+<span class="c1"># Using AFQ Algorithm.</span>
+<span class="c1"># All b-values with values less than or equal to `bo_threshold` are</span>
+<span class="c1"># considered as b0s i.e. without diffusion weighting.</span>
+<span class="c1"># Default: 50.</span>
+<span class="n">b0_threshold</span> <span class="o">=</span> <span class="mi">50</span>
+
+<span class="c1"># Using AFQ Algorithm.</span>
+<span class="c1"># Initial cleaning of fiber groups is done using probability maps</span>
+<span class="c1"># from [Hua2008]_. Here, we choose an average probability that</span>
+<span class="c1"># needs to be exceeded for an individual streamline to be retained.</span>
+<span class="c1"># Default: 0.</span>
+<span class="n">prob_threshold</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># Whether to use distance from nearest ROI as a tie breaker when a</span>
+<span class="c1"># streamline qualifies as a part of multiple bundles. If False,</span>
+<span class="c1"># probability maps are used.</span>
+<span class="c1"># Default : False.</span>
+<span class="n">roi_dist_tie_break</span> <span class="o">=</span> <span class="n">false</span>
+
+<span class="c1"># The distance that a streamline node has to be from the waypoint</span>
+<span class="c1"># ROI in order to be included or excluded.</span>
+<span class="c1"># If set to None (default), will be calculated as the</span>
+<span class="c1"># center-to-corner distance of the voxel in the diffusion data.</span>
+<span class="c1"># If a bundle has inc_addtol or exc_addtol in its bundle_dict, that</span>
+<span class="c1"># tolerance will be added to this distance.</span>
+<span class="c1"># For example, if you wanted to increase tolerance for the right</span>
+<span class="c1"># arcuate waypoint ROIs by 3 each, you could make the following</span>
+<span class="c1"># modification to your bundle_dict:</span>
+<span class="c1"># bundle_dict[&quot;ARC_R&quot;][&quot;inc_addtol&quot;] = [3, 3]</span>
+<span class="c1"># Additional tolerances can also be negative.</span>
+<span class="n">dist_to_waypoint</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># If None, creates RandomState.</span>
+<span class="c1"># If int, creates RandomState with seed rng.</span>
+<span class="c1"># Used in RecoBundles Algorithm.</span>
+<span class="c1"># Default: None.</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># Whether to return the indices in the original streamlines as part</span>
+<span class="c1"># of the output of segmentation.</span>
+<span class="n">return_idx</span> <span class="o">=</span> <span class="n">false</span>
+
+<span class="c1"># If not None, presegment by ROIs before performing</span>
+<span class="c1"># RecoBundles. Only used if seg_algo starts with &#39;Reco&#39;.</span>
+<span class="c1"># Meta-data for the segmentation. The format is something like::</span>
+<span class="c1"># {&#39;bundle_name&#39;: {</span>
+<span class="c1"># &#39;include&#39;:[img1, img2],</span>
+<span class="c1"># &#39;prob_map&#39;: img3,</span>
+<span class="c1"># &#39;cross_midline&#39;: False,</span>
+<span class="c1"># &#39;start&#39;: img4,</span>
+<span class="c1"># &#39;end&#39;: img5}}</span>
+<span class="c1"># Default: None</span>
+<span class="n">presegment_bundle_dict</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># Optional arguments for initializing the segmentation for the</span>
+<span class="c1"># presegmentation. Only used if presegment_bundle_dict is not None.</span>
+<span class="c1"># Default: {}</span>
+<span class="n">presegment_kwargs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span>
+
+<span class="c1"># Whether to filter the bundles based on their endpoints.</span>
+<span class="c1"># Applies only when `seg_algo == &#39;AFQ&#39;`.</span>
+<span class="c1"># Default: True.</span>
+<span class="n">filter_by_endpoints</span> <span class="o">=</span> <span class="n">true</span>
+
+<span class="c1"># If filter_by_endpoints is True, this is the required distance</span>
+<span class="c1"># from the endpoints to the atlas ROIs.</span>
+<span class="n">dist_to_atlas</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="c1"># The full path to a folder into which intermediate products</span>
+<span class="c1"># are saved. Default: None, means no saving of intermediates.</span>
+<span class="n">save_intermediates</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="p">[</span><span class="n">CLEANING_PARAMS</span><span class="p">]</span>
+
+<span class="c1"># Number of points to resample streamlines to.</span>
+<span class="c1"># Default: 100</span>
+<span class="n">n_points</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="c1"># Number of rounds of cleaning based on the Mahalanobis distance from</span>
+<span class="c1"># the mean of extracted bundles. Default: 5</span>
+<span class="n">clean_rounds</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="c1"># Threshold of cleaning based on the Mahalanobis distance (the units are</span>
+<span class="c1"># standard deviations). Default: 3.</span>
+<span class="n">distance_threshold</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="c1"># Threshold for cleaning based on length (in standard deviations). Length</span>
+<span class="c1"># of any streamline should not be *more* than this number of stdevs from</span>
+<span class="c1"># the mean length.</span>
+<span class="n">length_threshold</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="c1"># Number of streamlines in a bundle under which we will</span>
+<span class="c1"># not bother with cleaning outliers. Default: 20.</span>
+<span class="n">min_sl</span> <span class="o">=</span> <span class="mi">20</span>
+
+<span class="c1"># The statistic of each node relative to which the Mahalanobis is</span>
+<span class="c1"># calculated. Default: `np.mean` (but can also use median, etc.)</span>
+<span class="n">stat</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span>
+
+<span class="c1"># Whether to return indices in the original streamlines.</span>
+<span class="c1"># Default: False.</span>
+<span class="n">return_idx</span> <span class="o">=</span> <span class="n">false</span>
+
+<span class="p">[</span><span class="n">DATA</span><span class="p">]</span>
+
+<span class="c1"># Minimum b value you want to use</span>
+<span class="c1"># from the dataset (other than b0), inclusive.</span>
+<span class="c1"># If None, there is no minimum limit. Default: None</span>
+<span class="n">min_bval</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># Maximum b value you want to use</span>
+<span class="c1"># from the dataset (other than b0), inclusive.</span>
+<span class="c1"># If None, there is no maximum limit. Default: None</span>
+<span class="n">max_bval</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># Whether to filter the DWI data based on min or max bvals.</span>
+<span class="c1"># Default: True</span>
+<span class="n">filter_b</span> <span class="o">=</span> <span class="n">true</span>
+
+<span class="c1"># The value of b under which</span>
+<span class="c1"># it is considered to be b0. Default: 50.</span>
+<span class="n">b0_threshold</span> <span class="o">=</span> <span class="mi">50</span>
+
+<span class="c1"># Whether to use robust_tensor_fitting when</span>
+<span class="c1"># doing dti. Only applies to dti.</span>
+<span class="c1"># Default: False</span>
+<span class="n">robust_tensor_fitting</span> <span class="o">=</span> <span class="n">false</span>
+
+<span class="c1"># The response function to be used by CSD, as a tuple with two elements.</span>
+<span class="c1"># The first is the eigen-values as an (3,) ndarray and the second is</span>
+<span class="c1"># the signal value for the response function without diffusion-weighting</span>
+<span class="c1"># (i.e. S0). If not provided, auto_response will be used to calculate</span>
+<span class="c1"># these values.</span>
+<span class="c1"># Default: None</span>
+<span class="n">csd_response</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># default: infer the number of parameters from the number of data</span>
+<span class="c1"># volumes, but no larger than 8.</span>
+<span class="c1"># Default: None</span>
+<span class="n">csd_sh_order</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># weight given to the constrained-positivity regularization part of</span>
+<span class="c1"># the deconvolution equation. Default: 1</span>
+<span class="n">csd_lambda_</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="c1"># threshold controlling the amplitude below which the corresponding</span>
+<span class="c1"># fODF is assumed to be zero.  Ideally, tau should be set to</span>
+<span class="c1"># zero. However, to improve the stability of the algorithm, tau is</span>
+<span class="c1"># set to tau*100 percent of the mean fODF amplitude (here, 10 percent</span>
+<span class="c1"># by default)</span>
+<span class="c1"># (see [1]_). Default: 0.1</span>
+<span class="n">csd_tau</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+<span class="c1"># Diffusion sampling length.</span>
+<span class="c1"># Default: 1.2</span>
+<span class="n">gq_sampling_length</span> <span class="o">=</span> <span class="mf">1.2</span>
+
+<span class="c1"># Spherical harmonics order for OPDT model. Must be even.</span>
+<span class="c1"># Default: 8</span>
+<span class="n">opdt_sh_order</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="c1"># Spherical harmonics order for CSA model. Must be even.</span>
+<span class="c1"># Default: 8</span>
+<span class="n">csa_sh_order</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="c1"># The sphere providing sample directions for the initial</span>
+<span class="c1"># search of the maximal value of kurtosis.</span>
+<span class="c1"># Default: &#39;repulsion100&#39;</span>
+<span class="n">sphere</span> <span class="o">=</span> <span class="s2">&quot;repulsion100&quot;</span>
+
+<span class="c1"># This input is to refine kurtosis maxima under the precision of</span>
+<span class="c1"># the directions sampled on the sphere class instance.</span>
+<span class="c1"># The gradient of the convergence procedure must be less than gtol</span>
+<span class="c1"># before successful termination.</span>
+<span class="c1"># If gtol is None, fiber direction is directly taken from the initial</span>
+<span class="c1"># sampled directions of the given sphere object.</span>
+<span class="c1"># Default: 1e-2</span>
+<span class="n">gtol</span> <span class="o">=</span> <span class="mf">0.01</span>
+
+<span class="c1"># This will be used to create</span>
+<span class="c1"># the brain mask, which gets applied before registration to a</span>
+<span class="c1"># template.</span>
+<span class="c1"># If you want no brain mask to be applied, use FullImage.</span>
+<span class="c1"># If None, use B0Image()</span>
+<span class="c1"># Default: None</span>
+<span class="n">brain_mask_definition</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># List of bundle names to include in segmentation,</span>
+<span class="c1"># or a bundle dictionary (see BundleDict for inspiration),</span>
+<span class="c1"># or a BundleDict. See `Defining Custom Bundle Dictionaries`</span>
+<span class="c1"># in the `usage` section of pyAFQ&#39;s documentation for details.</span>
+<span class="c1"># If None, will get all appropriate bundles for the chosen</span>
+<span class="c1"># segmentation algorithm.</span>
+<span class="c1"># Default: None</span>
+<span class="n">bundle_info</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># The target image data for registration.</span>
+<span class="c1"># Can either be a Nifti1Image, a path to a Nifti1Image, or</span>
+<span class="c1"># if &quot;mni_T2&quot;, &quot;dti_fa_template&quot;, &quot;hcp_atlas&quot;, or &quot;mni_T1&quot;,</span>
+<span class="c1"># image data will be loaded automatically.</span>
+<span class="c1"># If &quot;hcp_atlas&quot; is used, slr registration will be used</span>
+<span class="c1"># and reg_subject should be &quot;subject_sls&quot;.</span>
+<span class="c1"># Default: &quot;mni_T1&quot;</span>
+<span class="n">reg_template_spec</span> <span class="o">=</span> <span class="s2">&quot;mni_T1&quot;</span>
+
+<span class="p">[</span><span class="n">MAPPING</span><span class="p">]</span>
+
+<span class="c1"># This defines how to either create a mapping from</span>
+<span class="c1"># each subject space to template space or load a mapping from</span>
+<span class="c1"># another software. If creating a map, will register reg_subject and</span>
+<span class="c1"># reg_template.</span>
+<span class="c1"># If None, use SynMap()</span>
+<span class="c1"># Default: None</span>
+<span class="n">mapping_definition</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># The source image data to be registered.</span>
+<span class="c1"># Can either be a Nifti1Image, an ImageFile, or str.</span>
+<span class="c1"># if &quot;b0&quot;, &quot;dti_fa_subject&quot;, &quot;subject_sls&quot;, or &quot;power_map,&quot;</span>
+<span class="c1"># image data will be loaded automatically.</span>
+<span class="c1"># If &quot;subject_sls&quot; is used, slr registration will be used</span>
+<span class="c1"># and reg_template should be &quot;hcp_atlas&quot;.</span>
+<span class="c1"># Default: &quot;power_map&quot;</span>
+<span class="n">reg_subject_spec</span> <span class="o">=</span> <span class="s2">&quot;power_map&quot;</span>
+
+<span class="p">[</span><span class="n">SEGMENTATION</span><span class="p">]</span>
+
+<span class="c1"># How to weight each streamline (1D) or each node (2D)</span>
+<span class="c1"># when calculating the tract-profiles. If callable, this is a</span>
+<span class="c1"># function that calculates weights. If None, no weighting will</span>
+<span class="c1"># be applied. If &quot;gauss&quot;, gaussian weights will be used.</span>
+<span class="c1"># If &quot;median&quot;, the median of values at each node will be used</span>
+<span class="c1"># instead of a mean or weighted mean.</span>
+<span class="c1"># Default: &quot;gauss&quot;</span>
+<span class="n">profile_weights</span> <span class="o">=</span> <span class="s2">&quot;gauss&quot;</span>
+
+<span class="c1"># List of scalars to use.</span>
+<span class="c1"># Can be any of: &quot;dti_fa&quot;, &quot;dti_md&quot;, &quot;dki_fa&quot;, &quot;dki_md&quot;, &quot;dki_awf&quot;,</span>
+<span class="c1"># &quot;dki_mk&quot;. Can also be a scalar from AFQ.definitions.image.</span>
+<span class="c1"># Default: [&quot;dti_fa&quot;, &quot;dti_md&quot;]</span>
+<span class="n">scalars</span> <span class="o">=</span> <span class="s2">&quot;[&#39;dti_fa&#39;, &#39;dti_md&#39;]&quot;</span>
+
+<span class="p">[</span><span class="n">TRACTOGRAPHY</span><span class="p">]</span>
+
+<span class="c1"># BIDS filters for inputing a user made tractography file,</span>
+<span class="c1"># or a path to the tractography file. If None, DIPY is used</span>
+<span class="c1"># to generate the tractography.</span>
+<span class="c1"># Default: None</span>
+<span class="n">import_tract</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="c1"># Number of GPUs to use in tractography. If non-0,</span>
+<span class="c1"># this algorithm is used for tractography,</span>
+<span class="c1"># https://github.com/dipy/GPUStreamlines</span>
+<span class="c1"># Default: 0</span>
+<span class="n">tractography_ngpus</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="p">[</span><span class="n">VIZ</span><span class="p">]</span>
+
+<span class="c1"># Of the form (lower bound, upper bound). Shading based on</span>
+<span class="c1"># shade_by_volume will only differentiate values within these bounds.</span>
+<span class="c1"># If lower bound is None, will default to 0.</span>
+<span class="c1"># If upper bound is None, will default to the maximum value in</span>
+<span class="c1"># shade_by_volume.</span>
+<span class="c1"># Default: [None, None]</span>
+<span class="n">sbv_lims_bundles</span> <span class="o">=</span> <span class="s2">&quot;[None, None]&quot;</span>
+
+<span class="c1"># Opacity of volume slices.</span>
+<span class="c1"># Default: 0.3</span>
+<span class="n">volume_opacity_bundles</span> <span class="o">=</span> <span class="mf">0.3</span>
+
+<span class="c1"># n_points to resample streamlines to before plotting. If None, no</span>
+<span class="c1"># resampling is done.</span>
+<span class="c1"># Default: 40</span>
+<span class="n">n_points_bundles</span> <span class="o">=</span> <span class="mi">40</span>
+
+<span class="c1"># Of the form (lower bound, upper bound). Shading based on</span>
+<span class="c1"># shade_by_volume will only differentiate values within these bounds.</span>
+<span class="c1"># If lower bound is None, will default to 0.</span>
+<span class="c1"># If upper bound is None, will default to the maximum value in</span>
+<span class="c1"># shade_by_volume.</span>
+<span class="c1"># Default: [None, None]</span>
+<span class="n">sbv_lims_indiv</span> <span class="o">=</span> <span class="s2">&quot;[None, None]&quot;</span>
+
+<span class="c1"># Opacity of volume slices.</span>
+<span class="c1"># Default: 0.3</span>
+<span class="n">volume_opacity_indiv</span> <span class="o">=</span> <span class="mf">0.3</span>
+
+<span class="c1"># n_points to resample streamlines to before plotting. If None, no</span>
+<span class="c1"># resampling is done.</span>
+<span class="c1"># Default: 40</span>
+<span class="n">n_points_indiv</span> <span class="o">=</span> <span class="mi">40</span>
+
+<span class="c1"># Which visualization backend to use.</span>
+<span class="c1"># See Visualization Backends page in documentation for details:</span>
+<span class="c1"># https://yeatmanlab.github.io/pyAFQ/usage/viz_backend.html</span>
+<span class="c1"># One of {&quot;fury&quot;, &quot;plotly&quot;, &quot;plotly_no_gif&quot;}.</span>
+<span class="c1"># Default: &quot;plotly_no_gif&quot;</span>
+<span class="n">viz_backend_spec</span> <span class="o">=</span> <span class="s2">&quot;plotly_no_gif&quot;</span>
+
+<span class="c1"># Whether to use a virtual fram buffer. This is neccessary if</span>
+<span class="c1"># generating GIFs in a headless environment. Default: False</span>
+<span class="n">virtual_frame_buffer</span> <span class="o">=</span> <span class="n">false</span>
+</pre></div>
+</div>
+<p>pyAFQ will store a copy of the configuration file alongside the computed
+results. Note that the <cite>title</cite> variable and <cite>[metadata]</cite> section are both for
+users to enter any title/metadata they would like and pyAFQ will generally
+ignore them.</p>
+</div>
+
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/yeatmanlab/pyAFQ/edit/master/docs/source/reference/config.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div class="tocsection sourcelink">
+    <a href="../_sources/reference/config.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2018--, The pyAFQ Contributors.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

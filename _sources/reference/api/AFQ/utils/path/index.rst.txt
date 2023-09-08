@@ -1,0 +1,93 @@
+:py:mod:`AFQ.utils.path`
+========================
+
+.. py:module:: AFQ.utils.path
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.utils.path.write_json
+   AFQ.utils.path.read_json
+   AFQ.utils.path.drop_extension
+   AFQ.utils.path.apply_cmd_to_afq_derivs
+
+
+
+.. py:function:: write_json(fname, data)
+
+   
+   Write data to JSON file.
+
+
+   :Parameters:
+
+       **fname** : str
+           Full path to the file to write.
+
+       **data** : dict
+           A dict containing the data to write.
+
+   :Returns:
+
+       None
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: read_json(fname)
+
+   
+   Read data from a JSON file.
+
+
+   :Parameters:
+
+       **fname** : str
+           Full path to the data-containing file
+
+   :Returns:
+
+       dict
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: drop_extension(path)
+
+
+.. py:function:: apply_cmd_to_afq_derivs(derivs_dir, base_fname, cmd='rm', exception_file_names=[], suffix='', dependent_on=None)
+
+

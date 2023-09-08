@@ -1,0 +1,769 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AFQ.tractography.tractography &#8212; AFQ 1.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/design-tabs.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/AFQ/tractography/tractography';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../howto/index.html">
+                        How To
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+                        Tutorials
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../explanations/index.html">
+                        Explanations
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../reference/index.html">
+                        Reference Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../reference/api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../howto/index.html">
+                        How To
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+                        Tutorials
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../explanations/index.html">
+                        Explanations
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../reference/index.html">
+                        Reference Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../reference/api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../../AFQ.html" class="nav-link">AFQ</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">AFQ.tractography.tractography</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for AFQ.tractography.tractography</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">dipy.data</span> <span class="k">as</span> <span class="nn">dpd</span>
+<span class="kn">from</span> <span class="nn">dipy.align</span> <span class="kn">import</span> <span class="n">resample</span>
+<span class="kn">from</span> <span class="nn">dipy.direction</span> <span class="kn">import</span> <span class="p">(</span><span class="n">DeterministicMaximumDirectionGetter</span><span class="p">,</span>
+                            <span class="n">ProbabilisticDirectionGetter</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">dipy.tracking.utils</span> <span class="k">as</span> <span class="nn">dtu</span>
+<span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">StatefulTractogram</span><span class="p">,</span> <span class="n">Space</span>
+<span class="kn">from</span> <span class="nn">dipy.tracking.stopping_criterion</span> <span class="kn">import</span> <span class="p">(</span><span class="n">ThresholdStoppingCriterion</span><span class="p">,</span>
+                                              <span class="n">CmcStoppingCriterion</span><span class="p">,</span>
+                                              <span class="n">ActStoppingCriterion</span><span class="p">)</span>
+
+
+<span class="kn">from</span> <span class="nn">AFQ._fixes</span> <span class="kn">import</span> <span class="p">(</span><span class="n">VerboseLocalTracking</span><span class="p">,</span> <span class="n">VerboseParticleFilteringTracking</span><span class="p">,</span>
+                        <span class="n">tensor_odf</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_percentile_threshold"><a class="viewcode-back" href="../../../reference/api/AFQ/tractography/tractography/index.html#AFQ.tractography.tractography.get_percentile_threshold">[docs]</a><span class="k">def</span> <span class="nf">get_percentile_threshold</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
+    <span class="n">zero_mask</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="n">mask</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">new_threshold</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span>
+        <span class="n">mask</span><span class="p">,</span>
+        <span class="mi">100</span> <span class="o">-</span> <span class="n">threshold</span><span class="p">)</span>
+    <span class="n">mask</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">new_threshold</span></div>
+
+
+<div class="viewcode-block" id="track"><a class="viewcode-back" href="../../../reference/api/AFQ/tractography/tractography/index.html#AFQ.tractography.tractography.track">[docs]</a><span class="k">def</span> <span class="nf">track</span><span class="p">(</span><span class="n">params_file</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="s2">&quot;prob&quot;</span><span class="p">,</span> <span class="n">max_angle</span><span class="o">=</span><span class="mf">30.</span><span class="p">,</span> <span class="n">sphere</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+          <span class="n">seed_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">seed_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">thresholds_as_percentages</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+          <span class="n">n_seeds</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_seeds</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rng_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+          <span class="n">stop_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span>
+          <span class="n">odf_model</span><span class="o">=</span><span class="s2">&quot;CSD&quot;</span><span class="p">,</span> <span class="n">tracker</span><span class="o">=</span><span class="s2">&quot;local&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Tractography</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    params_file : str, nibabel img.</span>
+<span class="sd">        Full path to a nifti file containing CSD spherical harmonic</span>
+<span class="sd">        coefficients, or nibabel img with model params.</span>
+<span class="sd">    directions : str</span>
+<span class="sd">        How tracking directions are determined.</span>
+<span class="sd">        One of: {&quot;det&quot; | &quot;prob&quot;}</span>
+<span class="sd">        Default: &quot;prob&quot;</span>
+<span class="sd">    max_angle : float, optional.</span>
+<span class="sd">        The maximum turning angle in each step. Default: 30</span>
+<span class="sd">    sphere : Sphere object, optional.</span>
+<span class="sd">        The discretization of direction getting. default:</span>
+<span class="sd">        dipy.data.default_sphere.</span>
+<span class="sd">    seed_mask : array, optional.</span>
+<span class="sd">        Float or binary mask describing the ROI within which we seed for</span>
+<span class="sd">        tracking.</span>
+<span class="sd">        Default to the entire volume (all ones).</span>
+<span class="sd">    seed_threshold : float, optional.</span>
+<span class="sd">        A value of the seed_mask above which tracking is seeded.</span>
+<span class="sd">        Default to 0.</span>
+<span class="sd">    n_seeds : int or 2D array, optional.</span>
+<span class="sd">        The seeding density: if this is an int, it is is how many seeds in each</span>
+<span class="sd">        voxel on each dimension (for example, 2 =&gt; [2, 2, 2]). If this is a 2D</span>
+<span class="sd">        array, these are the coordinates of the seeds. Unless random_seeds is</span>
+<span class="sd">        set to True, in which case this is the total number of random seeds</span>
+<span class="sd">        to generate within the mask. Default: 1</span>
+<span class="sd">    random_seeds : bool</span>
+<span class="sd">        Whether to generate a total of n_seeds random seeds in the mask.</span>
+<span class="sd">        Default: False.</span>
+<span class="sd">    rng_seed : int</span>
+<span class="sd">        random seed used to generate random seeds if random_seeds is</span>
+<span class="sd">        set to True. Default: None</span>
+<span class="sd">    stop_mask : array or str, optional.</span>
+<span class="sd">        If array: A float or binary mask that determines a stopping criterion</span>
+<span class="sd">        (e.g. FA).</span>
+<span class="sd">        If tuple: it contains a sequence that is interpreted as:</span>
+<span class="sd">        (pve_wm, pve_gm, pve_csf), each item of which is either a string</span>
+<span class="sd">        (full path) or a nibabel img to be used in particle filtering</span>
+<span class="sd">        tractography.</span>
+<span class="sd">        A tuple is required if tracker is set to &quot;pft&quot;.</span>
+<span class="sd">        Defaults to no stopping (all ones).</span>
+<span class="sd">    stop_threshold : float or tuple, optional.</span>
+<span class="sd">        If float, this a value of the stop_mask below which tracking is</span>
+<span class="sd">        terminated (and stop_mask has to be an array).</span>
+<span class="sd">        If str, &quot;CMC&quot; for Continuous Map Criterion [Girard2014]_.</span>
+<span class="sd">                &quot;ACT&quot; for Anatomically-constrained tractography [Smith2012]_.</span>
+<span class="sd">        A string is required if the tracker is set to &quot;pft&quot;.</span>
+<span class="sd">        Defaults to 0 (this means that if no stop_mask is passed,</span>
+<span class="sd">        we will stop only at the edge of the image).</span>
+<span class="sd">    thresholds_as_percentages : bool, optional</span>
+<span class="sd">        Interpret seed_threshold and stop_threshold as percentages of the</span>
+<span class="sd">        total non-nan voxels in the seed and stop mask to include</span>
+<span class="sd">        (between 0 and 100), instead of as a threshold on the</span>
+<span class="sd">        values themselves. </span>
+<span class="sd">        Default: False</span>
+<span class="sd">    step_size : float, optional.</span>
+<span class="sd">        The size of a step (in mm) of tractography. Default: 0.5</span>
+<span class="sd">    min_length: int, optional</span>
+<span class="sd">        The miminal length (mm) in a streamline. Default: 20</span>
+<span class="sd">    max_length: int, optional</span>
+<span class="sd">        The miminal length (mm) in a streamline. Default: 250</span>
+<span class="sd">    odf_model : str, optional</span>
+<span class="sd">        One of {&quot;DTI&quot;, &quot;CSD&quot;, &quot;DKI&quot;}. Defaults to use &quot;DTI&quot;</span>
+<span class="sd">    tracker : str, optional</span>
+<span class="sd">        Which strategy to use in tracking. This can be the standard local</span>
+<span class="sd">        tracking (&quot;local&quot;) or Particle Filtering Tracking ([Girard2014]_).</span>
+<span class="sd">        One of {&quot;local&quot;, &quot;pft&quot;}. Default: &quot;local&quot;</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of streamlines ()</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [Girard2014] Girard, G., Whittingstall, K., Deriche, R., &amp;</span>
+<span class="sd">        Descoteaux, M. Towards quantitative connectivity analysis: reducing</span>
+<span class="sd">        tractography biases. NeuroImage, 98, 266-278, 2014.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ&#39;</span><span class="p">)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading Image...&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">params_file</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">params_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">params_file</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">params_img</span> <span class="o">=</span> <span class="n">params_file</span>
+
+    <span class="n">model_params</span> <span class="o">=</span> <span class="n">params_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+    <span class="n">affine</span> <span class="o">=</span> <span class="n">params_img</span><span class="o">.</span><span class="n">affine</span>
+    <span class="n">odf_model</span> <span class="o">=</span> <span class="n">odf_model</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    <span class="n">directions</span> <span class="o">=</span> <span class="n">directions</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="c1"># We need to calculate the size of a voxel, so we can transform</span>
+    <span class="c1"># from mm to voxel units:</span>
+    <span class="n">min_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">min_length</span> <span class="o">/</span> <span class="n">step_size</span><span class="p">)</span>
+    <span class="n">max_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_length</span> <span class="o">/</span> <span class="n">step_size</span><span class="p">)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Generating Seeds...&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n_seeds</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">seed_mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">seed_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">params_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">seed_mask</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">thresholds_as_percentages</span><span class="p">:</span>
+                <span class="n">seed_threshold</span> <span class="o">=</span> <span class="n">get_percentile_threshold</span><span class="p">(</span>
+                    <span class="n">seed_mask</span><span class="p">,</span> <span class="n">seed_threshold</span><span class="p">)</span>
+            <span class="n">seed_mask</span> <span class="o">=</span> <span class="n">seed_mask</span> <span class="o">&gt;</span> <span class="n">seed_threshold</span>
+        <span class="k">if</span> <span class="n">random_seeds</span><span class="p">:</span>
+            <span class="n">seeds</span> <span class="o">=</span> <span class="n">dtu</span><span class="o">.</span><span class="n">random_seeds_from_mask</span><span class="p">(</span><span class="n">seed_mask</span><span class="p">,</span> <span class="n">seeds_count</span><span class="o">=</span><span class="n">n_seeds</span><span class="p">,</span>
+                                               <span class="n">seed_count_per_voxel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                               <span class="n">affine</span><span class="o">=</span><span class="n">affine</span><span class="p">,</span>
+                                               <span class="n">random_seed</span><span class="o">=</span><span class="n">rng_seed</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">seeds</span> <span class="o">=</span> <span class="n">dtu</span><span class="o">.</span><span class="n">seeds_from_mask</span><span class="p">(</span><span class="n">seed_mask</span><span class="p">,</span>
+                                        <span class="n">density</span><span class="o">=</span><span class="n">n_seeds</span><span class="p">,</span>
+                                        <span class="n">affine</span><span class="o">=</span><span class="n">affine</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># If user provided an array, we&#39;ll use n_seeds as the seeds:</span>
+        <span class="n">seeds</span> <span class="o">=</span> <span class="n">n_seeds</span>
+    <span class="k">if</span> <span class="n">sphere</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sphere</span> <span class="o">=</span> <span class="n">dpd</span><span class="o">.</span><span class="n">default_sphere</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Getting Directions...&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">directions</span> <span class="o">==</span> <span class="s2">&quot;det&quot;</span><span class="p">:</span>
+        <span class="n">dg</span> <span class="o">=</span> <span class="n">DeterministicMaximumDirectionGetter</span>
+    <span class="k">elif</span> <span class="n">directions</span> <span class="o">==</span> <span class="s2">&quot;prob&quot;</span><span class="p">:</span>
+        <span class="n">dg</span> <span class="o">=</span> <span class="n">ProbabilisticDirectionGetter</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unrecognized direction &#39;</span><span class="si">{</span><span class="n">directions</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">odf_model</span> <span class="o">==</span> <span class="s2">&quot;DTI&quot;</span> <span class="ow">or</span> <span class="n">odf_model</span> <span class="o">==</span> <span class="s2">&quot;DKI&quot;</span><span class="p">:</span>
+        <span class="n">evals</span> <span class="o">=</span> <span class="n">model_params</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">evecs</span> <span class="o">=</span> <span class="n">model_params</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span><span class="mi">12</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">params_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">odf</span> <span class="o">=</span> <span class="n">tensor_odf</span><span class="p">(</span><span class="n">evals</span><span class="p">,</span> <span class="n">evecs</span><span class="p">,</span> <span class="n">sphere</span><span class="p">)</span>
+        <span class="n">dg</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">from_pmf</span><span class="p">(</span><span class="n">odf</span><span class="p">,</span> <span class="n">max_angle</span><span class="o">=</span><span class="n">max_angle</span><span class="p">,</span> <span class="n">sphere</span><span class="o">=</span><span class="n">sphere</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">odf_model</span> <span class="o">==</span> <span class="s2">&quot;CSD&quot;</span> <span class="ow">or</span> <span class="n">odf_model</span> <span class="o">==</span> <span class="s2">&quot;GQ&quot;</span><span class="p">:</span>
+        <span class="n">dg</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">from_shcoeff</span><span class="p">(</span><span class="n">model_params</span><span class="p">,</span> <span class="n">max_angle</span><span class="o">=</span><span class="n">max_angle</span><span class="p">,</span> <span class="n">sphere</span><span class="o">=</span><span class="n">sphere</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">tracker</span> <span class="o">==</span> <span class="s2">&quot;local&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">stop_mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">stop_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">params_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">stop_mask</span><span class="p">))</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">ThresholdStoppingCriterion</span><span class="p">(</span><span class="n">stop_mask</span><span class="p">,</span>
+                                                            <span class="mf">0.5</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">thresholds_as_percentages</span><span class="p">:</span>
+                <span class="n">stop_threshold</span> <span class="o">=</span> <span class="n">get_percentile_threshold</span><span class="p">(</span>
+                    <span class="n">stop_mask</span><span class="p">,</span> <span class="n">stop_threshold</span><span class="p">)</span>
+            <span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">ThresholdStoppingCriterion</span><span class="p">(</span><span class="n">stop_mask</span><span class="p">,</span>
+                                                            <span class="n">stop_threshold</span><span class="p">)</span>
+
+        <span class="n">my_tracker</span> <span class="o">=</span> <span class="n">VerboseLocalTracking</span>
+
+    <span class="k">elif</span> <span class="n">tracker</span> <span class="o">==</span> <span class="s2">&quot;pft&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stop_threshold</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;You are using PFT tracking, but did not provide a string &quot;</span><span class="p">,</span>
+                <span class="s2">&quot;&#39;stop_threshold&#39; input. &quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Possible inputs are: &#39;CMC&#39; or &#39;ACT&#39;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">stop_mask</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">stop_mask</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;You are using PFT tracking, but did not provide a length &quot;</span>
+                <span class="s2">&quot;3 iterable for `stop_mask`. &quot;</span>
+                <span class="s2">&quot;Expected a (pve_wm, pve_gm, pve_csf) tuple.&quot;</span><span class="p">)</span>
+        <span class="n">pves</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">pve_imgs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">vox_sizes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">pve</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">stop_mask</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pve</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">pve</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">img</span> <span class="o">=</span> <span class="n">pve</span>
+            <span class="n">pve_imgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+            <span class="n">pves</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pve_imgs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">())</span>
+        <span class="n">average_voxel_size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">vox_sizes</span><span class="p">)</span>
+        <span class="n">pve_wm_img</span><span class="p">,</span> <span class="n">pve_gm_img</span><span class="p">,</span> <span class="n">pve_csf_img</span> <span class="o">=</span> <span class="n">pve_imgs</span>
+        <span class="n">pve_wm_data</span><span class="p">,</span> <span class="n">pve_gm_data</span><span class="p">,</span> <span class="n">pve_csf_data</span> <span class="o">=</span> <span class="n">pves</span>
+        <span class="n">pve_wm_data</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span>
+            <span class="n">pve_wm_data</span><span class="p">,</span> <span class="n">model_params</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="n">pve_wm_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+            <span class="n">params_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+        <span class="n">pve_gm_data</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span>
+            <span class="n">pve_gm_data</span><span class="p">,</span> <span class="n">model_params</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="n">pve_gm_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+            <span class="n">params_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+        <span class="n">pve_csf_data</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span>
+            <span class="n">pve_csf_data</span><span class="p">,</span> <span class="n">model_params</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="n">pve_csf_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+            <span class="n">params_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+
+        <span class="n">vox_sizes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">params_img</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">get_zooms</span><span class="p">()[:</span><span class="mi">3</span><span class="p">]))</span>
+
+        <span class="n">my_tracker</span> <span class="o">=</span> <span class="n">VerboseParticleFilteringTracking</span>
+        <span class="k">if</span> <span class="n">stop_threshold</span> <span class="o">==</span> <span class="s2">&quot;CMC&quot;</span><span class="p">:</span>
+            <span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">CmcStoppingCriterion</span><span class="o">.</span><span class="n">from_pve</span><span class="p">(</span>
+                <span class="n">pve_wm_data</span><span class="p">,</span>
+                <span class="n">pve_gm_data</span><span class="p">,</span>
+                <span class="n">pve_csf_data</span><span class="p">,</span>
+                <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span>
+                <span class="n">average_voxel_size</span><span class="o">=</span><span class="n">average_voxel_size</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">stop_threshold</span> <span class="o">==</span> <span class="s2">&quot;ACT&quot;</span><span class="p">:</span>
+            <span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">ActStoppingCriterion</span><span class="o">.</span><span class="n">from_pve</span><span class="p">(</span>
+                <span class="n">pve_wm_data</span><span class="p">,</span>
+                <span class="n">pve_gm_data</span><span class="p">,</span>
+                <span class="n">pve_csf_data</span><span class="p">)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Tracking...&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_tracking</span><span class="p">(</span><span class="n">my_tracker</span><span class="p">,</span> <span class="n">seeds</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">,</span> <span class="n">params_img</span><span class="p">,</span>
+                     <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="n">min_length</span><span class="p">,</span>
+                     <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="n">rng_seed</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="_tracking"><a class="viewcode-back" href="../../../reference/api/AFQ/tractography/tractography/index.html#AFQ.tractography.tractography._tracking">[docs]</a><span class="k">def</span> <span class="nf">_tracking</span><span class="p">(</span><span class="n">tracker</span><span class="p">,</span> <span class="n">seeds</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">,</span> <span class="n">params_img</span><span class="p">,</span>
+              <span class="n">step_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+              <span class="n">random_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">seeds</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">seeds</span> <span class="o">=</span> <span class="n">seeds</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+
+    <span class="n">tracker</span> <span class="o">=</span> <span class="n">tracker</span><span class="p">(</span>
+        <span class="n">dg</span><span class="p">,</span>
+        <span class="n">stopping_criterion</span><span class="p">,</span>
+        <span class="n">seeds</span><span class="p">,</span>
+        <span class="n">params_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
+        <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="n">min_length</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span>
+        <span class="n">random_seed</span><span class="o">=</span><span class="n">random_seed</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">StatefulTractogram</span><span class="p">(</span><span class="n">tracker</span><span class="p">,</span> <span class="n">params_img</span><span class="p">,</span> <span class="n">Space</span><span class="o">.</span><span class="n">RASMM</span><span class="p">)</span></div>
+</pre></div>
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2018--, The pyAFQ Contributors.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

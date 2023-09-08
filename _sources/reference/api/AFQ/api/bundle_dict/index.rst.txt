@@ -1,0 +1,576 @@
+:py:mod:`AFQ.api.bundle_dict`
+=============================
+
+.. py:module:: AFQ.api.bundle_dict
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.api.bundle_dict.BundleDict
+   AFQ.api.bundle_dict.PediatricBundleDict
+
+
+
+
+.. py:class:: BundleDict(bundle_info=BUNDLES, seg_algo='afq', resample_to=None, resample_subject_to=False, keep_in_memory=False)
+
+
+   Bases: :py:obj:`collections.abc.MutableMapping`
+
+   
+   Create a bundle dictionary, needed for the segmentation.
+
+
+   :Parameters:
+
+       **bundle_info** : list or dict, optional
+           A list of the bundles to be used, or a dictionary defining
+           custom bundles. See `Defining Custom Bundle Dictionaries`
+           in the `usage` section of pyAFQ's documentation for details.
+           Default: AFQ.api.bundle_dict.BUNDLES
+
+       **seg_algo: One of {"afq", "reco", "reco16", "reco80"}**
+           The bundle segmentation algorithm to use.
+               "afq" : Use waypoint ROIs + probability maps, as described
+               in [Yeatman2012]_
+               "reco" / "reco16" : Use Recobundles [Garyfallidis2017]_
+               with a 16-bundle set.
+               "reco80": Use Recobundles with an 80-bundle set.
+
+       **resample_to** : Nifti1Image or bool, optional
+           If there are bundles in bundle_info with the 'space' attribute
+           set to 'template', or with no 'space' attribute,
+           their images (all ROIs and probability maps)
+           will be resampled to the affine and shape of this image.
+           If None, the MNI template will be used.
+           If False, no resampling will be done.
+           Default: None
+
+       **resample_subject_to** : Nifti1Image or bool, optional
+           If there are bundles in bundle_info with the 'space' attribute
+           set to 'subject', their images (all ROIs and probability maps)
+           will be resampled to the affine and shape of this image.
+           If False, no resampling will be done.
+           Default: None
+
+       **keep_in_memory** : bool, optional
+           Whether, once loaded, all ROIs and probability maps will stay
+           loaded in memory within this object. By default, ROIs are loaded
+           into memory on demand and no references to ROIs are kept, other
+           than their paths. The default 18 bundles use ~6GB when all loaded.
+           Default: False
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   # import OR ROIs and create a custom bundle dict
+   # from them
+   import AFQ.data.fetch as afd
+   or_rois = afd.read_or_templates()
+
+   bundles = BundleDict({
+       "L_OR": {
+           "include": [
+               or_rois["left_OR_1"],  # these can be paths to Nifti files
+               or_rois["left_OR_2"]],  # or they can Nifti images
+           "exclude": [
+               or_rois["left_OP_MNI"],
+               or_rois["left_TP_MNI"],
+               or_rois["left_pos_thal_MNI"]],
+           "start": or_rois['left_thal_MNI'],
+           "end": or_rois['left_V1_MNI'],
+           "cross_midline": False,
+       },
+       "R_OR": {
+           "include": [
+               or_rois["right_OR_1"],
+               or_rois["right_OR_2"]],
+           "exclude": [
+               or_rois["right_OP_MNI"],
+               or_rois["right_TP_MNI"],
+               or_rois["right_pos_thal_MNI"]],
+           "start": or_rois['right_thal_MNI'],
+           "end": or_rois['right_V1_MNI'],
+           "cross_midline": False
+       }
+   })
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: update_max_includes(new_max)
+
+
+   .. py:method:: load_templates()
+
+      
+      Loads templates for generating bundle dictionaries
+      from bundle names.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: _gen(bundle_name)
+
+      
+      Given a bundle name, load its
+      bundle's dictionary describing the bundle.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: gen_all()
+
+      
+      If bundle_info is a list of names, this will load
+      each bundle's dictionary describing the bundle.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: set_bids_info(bids_layout, bids_path, subject, session)
+
+      
+      Provide the bids_layout, a nearest path,
+      and the subject and session information
+      to load ROIS from BIDS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: _cond_load(roi_or_sl, resample_to)
+
+      
+      Load ROI or streamline if not already loaded
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get_b_info(b_name)
+
+
+   .. py:method:: __getitem__(key)
+
+
+   .. py:method:: __setitem__(key, item)
+
+
+   .. py:method:: __len__()
+
+
+   .. py:method:: __delitem__(key)
+
+
+   .. py:method:: __iter__()
+
+
+   .. py:method:: copy()
+
+      
+      Generates a copy of this BundleDict where the internal dictionary
+      is a copy of this BundleDict's internal dictionary.
+      Useful if you want to add or remove bundles from a copy
+      of a BundleDict.
+
+
+
+      :Returns:
+
+          **bundle_dict** : BundleDict
+              Euclidean norms of vectors.
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: apply_to_rois(b_name, func, *args, dry_run=False, **kwargs)
+
+      
+      Applies some transformation to all ROIs (include, exclude, end, start)
+      and the prob_map in a given bundle.
+
+
+      :Parameters:
+
+          **b_name** : name
+              bundle name of bundle whose ROIs will be transformed.
+
+          **func** : function
+              function whose first argument must be a Nifti1Image and which
+              returns a Nifti1Image
+
+          **dry_run** : bool
+              Whether to actually apply changes returned by `func` to the ROIs.
+              If has_return is False, dry_run is not used.
+
+          **\*args**
+              Additional arguments for func
+
+          **\*\*kwargs**
+              Optional arguments for func
+
+      :Returns:
+
+          A dictionary where keys are
+              ..
+
+          the roi type and values are the transformed ROIs.
+              ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: _cond_load_bundle(b_name, dry_run=False)
+
+      
+      Given a bundle name, resample all ROIs and prob maps
+      into either template or subject space for that bundle,
+      depending on its "space" attribute.
+
+
+      :Parameters:
+
+          **b_name** : str
+              Name of the bundle to be resampled.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: is_bundle_in_template(bundle_name)
+
+
+   .. py:method:: _roi_transform_helper(roi, mapping, new_affine, bundle_name)
+
+
+   .. py:method:: transform_rois(bundle_name, mapping, new_affine, base_fname=None)
+
+      
+      Get the bundle definition with transformed ROIs
+      for a given bundle into a
+      given subject space using a given mapping.
+      Will only run on bundles which are in template
+      space, otherwise will just return the bundle
+      definition without transformation.
+
+
+      :Parameters:
+
+          **bundle_name** : str
+              Name of the bundle to be transformed.
+
+          **mapping** : DiffeomorphicMap object
+              A mapping between DWI space and a template.
+
+          **new_affine** : array
+              Affine of space transformed into.
+
+          **base_fname** : str, optional
+              Base file path to save ROIs too. Additional BIDS
+              descriptors will be added to this file path. If None, 
+              do not save the ROIs.
+
+      :Returns:
+
+          If base_fname is None, a dictionary where keys are
+              ..
+
+          the roi type and values are the transformed ROIs.
+              ..
+
+          Otherwise, a list of file names where the transformed
+              ..
+
+          ROIs are saved.
+              ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: __add__(other)
+
+
+
+.. py:class:: PediatricBundleDict(bundle_info=PEDIATRIC_BUNDLES, seg_algo='afq', resample_to=None, resample_subject_to=False, keep_in_memory=False)
+
+
+   Bases: :py:obj:`BundleDict`
+
+   
+   Create a bundle dictionary, needed for the segmentation.
+
+
+   :Parameters:
+
+       **bundle_info** : list or dict, optional
+           A list of the bundles to be used, or a dictionary defining
+           custom bundles. See `Defining Custom Bundle Dictionaries`
+           in the `usage` section of pyAFQ's documentation for details.
+           Default: AFQ.api.bundle_dict.BUNDLES
+
+       **seg_algo: One of {"afq", "reco", "reco16", "reco80"}**
+           The bundle segmentation algorithm to use.
+               "afq" : Use waypoint ROIs + probability maps, as described
+               in [Yeatman2012]_
+               "reco" / "reco16" : Use Recobundles [Garyfallidis2017]_
+               with a 16-bundle set.
+               "reco80": Use Recobundles with an 80-bundle set.
+
+       **resample_to** : Nifti1Image or bool, optional
+           If there are bundles in bundle_info with the 'space' attribute
+           set to 'template', or with no 'space' attribute,
+           their images (all ROIs and probability maps)
+           will be resampled to the affine and shape of this image.
+           If None, the MNI template will be used.
+           If False, no resampling will be done.
+           Default: None
+
+       **resample_subject_to** : Nifti1Image or bool, optional
+           If there are bundles in bundle_info with the 'space' attribute
+           set to 'subject', their images (all ROIs and probability maps)
+           will be resampled to the affine and shape of this image.
+           If False, no resampling will be done.
+           Default: None
+
+       **keep_in_memory** : bool, optional
+           Whether, once loaded, all ROIs and probability maps will stay
+           loaded in memory within this object. By default, ROIs are loaded
+           into memory on demand and no references to ROIs are kept, other
+           than their paths. The default 18 bundles use ~6GB when all loaded.
+           Default: False
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: Examples
+
+   # import OR ROIs and create a custom bundle dict
+   # from them
+   import AFQ.data.fetch as afd
+   or_rois = afd.read_or_templates()
+
+   bundles = BundleDict({
+       "L_OR": {
+           "include": [
+               or_rois["left_OR_1"],  # these can be paths to Nifti files
+               or_rois["left_OR_2"]],  # or they can Nifti images
+           "exclude": [
+               or_rois["left_OP_MNI"],
+               or_rois["left_TP_MNI"],
+               or_rois["left_pos_thal_MNI"]],
+           "start": or_rois['left_thal_MNI'],
+           "end": or_rois['left_V1_MNI'],
+           "cross_midline": False,
+       },
+       "R_OR": {
+           "include": [
+               or_rois["right_OR_1"],
+               or_rois["right_OR_2"]],
+           "exclude": [
+               or_rois["right_OP_MNI"],
+               or_rois["right_TP_MNI"],
+               or_rois["right_pos_thal_MNI"]],
+           "start": or_rois['right_thal_MNI'],
+           "end": or_rois['right_V1_MNI'],
+           "cross_midline": False
+       }
+   })
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: load_templates()
+
+      
+      Loads templates for generating bundle dictionaries
+      from bundle names.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: _gen(bundle_name)
+
+      
+      Given a bundle name, load its
+      bundle's dictionary describing the bundle.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

@@ -1,0 +1,416 @@
+:py:mod:`AFQ.segmentation`
+==========================
+
+.. py:module:: AFQ.segmentation
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.segmentation.Segmentation
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.segmentation.clean_bundle
+   AFQ.segmentation.clean_by_endpoints
+
+
+
+.. py:class:: Segmentation(nb_points=False, nb_streamlines=False, seg_algo='AFQ', clip_edges=False, parallel_segmentation={'n_jobs': 4, 'engine': 'dask'}, progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=1.25, reduction_thr=25, refine=False, pruning_thr=12, b0_threshold=50, prob_threshold=0, roi_dist_tie_break=False, dist_to_waypoint=None, rng=None, return_idx=False, presegment_bundle_dict=None, presegment_kwargs={}, filter_by_endpoints=True, dist_to_atlas=4, save_intermediates=None)
+
+
+   .. py:method:: _read_tg(tg=None)
+
+
+   .. py:method:: segment(bundle_dict, tg, mapping, fdata=None, fbval=None, fbvec=None, reg_prealign=None, reg_template=None, img_affine=None, reset_tg_space=False, clean_params={})
+
+      
+      Segment streamlines into bundles based on either waypoint ROIs
+      [R03e71c6d7dc6-Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
+      Parameters
+      ----------
+      bundle_dict: dict or AFQ.api.BundleDict
+          Meta-data for the segmentation. The format is something like::
+              {'bundle_name': {
+                  'include':[img1, img2],
+                  'prob_map': img3,
+                  'cross_midline': False,
+                  'start': img4,
+                  'end': img5}}
+      tg : StatefulTractogram
+          Bundles to segment
+      mapping : DiffeomorphicMap, or equivalent interface
+          A mapping between DWI space and a template.
+      fdata, fbval, fbvec : str
+          Full path to data, bvals, bvecs
+      reg_prealign : array, optional.
+          The linear transformation to be applied to align input images to
+          the reference space before warping under the deformation field.
+          Default: None.
+      reg_template : str or nib.Nifti1Image, optional.
+          Template to use for registration. Default: MNI T2.
+      img_affine : array, optional.
+          The spatial transformation from the measurement to the scanner
+          space.
+      reset_tg_space : bool, optional
+          Whether to reset the space of the input tractogram after
+          segmentation is complete. Default: False.
+      clean_params : dict, optional
+          Parameters for Mahalanobis cleaning. Default: {}
+
+
+
+      :Returns:
+
+          **dict** : Where keys are bundle names, values are tractograms of
+              these bundles.
+
+
+
+
+
+
+
+
+
+      .. rubric:: References
+
+      .. [R03e71c6d7dc6-Yeatman2012] Yeatman, Jason D., Robert F. Dougherty, Nathaniel J.
+      Myall, Brian A. Wandell, and Heidi M. Feldman. 2012. "Tract Profiles of
+      White Matter Properties: Automating Fiber-Tract Quantification"
+      PloS One 7 (11): e49790.
+      .. [R03e71c6d7dc6-Garyfallidis17] Garyfallidis et al. Recognition of white matter
+      bundles using local and global streamline-based registration and
+      clustering, Neuroimage, 2017.
+
+      .. only:: latex
+
+         [R03e71c6d7dc6-Yeatman2012]_, [R03e71c6d7dc6-Garyfallidis17]_
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: prepare_img(fdata, fbval, fbvec)
+
+      
+      Prepare image data from DWI data.
+      Parameters
+      ----------
+      fdata, fbval, fbvec : str
+          Full path to data, bvals, bvecs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: cross_streamlines(fgarray, template=None)
+
+      
+      Classify the streamlines by whether they cross the midline.
+      Creates a crosses attribute which is an array of booleans. Each boolean
+      corresponds to a streamline, and is whether or not that streamline
+      crosses the midline.
+      Parameters
+      ----------
+      fgarray : streamlines resampled to the same length.
+      template : nibabel.Nifti1Image class instance
+          An affine transformation into a template space.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: _return_empty(bundle)
+
+      
+      Helper function for segment_afq, to return an empty dict under
+      some conditions.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: _add_bundle_to_fiber_group(b_name, sl, idx)
+
+      
+      Helper function for segment_afq, to add a bundle
+      to a fiber group.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: segment_afq(clean_params={}, tg=None)
+
+      
+      Assign streamlines to bundles using the waypoint ROI approach
+      Parameters
+      ----------
+      tg : StatefulTractogram class instance
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: move_streamlines(tg, to='template')
+
+      
+      Streamline-based registration of a whole-brain tractogram to
+      the MNI whole-brain atlas.
+
+      to : str
+          "template" or "subject"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: segment_reco(tg=None)
+
+      
+      Segment streamlines using the RecoBundles algorithm [Garyfallidis2017]
+      Parameters
+      ----------
+      tg : StatefulTractogram class instance
+          A whole-brain tractogram to be segmented.
+      Returns
+      -------
+      fiber_groups : dict
+          Keys are names of the bundles, values are Streamline objects.
+          The streamlines in each object have all been oriented to have the
+          same orientation (using `dts.orient_by_streamline`).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:function:: clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3, length_threshold=4, min_sl=20, stat='mean', return_idx=False)
+
+   
+   Clean a segmented fiber group based on the Mahalnobis distance of
+   each streamline
+
+
+   :Parameters:
+
+       **tg** : StatefulTractogram class instance or ArraySequence
+           A whole-brain tractogram to be segmented.
+
+       **n_points** : int, optional
+           Number of points to resample streamlines to.
+           Default: 100
+
+       **clean_rounds** : int, optional.
+           Number of rounds of cleaning based on the Mahalanobis distance from
+           the mean of extracted bundles. Default: 5
+
+       **distance_threshold** : float, optional.
+           Threshold of cleaning based on the Mahalanobis distance (the units are
+           standard deviations). Default: 3.
+
+       **length_threshold: float, optional**
+           Threshold for cleaning based on length (in standard deviations). Length
+           of any streamline should not be *more* than this number of stdevs from
+           the mean length.
+
+       **min_sl** : int, optional.
+           Number of streamlines in a bundle under which we will
+           not bother with cleaning outliers. Default: 20.
+
+       **stat** : callable or str, optional.
+           The statistic of each node relative to which the Mahalanobis is
+           calculated. Default: `np.mean` (but can also use median, etc.)
+
+       **return_idx** : bool
+           Whether to return indices in the original streamlines.
+           Default: False.
+
+       **Returns**
+           ..
+
+       **-------**
+           ..
+
+       **A StatefulTractogram class instance containing only the streamlines**
+           ..
+
+       **that have a Mahalanobis distance smaller than `clean_threshold` from**
+           ..
+
+       **the mean of each one of the nodes.**
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: clean_by_endpoints(streamlines, target, target_idx, tol=None, flip_sls=None, accepted_idxs=None)
+
+   
+   Clean a collection of streamlines based on an endpoint ROI.
+   Filters down to only include items that have their start or end points
+   close to the targets.
+   Parameters
+   ----------
+   streamlines : sequence of N by 3 arrays
+       Where N is number of nodes in the array, the collection of
+       streamlines to filter down to.
+   target: Nifti1Image
+       Nifti1Image containing a boolean representation of the ROI.
+   target_idx: int.
+       Index within each streamline to check if within the target region.
+       Typically 0 for startpoint ROIs or -1 for endpoint ROIs.
+       If using flip_sls, this becomes (len(sl) - this_idx - 1) % len(sl)
+   tol : float, optional A distance tolerance (in units that the coordinates
+       of the streamlines are represented in). Default: 0, which means that
+       the endpoint is exactly in the coordinate of the target ROI.
+   flip_sls : 1d array, optional
+       Length is len(streamlines), whether to flip the streamline.
+   accepted_idxs : 1d array, optional
+       Boolean array, where entries correspond to eachs streamline,
+       and streamlines that pass cleaning will be set to 1.
+   Yields
+   -------
+   boolean array of streamlines that survive cleaning.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

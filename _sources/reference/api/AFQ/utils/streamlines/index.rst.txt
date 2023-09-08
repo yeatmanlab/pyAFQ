@@ -1,0 +1,74 @@
+:py:mod:`AFQ.utils.streamlines`
+===============================
+
+.. py:module:: AFQ.utils.streamlines
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.utils.streamlines.SegmentedSFT
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.utils.streamlines.split_streamline
+
+
+
+.. py:class:: SegmentedSFT(bundles, space)
+
+
+   .. py:method:: get_sft_and_sidecar()
+
+
+   .. py:method:: get_bundle(b_name)
+
+
+   .. py:method:: fromfile(trk_file, reference='same', sidecar_file=None)
+      :classmethod:
+
+
+
+.. py:function:: split_streamline(streamlines, sl_to_split, split_idx)
+
+   
+   Given a Streamlines object, split one of the underlying streamlines
+
+
+   :Parameters:
+
+       **streamlines** : a Streamlines class instance
+           The group of streamlines, one of which is being split.
+
+       **sl_to_split** : int
+           The index of the streamline that is being split
+
+       **split_idx** : int
+           Where is the streamline being split
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
