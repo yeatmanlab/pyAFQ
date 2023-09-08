@@ -61,7 +61,9 @@ def segment(dwi, data_imap, mapping_imap,
         is_trx = False
     elif streamlines.endswith(".trx"):
         is_trx = True
-        tg = load_trx(streamlines, img).to_sft()
+        trx = load_trx(streamlines, img)
+        trx.streamlines._data = trx.streamlines._data.astype(np.float32)
+        tg = trx.to_sft()
 
     indices_to_remove, _ = tg.remove_invalid_streamlines()
     if len(indices_to_remove) > 0:
