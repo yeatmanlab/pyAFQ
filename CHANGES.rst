@@ -1,3 +1,39 @@
+1.1 (September 08, 2023)
+========================
+Add compatibility with GPU based tractography. Speeds
+up the Mahalanobis cleaning step. Removes interface for
+loading ITK files and using them as maps in pyAFQ, because
+it did not work in all cases. Adds more examples and updates
+docs to a new system. Other minor fixes.
+  * [FIX] delete folders in AFQ derivatives when clobbering (#1015)
+  * Update the pypi action so that it runs on latest ubuntu. (#1012)
+  * NF: Adds fetcher for cerebellar peduncle waypoint ROIs. (#968)
+  * [ENH] Bundle montage (#994)
+  * Slf123new (#997)
+  *  (#1011)
+  * [FIX] fix a small bug in the curvature code (#985)
+  * added more documentation of dependencies (#1002)
+  * [Doc] add an example of single subject rois; reduce example time (#999)
+  * RF: Set dask as the default paralellization engine. (#1009)
+  * [ENH] add OR pediatric bundle definition, make it easier to add future pediatric bundles (#1007)
+  * DOC: Myst (#992)
+  * [ENH] Much faster mahal cleaning (#982)
+  * [FIX] Remove itk (#981)
+  * Update setup.cfg with newer pybids (#991)
+  * Update plot_viz.py (#993)
+  * Installation with quotes (#988)
+  * [ENH] update dipy (#986)
+  * [ENH] Adds export_up_to, adds some minor fixes here and there (#977)
+  * [ENH] allow the setting of number of voxels for a seed mask (#976)
+  * [ENH] Calculate new curvature metric manually (#973)
+  * [FIX] split GPU pyafq docker builds into differnet actions (#975)
+  * [ENH] add CUDA 12 compat to GPU tractography (#972)
+  * [ENH] allow GPU docker file to play nice with singularity (#971)
+  * [ENH/FIX] Improvements for finding the Visual Pathway (#953)
+  * Adds back reference documentation to reference section. (#964)
+  * Starting doc overhaul (#948)
+  * [ENH] add gpu tracking to pyAFQ (#962)
+
 1.0.1 (February 22, 2023)
 =========================
 Fixed two bugs, where max streamline length was not being enforced and the
