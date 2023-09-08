@@ -75,6 +75,7 @@ class SegmentedSFT():
         sidecar_info = read_json(sidecar_file)
         if trk_or_trx_file.endswith(".trx"):
             trx = load_trx(trk_or_trx_file, reference)
+            trx.streamlines._data = trx.streamlines._data.astype(np.float32)
             sft = trx.to_sft()
             if reference == "same":
                 reference = sft
