@@ -135,9 +135,16 @@ def as_file(suffix, include_track=False, include_seg=False):
                 base_fname, suffix,
                 tracking_params=tracking_params,
                 segmentation_params=segmentation_params)
-            exists = (op.exists(this_file)
-                      or op.exists(this_file + ".trk")
-                      or op.exists(this_file + ".trx"))
+
+            exists = False
+            if op.exists(this_file):
+                exists = True
+            elif op.exists(this_file + ".trk"):
+                this_file = this_file + ".trk"
+                exists = True
+            elif op.exists(this_file + ".trx"):
+                this_file = this_file + ".trx"
+                exists = True
             if not exists:
                 gen, meta = func(*args[:og_arg_count], **kwargs)
 
@@ -145,7 +152,6 @@ def as_file(suffix, include_track=False, include_seg=False):
                 if isinstance(gen, nib.Nifti1Image):
                     nib.save(gen, this_file)
                 elif isinstance(gen, StatefulTractogram):
-                    this_file = this_file + ".trk"
                     save_tractogram(
                         gen, this_file, bbox_valid_check=False)
                 elif isinstance(gen, np.ndarray):
