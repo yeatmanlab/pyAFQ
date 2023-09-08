@@ -16,9 +16,11 @@ import numpy as np
 
 from dipy.io.streamline import load_trk
 from dipy.tracking.streamline import transform_streamlines
+from dipy.align import resample
 
 from fury import actor, window
 from fury.colormap import create_colormap
+from matplotlib.cm import tab20
 
 import AFQ.data.fetch as afd
 
@@ -96,7 +98,9 @@ cst_t1w = transform_streamlines(sft_cst.streamlines,
 # .. note::
 #   A virtual frame buffer is needed if you are running this example on
 #   a machine that is not connected to a display ("headless"). If this is
-#   the case, you can either
+#   the case, you can either run this example with the environment variable
+#   "XVFB" set to "1" or "True" or you can remove the if statement below,
+#   which will start a virtual frame buffer for you.
 
 if os.environ.get("XVFB", False):
     print("Initializing XVFB")
@@ -231,6 +235,7 @@ scene.set_camera(position=(238.04, 174.48, 143.04),
                  focal_point=(96.32, 110.34, 84.48),
                  view_up=(-0.33, -0.12, 0.94))
 
+scene.background((1, 1, 1))
 #############################################################################
 # Record the visualization
 # -------------------------
@@ -240,6 +245,7 @@ scene.set_camera(position=(238.04, 174.48, 143.04),
 # that we get a nice crisp image. That also means the file is pretty large.
 
 window.record(scene, out_path='arc_cst1.png', size=(2400, 2400))
+
 
 
 ############################################################################
@@ -256,7 +262,6 @@ window.record(scene, out_path='arc_cst1.png', size=(2400, 2400))
 # the scene before adding these new actors and adding back the slice actors. We
 # then call `record` to create this new figure.
 
-from matplotlib.cm import tab20
 color_arc = tab20.colors[18]
 color_cst = tab20.colors[2]
 
@@ -364,7 +369,6 @@ window.record(scene, out_path='arc_cst3.png', size=(2400, 2400))
 #   be visualized provided an array with a binary representation of the volume #   enclosed in this boundary
 
 
-from dipy.align import resample
 
 waypoint1 = nib.load(
     op.join(
@@ -374,7 +378,7 @@ waypoint1 = nib.load(
 waypoint2 = nib.load(
     op.join(
         afq_path,
-        "ROIs", "sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_desc-ROI-ARC_L-1-include.nii.gz"))
+        "ROIs", "sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_desc-ROI-ARC_L-2-include.nii.gz"))
 
 waypoint1_xform = resample(waypoint1, t1w_img)
 waypoint2_xform = resample(waypoint2, t1w_img)
