@@ -136,16 +136,14 @@ def as_file(suffix, include_track=False, include_seg=False):
                 tracking_params=tracking_params,
                 segmentation_params=segmentation_params)
 
-            exists = False
-            if op.exists(this_file):
-                exists = True
-            elif op.exists(this_file + ".trk"):
-                this_file = this_file + ".trk"
-                exists = True
-            elif op.exists(this_file + ".trx"):
-                this_file = this_file + ".trx"
-                exists = True
-            if not exists:
+            # tracking_params is defined and file has no extension
+            if tracking_params is not None and not op.splitext(this_file)[1]:
+                if tracking_params["trx"]:
+                    this_file = this_file + ".trx"
+                else:
+                    this_file = this_file + ".trk"
+
+            if not op.exists(this_file):
                 gen, meta = func(*args[:og_arg_count], **kwargs)
 
                 logger.info(f"Saving {this_file}")
