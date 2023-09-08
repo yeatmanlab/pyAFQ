@@ -11,7 +11,7 @@ try:
 except ModuleNotFoundError:
     has_trx = False
 
-from AFQ.utils.path import drop_extension
+from AFQ.utils.path import drop_extension, read_json
 
 
 class SegmentedSFT():
