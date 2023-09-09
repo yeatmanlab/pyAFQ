@@ -28,6 +28,8 @@ this is 2.69GB of data, so it can take a while to download). This data has
 been previously published in Grotheer et al. (2022).
 
 """
+
+print("Downloading processed pediatric data; this could take a while...")
 data_folder = op.join(op.expanduser('~'), "AFQ_data/")
 wget.download("https://figshare.com/ndownloader/files/38053692",
               op.join(data_folder, "baby_example.zip"))
@@ -59,7 +61,7 @@ there in the way that pyAFQ expects to find them.
 
 
 myafq = GroupAFQ(
-    bids_path=op.join(op.expanduser('~'), "AFQ_data/baby_example/"),
+    bids_path=op.join(op.expanduser('~'), "AFQ_data/baby_example/example_bids_subject"),
     preproc_pipeline="vistasoft",
     reg_template_spec=afd.read_pediatric_templates()["UNCNeo-withCerebellum-for-babyAFQ"],
     reg_subject_spec="b0",
