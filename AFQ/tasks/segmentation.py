@@ -54,7 +54,7 @@ def segment(dwi, data_imap, mapping_imap,
     reg_template = data_imap["reg_template"]
     streamlines = tractography_imap["streamlines"]
     img = nib.load(dwi)
-    if streamlines.endswith(".trk"):
+    if streamlines.endswith(".trk") or streamlines.endswith(".tck"):
         tg = load_tractogram(
             streamlines, img, Space.VOX,
             bbox_valid_check=False)
