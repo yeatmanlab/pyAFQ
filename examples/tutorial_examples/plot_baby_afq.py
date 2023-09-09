@@ -77,8 +77,8 @@ myafq = GroupAFQ(
 ##########################################################################
 # Visualizing bundles:
 # --------------------
-
-plotly.io.show(myafq.export("all_bundles_figure").values()[0][0])
+viz = myafq.export("all_bundles_figure")
+plotly.io.show(viz["01"])
 
 ##########################################################################
 # References:

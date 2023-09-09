@@ -962,7 +962,7 @@ class PediatricBundleDict(BundleDict):
 
         self.templates["Callosum_midsag"] = self.templates["mid-saggital"]
 
-        for bundle_name in PEDIATRIC_BUNDLES:
+        for bundle_name in prob_map_order:
             self.templates[bundle_name + "_prob_map"] = nib.Nifti1Image(
                 prob_map_data[
                     ...,
