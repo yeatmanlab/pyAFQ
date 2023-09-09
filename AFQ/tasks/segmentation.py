@@ -16,6 +16,13 @@ import AFQ.utils.streamlines as aus
 from AFQ.tasks.utils import get_default_args
 import AFQ.utils.volume as auv
 
+try:
+    from trx.io import load as load_trx
+    from trx.trx_file_memmap import TrxFile
+    has_trx = True
+except ModuleNotFoundError:
+    has_trx = False
+
 from dipy.io.streamline import load_tractogram, save_tractogram
 from dipy.io.stateful_tractogram import Space
 from dipy.stats.analysis import afq_profile, gaussian_weights
@@ -26,11 +33,11 @@ logger = logging.getLogger('AFQ')
 
 
 @pimms.calc("bundles")
-@as_file('_tractography.trk', include_track=True, include_seg=True)
+@as_file('_tractography', include_track=True, include_seg=True)
 def segment(dwi, data_imap, mapping_imap,
             tractography_imap, segmentation_params, clean_params):
     """
-    full path to a trk file containing containting
+    full path to a trk/trx file containing containing
     segmented streamlines, labeled by bundle
 
     Parameters
@@ -47,9 +54,17 @@ def segment(dwi, data_imap, mapping_imap,
     reg_template = data_imap["reg_template"]
     streamlines = tractography_imap["streamlines"]
     img = nib.load(dwi)
-    tg = load_tractogram(
-        streamlines, img, Space.VOX,
-        bbox_valid_check=False)
+    if streamlines.endswith(".trk"):
+        tg = load_tractogram(
+            streamlines, img, Space.VOX,
+            bbox_valid_check=False)
+        is_trx = False
+    elif streamlines.endswith(".trx"):
+        is_trx = True
+        trx = load_trx(streamlines, img)
+        trx.streamlines._data = trx.streamlines._data.astype(np.float32)
+        tg = trx.to_sft()
+
     indices_to_remove, _ = tg.remove_invalid_streamlines()
     if len(indices_to_remove) > 0:
         logger.warning(f"{len(indices_to_remove)} invalid streamlines removed")
@@ -71,7 +86,15 @@ def segment(dwi, data_imap, mapping_imap,
     if len(seg_sft.sft) < 1:
         raise ValueError("Fatal: No bundles recognized.")
 
-    tgram, meta = seg_sft.get_sft_and_sidecar()
+    if is_trx:
+        seg_sft.sft.dtype_dict = {'positions': np.float16,
+                                  'offsets': np.uint32}
+        tgram = TrxFile.from_sft(seg_sft.sft)
+        tgram.groups = seg_sft.bundle_idxs
+        meta = {}
+
+    else:
+        tgram, meta = seg_sft.get_sft_and_sidecar()
 
     segmentation_params_out = {
         arg_name: value if isinstance(value, (int, float, bool, str)) or (
@@ -92,9 +115,13 @@ def export_bundles(base_fname, results_dir,
                    segmentation_params):
     """
     dictionary of paths, where each path is
-    a full path to a trk file containing the streamlines of a given bundle,
-    cleaned or uncleaned
+    a full path to a trk file containing the streamlines of a given bundle.
     """
+    is_trx = tracking_params.get("trx", False)
+    if is_trx:
+        raise ValueError(
+            "Cannot export individual bundles when using trx format")
+
     bundles_dir = op.join(results_dir, "bundles")
     os.makedirs(bundles_dir, exist_ok=True)
     seg_sft = aus.SegmentedSFT.fromfile(bundles)
@@ -228,9 +255,11 @@ def tract_profiles(bundles,
     node_numbers = []
     profiles = np.empty((len(scalar_dict), 0)).tolist()
     this_profile = np.zeros((len(scalar_dict), 100))
-
+    reference = nib.load(scalar_dict[list(scalar_dict.keys())[0]])
     seg_sft = aus.SegmentedSFT.fromfile(
-        bundles)
+        bundles,
+        reference=reference)
+
     seg_sft.sft.to_rasmm()
     for bundle_name in seg_sft.bundle_names:
         this_sl = seg_sft.get_bundle(bundle_name).streamlines

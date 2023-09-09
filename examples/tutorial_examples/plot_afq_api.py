@@ -57,7 +57,8 @@ afd.organize_stanford_data(clear_previous_afq="track")
 
 tracking_params = dict(n_seeds=25000,
                        random_seeds=True,
-                       rng_seed=42)
+                       rng_seed=42,
+                       trx=True)
 
 ##########################################################################
 # Initialize a GroupAFQ object:

@@ -22,7 +22,7 @@ jobs:
     - name: Install
       run: |
         python -m pip install --upgrade pip
-        pip install .[dev,fury,afqbrowser]
+        pip install .[all]
     - name: Nibabel pre-release installation
       if: ${{ matrix.nibabel-pre }}
       run: |

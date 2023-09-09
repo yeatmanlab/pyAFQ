@@ -301,6 +301,18 @@ def test_AFQ_fury():
     myafq.export("all_bundles_figure")
 
 
+def test_AFQ_trx():
+    tmpdir = tempfile.TemporaryDirectory()
+    bids_path = op.join(tmpdir.name, "stanford_hardi")
+    afd.organize_stanford_data(path=tmpdir.name)
+
+    myafq = GroupAFQ(
+        bids_path=bids_path,
+        preproc_pipeline='vistasoft',
+        tracking_params={"trx": True})
+    myafq.export("all_bundles_figure")
+
+
 def test_AFQ_init():
     """
     Test the initialization of the GroupAFQ object

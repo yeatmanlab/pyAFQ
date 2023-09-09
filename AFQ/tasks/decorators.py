@@ -8,6 +8,13 @@ import nibabel as nib
 from dipy.io.streamline import save_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram
 
+try:
+    from trx.trx_file_memmap import TrxFile
+    from trx.io import save as save_trx
+    has_trx = True
+except ModuleNotFoundError:
+    has_trx = False
+
 import numpy as np
 
 from AFQ.tasks.utils import get_fname
@@ -128,20 +135,32 @@ def as_file(suffix, include_track=False, include_seg=False):
                 base_fname, suffix,
                 tracking_params=tracking_params,
                 segmentation_params=segmentation_params)
+
+            # tracking_params is defined and file has no extension
+            if tracking_params is not None and not op.splitext(this_file)[1]:
+                if tracking_params["trx"]:
+                    this_file = this_file + ".trx"
+                else:
+                    this_file = this_file + ".trk"
+
             if not op.exists(this_file):
-                img_trk_np_or_csv, meta = func(*args[:og_arg_count], **kwargs)
+                gen, meta = func(*args[:og_arg_count], **kwargs)
 
                 logger.info(f"Saving {this_file}")
-                if isinstance(img_trk_np_or_csv, nib.Nifti1Image):
-                    nib.save(img_trk_np_or_csv, this_file)
-                elif isinstance(img_trk_np_or_csv, StatefulTractogram):
+                if isinstance(gen, nib.Nifti1Image):
+                    nib.save(gen, this_file)
+                elif isinstance(gen, StatefulTractogram):
                     save_tractogram(
-                        img_trk_np_or_csv, this_file, bbox_valid_check=False)
-                elif isinstance(img_trk_np_or_csv, np.ndarray):
-                    np.save(this_file, img_trk_np_or_csv)
+                        gen, this_file, bbox_valid_check=False)
+                elif isinstance(gen, np.ndarray):
+                    np.save(this_file, gen)
+                elif isinstance(gen, TrxFile):
+                    save_trx(gen, this_file)
                 else:
-                    img_trk_np_or_csv.to_csv(this_file)
+                    gen.to_csv(this_file)
 
+                # these are used to determine dependencies
+                # when clobbering derivatives
                 if include_seg:
                     meta["dependent"] = "rec"
                 elif include_track:

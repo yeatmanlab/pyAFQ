@@ -4,6 +4,13 @@ import numpy as np
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 import os.path as op
 
+
+try:
+    from trx.io import load as load_trx
+    has_trx = True
+except ModuleNotFoundError:
+    has_trx = False
+
 from AFQ.utils.path import drop_extension, read_json
 
 
@@ -26,7 +33,7 @@ class SegmentedSFT():
             this_sls = list(this_sls.streamlines)
             sls.extend(this_sls)
             new_idx_count = idx_count + len(this_sls)
-            idxs[b_name] = list(range(idx_count, new_idx_count))
+            idxs[b_name] = np.arange(idx_count, new_idx_count, dtype=np.uint32)
             idx_count = new_idx_count
             self.bundle_names.append(b_name)
 
@@ -50,36 +57,49 @@ class SegmentedSFT():
             for ii in range(len(self.this_tracking_idxs)):
                 self.this_tracking_idxs[ii] = int(self.this_tracking_idxs[ii])
             sidecar_info["tracking_idx"] = self.this_tracking_idxs
-
         return self.sft, sidecar_info
 
     def get_bundle(self, b_name):
         return self.sft[self.bundle_idxs[b_name]]
 
     @classmethod
-    def fromfile(cls, trk_file, reference="same", sidecar_file=None):
+    def fromfile(cls, trk_or_trx_file, reference="same", sidecar_file=None):
         if sidecar_file is None:
             # assume json sidecar has the same name as trk_file,
             # but with json suffix
-            sidecar_file = f'{drop_extension(trk_file)}.json'
+            sidecar_file = f'{drop_extension(trk_or_trx_file)}.json'
             if not op.exists(sidecar_file):
                 raise ValueError((
                     "JSON sidecars are required for trk files. "
                     f"JSON sidecar not found for: {sidecar_file}"))
         sidecar_info = read_json(sidecar_file)
-        sft = load_tractogram(trk_file, reference, Space.RASMM)
-        if reference == "same":
-            reference = sft
-        bundles = {}
-        if "bundle_ids" in sidecar_info:
-            for b_name, b_id in sidecar_info["bundle_ids"].items():
-                if not b_name == "whole_brain":
-                    idx = np.where(
-                        sft.data_per_streamline['bundle'] == b_id)[0]
-                    bundles[b_name] = StatefulTractogram(
-                        sft.streamlines[idx], reference, Space.RASMM)
+        if trk_or_trx_file.endswith(".trx"):
+            trx = load_trx(trk_or_trx_file, reference)
+            trx.streamlines._data = trx.streamlines._data.astype(np.float32)
+            sft = trx.to_sft()
+            if reference == "same":
+                reference = sft
+            bundles = {}
+            for bundle in trx.groups:
+                idx = trx.groups[bundle]
+                bundles[bundle] = StatefulTractogram(
+                    sft.streamlines[idx], reference, Space.RASMM)
         else:
-            bundles["whole_brain"] = sft
+            sft = load_tractogram(trk_or_trx_file, reference, Space.RASMM)
+
+            if reference == "same":
+                reference = sft
+            bundles = {}
+            if "bundle_ids" in sidecar_info:
+                for b_name, b_id in sidecar_info["bundle_ids"].items():
+                    if not b_name == "whole_brain":
+                        idx = np.where(
+                            sft.data_per_streamline['bundle'] == b_id)[0]
+                        bundles[b_name] = StatefulTractogram(
+                            sft.streamlines[idx], reference, Space.RASMM)
+            else:
+                bundles["whole_brain"] = sft
+
         return cls(bundles, Space.RASMM)
 
 

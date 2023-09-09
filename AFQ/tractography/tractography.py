@@ -13,6 +13,7 @@ from dipy.tracking.stopping_criterion import (ThresholdStoppingCriterion,
                                               CmcStoppingCriterion,
                                               ActStoppingCriterion)
 
+from nibabel.streamlines.tractogram import LazyTractogram
 
 from AFQ._fixes import (VerboseLocalTracking, VerboseParticleFilteringTracking,
                         tensor_odf)
@@ -32,7 +33,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
           seed_mask=None, seed_threshold=0, thresholds_as_percentages=False,
           n_seeds=1, random_seeds=False, rng_seed=None, stop_mask=None,
           stop_threshold=0, step_size=0.5, min_length=50, max_length=250,
-          odf_model="CSD", tracker="local"):
+          odf_model="CSD", tracker="local", trx=False):
     """
     Tractography
 
@@ -90,7 +91,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         Interpret seed_threshold and stop_threshold as percentages of the
         total non-nan voxels in the seed and stop mask to include
         (between 0 and 100), instead of as a threshold on the
-        values themselves. 
+        values themselves.
         Default: False
     step_size : float, optional.
         The size of a step (in mm) of tractography. Default: 0.5
@@ -104,6 +105,10 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         Which strategy to use in tracking. This can be the standard local
         tracking ("local") or Particle Filtering Tracking ([Girard2014]_).
         One of {"local", "pft"}. Default: "local"
+    trx : bool, optional
+        Whether to return the streamlines compatible with input to TRX file
+        (i.e., as a LazyTractogram class instance).
+        Default: False
 
     Returns
     -------
@@ -246,12 +251,13 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
 
     return _tracking(my_tracker, seeds, dg, stopping_criterion, params_img,
                      step_size=step_size, min_length=min_length,
-                     max_length=max_length, random_seed=rng_seed)
+                     max_length=max_length, random_seed=rng_seed,
+                     trx=trx)
 
 
 def _tracking(tracker, seeds, dg, stopping_criterion, params_img,
               step_size=0.5, min_length=40, max_length=200,
-              random_seed=None):
+              random_seed=None, trx=False):
     """
     Helper function
     """
@@ -268,4 +274,8 @@ def _tracking(tracker, seeds, dg, stopping_criterion, params_img,
         max_length=max_length,
         random_seed=random_seed)
 
-    return StatefulTractogram(tracker, params_img, Space.RASMM)
+    if trx:
+        return LazyTractogram(lambda: tracker,
+                              affine_to_rasmm=params_img.affine)
+    else:
+        return StatefulTractogram(tracker, params_img, Space.RASMM)
