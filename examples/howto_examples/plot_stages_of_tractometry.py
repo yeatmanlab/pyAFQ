@@ -288,16 +288,26 @@ arc_t1w = transform_streamlines(sft_arc.streamlines,
                                 np.linalg.inv(t1w_img.affine))
 
 
-bundles = ["ARC_R", "ARC_L",
-           "ATR_R", "ATR_L",
-           "CST_R", "CST_L",
-           "IFO_R", "IFO_L",
-           "ILF_R", "ILF_L",
-           "SLF_R", "SLF_L",
-           "UNC_R", "UNC_L",
-           "CGC_R", "CGC_L",
-           "Orbital", "AntFrontal", "SupFrontal", "Motor",
-           "SupParietal", "PostParietal", "Temporal", "Occipital"]
+bundles = [
+    "ARC_R",
+    "ATR_R",
+    "CST_R",
+    "IFO_R",
+    "ILF_R",
+    "SLF_R",
+    "UNC_R",
+    "CGC_R",
+    "Orbital", "AntFrontal", "SupFrontal", "Motor",
+    "SupParietal", "PostParietal", "Temporal", "Occipital",
+    "CGC_L",
+    "UNC_L",
+    "SLF_L",
+    "ILF_L",
+    "IFO_L",
+    "CST_L",
+    "ATR_L",
+    "ARC_L",
+    ]
 
 color_dict = gen_color_dict(bundles)
 
@@ -443,5 +453,12 @@ window.record(scene, out_path='all_tract_profiles.png', size=(2400, 2400))
 
 import matplotlib.pyplot as plt
 fig, ax = plt.subplots()
-ax.plot(np.asarray(tract_profiles).T)
+for ii, bundle in enumerate(bundles):
+    ax.plot(np.arange(ii * 20, (ii + 1) * 20),
+            tract_profiles[ii],
+            color=color_dict[bundle],
+            linewidth=3)
+ax.set_xticks(np.arange(0, 20 * len(bundles), 20))
+ax.set_xticklabels(bundles, rotation=45, ha='right')
+fig.set_size_inches(10, 4)
 fig.savefig('tract_profiles_as_table.png')
