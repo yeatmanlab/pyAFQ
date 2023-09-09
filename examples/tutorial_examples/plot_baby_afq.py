@@ -1,44 +1,52 @@
 """
-==============================
-Pediatric Profiles:
-==============================
+=============================================
+BabyAFQ : tractometry for pediatric dMRI data
+=============================================
 
-The following is an example of tractometry for pediatric bundles.
-
-.. note::
-
-  This example and resulting pyAFQ support for pediatric bundles was
-  inspired by and largely due to the work of Grotheer et al. [Grotheer2021]_.
-
-  This example uses the Yeatman et al. waypoint ROI approach, first
-  described in [Yeatman2012]_ and further elaborated in [Yeatman2014]_.
+The following is an example of tractometry for pediatric bundles. This example
+and resulting pyAFQ support for pediatric bundles was inspired by and largely
+due to the work of Grotheer et al. [Grotheer2021]_, as implemented in
+[Grotheer2023]_.
 
 """
 import os.path as op
 import plotly
+import wget
+import zipfile
 
 from AFQ.api.group import GroupAFQ
 import AFQ.api.bundle_dict as abd
 import AFQ.data.fetch as afd
 
-from AFQ.definitions.image import RoiImage, ImageFile
+"""
+
+
+The data for this example, provided by Kalanit Grill Spector's Stanford Vision
+and Perception Neuroscience Lab is available to download on Figshare. You can
+download it from there and unzip it into ~/AFQ_Data/baby_example/ (Note that
+this is 2.69GB of data, so it can take a while to download). This data has
+been previously published in Grotheer et al. (2022).
+
+"""
+data_folder = op.join(op.expanduser('~'), "AFQ_data/")
+wget.download("https://figshare.com/ndownloader/files/38053692",
+              op.join(data_folder, "baby_example.zip"))
+
+with zipfile.ZipFile(op.join(data_folder, "baby_example.zip"), 'r') as zip_ref:
+    zip_ref.extractall(op.join(data_folder, "baby_example"))
+
+"""
+
+In this case, a tractography has already been run with the excellent MRtrix
+software. When you first run the following code, it will download the infant
+templates into your ~/AFQ_data/pediatric_templates folder, organizing them
+there in the way that pyAFQ expects to find them.
+
+"""
 
 ##########################################################################
 # Initialize a GroupAFQ object:
 # -------------------------
-#
-# .. note::
-#   This example assumes:
-#
-#   - A single subject and session
-#
-#   - Subject's session data has been downloaded into
-#
-#     `AFQ_data\\study\\derivatives`
-#
-#   - Subject's session data has been made BIDS compliant
-#
-#     see https://bids.neuroimaging.io
 #
 # .. note::
 #
@@ -50,28 +58,18 @@ from AFQ.definitions.image import RoiImage, ImageFile
 #   - https://github.com/bloomdt-uw/babyafq/blob/main/pybabyafq.ipynb
 
 
-myafq = GroupAFQ(  # ==== BIDS parameters ====
-    bids_path=op.join(afd.afq_home, "study"),
-    preproc_pipeline="derivatives",
-    # ===== Registration parameters ====
-    min_bval=1000,
-    max_bval=1000,
-    reg_template=afd.read_pediatric_templates(
-    )["UNCNeo-withCerebellum-for-babyAFQ"],
-    reg_subject="b0",
-    brain_mask_definition=ImageFile(
-        suffix="brainmask", filters={"scope": "derivatives"}),
-    # ==== Bundle parameters ====
+myafq = GroupAFQ(
+    bids_path=op.join(op.expanduser('~'), "AFQ_data/baby_example/"),
+    preproc_pipeline="vistasoft",
+    reg_template_spec=afd.read_pediatric_templates()["UNCNeo-withCerebellum-for-babyAFQ"],
+    reg_subject_spec="b0",
     bundle_info=abd.PediatricBundleDict(),
-    # ==== Compute parameters ====
-    force_recompute=True,
-    # ==== Tracking parameters ====
-    tracking_params={
-        "seed_mask": RoiImage(),
-        "stop_threshold": 0.1},
-    # ==== Segmentation parameters ====
+    import_tract={
+        "suffix": "tractography", "scope": "mrtrix"},
     segmentation_params={
         "filter_by_endpoints": False},
+    clean_params={
+        'distance_threshold': 4},
 )
 
 ##########################################################################
@@ -83,17 +81,15 @@ plotly.io.show(myafq.export("all_bundles_figure").values()[0][0])
 ##########################################################################
 # References:
 # -------------------------
-# .. [Grotheer2021] Mareike Grotheer, Mona Rosenke, Hua Wu, Holly Kular,
-#                   Francesca R. Querdasi, Vaidehi Natu, Jason D. Yeatman,
-#                   alanit Grill-Spector, "Catch me if you can: Least
-#                   myelinated white matter develops fastest during early
-#                   infancy", bioRxiv
+# .. [Grotheer2021] Grotheer, Mareike, Mona Rosenke, Hua Wu, Holly Kular,
+#                   Francesca R. Querdasi, Vaidehi S. Natu, Jason D. Yeatman,
+#                   and Kalanit Grill-Spector. "White matter myelination during
+#                   early infancy is linked to spatial gradients and myelin
+#                   content at birth." Nature communications 13: 997.
 #
-# .. [Yeatman2012] Jason D Yeatman, Robert F Dougherty, Nathaniel J Myall,
-#                  Brian A Wandell, Heidi M Feldman, "Tract profiles of
-#                  white matter properties: automating fiber-tract
-#                  quantification", PloS One, 7: e49790
-#
-# .. [Yeatman2014] Jason D Yeatman, Brian A Wandell, Aviv Mezer Feldman,
-#                  "Lifespan maturation and degeneration of human brain white
-#                  matter", Nature Communications 5: 4932
+# .. [Grotheer2023] Grotheer, Mareike, David Bloom, John Kruper,
+#                   Adam Richie-Halford, Stephanie Zika,
+#                   Vicente A. Aguilera González, Jason D. Yeatman,
+#                   Kalanit Grill-Spector, and Ariel Rokem. "Human white matter
+#                   myelinates faster in utero than ex utero." Proceedings
+#                   of the National Academy of Sciences 120: e2303491120.
