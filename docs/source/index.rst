@@ -7,7 +7,7 @@ Automated Fiber Quantification in Python (pyAFQ)
 pyAFQ is an open-source software tool for the analysis of brain white matter in
 diffusion MRI measurements. It implements a complete and automated data
 processing pipeline for tractometry, from raw DTI data to white matter tract identification
-, as well as quantification of tissue properties along the length of the 
+, as well as quantification of tissue properties along the length of the
 major long-range brain white matter connections.
 
 
@@ -22,9 +22,9 @@ major long-range brain white matter connections.
 .. note::
 
   Tractography is concerned with the visualization and mapping of white matter
-  tracts in the brain, while tractometry involves the quantitative analysis of 
-  the structural properties of these tracts. Both techniques are valuable in 
-  understanding the brain's connectivity and can provide insights into various 
+  tracts in the brain, while tractometry involves the quantitative analysis of
+  the structural properties of these tracts. Both techniques are valuable in
+  understanding the brain's connectivity and can provide insights into various
   neurological conditions and cognitive processes. More information can be found in
   the Explanations page.
 
@@ -41,20 +41,6 @@ major long-range brain white matter connections.
 .. grid:: 2
 
     .. grid-item-card::
-        :link: howto/index.html
-
-        :octicon:`rocket;3em;sd-text-center`
-
-        How To
-        ^^^^^^
-
-        User's guide to pyAFQ. This guide assumes you know
-        the basics and walks through more commonly used examples.
-
-        +++
-
-
-    .. grid-item-card::
         :link: tutorials/index.html
 
         :octicon:`book;3em;sd-text-center`
@@ -67,6 +53,19 @@ major long-range brain white matter connections.
 
         +++
 
+    .. grid-item-card::
+        :link: howto/index.html
+
+        :octicon:`rocket;3em;sd-text-center`
+
+        How To
+        ^^^^^^
+
+        A set of recipes for specific use-cases. This guide assumes you know
+        the basics and walks through more commonly used examples.
+
+        +++
+
 
     .. grid-item-card::
         :link: explanations/index.html
@@ -76,10 +75,8 @@ major long-range brain white matter connections.
         Explanations
         ^^^^^^^^^^^^
 
-        For more experienced users. This guide contains in depth
-        explanations on how to use pyAFQ methods. It includes how to
-        create detailed visualizations and analyses.
-
+        More detailed and conceptual, this guide contains in depth
+        explanations on how to think about the various pyAFQ methods.
         +++
 
     .. grid-item-card::
@@ -116,8 +113,3 @@ R01EB027585) to Eleftherios Garyfallidis and to Ariel Rokem , and by `NSF grant 
    :align: center
    :figclass: align-center
    :target: http://brainandeducation.com
-
-
-
-
-
