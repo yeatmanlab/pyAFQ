@@ -1,59 +1,91 @@
 """
-==========================
-AFQ API
-==========================
+=========================================================
+1 Using the pyAFQ Application Programming Interface (API)
+=========================================================
 
-An example using the AFQ API
+In this first tutorial, we will introduce the use of the pyAFQ Application
+Programming Interface (API). This API is designed to be flexible and
+extensible, and allows users to customize the pipeline to their needs.
+
+The pipeline executes the following steps:
+
+1. Tractography
+2. Registration to a template.
+3. Bundle segmentation + cleaning
+4. Tissue property modeling
+5. Tract profile calculation
+6. Bundle visualization
 
 
+We will not go into these in a lot more detail here, but you can read more
+about them in other examples and tutorials.
 """
-import os.path as op
 
+##########################################################################
+# Importing libraries that we will use
+# ------------------------------------
+# The tutorial will show-case some of the functionality and outputs of
+# pyAFQ. We will use the following libraries in this tutorial:
+#
+# - `AFQ.api.group.GroupAFQ` to run the pipeline. As you will see below, this
+#   object is the workhorse of pyAFQ, and used to define the pipeline and
+#   execute it.
+# - `AFQ.data.fetch` is pyAFQ's data management module. Here, we use it to
+#   download example data and to locate the data in the user's home directory.
+# - `os.path` is used to specify file paths
+# - `matplotlib.pyplot` used to visualize the results with 2D plots and
+#   figures.
+# - `nibabel` is used to load resulting data derivatives.
+# - `plotly` is used to visualize the results with 3D web-based visualizations.
+# - `pandas` is used to read the results into a table.
+#
+#
+from AFQ.api.group import GroupAFQ
+import AFQ.data.fetch as afd
+
+import os.path as op
 import matplotlib.pyplot as plt
 import nibabel as nib
 import plotly
 import pandas as pd
 
-from AFQ.api.group import GroupAFQ
-import AFQ.data.fetch as afd
 
 ##########################################################################
-# Get some example data
-# ---------------------
+# Download example data and organize it
+# -------------------------------------
+# Before we can start running the software we need to download some data.
+# We will use an example dataset that contains high angular resolution
+# diffusion MR imaging (HARDI) from one subject. This data was acquired in
+# the Stanford Center for Cognitive and Neurobiological Imaging (CNI). You can
+# learn more about this data in [Rokem2015]_.
 #
-# Retrieves High angular resolution diffusion imaging (HARDI) dataset from
-# Stanford's Vista Lab
+# The following code downloads the data and organizes it in a BIDS compliant
+# format, and places it in the `AFQ_data` directory, which is typically
+# located in your home directory under:
 #
-#   see https://purl.stanford.edu/ng782rw8378 for details on dataset.
+#   ``~/AFQ_data/stanford_hardi/``
 #
-# The data for the first subject and first session are downloaded locally
-# (by default into the users home directory) under:
-#
-#   ``.dipy/stanford_hardi/``
-#
-# Anatomical data (``anat``) and Diffusion-weighted imaging data (``dwi``) are
-# then extracted, formatted to be BIDS compliant, and placed in the AFQ
-# data directory (by default in the users home directory) under:
-#
-#   ``AFQ_data/stanford_hardi/``
-#
-# This data represents the required preprocessed diffusion data necessary for
-# intializing the GroupAFQ object (which we will do next)
-#
-# The clear_previous_afq is used to remove any previous runs of the afq object
-# stored in the AFQ_data/stanford_hardi/ BIDS directory. Set it to None if
-# you want to use the results of previous runs.
+# The `clear_previous_afq` argument is used to remove the outputs from previous
+# runs of pyAFQ that may be stored in the AFQ_data/stanford_hardi/ BIDS
+# directory. Set it to None if you want to use all the results of previous
+# runs of pyAFQ. Here, we set it to clear all of the the outputs past the
+# tractography stage (which tends to be time-consuming).
 
 afd.organize_stanford_data(clear_previous_afq="track")
 
 ##########################################################################
-# Set tractography parameters (optional)
-# ---------------------
-# We make this tracking_params which we will pass to the GroupAFQ object
-# which specifies that we want 25,000 seeds randomly distributed
-# in the white matter.
-#
-# We only do this to make this example faster and consume less space.
+# Set tractography parameters
+# ---------------------------
+# The pyAFQ API allows us to define the parameters used for tractography.
+# If you do not set these parameters, a reasonable set of defaults is used:
+# probabilistic tractography using constrained spherical decovolution with one
+# seed in every white-matter voxel. Here, we create an alternative setting,
+# which uses csd-based probabilistic tractography, but with only 25,000 seeds
+# randomly distributed in the white matter. This is a much smaller number of
+# seeds than the default, and will result in a much faster run-time. However,
+# it will also result in less accurate tractography, and may result in missing
+# some of the smaller tracts. In this case, we only do this to make this
+# example faster and consume less space.
 
 tracking_params = dict(n_seeds=25000,
                        random_seeds=True,
@@ -64,18 +96,9 @@ tracking_params = dict(n_seeds=25000,
 # Initialize a GroupAFQ object:
 # -------------------------
 #
-# Creates a GroupAFQ object, that encapsulates tractometry. This object can be
-# used to manage the entire AFQ pipeline, including:
-#
-# - Tractography
-# - Registration
-# - Segmentation
-# - Cleaning
-# - Profiling
-# - Visualization
-#
-# In this example we will load the subjects session data from the previous step
-# using the default AFQ parameters.
+# The following code creates the GroupAFQ object, which manages all of the
+# data transformations and computations conducted by the software, based on
+# its initial configuration, which we set up below.
 #
 # .. note::
 #
@@ -212,3 +235,13 @@ for ind in bundle_counts.index:
         raise ValueError((
             "Small number of streamlines found "
             f"for bundle(s):\n{bundle_counts}"))
+
+
+##########################################################################
+# References
+# ----------
+#
+# .. [Rokem2015] Ariel Rokem, Jason D Yeatman, Franco Pestilli, Kendrick
+#    N Kay, Aviv Mezer, Stefan van der Walt, Brian A Wandell. Evaluating the
+#    accuracy of diffusion MRI models in white matter. PLoS One, 10(4),
+#    e0123272, 2015.
