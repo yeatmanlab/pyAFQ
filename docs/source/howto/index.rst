@@ -13,5 +13,6 @@ software.
     developing/index
     getting_help
     cite
+    scalars
     howto_examples/index
 
