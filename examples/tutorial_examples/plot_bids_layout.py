@@ -107,7 +107,8 @@ os.rename(
 afd.to_bids_description(
     tractography_path,
     **{"Name": "my_tractography",
-        "PipelineDescription": {"Name": "my_tractography"}})
+       "PipelineDescription": {"Name": "my_tractography"},
+       "GeneratedBy": [{"Name": "my_tractography"}]})
 
 
 ###########################################################################
