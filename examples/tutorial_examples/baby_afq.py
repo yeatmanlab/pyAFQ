@@ -39,7 +39,7 @@ import AFQ.data.fetch as afd
 # sensitive to the myelin content, and it means that the dMRI signal differs
 # quite a bit in newborn infants. For the purpose of delineating the major
 # white matter pathways, it is also important to know that their shape,
-# location and curviness is different in infants than in grownups. For example,
+# location and curvature is different in infants than in grownups. For example,
 # the arcuate fasciculus is much more curved in infants than in grownups.
 # Because of this, we use a different set of templates for infant brains than
 # for grownup brains. These templates were created and validated by
