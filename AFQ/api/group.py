@@ -187,7 +187,9 @@ class GroupAFQ(object):
             "Name": bids_description["Name"],
             "BIDSVersion": bids_description["BIDSVersion"],
             "PipelineDescription": {"Name": "pyAFQ",
-                                    "Version": pyafq_version}}
+                                    "Version": pyafq_version},
+            "GeneratedBy": [{"Name": op.basename(self.afq_path),
+                             "Version": pyafq_version}]}
 
         pl_desc_file = op.join(self.afq_path, 'dataset_description.json')
 

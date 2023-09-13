@@ -1020,7 +1020,8 @@ def organize_cfin_data(path=None):
     to_bids_description(
         dmriprep_folder,
         **{"Name": "CFIN",
-           "PipelineDescription": {"Name": "dipy"}})
+           "PipelineDescription": {"Name": "dipy"},
+           "GeneratedBy": [{"Name": "dipy"}]})
 
 
 def organize_stanford_data(path=None, clear_previous_afq=None):
@@ -1120,10 +1121,12 @@ def organize_stanford_data(path=None, clear_previous_afq=None):
     # And descriptions of the pipelines in the derivatives:
     to_bids_description(dmriprep_folder,
                         **{"Name": "Stanford HARDI",
-                           "PipelineDescription": {"Name": "vistasoft"}})
+                           "PipelineDescription": {"Name": "vistasoft"},
+                           "GeneratedBy": [{"Name": "vistasoft"}]})
     to_bids_description(freesurfer_folder,
                         **{"Name": "Stanford HARDI",
-                           "PipelineDescription": {"Name": "freesurfer"}})
+                           "PipelineDescription": {"Name": "freesurfer"},
+                           "GeneratedBy": [{"Name": "freesurfer"}]})
 
 
 fetch_stanford_hardi_lv1 = _make_reusable_fetcher(
@@ -1750,7 +1753,8 @@ def fetch_hcp(subjects,
     to_bids_description(base_dir,
                         **{"Name": study,
                            "Acknowledgements": hcp_acknowledgements,
-                           "PipelineDescription": {'Name': 'dmriprep'}})
+                           "PipelineDescription": {'Name': 'dmriprep'},
+                           "GeneratedBy": [{'Name': 'dmriprep'}]})
 
     return data_files, op.join(my_path, study)
 
@@ -1844,7 +1848,8 @@ def fetch_hbn_preproc(subjects, path=None):
     to_bids_description(base_dir,
                         **{"Name": "HBN",
                            "Acknowledgements": hbn_acknowledgements,
-                           "PipelineDescription": {'Name': 'qsiprep'}})
+                           "PipelineDescription": {'Name': 'qsiprep'},
+                           "GeneratedBy": [{'Name': 'qsiprep'}]})
 
     return data_files, op.join(my_path, "HBN")
 
@@ -1941,6 +1946,7 @@ def fetch_hbn_afq(subjects, path=None):
     # Create the BIDS derivatives description file text
     to_bids_description(base_dir,
                         **{"Name": "HBN",
-                           "PipelineDescription": {'Name': 'afq'}})
+                           "PipelineDescription": {'Name': 'afq'},
+                           "GeneratedBy": [{'Name': 'afq'}]})
 
     return data_files, op.join(my_path, "HBN")
