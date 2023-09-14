@@ -45,3 +45,8 @@ realclean: distclean
 	@echo Removing data files from $(HOME)
 	rm -rf $(HOME)/.dipy/
 	rm -rf $(HOME)/AFQ_data/
+
+html-noplot:
+	$(SPHINXBUILD) -D plot_gallery=0 -b html $(ALLSPHINXOPTS) $(SOURCEDIR) $(BUILDDIR)/html
+	@echo
+	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
