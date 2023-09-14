@@ -31,7 +31,7 @@ The other requires that you clone the source code to your machine::
 
   git clone https://github.com/yeatmanlab/pyAFQ.git
 
-Then, change your working directory into the top-level directory of this repo
+With both installation methods, you will need to include extensions. Change your working directory into the top-level directory of this repo
 and issue::
 
   pip install -e .[dev,fury,afqbrowser,plot]
@@ -39,8 +39,6 @@ and issue::
 On some platforms, you may need to add quotes around the ``.[]`` part::
 
   pip install -e .'[dev,fury,afqbrowser,plot]'
-
-which will install pyAFQ locally in editible mode and include extensions.
 
 .. note::
 
