@@ -31,7 +31,7 @@ The other requires that you clone the source code to your machine::
 
   git clone https://github.com/yeatmanlab/pyAFQ.git
 
-With both installation methods, you will need to include extensions. Change your working directory into the top-level directory of this repo
+With both installation methods, you can include extensions to the base installation in square brackets. Change your working directory into the top-level directory of this repo
 and issue::
 
   pip install -e .[dev,fury,afqbrowser,plot]
