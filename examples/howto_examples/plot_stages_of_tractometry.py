@@ -32,6 +32,23 @@ from matplotlib.cm import tab20
 import AFQ.data.fetch as afd
 from AFQ.viz.utils import gen_color_dict
 
+
+from PIL import Image
+def make_video(frames, out):
+    video = []
+    for nn in frames:
+        frame = Image.open(nn)
+        video.append(frame)
+
+    # Save the frames as an animated GIF
+    video[0].save(
+        out,
+        save_all=True,
+        append_images=video[1:],
+        duration=300,
+        loop=1)
+
+
 #############################################################################
 #
 # .. note::
@@ -138,23 +155,23 @@ def slice_volume(data, x=None, y=None, z=None):
 
     return slicer_actors
 
-slicers_b0 = slice_volume(dmri_b0, x=dmri_b0.shape[0] // 2, z=dmri_b0.shape[-1] // 3)
-slicers_b1000 = slice_volume(dmri_b1000, x=dmri_b0.shape[0] // 2, z=dmri_b0.shape[-1] // 3)
-slicers_b2000 = slice_volume(dmri_b2000, x=dmri_b0.shape[0] // 2, z=dmri_b0.shape[-1] // 3)
+slicers_b0 = slice_volume(dmri_b0, x=dmri_b0.shape[0] // 2, y=dmri_b0.shape[1] // 2, z=dmri_b0.shape[-1] // 3)
+slicers_b1000 = slice_volume(dmri_b1000, x=dmri_b0.shape[0] // 2, y=dmri_b0.shape[1] // 2, z=dmri_b0.shape[-1] // 3)
+slicers_b2000 = slice_volume(dmri_b2000, x=dmri_b0.shape[0] // 2, y=dmri_b0.shape[1] // 2, z=dmri_b0.shape[-1] // 3)
 
 for bval, slicers in zip([0, 1000, 2000], [slicers_b0, slicers_b1000, slicers_b2000]):
     scene = window.Scene()
     for slicer in slicers:
         scene.add(slicer)
-    scene.set_camera(
-        position=(238.04, 174.48, 143.04),
-        focal_point=(96.32, 110.34, 84.48),
-        view_up=(-0.33, -0.12, 0.94))
+    scene.set_camera(position=(721.34, 393.48, 97.03),
+                     focal_point=(96.00, 114.00, 96.00),
+                     view_up=(-0.01, 0.02, 1.00))
 
     scene.background((1, 1, 1))
-    window.record(scene, out_path=f'b{bval}.png', size=(2400, 2400))
+    window.record(scene, out_path=f'b{bval}', size=(2400, 2400),
+                  n_frames=36, path_numbering=True)
 
-
+    make_video([f'b{bval}{ii:06d}.png' for ii in range(36)], f'b{bval}.gif')
 #############################################################################
 # Visualizing whole-brain tractography
 # ------------------------------------
@@ -204,7 +221,7 @@ def lines_as_tubes(sl, line_width, **kwargs):
 
 
 whole_brain_actor = lines_as_tubes(whole_brain_t1w, 2)
-slicers = slice_volume(t1w, x=t1w.shape[0] // 2, z=t1w.shape[-1] // 3)
+slicers = slice_volume(t1w, x=t1w.shape[0] // 2, y=t1w.shape[1] // 2)
 
 scene = window.Scene()
 
@@ -212,18 +229,20 @@ scene.add(whole_brain_actor)
 for slicer in slicers:
     scene.add(slicer)
 
-scene.set_camera(position=(238.04, 174.48, 143.04),
-                 focal_point=(96.32, 110.34, 84.48),
-                 view_up=(-0.33, -0.12, 0.94))
+scene.set_camera(position=(721.34, 393.48, 97.03),
+                 focal_point=(96.00, 114.00, 96.00),
+                 view_up=(-0.01, 0.02, 1.00))
 
 scene.background((1, 1, 1))
-window.record(scene, out_path='whole_brain.png', size=(2400, 2400))
+window.record(scene, out_path='whole_brain', size=(2400, 2400),
+              n_frames=36, path_numbering=True)
+
+make_video([f"whole_brain{ii:06d}.png" for ii in range(36)], "whole_brain.gif")
 
 #############################################################################
 # Whole brain with waypoints
 # --------------------------------------
 #
-
 
 scene.clear()
 whole_brain_actor = lines_as_tubes(whole_brain_t1w, 2)
@@ -263,7 +282,11 @@ waypoint2_actor = actor.contour_from_roi(waypoint2_data,
 scene.add(waypoint1_actor)
 scene.add(waypoint2_actor)
 
-window.record(scene, out_path='whole_brain_with_waypoints.png', size=(2400, 2400))
+window.record(scene, out_path='whole_brain_with_waypoints', size=(2400, 2400),
+              n_frames=36, path_numbering=True)
+
+make_video([f"whole_brain_with_waypoints{ii:06d}.png" for ii in range(36)],
+           "whole_brain_with_waypoints.gif")
 
 bundle_path = op.join(afq_path,
                       'bundles')
@@ -321,7 +344,10 @@ for slicer in slicers:
 scene.add(waypoint1_actor)
 scene.add(waypoint2_actor)
 
-window.record(scene, out_path='arc1.png', size=(2400, 2400))
+window.record(scene, out_path='arc1', size=(2400, 2400),
+              n_frames=36, path_numbering=True)
+
+make_video([f"arc1{ii:06d}.png" for ii in range(36)], "arc1.gif")
 
 #############################################################################
 # Clean bundle
@@ -333,7 +359,10 @@ scene.add(arc_actor)
 for slicer in slicers:
     scene.add(slicer)
 
-window.record(scene, out_path='arc2.png', size=(2400, 2400))
+window.record(scene, out_path='arc2', size=(2400, 2400),
+              n_frames=36, path_numbering=True)
+
+make_video([f"arc2{ii:06d}.png" for ii in range(36)], "arc2.gif")
 
 clean_bundles_path = op.join(afq_path,
                              'clean_bundles')
@@ -353,26 +382,33 @@ scene.add(arc_actor)
 for slicer in slicers:
     scene.add(slicer)
 
-window.record(scene, out_path='arc3.png', size=(2400, 2400))
+window.record(scene, out_path='arc3', size=(2400, 2400),
+              n_frames=36, path_numbering=True)
+
+make_video([f"arc3{ii:06d}.png" for ii in range(36)], "arc3.gif")
 
 #############################################################################
 # Show the values of tissue properties along the bundle
 # ---------------
 
+lut_args = dict(scale_range=(0, 1),
+                hue_range=(1, 0),
+                saturation_range=(0, 1),
+                value_range=(0, 1))
+
 arc_actor = lines_as_tubes(arc_t1w, 8,
                            colors=resample(fa_img, t1w_img).get_fdata(),
-                           lookup_colormap=colormap_lookup_table(
-                               scale_range=(0, 1),
-                               hue_range=(0, 1),
-                               saturation_range=(1, 1),
-                               value_range=(0.8, 0.8)))
+                           lookup_colormap=colormap_lookup_table(**lut_args))
 scene.clear()
 
 scene.add(arc_actor)
 for slicer in slicers:
     scene.add(slicer)
 
-window.record(scene, out_path='arc4.png', size=(2400, 2400))
+window.record(scene, out_path='arc4', size=(2400, 2400),
+              n_frames=36, path_numbering=True)
+
+make_video([f"arc4{ii:06d}.png" for ii in range(36)], "arc4.gif")
 
 #############################################################################
 # Core of the bundle and tract profile
@@ -391,6 +427,10 @@ core_arc_actor = lines_as_tubes(
     colors=create_colormap(arc_profile, 'viridis')
 )
 
+arc_actor = lines_as_tubes(arc_t1w, 1,
+                           colors=resample(fa_img, t1w_img).get_fdata(),
+                           lookup_colormap=colormap_lookup_table(**lut_args))
+
 scene.clear()
 
 for slicer in slicers:
@@ -398,7 +438,10 @@ for slicer in slicers:
 scene.add(arc_actor)
 scene.add(core_arc_actor)
 
-window.record(scene, out_path='arc5.png', size=(2400, 2400))
+window.record(scene, out_path='arc5', size=(2400, 2400),
+              n_frames=36, path_numbering=True)
+
+make_video([f"arc5{ii:06d}.png" for ii in range(36)], "arc5.gif")
 
 scene.clear()
 
@@ -411,12 +454,15 @@ for bundle in bundles:
 
     sft.to_rasmm()
     bundle_t1w = transform_streamlines(sft.streamlines,
-                                    np.linalg.inv(t1w_img.affine))
+                                       np.linalg.inv(t1w_img.affine))
 
     bundle_actor = lines_as_tubes(bundle_t1w, 8, colors=color_dict[bundle])
     scene.add(bundle_actor)
 
-window.record(scene, out_path='all_bundles.png', size=(2400, 2400))
+window.record(scene, out_path='all_bundles', size=(2400, 2400),
+              n_frames=36, path_numbering=True)
+
+make_video([f"all_bundles{ii:06d}.png" for ii in range(36)], "all_bundles.gif")
 
 
 scene.clear()
@@ -446,7 +492,14 @@ for bundle in bundles:
 
     scene.add(core_actor)
 
-window.record(scene, out_path='all_tract_profiles.png', size=(2400, 2400))
+window.record(scene,
+              out_path='all_tract_profiles',
+              size=(2400, 2400),
+              n_frames=36,
+              path_numbering=True)
+
+make_video([f"all_tract_profiles{ii:06d}.png" for ii in range(36)],
+            "all_tract_profiles.gif")
 
 #############################################################################
 # Tract profiles as a table
