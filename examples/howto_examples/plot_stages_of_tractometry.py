@@ -28,7 +28,8 @@ import numpy as np
 import tempfile
 
 from dipy.io.streamline import load_trk
-from dipy.tracking.streamline import transform_streamlines, set_number_of_points
+from dipy.tracking.streamline import (transform_streamlines,
+                                      set_number_of_points)
 from dipy.core.gradients import gradient_table
 from dipy.align import resample
 
@@ -230,7 +231,7 @@ fa_img = nib.load(op.join(afq_path,
 
 
 sft_whole_brain = load_trk(op.join(afq_path,
-                                   'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_space-RASMM_model-probCSD_tractography.trk'), fa_img)
+                                   'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_space-RASMM_model-CSD_desc-prob-afq_tractography.trk'), fa_img)
 
 
 #############################################################################
