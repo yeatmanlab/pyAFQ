@@ -1,18 +1,25 @@
 """
-============================
-The stages of tractometry
-============================
+=================================================
+Making videos the different stages of tractometry
+=================================================
 
-This example visualizes the different stages of tractometry, from the
-preprocessed diffusion data to the final tract profiles. We will use the Fury
-library to visualize the results of pyAFQ in high-quality, publication-ready
-figures.
+Two-dimensional figures of anatomical data are somewhat limited, because of the
+complex three-dimensional configuration of the brain. Therefored, dynamic
+videos of anatomical data are useful for exploring the data, as well as for
+creating dynamic presentations of the results. This example visualizes various
+stages of tractometry, from preprocessed diffusion data to the final tract
+profiles. We will use the `Fury <https://fury.gl/>`_ software library to
+visualize individual frames of the results of each stage, and then create
+videos of each stage of the process using the Python Image Library (PIL, also
+known as pillow).
 
 """
 
 ##############################################################################
-# In this set of examples, we will use the `fury <https://fury.gl/>`_
-# library to visualize outputs of pyAFQ as publication-ready figures.
+# Imports
+# -------
+#
+
 
 import os
 import os.path as op
@@ -35,8 +42,34 @@ from AFQ.viz.utils import gen_color_dict
 
 from PIL import Image
 
+##############################################################################
+# Define a function that makes videos
+# -----------------------------------
+# The PIL library has a function that can be used to create animated GIFs from
+# a series of images. We will use this function to create videos.
+#
+# .. note::
+#  This function is not part of the AFQ library, but is included here for
+#  convenience. It is not necessary to understand this function in order to
+#  understand the rest of the example. If you are interested in learning more
+#  about this function, you can read the PIL documentation. The function is
+#  based on the `PIL.Image.save <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.save>`_
+#  function.
+
 
 def make_video(frames, out):
+    """
+    Make a video from a series of frames.
+
+    Parameters
+    ----------
+    frames : list of str
+        A list of file names of the frames to be included in the video.
+
+    out : str
+        The name of the output file. Format is determined by the file
+        extension.
+    """
     video = []
     for nn in frames:
         frame = Image.open(nn)
@@ -369,7 +402,7 @@ for slicer in slicers:
 window.record(scene, out_path=f'{tmp}/arc2', size=(2400, 2400),
               n_frames=n_frames, path_numbering=True)
 
-make_video([f"arc2{ii:06d}.png" for ii in range(n_frames)], "arc2.gif")
+make_video([f"{tmp}/arc2{ii:06d}.png" for ii in range(n_frames)], "arc2.gif")
 
 clean_bundles_path = op.join(afq_path,
                              'clean_bundles')
