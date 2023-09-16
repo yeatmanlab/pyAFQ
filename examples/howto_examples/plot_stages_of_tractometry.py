@@ -18,6 +18,7 @@ import os
 import os.path as op
 import nibabel as nib
 import numpy as np
+import tempfile
 
 from dipy.io.streamline import load_trk
 from dipy.tracking.streamline import transform_streamlines, set_number_of_points
@@ -32,8 +33,9 @@ from matplotlib.cm import tab20
 import AFQ.data.fetch as afd
 from AFQ.viz.utils import gen_color_dict
 
-
 from PIL import Image
+
+
 def make_video(frames, out):
     video = []
     for nn in frames:
@@ -65,6 +67,10 @@ if os.environ.get("XVFB", False):
 
     vdisplay = Xvfb()
     vdisplay.start()
+
+
+tmp = tempfile.mkdtemp()
+n_frames = 72
 
 ###############################################################################
 # Get some data from HBN POD2
@@ -168,10 +174,11 @@ for bval, slicers in zip([0, 1000, 2000], [slicers_b0, slicers_b1000, slicers_b2
                      view_up=(-0.01, 0.02, 1.00))
 
     scene.background((1, 1, 1))
-    window.record(scene, out_path=f'b{bval}', size=(2400, 2400),
-                  n_frames=36, path_numbering=True)
+    window.record(scene, out_path=f'{tmp}/b{bval}',
+                  size=(2400, 2400),
+                  n_frames=n_frames, path_numbering=True)
 
-    make_video([f'b{bval}{ii:06d}.png' for ii in range(36)], f'b{bval}.gif')
+    make_video([f'{tmp}/b{bval}{ii:06d}.png' for ii in range(n_frames)], f'b{bval}.gif')
 #############################################################################
 # Visualizing whole-brain tractography
 # ------------------------------------
@@ -221,7 +228,7 @@ def lines_as_tubes(sl, line_width, **kwargs):
 
 
 whole_brain_actor = lines_as_tubes(whole_brain_t1w, 2)
-slicers = slice_volume(t1w, x=t1w.shape[0] // 2, y=t1w.shape[1] // 2)
+slicers = slice_volume(t1w, y=t1w.shape[1] // 2 - 5, z=t1w.shape[-1] // 3)
 
 scene = window.Scene()
 
@@ -234,10 +241,11 @@ scene.set_camera(position=(721.34, 393.48, 97.03),
                  view_up=(-0.01, 0.02, 1.00))
 
 scene.background((1, 1, 1))
-window.record(scene, out_path='whole_brain', size=(2400, 2400),
-              n_frames=36, path_numbering=True)
+window.record(scene, out_path=f'{tmp}/whole_brain', size=(2400, 2400),
+              n_frames=n_frames, path_numbering=True)
 
-make_video([f"whole_brain{ii:06d}.png" for ii in range(36)], "whole_brain.gif")
+make_video([f"{tmp}/whole_brain{ii:06d}.png" for ii in range(n_frames)],
+            "whole_brain.gif")
 
 #############################################################################
 # Whole brain with waypoints
@@ -246,7 +254,6 @@ make_video([f"whole_brain{ii:06d}.png" for ii in range(36)], "whole_brain.gif")
 
 scene.clear()
 whole_brain_actor = lines_as_tubes(whole_brain_t1w, 2)
-slicers = slice_volume(t1w, x=t1w.shape[0] // 2, z=t1w.shape[-1] // 3)
 
 scene.add(whole_brain_actor)
 for slicer in slicers:
@@ -282,10 +289,10 @@ waypoint2_actor = actor.contour_from_roi(waypoint2_data,
 scene.add(waypoint1_actor)
 scene.add(waypoint2_actor)
 
-window.record(scene, out_path='whole_brain_with_waypoints', size=(2400, 2400),
-              n_frames=36, path_numbering=True)
+window.record(scene, out_path=f'{tmp}/whole_brain_with_waypoints', size=(2400, 2400),
+              n_frames=n_frames, path_numbering=True)
 
-make_video([f"whole_brain_with_waypoints{ii:06d}.png" for ii in range(36)],
+make_video([f"{tmp}/whole_brain_with_waypoints{ii:06d}.png" for ii in range(n_frames)],
            "whole_brain_with_waypoints.gif")
 
 bundle_path = op.join(afq_path,
@@ -344,10 +351,10 @@ for slicer in slicers:
 scene.add(waypoint1_actor)
 scene.add(waypoint2_actor)
 
-window.record(scene, out_path='arc1', size=(2400, 2400),
-              n_frames=36, path_numbering=True)
+window.record(scene, out_path=f'{tmp}/arc1', size=(2400, 2400),
+              n_frames=n_frames, path_numbering=True)
 
-make_video([f"arc1{ii:06d}.png" for ii in range(36)], "arc1.gif")
+make_video([f"{tmp}/arc1{ii:06d}.png" for ii in range(n_frames)], "arc1.gif")
 
 #############################################################################
 # Clean bundle
@@ -359,10 +366,10 @@ scene.add(arc_actor)
 for slicer in slicers:
     scene.add(slicer)
 
-window.record(scene, out_path='arc2', size=(2400, 2400),
-              n_frames=36, path_numbering=True)
+window.record(scene, out_path=f'{tmp}/arc2', size=(2400, 2400),
+              n_frames=n_frames, path_numbering=True)
 
-make_video([f"arc2{ii:06d}.png" for ii in range(36)], "arc2.gif")
+make_video([f"arc2{ii:06d}.png" for ii in range(n_frames)], "arc2.gif")
 
 clean_bundles_path = op.join(afq_path,
                              'clean_bundles')
@@ -382,10 +389,10 @@ scene.add(arc_actor)
 for slicer in slicers:
     scene.add(slicer)
 
-window.record(scene, out_path='arc3', size=(2400, 2400),
-              n_frames=36, path_numbering=True)
+window.record(scene, out_path=f'{tmp}/arc3', size=(2400, 2400),
+              n_frames=n_frames, path_numbering=True)
 
-make_video([f"arc3{ii:06d}.png" for ii in range(36)], "arc3.gif")
+make_video([f"{tmp}/arc3{ii:06d}.png" for ii in range(n_frames)], "arc3.gif")
 
 #############################################################################
 # Show the values of tissue properties along the bundle
@@ -405,10 +412,10 @@ scene.add(arc_actor)
 for slicer in slicers:
     scene.add(slicer)
 
-window.record(scene, out_path='arc4', size=(2400, 2400),
-              n_frames=36, path_numbering=True)
+window.record(scene, out_path=f'{tmp}/arc4', size=(2400, 2400),
+              n_frames=n_frames, path_numbering=True)
 
-make_video([f"arc4{ii:06d}.png" for ii in range(36)], "arc4.gif")
+make_video([f"{tmp}/arc4{ii:06d}.png" for ii in range(n_frames)], "arc4.gif")
 
 #############################################################################
 # Core of the bundle and tract profile
@@ -438,10 +445,10 @@ for slicer in slicers:
 scene.add(arc_actor)
 scene.add(core_arc_actor)
 
-window.record(scene, out_path='arc5', size=(2400, 2400),
-              n_frames=36, path_numbering=True)
+window.record(scene, out_path=f'{tmp}/arc5', size=(2400, 2400),
+              n_frames=n_frames, path_numbering=True)
 
-make_video([f"arc5{ii:06d}.png" for ii in range(36)], "arc5.gif")
+make_video([f"{tmp}/arc5{ii:06d}.png" for ii in range(n_frames)], "arc5.gif")
 
 scene.clear()
 
@@ -459,10 +466,10 @@ for bundle in bundles:
     bundle_actor = lines_as_tubes(bundle_t1w, 8, colors=color_dict[bundle])
     scene.add(bundle_actor)
 
-window.record(scene, out_path='all_bundles', size=(2400, 2400),
-              n_frames=36, path_numbering=True)
+window.record(scene, out_path=f'{tmp}/all_bundles', size=(2400, 2400),
+              n_frames=n_frames, path_numbering=True)
 
-make_video([f"all_bundles{ii:06d}.png" for ii in range(36)], "all_bundles.gif")
+make_video([f"{tmp}/all_bundles{ii:06d}.png" for ii in range(n_frames)], "all_bundles.gif")
 
 
 scene.clear()
@@ -493,13 +500,13 @@ for bundle in bundles:
     scene.add(core_actor)
 
 window.record(scene,
-              out_path='all_tract_profiles',
+              out_path=f'{tmp}/all_tract_profiles',
               size=(2400, 2400),
-              n_frames=36,
+              n_frames=n_frames,
               path_numbering=True)
 
-make_video([f"all_tract_profiles{ii:06d}.png" for ii in range(36)],
-            "all_tract_profiles.gif")
+make_video([f"{tmp}/all_tract_profiles{ii:06d}.png" for ii in range(n_frames)],
+           "all_tract_profiles.gif")
 
 #############################################################################
 # Tract profiles as a table
@@ -513,5 +520,6 @@ for ii, bundle in enumerate(bundles):
             linewidth=3)
 ax.set_xticks(np.arange(0, 20 * len(bundles), 20))
 ax.set_xticklabels(bundles, rotation=45, ha='right')
-fig.set_size_inches(10, 4)
+fig.set_size_inches(10, 5)
 fig.savefig('tract_profiles_as_table.png')
+plt.tight_layout()
