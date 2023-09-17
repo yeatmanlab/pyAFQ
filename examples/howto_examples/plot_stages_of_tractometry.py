@@ -555,5 +555,5 @@ for ii, bundle in enumerate(bundles):
 ax.set_xticks(np.arange(0, 20 * len(bundles), 20))
 ax.set_xticklabels(bundles, rotation=45, ha='right')
 fig.set_size_inches(10, 5)
+plt.subplots_adjust(bottom=0.2)
 fig.savefig('tract_profiles_as_table.png')
-plt.tight_layout()
