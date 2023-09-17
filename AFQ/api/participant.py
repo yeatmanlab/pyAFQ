@@ -7,7 +7,6 @@ from tqdm import tqdm
 import numpy as np
 import tempfile
 import math
-from matplotlib import font_manager
 
 from PIL import Image, ImageDraw, ImageFont
 
