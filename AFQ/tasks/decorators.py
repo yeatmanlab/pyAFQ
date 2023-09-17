@@ -154,7 +154,7 @@ def as_file(suffix, include_track=False, include_seg=False):
                         gen, this_file, bbox_valid_check=False)
                 elif isinstance(gen, np.ndarray):
                     np.save(this_file, gen)
-                elif isinstance(gen, TrxFile):
+                elif has_trx and isinstance(gen, TrxFile):
                     save_trx(gen, this_file)
                 else:
                     gen.to_csv(this_file)
