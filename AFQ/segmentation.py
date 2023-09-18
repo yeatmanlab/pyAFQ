@@ -161,10 +161,9 @@ class Segmentation:
         parallel_segmentation : dict or AFQ.api.BundleDict
             How to parallelize segmentation across processes when performing
             waypoint ROI segmentation. Set to {"engine": "serial"} to not
-            perform parallelization. See ``AFQ.utils.parallel.pafor`` for
+            perform parallelization. See ``dipy.utils.parallel.paramap`` for
             details.
-            Default: {"n_jobs": -1, "engine": "joblib",
-                      "backend": "loky"}
+            Default: {"engine": "serial"}
         rm_small_clusters : int
             Using RecoBundles Algorithm.
             Remove clusters that have less than this value
