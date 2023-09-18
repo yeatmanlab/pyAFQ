@@ -336,11 +336,11 @@ reg_subject:
 
 
 bundles:
-    full path to a trk file containing containting segmented streamlines, labeled by bundle
+    full path to a trk/trx file containing containing segmented streamlines, labeled by bundle
 
 
 indiv_bundles:
-    dictionary of paths, where each path is a full path to a trk file containing the streamlines of a given bundle, cleaned or uncleaned
+    dictionary of paths, where each path is a full path to a trk file containing the streamlines of a given bundle.
 
 
 sl_counts:
