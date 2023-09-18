@@ -118,8 +118,7 @@ class Segmentation:
                  nb_streamlines=False,
                  seg_algo='AFQ',
                  clip_edges=False,
-                 parallel_segmentation={
-                     "n_jobs": 4, "engine": "dask"},
+                 parallel_segmentation={"engine": "serial"},
                  progressive=True,
                  greater_than=50,
                  rm_small_clusters=50,
@@ -162,10 +161,10 @@ class Segmentation:
         parallel_segmentation : dict or AFQ.api.BundleDict
             How to parallelize segmentation across processes when performing
             waypoint ROI segmentation. Set to {"engine": "serial"} to not
-            perform parallelization. See ``AFQ.utils.parallel.pafor`` for
+            perform parallelization. Some engines may cause errors, depending
+            on the system. See ``dipy.utils.parallel.paramap`` for
             details.
-            Default: {"n_jobs": -1, "engine": "joblib",
-                      "backend": "loky"}
+            Default: {"engine": "serial"}
         rm_small_clusters : int
             Using RecoBundles Algorithm.
             Remove clusters that have less than this value
