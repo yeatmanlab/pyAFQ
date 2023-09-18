@@ -118,8 +118,7 @@ class Segmentation:
                  nb_streamlines=False,
                  seg_algo='AFQ',
                  clip_edges=False,
-                 parallel_segmentation={
-                     "n_jobs": 4, "engine": "dask"},
+                 parallel_segmentation={"engine": "serial"},
                  progressive=True,
                  greater_than=50,
                  rm_small_clusters=50,
