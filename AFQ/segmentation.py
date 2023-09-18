@@ -161,7 +161,8 @@ class Segmentation:
         parallel_segmentation : dict or AFQ.api.BundleDict
             How to parallelize segmentation across processes when performing
             waypoint ROI segmentation. Set to {"engine": "serial"} to not
-            perform parallelization. See ``dipy.utils.parallel.paramap`` for
+            perform parallelization. Some engines may cause errors, depending
+            on the system. See ``dipy.utils.parallel.paramap`` for
             details.
             Default: {"engine": "serial"}
         rm_small_clusters : int
