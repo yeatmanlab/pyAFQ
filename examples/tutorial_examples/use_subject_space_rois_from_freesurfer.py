@@ -86,6 +86,10 @@ nib.save(
         freesurfer_subject_folder,
         "sub-01_ses-01_desc-leftThal_mask.nii.gz"))
 
+# Fetch LV1 ROI
+# which was already generated using the process above
+afd.fetch_stanford_hardi_lv1()
+
 ##########################################################################
 # Set tractography parameters (optional)
 # ---------------------
