@@ -33,7 +33,7 @@ def get_fname(base_fname, suffix,
         )
     if segmentation_params is not None and 'seg_algo' in segmentation_params:
         seg_algo = segmentation_params['seg_algo']
-        fname = fname + f"_segalgo-{seg_algo}"
+        fname = fname + f"_bundlerec-{seg_algo}"
 
     return fname + suffix
 
