@@ -29,7 +29,7 @@ def test_BundleDict():
 
     assert len(afq_bundles) == 2
 
-    # Forceps Minor
+    # Forceps Minor and Major
     afq_bundles = abd.default18_bd()["FA", "FP"]
 
     assert len(afq_bundles) == 2

@@ -14,7 +14,10 @@ from dipy.io.streamline import load_tractogram
 logging.basicConfig(level=logging.INFO)
 
 
-__all__ = ["PediatricBundleDict", "BundleDict"]
+__all__ = [
+    "PediatricBundleDict", "BundleDict",
+    "default18_bd", "reco_bd",
+    "callosal_bd", "cerebellar_bd"]
 
 
 def do_preprocessing():
