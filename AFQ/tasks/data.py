@@ -874,12 +874,10 @@ def get_bundle_dict(segmentation_params,
             "reg_template must be a str or Nifti1Image")
 
     if bundle_info is not None and not ((
-            isinstance(bundle_info, list)
-            and isinstance(bundle_info[0], str)) or (
-                isinstance(bundle_info, dict)) or (
-                    isinstance(bundle_info, abd.BundleDict))):
+            isinstance(bundle_info, dict)) or (
+            isinstance(bundle_info, abd.BundleDict))):
         raise TypeError((
-            "bundle_info must be a list of strings,"
+            "bundle_info must be"
             " a dict, or a BundleDict"))
 
     if bundle_info is None:

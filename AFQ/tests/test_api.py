@@ -240,7 +240,7 @@ def test_AFQ_custom_tract():
     _, bids_path, sub_path = get_temp_hardi()
     afd.fetch_stanford_hardi_tractography()
 
-    bundle_names = [
+    bundle_info = abd.default18_bd()[
         "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"]
 
     # move subsampled tractography into bids folder
@@ -258,7 +258,7 @@ def test_AFQ_custom_tract():
     myafq = GroupAFQ(
         bids_path,
         preproc_pipeline='vistasoft',
-        bundle_info=bundle_names,
+        bundle_info=bundle_info,
         import_tract={
             "suffix": "tractography",
             "scope": "vistasoft"
@@ -479,7 +479,7 @@ def test_API_type_checking():
     with pytest.raises(
             TypeError,
             match=(
-                "bundle_info must be a list of strings,"
+                "bundle_info must be"
                 " a dict, or a BundleDict")):
         myafq = GroupAFQ(
             bids_path,
@@ -503,7 +503,7 @@ def test_API_type_checking():
                 "odf_model": "CSD"},
             csd_sh_order=2,  # reduce CSD fit time
             csd_response=((1, 1, 1), 1),
-            bundle_info=["ARC_L", "ARC_R"])
+            bundle_info=abd.default18_bd()["ARC_L", "ARC_R"])
         myafq.export("bundles")
     del myafq
 
@@ -607,7 +607,7 @@ def test_AFQ_pft():
     """
     _, bids_path, sub_path = get_temp_hardi()
 
-    bundle_names = [
+    bundle_names = abd.default18_bd()[
         "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"]
 
     f_pve_csf, f_pve_gm, f_pve_wm = get_fnames('stanford_pve_maps')
@@ -732,7 +732,7 @@ def test_run_using_auto_cli():
     # after the file is written
     arg_dict['BIDS_PARAMS']['bids_path']['default'] = bids_path
     arg_dict['BIDS_PARAMS']['dmriprep']['default'] = 'vistasoft'
-    arg_dict['DATA']['bundle_info']['default'] = ["CST_L"]
+    arg_dict['DATA']['bundle_info']['default'] = abd.default18_bd()["CST_L"]
     arg_dict['TRACTOGRAPHY_PARAMS']['n_seeds']['default'] = 500
     arg_dict['TRACTOGRAPHY_PARAMS']['random_seeds']['default'] = True
 
