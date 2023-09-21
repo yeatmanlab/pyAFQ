@@ -599,9 +599,9 @@ class BundleDict(MutableMapping):
         return self._dict[b_name]
 
     def __getitem__(self, key):
-        if isinstance(key, tuple):
+        if isinstance(key, tuple) or isinstance(key, list):
             # Generates a copy of this BundleDict with only the bundle names
-            # from the tuple
+            # from the tuple/list
             new_bd = {}
             for b_name in key:
                 if b_name in self._dict:

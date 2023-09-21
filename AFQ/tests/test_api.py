@@ -528,7 +528,7 @@ def test_AFQ_slr():
     afd.read_stanford_hardi_tractography()
 
     _, bids_path, _ = get_temp_hardi()
-    bd = abd.default18_bd()["CST_L"]
+    bd = abd.default18_bd()[("CST_L")]
 
     myafq = GroupAFQ(
         bids_path=bids_path,
@@ -652,7 +652,6 @@ def test_AFQ_custom_subject_reg():
     # make first temproary directory to generate b0
     _, bids_path, sub_path = get_temp_hardi()
 
-
     bundle_info = abd.default18_bd()[
         "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"]
 
@@ -732,7 +731,7 @@ def test_run_using_auto_cli():
     # after the file is written
     arg_dict['BIDS_PARAMS']['bids_path']['default'] = bids_path
     arg_dict['BIDS_PARAMS']['dmriprep']['default'] = 'vistasoft'
-    arg_dict['DATA']['bundle_info']['default'] = abd.default18_bd()["CST_L"]
+    arg_dict['DATA']['bundle_info']['default'] = abd.default18_bd()[("CST_L")]
     arg_dict['TRACTOGRAPHY_PARAMS']['n_seeds']['default'] = 500
     arg_dict['TRACTOGRAPHY_PARAMS']['random_seeds']['default'] = True
 
@@ -773,7 +772,7 @@ def test_AFQ_data_waypoint():
     bundle_info["SLF_L"] = {
         "start": afq_templates["SLF_L_start"],
         "end": afq_templates["SLF_L_end"],
-        "prob_map" : afq_templates["SLF_L_prob_map"]
+        "prob_map": afq_templates["SLF_L_prob_map"]
     }
 
     bundle_info["LV1"] = {
