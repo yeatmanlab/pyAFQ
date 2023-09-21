@@ -41,7 +41,7 @@ except ImportError:
     using_afqb = False
 
 
-__all__ = ["GroupAFQ"]
+__all__ = ["GroupAFQ", "get_afq_bids_entities_fname"]
 
 
 logger = logging.getLogger('AFQ')
@@ -53,6 +53,11 @@ def clean_pandas_df(df):
     df = df.reset_index(drop=True)
     df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
     return df
+
+
+def get_afq_bids_entities_fname():
+    return op.dirname(op.dirname(op.abspath(
+        aus.__file__))) + "/afq_bids_entities.json"
 
 
 class GroupAFQ(object):
