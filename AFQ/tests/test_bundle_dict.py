@@ -30,9 +30,9 @@ def test_BundleDict():
     assert len(afq_bundles) == 2
 
     # Forceps Minor
-    afq_bundles = abd.default18_bd()[("FA")]
+    afq_bundles = abd.default18_bd()["FA", "FP"]
 
-    assert len(afq_bundles) == 1
+    assert len(afq_bundles) == 2
 
     # Cingulum Hippocampus
     # not included but exists in templates

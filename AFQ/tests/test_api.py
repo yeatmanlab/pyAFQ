@@ -528,7 +528,7 @@ def test_AFQ_slr():
     afd.read_stanford_hardi_tractography()
 
     _, bids_path, _ = get_temp_hardi()
-    bd = abd.default18_bd()[("CST_L")]
+    bd = abd.default18_bd()[("CST_L", "CST_R")]
 
     myafq = GroupAFQ(
         bids_path=bids_path,
