@@ -20,7 +20,7 @@ import os.path as op
 afd.organize_stanford_data(clear_previous_afq="track")
 
 bundle_names = ["ARC_L", "ARC_R", "pARC_L", "pARC_R", "VOF_L", "VOF_R"]
-bundle_dict = abd.default18_bd().sub(bundle_names)
+bundle_dict = abd.default18_bd()[bundle_names]
 
 
 myafq = GroupAFQ(

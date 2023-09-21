@@ -528,7 +528,7 @@ def test_AFQ_slr():
     afd.read_stanford_hardi_tractography()
 
     _, bids_path, _ = get_temp_hardi()
-    bd = abd.default18_bd().sub(["CST_L"])
+    bd = abd.default18_bd()["CST_L"]
 
     myafq = GroupAFQ(
         bids_path=bids_path,
@@ -653,8 +653,8 @@ def test_AFQ_custom_subject_reg():
     _, bids_path, sub_path = get_temp_hardi()
 
 
-    bundle_info = abd.default18_bd().sub([
-        "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"])
+    bundle_info = abd.default18_bd()[
+        "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"]
 
     b0_file = GroupAFQ(
         bids_path,
@@ -763,7 +763,7 @@ def test_AFQ_data_waypoint():
         list(lv1_files.keys())[0])
     bundle_names = [
         "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"]
-    bundle_info = abd.default18_bd().sub(bundle_names)
+    bundle_info = abd.default18_bd()[bundle_names]
 
     bundle_info.resample_subject_to = nib.load(
             op.join(vista_folder, "sub-01_ses-01_dwi.nii.gz"))
@@ -891,9 +891,9 @@ def test_AFQ_data_waypoint():
                            random_seeds=True,
                            rng_seed=42)
     bundle_dict_as_str = (
-        'default18_bd().sub(['
+        'default18_bd()['
         '"SLF_L", "SLF_R", "ARC_L", '
-        '"ARC_R", "CST_L", "CST_R", "FP"])'
+        '"ARC_R", "CST_L", "CST_R", "FP"]'
         '+ BundleDict({"LV1": {"start": '
         f'"{lv1_fname}", '
         '"space": "subject"}})')

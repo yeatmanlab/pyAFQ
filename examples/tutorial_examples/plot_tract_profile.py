@@ -115,7 +115,7 @@ else:
 # they are brought into the subject's individual native space.
 # For speed, we only segment two bundles here.
 
-bundles = abd.default18_bd().sub(["CST_L", "CST_R", "ARC_L", "ARC_R"])
+bundles = abd.default18_bd()["CST_L", "CST_R", "ARC_L", "ARC_R"]
 
 
 ##########################################################################

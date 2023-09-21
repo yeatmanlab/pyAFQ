@@ -25,12 +25,12 @@ def test_BundleDict():
     assert len(afq_bundles) == len(abd.BUNDLES)
 
     # Arcuate Fasciculus
-    afq_bundles = abd.default18_bd().sub(["ARC_L", "ARC_R"])
+    afq_bundles = abd.default18_bd()["ARC_L", "ARC_R"]
 
     assert len(afq_bundles) == 2
 
     # Forceps Minor
-    afq_bundles = abd.default18_bd().sub(["FA"])
+    afq_bundles = abd.default18_bd()["FA"]
 
     assert len(afq_bundles) == 1
 
@@ -58,10 +58,10 @@ def test_BundleDict():
     with pytest.raises(
             ValueError,
             match=" is not in this BundleDict"):
-        afq_bundles = abd.default18_bd().sub(["VOQ_L", "VOQ_R"])
+        afq_bundles = abd.default18_bd()["VOQ_L", "VOQ_R"]
 
-    afq_bundles = abd.reco_bd(80).sub(["VOF_L", "VOF_R"])
+    afq_bundles = abd.reco_bd(80)["VOF_L", "VOF_R"]
     assert len(afq_bundles) == 2
 
-    afq_bundles = abd.reco_bd(80).sub(["whole_brain"])
+    afq_bundles = abd.reco_bd(80)["whole_brain"]
     assert len(afq_bundles) == 1

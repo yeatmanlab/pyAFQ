@@ -599,22 +599,39 @@ class BundleDict(MutableMapping):
         return self._dict[b_name]
 
     def __getitem__(self, key):
-        if not self.keep_in_memory:
-            _item = self._dict[key].copy()
-            _res = self._cond_load_bundle(key, dry_run=True)
-            if _res is not None:
-                _item.update(_res)
-            _item = _BundleEntry(_item)
+        if isinstance(key, tuple):
+            # Generates a copy of this BundleDict with only the bundle names
+            # from the tuple
+            new_bd = {}
+            for b_name in key:
+                if b_name in self._dict:
+                    new_bd[b_name] = self._dict[b_name]
+                else:
+                    raise ValueError(f"{b_name} is not in this BundleDict")
+
+            return self.__class__(
+                new_bd,
+                seg_algo=self.seg_algo,
+                resample_to=self.resample_to,
+                resample_subject_to=self.resample_subject_to,
+                keep_in_memory=self.keep_in_memory)
         else:
-            if "loaded" not in self._dict[key] or\
-                    not self._dict[key]["loaded"]:
-                self._cond_load_bundle(key)
-                self._dict[key]["loaded"] = True
-            if "resampled" not in self._dict[key] or not self._dict[
-                    key]["resampled"]:
-                self._resample_roi(key)
-            _item = _BundleEntry(self._dict[key].copy())
-        return _item
+            if not self.keep_in_memory:
+                _item = self._dict[key].copy()
+                _res = self._cond_load_bundle(key, dry_run=True)
+                if _res is not None:
+                    _item.update(_res)
+                _item = _BundleEntry(_item)
+            else:
+                if "loaded" not in self._dict[key] or\
+                        not self._dict[key]["loaded"]:
+                    self._cond_load_bundle(key)
+                    self._dict[key]["loaded"] = True
+                if "resampled" not in self._dict[key] or not self._dict[
+                        key]["resampled"]:
+                    self._resample_roi(key)
+                _item = _BundleEntry(self._dict[key].copy())
+            return _item
 
     def __setitem__(self, key, item):
         self._dict[key] = item
@@ -659,25 +676,6 @@ class BundleDict(MutableMapping):
         """
         return self.__class__(
             self._dict.copy(),
-            seg_algo=self.seg_algo,
-            resample_to=self.resample_to,
-            resample_subject_to=self.resample_subject_to,
-            keep_in_memory=self.keep_in_memory)
-
-    def sub(self, bundle_names):
-        """
-        Generates a copy of this BundleDict with only the bundle names
-        from the list
-        """
-        new_bd = {}
-        for b_name in bundle_names:
-            if b_name in self._dict:
-                new_bd[b_name] = self._dict[b_name]
-            else:
-                raise ValueError(f"{b_name} is not in this BundleDict")
-
-        return self.__class__(
-            new_bd,
             seg_algo=self.seg_algo,
             resample_to=self.resample_to,
             resample_subject_to=self.resample_subject_to,
