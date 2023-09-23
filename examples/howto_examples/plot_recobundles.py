@@ -86,7 +86,7 @@ bundle_names = [
     "CST_L", "CST_R", "UF_L", "UF_R",
     "CC_ForcepsMajor", "CC_ForcepsMinor",
     "OR_L", "OR_R", "VOF_L", "VOF_R"]
-bundles = abd.BundleDict(bundle_names, seg_algo="reco80")
+bundles = abd.reco_bd(80)[bundle_names]
 
 print("Tracking...")
 if not op.exists(op.join(working_dir, 'dti_streamlines_reco.trk')):
