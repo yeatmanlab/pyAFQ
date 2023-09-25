@@ -25,10 +25,8 @@ of the software.
 import os
 import os.path as op
 
-import matplotlib.pyplot as plt
-import nibabel as nib
-
 from AFQ.api.group import GroupAFQ
+import AFQ.api.bundle_dict as abd
 import AFQ.data.fetch as afd
 
 
@@ -211,7 +209,7 @@ print(validator.is_bids(tractography_relative_path))
 # For an example that includes custom definition of bundle info, see the
 # `plot_callosal_tract_profile example <http://yeatmanlab.github.io/pyAFQ/auto_examples/plot_callosal_tract_profile.html>`_.
 
-bundle_info = [
+bundle_info = abd.default18_bd()[
     "SLF_L", "SLF_R", "ARC_L", "ARC_R",
     "CST_L", "CST_R", "FP"]
 

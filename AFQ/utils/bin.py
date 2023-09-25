@@ -78,7 +78,8 @@ def toml_to_val(t):
         return eval(t)
     elif isinstance(t, str) and t[0] == '{':
         return eval(t)  # interpret as dictionary
-    elif isinstance(t, str) and ("Image" in t or "Map" in t or "Dict" in t):
+    elif isinstance(t, str) and (
+            "Image" in t or "Map" in t or "Dict" in t or "_bd(" in t):
         try:
             definition_or_dict = eval(t)
         except NameError:

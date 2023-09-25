@@ -852,10 +852,9 @@ def get_bundle_dict(segmentation_params,
 
     Parameters
     ----------
-    bundle_info : list of strings, dict, or BundleDict, optional
-        List of bundle names to include in segmentation,
-        or a bundle dictionary (see BundleDict for inspiration),
-        or a BundleDict. See `Defining Custom Bundle Dictionaries`
+    bundle_info : dict or BundleDict, optional
+        A dictionary or BundleDict for use in segmentation.
+        See `Defining Custom Bundle Dictionaries`
         in the `usage` section of pyAFQ's documentation for details.
         If None, will get all appropriate bundles for the chosen
         segmentation algorithm.
@@ -875,22 +874,20 @@ def get_bundle_dict(segmentation_params,
             "reg_template must be a str or Nifti1Image")
 
     if bundle_info is not None and not ((
-            isinstance(bundle_info, list)
-            and isinstance(bundle_info[0], str)) or (
-                isinstance(bundle_info, dict)) or (
-                    isinstance(bundle_info, abd.BundleDict))):
+            isinstance(bundle_info, dict)) or (
+            isinstance(bundle_info, abd.BundleDict))):
         raise TypeError((
-            "bundle_info must be a list of strings,"
+            "bundle_info must be"
             " a dict, or a BundleDict"))
 
     if bundle_info is None:
         if segmentation_params["seg_algo"] == "reco" or\
                 segmentation_params["seg_algo"] == "reco16":
-            bundle_info = abd.RECO_BUNDLES_16
+            bundle_info = abd.reco_bd(16)
         elif segmentation_params["seg_algo"] == "reco80":
-            bundle_info = abd.RECO_BUNDLES_80
+            bundle_info = abd.reco_bd(80)
         else:
-            bundle_info = abd.BUNDLES
+            bundle_info = abd.default18_bd()
 
     use_brain_mask = True
     brain_mask = nib.load(brain_mask).get_fdata()

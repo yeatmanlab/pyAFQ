@@ -137,7 +137,7 @@ bundles = abd.BundleDict({
 # can be combined through addition. To get both the SLF and the standard
 # bundles, we would execute the following code::
 #
-#     bundles = bundles + abd.BundleDict()
+#     bundles = bundles + abd.default18_bd()
 #
 # In this case, we will skip this and generate just the SLF.
 
