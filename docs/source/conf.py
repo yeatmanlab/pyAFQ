@@ -227,7 +227,6 @@ sphinx_gallery_conf = {
                       '../../examples/tutorial_examples'],
     # path where to save gallery generated examples
     'gallery_dirs': ['howto/howto_examples', 'tutorials/tutorial_examples'],
-    # 'ignore_pattern': 'plot_baby_afq.py',  # noqa
     'image_scrapers': image_scrapers,
     'reset_modules': (reset_progressbars),
     'show_memory': True,
