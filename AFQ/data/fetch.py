@@ -56,7 +56,11 @@ __all__ = ["fetch_callosum_templates", "read_callosum_templates",
            "fetch_stanford_hardi_lv1"]
 
 
-afq_home = op.join(op.expanduser('~'), 'AFQ_data')
+# Set a user-writeable file-system location to put files:
+if 'AFQ_HOME' in os.environ:
+    afq_home = os.environ['AFQ_HOME']
+else:
+    afq_home = op.join(op.expanduser('~'), 'AFQ_data')
 
 baseurl = "https://ndownloader.figshare.com/files/"
 
@@ -822,7 +826,8 @@ def read_cp_templates(as_img=True, resample_to=False):
         resample_to=resample_to)
 
     toc = time.perf_counter()
-    logger.debug(f'Cerebellar peduncles templates loaded in {toc - tic:0.4f} seconds')
+    logger.debug(
+        f'Cerebellar peduncles templates loaded in {toc - tic:0.4f} seconds')
 
     return template_dict
 
