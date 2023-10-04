@@ -25,8 +25,8 @@ of the software.
 import os
 import os.path as op
 
-from AFQ.api.group import GroupAFQ
 import AFQ.api.bundle_dict as abd
+from AFQ.api.group import GroupAFQ, get_afq_bids_entities_fname
 import AFQ.data.fetch as afd
 
 
@@ -35,7 +35,7 @@ import AFQ.data.fetch as afd
 #  `pyBIDS <https://bids-standard.github.io/pybids/>`_.
 
 import bids
-
+from bids.layout import BIDSLayout
 
 ##########################################################################
 # We start with some example data. The data we will use here is
@@ -256,3 +256,16 @@ my_afq.export_all()
 #    file contains the right names for the pipeline. See above for an example
 #    of that.
 # 2. File naming convention doesn't uniquely identify file with bids filters.
+
+
+##########################################################################
+# The outputs of AFQ are also BIDS compatible. However, we use some
+# custom entities, which need to be loaded. Here we demonstrate how
+# to load the afq entities with get_afq_bids_entities_fname()
+# and then show all files with the key-value pair recogmethod-AFQ
+
+layout = BIDSLayout(bids_path)
+layout.add_derivatives(
+    f'{bids_path}/derivatives/afq',
+    config=['bids', 'derivatives', get_afq_bids_entities_fname()])
+print(layout.get(recogmethod="AFQ", return_type="filename"))

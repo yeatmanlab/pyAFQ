@@ -1089,7 +1089,7 @@ def organize_stanford_data(path=None, clear_previous_afq=None):
         else:
             apply_cmd_to_afq_derivs(
                 op.join(afq_folder, "sub-01/ses-01"),
-                op.join(afq_folder, "sub-01/ses-01/sub-01_ses-01_dwi"),
+                op.join(afq_folder, "sub-01/ses-01/sub-01_ses-01"),
                 dependent_on=clear_previous_afq)
 
     if not op.exists(derivatives_path):

@@ -124,7 +124,7 @@ def dti_fit(dti_params, gtab):
 
 
 @pimms.calc("dti_params")
-@as_file(suffix='_model-DTI_desc-diffmodel_dwi.nii.gz')
+@as_file(suffix='_odfmodel-DTI_desc-diffmodel_dwi.nii.gz')
 @as_img
 def dti_params(brain_mask, data, gtab,
                bval, bvec, b0_threshold=50, robust_tensor_fitting=False):
@@ -172,7 +172,7 @@ def fwdti_fit(fwdti_params, gtab):
 
 
 @pimms.calc("fwdti_params")
-@as_file(suffix='_model-FWDTI_desc-diffmodel_dwi.nii.gz')
+@as_file(suffix='_odfmodel-FWDTI_desc-diffmodel_dwi.nii.gz')
 @as_img
 def fwdti_params(brain_mask, data, gtab):
     """
@@ -200,7 +200,7 @@ def dki_fit(dki_params, gtab):
 
 
 @pimms.calc("dki_params")
-@as_file(suffix='_model-DKI_desc-diffmodel_dwi.nii.gz')
+@as_file(suffix='_odfmodel-DKI_desc-diffmodel_dwi.nii.gz')
 @as_img
 def dki_params(brain_mask, gtab, data):
     """
@@ -221,7 +221,7 @@ def dki_params(brain_mask, gtab, data):
 
 
 @pimms.calc("csd_params")
-@as_file(suffix='_model-CSD_desc-diffmodel_dwi.nii.gz')
+@as_file(suffix='_odfmodel-CSD_desc-diffmodel_dwi.nii.gz')
 @as_img
 def csd_params(dwi, brain_mask, gtab, data,
                csd_response=None, csd_sh_order=None,
@@ -285,7 +285,7 @@ def csd_params(dwi, brain_mask, gtab, data,
 
 
 @pimms.calc("csd_pmap")
-@as_file(suffix='_model-CSD_desc-APM_dwi.nii.gz')
+@as_file(suffix='_odfmodel-CSD_desc-APM_dwi.nii.gz')
 @as_img
 def anisotropic_power_map(csd_params):
     """
@@ -298,7 +298,7 @@ def anisotropic_power_map(csd_params):
 
 
 @pimms.calc("csd_ai")
-@as_file(suffix='_model-CSD_desc-AI_dwi.nii.gz')
+@as_file(suffix='_odfmodel-CSD_desc-AI_dwi.nii.gz')
 @as_img
 def csd_anisotropic_index(csd_params):
     """
@@ -334,7 +334,7 @@ def gq(base_fname, gtab, dwi_affine, data,
 
     GQ_shm, ASO, ISO = extract_odf(odf)
 
-    params_suffix = "_model-GQ_desc-diffmodel_dwi.nii.gz"
+    params_suffix = "_odfmodel-GQ_desc-diffmodel_dwi.nii.gz"
     params_fname = get_fname(base_fname, params_suffix)
     nib.save(nib.Nifti1Image(GQ_shm, dwi_affine), params_fname)
     write_json(
@@ -342,7 +342,7 @@ def gq(base_fname, gtab, dwi_affine, data,
         dict(GQSamplingLength=gq_sampling_length)
     )
 
-    ASO_suffix = "_model-GQ_desc-ASO_dwi.nii.gz"
+    ASO_suffix = "_odfmodel-GQ_desc-ASO_dwi.nii.gz"
     ASO_fname = get_fname(base_fname, ASO_suffix)
     nib.save(nib.Nifti1Image(ASO, dwi_affine), ASO_fname)
     write_json(
@@ -350,7 +350,7 @@ def gq(base_fname, gtab, dwi_affine, data,
         dict(GQSamplingLength=gq_sampling_length)
     )
 
-    ISO_suffix = "_model-GQ_desc-ISO_dwi.nii.gz"
+    ISO_suffix = "_odfmodel-GQ_desc-ISO_dwi.nii.gz"
     ISO_fname = get_fname(base_fname, ISO_suffix)
     nib.save(nib.Nifti1Image(ISO, dwi_affine), ISO_fname)
     write_json(
@@ -362,7 +362,7 @@ def gq(base_fname, gtab, dwi_affine, data,
 
 
 @pimms.calc("gq_pmap")
-@as_file(suffix='_model-GQ_desc-APM_dwi.nii.gz')
+@as_file(suffix='_odfmodel-GQ_desc-APM_dwi.nii.gz')
 @as_img
 def gq_pmap(gq_params):
     """
@@ -375,7 +375,7 @@ def gq_pmap(gq_params):
 
 
 @pimms.calc("gq_ai")
-@as_file(suffix='_model-GQ_desc-AI_dwi.nii.gz')
+@as_file(suffix='_odfmodel-GQ_desc-AI_dwi.nii.gz')
 @as_img
 def gq_ai(gq_params):
     """
@@ -406,7 +406,7 @@ def opdt_params(base_fname, data, gtab,
     opdt_model = shm.OpdtModel(gtab, opdt_sh_order)
     opdt_fit = opdt_model.fit(data, mask=brain_mask)
 
-    params_suffix = "_model-OPDT_desc-diffmodel_dwi.nii.gz"
+    params_suffix = "_odfmodel-OPDT_desc-diffmodel_dwi.nii.gz"
     params_fname = get_fname(base_fname, params_suffix)
     nib.save(nib.Nifti1Image(opdt_fit._shm_coef, dwi_affine), params_fname)
     write_json(
@@ -414,7 +414,7 @@ def opdt_params(base_fname, data, gtab,
         dict(sh_order=opdt_sh_order)
     )
 
-    GFA_suffix = "_model-OPDT_desc-GFA_dwi.nii.gz"
+    GFA_suffix = "_odfmodel-OPDT_desc-GFA_dwi.nii.gz"
     GFA_fname = get_fname(base_fname, GFA_suffix)
     nib.save(nib.Nifti1Image(opdt_fit.gfa, dwi_affine), GFA_fname)
     write_json(
@@ -426,7 +426,7 @@ def opdt_params(base_fname, data, gtab,
 
 
 @pimms.calc("opdt_pmap")
-@as_file(suffix='_model-OPDT_desc-APM_dwi.nii.gz')
+@as_file(suffix='_odfmodel-OPDT_desc-APM_dwi.nii.gz')
 @as_img
 def opdt_pmap(opdt_params):
     """
@@ -439,7 +439,7 @@ def opdt_pmap(opdt_params):
 
 
 @pimms.calc("opdt_ai")
-@as_file(suffix='_model-OPDT_desc-AI_dwi.nii.gz')
+@as_file(suffix='_odfmodel-OPDT_desc-AI_dwi.nii.gz')
 @as_img
 def opdt_ai(opdt_params):
     """
@@ -470,7 +470,7 @@ def csa_params(base_fname, data, gtab,
     csa_model = shm.CsaOdfModel(gtab, csa_sh_order)
     csa_fit = csa_model.fit(data, mask=brain_mask)
 
-    params_suffix = "_model-CSA_desc-diffmodel_dwi.nii.gz"
+    params_suffix = "_odfmodel-CSA_desc-diffmodel_dwi.nii.gz"
     params_fname = get_fname(base_fname, params_suffix)
     nib.save(nib.Nifti1Image(csa_fit._shm_coef, dwi_affine), params_fname)
     write_json(
@@ -478,7 +478,7 @@ def csa_params(base_fname, data, gtab,
         dict(sh_order=csa_sh_order)
     )
 
-    GFA_suffix = "_model-CSA_desc-GFA_dwi.nii.gz"
+    GFA_suffix = "_odfmodel-CSA_desc-GFA_dwi.nii.gz"
     GFA_fname = get_fname(base_fname, GFA_suffix)
     nib.save(nib.Nifti1Image(csa_fit.gfa, dwi_affine), GFA_fname)
     write_json(
@@ -490,7 +490,7 @@ def csa_params(base_fname, data, gtab,
 
 
 @pimms.calc("csa_pmap")
-@as_file(suffix='_model-CSA_desc-APM_dwi.nii.gz')
+@as_file(suffix='_odfmodel-CSA_desc-APM_dwi.nii.gz')
 @as_img
 def csa_pmap(csa_params):
     """
@@ -503,7 +503,7 @@ def csa_pmap(csa_params):
 
 
 @pimms.calc("csa_ai")
-@as_file(suffix='_model-CSA_desc-AI_dwi.nii.gz')
+@as_file(suffix='_odfmodel-CSA_desc-AI_dwi.nii.gz')
 @as_img
 def csa_ai(csa_params):
     """
@@ -516,7 +516,7 @@ def csa_ai(csa_params):
 
 
 @pimms.calc("fwdti_fa")
-@as_file(suffix='_model-FWDTI_desc-FA_dwi.nii.gz')
+@as_file(suffix='_odfmodel-FWDTI_desc-FA_dwi.nii.gz')
 @as_fit_deriv('FWDTI')
 def fwdti_fa(fwdti_tf):
     """
@@ -527,7 +527,7 @@ def fwdti_fa(fwdti_tf):
 
 
 @pimms.calc("fwdti_md")
-@as_file(suffix='_model-FWDTI_desc-MD_dwi.nii.gz')
+@as_file(suffix='_odfmodel-FWDTI_desc-MD_dwi.nii.gz')
 @as_fit_deriv('FWDTI')
 def fwdti_md(fwdti_tf):
     """
@@ -537,7 +537,7 @@ def fwdti_md(fwdti_tf):
 
 
 @pimms.calc("fwdti_fwf")
-@as_file(suffix='_model-FWDTI_desc-FWF_dwi.nii.gz')
+@as_file(suffix='_odfmodel-FWDTI_desc-FWF_dwi.nii.gz')
 @as_fit_deriv('FWDTI')
 def fwdti_fwf(fwdti_tf):
     """
@@ -547,7 +547,7 @@ def fwdti_fwf(fwdti_tf):
 
 
 @pimms.calc("dti_fa")
-@as_file(suffix='_model-DTI_desc-FA_dwi.nii.gz')
+@as_file(suffix='_odfmodel-DTI_desc-FA_dwi.nii.gz')
 @as_fit_deriv('DTI')
 def dti_fa(dti_tf):
     """
@@ -587,7 +587,7 @@ def dti_lt(dti_tf, dwi_affine):
 
 
 @pimms.calc("dti_cfa")
-@as_file(suffix='_model-DTI_desc-CFA_dwi.nii.gz')
+@as_file(suffix='_odfmodel-DTI_desc-CFA_dwi.nii.gz')
 @as_fit_deriv('DTI')
 def dti_cfa(dti_tf):
     """
@@ -598,7 +598,7 @@ def dti_cfa(dti_tf):
 
 
 @pimms.calc("dti_pdd")
-@as_file(suffix='_model-DTI_desc-PDD_dwi.nii.gz')
+@as_file(suffix='_odfmodel-DTI_desc-PDD_dwi.nii.gz')
 @as_fit_deriv('DTI')
 def dti_pdd(dti_tf):
     """
@@ -612,7 +612,7 @@ def dti_pdd(dti_tf):
 
 
 @pimms.calc("dti_md")
-@as_file('_model-DTI_desc-MD_dwi.nii.gz')
+@as_file('_odfmodel-DTI_desc-MD_dwi.nii.gz')
 @as_fit_deriv('DTI')
 def dti_md(dti_tf):
     """
@@ -623,7 +623,7 @@ def dti_md(dti_tf):
 
 
 @pimms.calc("dti_ga")
-@as_file(suffix='_model-DTI_desc-GA_dwi.nii.gz')
+@as_file(suffix='_odfmodel-DTI_desc-GA_dwi.nii.gz')
 @as_fit_deriv('DTI')
 def dti_ga(dti_tf):
     """
@@ -634,7 +634,7 @@ def dti_ga(dti_tf):
 
 
 @pimms.calc("dti_rd")
-@as_file(suffix='_model-DTI_desc-RD_dwi.nii.gz')
+@as_file(suffix='_odfmodel-DTI_desc-RD_dwi.nii.gz')
 @as_fit_deriv('DTI')
 def dti_rd(dti_tf):
     """
@@ -645,7 +645,7 @@ def dti_rd(dti_tf):
 
 
 @pimms.calc("dti_ad")
-@as_file(suffix='_model-DTI_desc-AD_dwi.nii.gz')
+@as_file(suffix='_odfmodel-DTI_desc-AD_dwi.nii.gz')
 @as_fit_deriv('DTI')
 def dti_ad(dti_tf):
     """
@@ -704,7 +704,7 @@ def dki_lt(dki_tf, dwi_affine):
 
 
 @pimms.calc("dki_fa")
-@as_file('_model-DKI_desc-FA_dwi.nii.gz')
+@as_file('_odfmodel-DKI_desc-FA_dwi.nii.gz')
 @as_fit_deriv('DKI')
 def dki_fa(dki_tf):
     """
@@ -715,7 +715,7 @@ def dki_fa(dki_tf):
 
 
 @pimms.calc("dki_md")
-@as_file('_model-DKI_desc-MD_dwi.nii.gz')
+@as_file('_odfmodel-DKI_desc-MD_dwi.nii.gz')
 @as_fit_deriv('DKI')
 def dki_md(dki_tf):
     """
@@ -726,7 +726,7 @@ def dki_md(dki_tf):
 
 
 @pimms.calc("dki_awf")
-@as_file('_model-DKI_desc-AWF_dwi.nii.gz')
+@as_file('_odfmodel-DKI_desc-AWF_dwi.nii.gz')
 @as_fit_deriv('DKI')
 def dki_awf(dki_params,
             sphere='repulsion100', gtol=1e-2):
@@ -754,7 +754,7 @@ def dki_awf(dki_params,
 
 
 @pimms.calc("dki_mk")
-@as_file('_model-DKI_desc-MK_dwi.nii.gz')
+@as_file('_odfmodel-DKI_desc-MK_dwi.nii.gz')
 @as_fit_deriv('DKI')
 def dki_mk(dki_tf):
     """
@@ -765,7 +765,7 @@ def dki_mk(dki_tf):
 
 
 @pimms.calc("dki_ga")
-@as_file(suffix='_model-DKI_desc-GA_dwi.nii.gz')
+@as_file(suffix='_odfmodel-DKI_desc-GA_dwi.nii.gz')
 @as_fit_deriv('DKI')
 def dki_ga(dki_tf):
     """
@@ -776,7 +776,7 @@ def dki_ga(dki_tf):
 
 
 @pimms.calc("dki_rd")
-@as_file(suffix='_model-DKI_desc-RD_dwi.nii.gz')
+@as_file(suffix='_odfmodel-DKI_desc-RD_dwi.nii.gz')
 @as_fit_deriv('DKI')
 def dki_rd(dki_tf):
     """
@@ -787,7 +787,7 @@ def dki_rd(dki_tf):
 
 
 @pimms.calc("dki_ad")
-@as_file(suffix='_model-DKI_desc-AD_dwi.nii.gz')
+@as_file(suffix='_odfmodel-DKI_desc-AD_dwi.nii.gz')
 @as_fit_deriv('DKI')
 def dki_ad(dki_tf):
     """
@@ -798,7 +798,7 @@ def dki_ad(dki_tf):
 
 
 @pimms.calc("dki_rk")
-@as_file(suffix='_model-DKI_desc-RK_dwi.nii.gz')
+@as_file(suffix='_odfmodel-DKI_desc-RK_dwi.nii.gz')
 @as_fit_deriv('DKI')
 def dki_rk(dki_tf):
     """
@@ -809,7 +809,7 @@ def dki_rk(dki_tf):
 
 
 @pimms.calc("dki_ak")
-@as_file(suffix='_model-DKI_desc-AK_dwi.nii.gz')
+@as_file(suffix='_odfmodel-DKI_desc-AK_dwi.nii.gz')
 @as_fit_deriv('DKI')
 def dki_ak(dki_tf):
     """

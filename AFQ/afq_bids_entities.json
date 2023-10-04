@@ -1,0 +1,22 @@
+{
+    "name": "bidsafq",
+    "entities": [
+      {
+        "name": "odfmodel",
+        "pattern": "[_/\\\\]+odfmodel-([a-zA-Z0-9]+)"
+      },
+      {
+        "name": "coordsys",
+        "pattern": "[_/\\\\]+coordsys-([a-zA-Z0-9]+)"
+      },
+      {
+        "name": "trkmethod",
+        "pattern": "[_/\\\\]+trkmethod-([a-zA-Z0-9]+)"
+      },
+      {
+        "name": "recogmethod",
+        "pattern": "[_/\\\\]+recogmethod-([a-zA-Z0-9]+)"
+      }
+    ]
+  }
+  

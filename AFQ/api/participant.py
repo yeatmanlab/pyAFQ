@@ -1,6 +1,5 @@
 import nibabel as nib
 import os.path as op
-import os
 from time import time
 import logging
 from tqdm import tqdm
@@ -20,7 +19,8 @@ from AFQ.tasks.mapping import get_mapping_plan
 from AFQ.tasks.tractography import get_tractography_plan
 from AFQ.tasks.segmentation import get_segmentation_plan
 from AFQ.tasks.viz import get_viz_plan
-from AFQ.utils.path import drop_extension, apply_cmd_to_afq_derivs
+from AFQ.tasks.utils import get_base_fname
+from AFQ.utils.path import apply_cmd_to_afq_derivs
 from AFQ.viz.utils import BEST_BUNDLE_ORIENTATIONS, trim, get_eye
 
 
@@ -104,9 +104,7 @@ class ParticipantAFQ(object):
             results_dir=output_dir,
             dwi_affine=nib.load(dwi_data_file).affine,
             bids_info=bids_info,
-            base_fname=op.join(
-                output_dir,
-                drop_extension(op.basename(dwi_data_file))),
+            base_fname=get_base_fname(output_dir, dwi_data_file),
             **kwargs)
         self.make_workflow()
 

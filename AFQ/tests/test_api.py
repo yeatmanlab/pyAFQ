@@ -427,7 +427,7 @@ def test_AFQ_anisotropic():
     myafq.export("mapping")
     assert op.exists(op.join(
         myafq.export("results_dir")["01"],
-        'sub-01_ses-01_dwi_model-CSD_desc-APM_dwi.nii.gz'))
+        'sub-01_ses-01_odfmodel-CSD_desc-APM_dwi.nii.gz'))
 
 
 def test_API_type_checking():
@@ -822,11 +822,11 @@ def test_AFQ_data_waypoint():
 
     mapping_file = op.join(
         myafq.export("results_dir"),
-        'sub-01_ses-01_dwi_desc-mapping_from-DWI_to-MNI_xform.nii.gz')
+        'sub-01_ses-01_desc-mapping_from-DWI_to-MNI_xform.nii.gz')
     nib.save(mapping, mapping_file)
     reg_prealign_file = op.join(
         myafq.export("results_dir"),
-        'sub-01_ses-01_dwi_desc-prealign_from-DWI_to-MNI_xform.npy')
+        'sub-01_ses-01_desc-prealign_from-DWI_to-MNI_xform.npy')
     np.save(reg_prealign_file, np.eye(4))
 
     # Test ROI exporting:
@@ -834,7 +834,7 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         myafq.export("results_dir"),
         'ROIs',
-        'sub-01_ses-01_dwi_space-subject_desc-CSTRinclude1_mask.json'))
+        'sub-01_ses-01_space-subject_desc-CSTRinclude1_mask.json'))
 
     seg_sft = aus.SegmentedSFT.fromfile(
         myafq.export("bundles"))
@@ -845,7 +845,7 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         myafq.export("results_dir"),
         'bundles',
-        'sub-01_ses-01_dwi_space-RASMM_model-probCSD_algo-AFQ_desc-SLFL_tractography.trk'))  # noqa
+        'sub-01_ses-01_coordsys-RASMM_trkmethod-probCSD_recogmethod-AFQ_desc-SLFL_tractography.trk'))  # noqa
 
     tract_profile_fname = myafq.export("profiles")
     tract_profiles = pd.read_csv(tract_profile_fname)
@@ -858,12 +858,12 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         myafq.export("results_dir"),
         "viz_bundles",
-        'sub-01_ses-01_dwi_space-RASMM_model-probCSD_algo-AFQ_desc-SLFLviz_dwi.html'))  # noqa
+        'sub-01_ses-01_coordsys-RASMM_trkmethod-probCSD_recogmethod-AFQ_desc-SLFLviz_dwi.html'))  # noqa
 
     assert op.exists(op.join(
         myafq.export("results_dir"),
         "viz_bundles",
-        'sub-01_ses-01_dwi_space-RASMM_model-probCSD_algo-AFQ_desc-SLFLviz_dwi.html'))  # noqa
+        'sub-01_ses-01_coordsys-RASMM_trkmethod-probCSD_recogmethod-AFQ_desc-SLFLviz_dwi.html'))  # noqa
 
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see
     # that the CLI generates them
@@ -936,9 +936,9 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         results_dir,
         'ROIs',
-        'sub-01_ses-01_dwi_space-subject_desc-SLFLinclude1_mask.json'))
+        'sub-01_ses-01_space-subject_desc-SLFLinclude1_mask.json'))
 
     assert op.exists(op.join(
         results_dir,
         'bundles',
-        'sub-01_ses-01_dwi_space-RASMM_model-probCSD_algo-AFQ_desc-SLFL_tractography.trk'))  # noqa
+        'sub-01_ses-01_coordsys-RASMM_trkmethod-probCSD_recogmethod-AFQ_desc-SLFL_tractography.trk'))  # noqa
