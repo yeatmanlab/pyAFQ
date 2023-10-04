@@ -63,7 +63,8 @@ RECO_BUNDLES_80 = ["AC", "AF", "AR", "AST", "C", "CB", "CC_ForcepsMajor",
 RECO_BUNDLES_80 = append_l_r(RECO_BUNDLES_80, RECO_UNIQUE)
 
 PEDIATRIC_BUNDLES = [
-    "ARC", "ATR", "CGC", "CST", "FA", "FP", "IFO", "ILF", "MdLF", "SLF", "UNC"]
+    "ARC", "ATR", "CGC", "CST", "FA", "FP", "IFO", "ILF", "MdLF", "SLF", "UNC",
+    "OR", "pARC", "VOF"]
 PEDIATRIC_BUNDLES = append_l_r(PEDIATRIC_BUNDLES, ["FA", "FP"])
 
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
@@ -961,7 +962,7 @@ class PediatricBundleDict(BundleDict):
 
         self.templates["Callosum_midsag"] = self.templates["mid-saggital"]
 
-        for bundle_name in PEDIATRIC_BUNDLES:
+        for bundle_name in prob_map_order:
             self.templates[bundle_name + "_prob_map"] = nib.Nifti1Image(
                 prob_map_data[
                     ...,
