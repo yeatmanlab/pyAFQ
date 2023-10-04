@@ -29,11 +29,11 @@ def get_fname(base_fname, suffix,
         odf_model = tracking_params['odf_model']
         directions = tracking_params['directions']
         fname = fname + (
-            f'_coordsys-RASMM_trkmodel-{directions+odf_model}'
+            f'_coordsys-RASMM_trkmethod-{directions+odf_model}'
         )
     if segmentation_params is not None and 'seg_algo' in segmentation_params:
         seg_algo = segmentation_params['seg_algo']
-        fname = fname + f"_bundlerec-{seg_algo}"
+        fname = fname + f"_recogmethod-{seg_algo}"
 
     return fname + suffix
 

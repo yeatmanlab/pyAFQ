@@ -262,10 +262,10 @@ my_afq.export_all()
 # The outputs of AFQ are also BIDS compatible. However, we use some
 # custom entities, which need to be loaded. Here we demonstrate how
 # to load the afq entities with get_afq_bids_entities_fname()
-# and then show all files with the key-value pair bundlerec-AFQ
+# and then show all files with the key-value pair recogmethod-AFQ
 
 layout = BIDSLayout(bids_path)
 layout.add_derivatives(
     f'{bids_path}/derivatives/afq',
     config=['bids', 'derivatives', get_afq_bids_entities_fname()])
-print(layout.get(bundlerec="AFQ", return_type="filename"))
+print(layout.get(recogmethod="AFQ", return_type="filename"))

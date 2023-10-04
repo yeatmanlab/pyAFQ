@@ -10,12 +10,12 @@
         "pattern": "[_/\\\\]+coordsys-([a-zA-Z0-9]+)"
       },
       {
-        "name": "trkmodel",
-        "pattern": "[_/\\\\]+trkmodel-([a-zA-Z0-9]+)"
+        "name": "trkmethod",
+        "pattern": "[_/\\\\]+trkmethod-([a-zA-Z0-9]+)"
       },
       {
-        "name": "bundlerec",
-        "pattern": "[_/\\\\]+bundlerec-([a-zA-Z0-9]+)"
+        "name": "recogmethod",
+        "pattern": "[_/\\\\]+recogmethod-([a-zA-Z0-9]+)"
       }
     ]
   }
