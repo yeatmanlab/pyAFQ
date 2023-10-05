@@ -35,7 +35,7 @@ logger = logging.getLogger('AFQ')
 @pimms.calc("bundles")
 @as_file('_tractography', include_track=True, include_seg=True)
 def segment(dwi, data_imap, mapping_imap,
-            tractography_imap, segmentation_params, clean_params):
+            tractography_imap, segmentation_params):
     """
     full path to a trk/trx file containing containing
     segmented streamlines, labeled by bundle
@@ -45,10 +45,6 @@ def segment(dwi, data_imap, mapping_imap,
     segmentation_params : dict, optional
         The parameters for segmentation.
         Default: use the default behavior of the seg.Segmentation object.
-    clean_params: dict, optional
-        The parameters for cleaning.
-        Default: use the default behavior of the seg.clean_bundle
-        function.
     """
     bundle_dict = data_imap["bundle_dict"]
     reg_template = data_imap["reg_template"]
@@ -78,8 +74,7 @@ def segment(dwi, data_imap, mapping_imap,
         dwi,
         data_imap["bval"],
         data_imap["bvec"],
-        reg_template=reg_template,
-        clean_params=clean_params)
+        reg_template=reg_template)
 
     seg_sft = aus.SegmentedSFT(bundles, Space.VOX)
 
@@ -103,7 +98,6 @@ def segment(dwi, data_imap, mapping_imap,
 
     meta["source"] = streamlines
     meta["Recognition Parameters"] = segmentation_params_out
-    meta["Cleaning Parameters"] = clean_params
     meta["Timing"] = time() - start_time
     return tgram, meta
 
@@ -361,11 +355,5 @@ def get_segmentation_plan(kwargs):
         for k in kwargs["segmentation_params"]:
             default_seg_params[k] = kwargs["segmentation_params"][k]
 
-    default_clean_params = get_default_args(seg.clean_bundle)
-    if "clean_params" in kwargs:
-        for k in kwargs["clean_params"]:
-            default_clean_params[k] = kwargs["clean_params"][k]
-
     kwargs["segmentation_params"] = default_seg_params
-    kwargs["clean_params"] = default_clean_params
     return pimms.plan(**segmentation_tasks)

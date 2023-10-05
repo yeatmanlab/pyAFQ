@@ -17,7 +17,8 @@ logging.basicConfig(level=logging.INFO)
 __all__ = [
     "PediatricBundleDict", "BundleDict",
     "default18_bd", "reco_bd",
-    "callosal_bd", "cerebellar_bd"]
+    "callosal_bd", "cerebellar_bd",
+    "baby_bd"]
 
 
 def do_preprocessing():
@@ -231,28 +232,273 @@ def default18_bd():
                    'space': 'template',
                    'start': templates['pARC_L_start'],
                    'primary_axis': 2,
-                   'primary_axis_percentage': 40},
+                   'primary_axis_percentage': 40,
+                   'mahal': {
+                       "distance_threshold": 3,
+                       "length_threshold": 5,
+                       "clean_rounds": 10}},
         'pARC_R': {'cross_midline': False,
                    'include': [templates['SLFt_roi2_R']],
                    'exclude': [templates['SLF_roi1_R']],
                    'space': 'template',
                    'start': templates['pARC_R_start'],
                    'primary_axis': 2,
-                   'primary_axis_percentage': 40},
+                   'primary_axis_percentage': 40,
+                   'mahal': {
+                       "distance_threshold": 3,
+                       "length_threshold": 5,
+                       "clean_rounds": 10}},
         'VOF_L': {'cross_midline': False,
                   'space': 'template',
                   'start': templates['VOF_L_start'],
                   'end': templates['VOF_L_end'],
                   'inc_addtol': [4, 0],
                   'primary_axis': 2,
-                  'primary_axis_percentage': 40},
+                  'primary_axis_percentage': 40,
+                  'mahal': {
+                      "distance_threshold": 3,
+                      "length_threshold": 5,
+                      "clean_rounds": 10}},
         'VOF_R': {'cross_midline': False,
                   'space': 'template',
                   'start': templates['VOF_R_start'],
                   'end': templates['VOF_R_end'],
                   'inc_addtol': [4, 0],
                   'primary_axis': 2,
-                  'primary_axis_percentage': 40}})
+                  'primary_axis_percentage': 40,
+                  'mahal': {
+                      "distance_threshold": 3,
+                      "length_threshold": 5,
+                      "clean_rounds": 10}}})
+
+
+def baby_bd():
+    # Pediatric bundles differ from adult bundles:
+    #   - A third ROI has been introduced for curvy tracts:
+    #     ARC, ATR, CGC, IFO, and UCI
+    #   - ILF posterior ROI has been split into two
+    #     to separate ILF and mdLF
+    #   - Addition of pAF and VOF ROIs
+    #   - SLF ROIs are restricted to parietal cortex
+    templates = afd.read_pediatric_templates()
+
+    # pediatric probability maps
+    prob_map_order = [
+        "ATR_L", "ATR_R", "CST_L", "CST_R", "CGC_L", "CGC_R",
+        "FP", "FA", "IFO_L", "IFO_R", "ILF_L",
+        "ILF_R", "SLF_L", "SLF_R", "UNC_L", "UNC_R",
+        "ARC_L", "ARC_R", "MdLF_L", "MdLF_R"]
+
+    prob_maps = templates[
+        'UNCNeo_JHU_tracts_prob-for-babyAFQ']
+    prob_map_data = prob_maps.get_fdata()
+
+    templates["Callosum_midsag"] = templates["mid-saggital"]
+
+    for bundle_name in prob_map_order:
+        templates[bundle_name + "_prob_map"] = nib.Nifti1Image(
+            prob_map_data[
+                ...,
+                prob_map_order.index(bundle_name)], prob_maps.affine)
+
+    # reuse probability map from ILF
+    templates["MdLF_L_prob_map"] = templates["ILF_L_prob_map"]
+    templates["MdLF_R_prob_map"] = templates["ILF_R_prob_map"]
+
+    return BundleDict({
+        'ATR_L': {
+            'cross_midline': False,
+            'include': [
+                templates['ATR_roi1_L'],
+                templates['ATR_roi2_L']],
+            'exclude': [],
+            'space': 'template',
+            'prob_map': templates['ATR_L_prob_map'],
+            'start': templates['ATR_L_start'],
+            'end': templates['ATR_L_end']},
+        'ATR_R': {'cross_midline': False,
+                  'include': [templates['ATR_roi1_R'],
+                              templates['ATR_roi2_R']],
+                  'exclude': [],
+                  'space': 'template',
+                  'prob_map': templates['ATR_R_prob_map'],
+                  'start': templates['ATR_R_start'],
+                  'end': templates['ATR_R_end']},
+        'CGC_L': {'cross_midline': False,
+                  'include': [templates['CGC_roi1_L'],
+                              templates['CGC_roi2_L']],
+                  'exclude': [],
+                  'space': 'template',
+                  'prob_map': templates['CGC_L_prob_map'],
+                  'start': templates['CGC_L_start']},
+        'CGC_R': {'cross_midline': False,
+                  'include': [templates['CGC_roi1_R'],
+                              templates['CGC_roi2_R']],
+                  'exclude': [],
+                  'space': 'template',
+                  'prob_map': templates['CGC_R_prob_map'],
+                  'start': templates['CGC_R_start']},
+        'CST_L': {'cross_midline': False,
+                  'include': [templates['CST_roi1_L'],
+                              templates['CST_roi2_L']],
+                  'exclude': [],
+                  'space': 'template',
+                  'prob_map': templates['CST_L_prob_map'],
+                  'start': templates['CST_L_start'],
+                  'end': templates['CST_L_end']},
+        'CST_R': {'cross_midline': False,
+                  'include': [templates['CST_roi1_R'],
+                              templates['CST_roi2_R']],
+                  'exclude': [],
+                  'space': 'template',
+                  'prob_map': templates['CST_R_prob_map'],
+                  'start': templates['CST_R_start'],
+                  'end': templates['CST_R_end']},
+        'IFO_L': {'cross_midline': False,
+                  'include': [templates['IFO_roi1_L'],
+                              templates['IFO_roi2_L']],
+                  'exclude': [],
+                  'space': 'template',
+                  'prob_map': templates['IFO_L_prob_map'],
+                  'start': templates['IFO_L_start'],
+                  'end': templates['IFO_L_end']},
+        'IFO_R': {'cross_midline': False,
+                  'include': [templates['IFO_roi1_R'],
+                              templates['IFO_roi2_R']],
+                  'exclude': [],
+                  'space': 'template',
+                  'prob_map': templates['IFO_R_prob_map'],
+                  'start': templates['IFO_R_start'],
+                  'end': templates['IFO_R_end']},
+        'ILF_L': {'cross_midline': False,
+                  'include': [templates['ILF_roi1_L'],
+                              templates['ILF_roi2_L']],
+                  'exclude': [],
+                  'space': 'template',
+                  'prob_map': templates['ILF_L_prob_map'],
+                  'start': templates['ILF_L_start'],
+                  'end': templates['ILF_L_end']},
+        'ILF_R': {'cross_midline': False,
+                  'include': [templates['ILF_roi1_R'],
+                              templates['ILF_roi2_R']],
+                  'exclude': [],
+                  'space': 'template',
+                  'prob_map': templates['ILF_R_prob_map'],
+                  'start': templates['ILF_R_start'],
+                  'end': templates['ILF_R_end']},
+        'SLF_L': {'cross_midline': False,
+                  'include': [templates['SLF_roi1_L'],
+                              templates['SLF_roi2_L']],
+                  'exclude': [templates['SLFt_roi2_L']],
+                  'space': 'template',
+                  'prob_map': templates['SLF_L_prob_map'],
+                  'start': templates['SLF_L_start'],
+                  'end': templates['SLF_L_end']},
+        'SLF_R': {'cross_midline': False,
+                  'include': [templates['SLF_roi1_R'],
+                              templates['SLF_roi2_R']],
+                  'exclude': [templates['SLFt_roi2_R']],
+                  'space': 'template',
+                  'prob_map': templates['SLF_R_prob_map'],
+                  'start': templates['SLF_R_start'],
+                  'end': templates['SLF_R_end']},
+        'ARC_L': {'cross_midline': False,
+                  'include': [templates['SLF_roi1_L'],
+                              templates['SLFt_roi2_L']],
+                  'exclude': [],
+                  'space': 'template',
+                  'prob_map': templates['ARC_L_prob_map'],
+                  'start': templates['ARC_L_start'],
+                  'end': templates['ARC_L_end']},
+        'ARC_R': {'cross_midline': False,
+                  'include': [templates['SLF_roi1_R'],
+                              templates['SLFt_roi2_R']],
+                  'exclude': [],
+                  'space': 'template',
+                  'prob_map': templates['ARC_R_prob_map'],
+                  'start': templates['ARC_R_start'],
+                  'end': templates['ARC_R_end']},
+        'UNC_L': {'cross_midline': False,
+                  'include': [templates['UNC_roi1_L'],
+                              templates['UNC_roi2_L']],
+                  'exclude': [],
+                  'space': 'template',
+                  'prob_map': templates['UNC_L_prob_map'],
+                  'start': templates['UNC_L_start'],
+                  'end': templates['UNC_L_end']},
+        'UNC_R': {'cross_midline': False,
+                  'include': [templates['UNC_roi1_R'],
+                              templates['UNC_roi2_R']],
+                  'exclude': [],
+                  'space': 'template',
+                  'prob_map': templates['UNC_R_prob_map'],
+                  'start': templates['UNC_R_start'],
+                  'end': templates['UNC_R_end']},
+        'FA': {'cross_midline': True,
+               'include': [templates['FA_L'],
+                           templates['FA_R'],
+                           callosal_templates['Callosum_midsag']],
+               'exclude': [],
+               'space': 'template',
+               'prob_map': templates['FA_prob_map'],
+               'start': templates['FA_start'],
+               'end': templates['FA_end']},
+        'FP': {'cross_midline': True,
+               'include': [templates['FP_L'],
+                           templates['FP_R'],
+                           callosal_templates['Callosum_midsag']],
+               'exclude': [],
+               'space': 'template',
+               'prob_map': templates['FP_prob_map'],
+               'start': templates['FP_start'],
+               'end': templates['FP_end']},
+        'pARC_L': {'cross_midline': False,
+                   'include': [templates['SLFt_roi2_L']],
+                   'exclude': [templates['SLF_roi1_L']],
+                   'space': 'template',
+                   'start': templates['pARC_L_start'],
+                   'primary_axis': 2,
+                   'primary_axis_percentage': 40,
+                   'mahal': {
+                       "distance_threshold": 3,
+                       "length_threshold": 5,
+                       "clean_rounds": 10}},
+        'pARC_R': {'cross_midline': False,
+                   'include': [templates['SLFt_roi2_R']],
+                   'exclude': [templates['SLF_roi1_R']],
+                   'space': 'template',
+                   'start': templates['pARC_R_start'],
+                   'primary_axis': 2,
+                   'primary_axis_percentage': 40,
+                   'mahal': {
+                       "distance_threshold": 3,
+                       "length_threshold": 5,
+                       "clean_rounds": 10}},
+        'VOF_L': {'cross_midline': False,
+                  'space': 'template',
+                  'start': templates['VOF_L_start'],
+                  'end': templates['VOF_L_end'],
+                  'inc_addtol': [4, 0],
+                  'primary_axis': 2,
+                  'primary_axis_percentage': 40,
+                  'mahal': {
+                      "distance_threshold": 3,
+                      "length_threshold": 5,
+                      "clean_rounds": 10}},
+        'VOF_R': {'cross_midline': False,
+                  'space': 'template',
+                  'start': templates['VOF_R_start'],
+                  'end': templates['VOF_R_end'],
+                  'inc_addtol': [4, 0],
+                  'primary_axis': 2,
+                  'primary_axis_percentage': 40,
+                  'mahal': {
+                      "distance_threshold": 3,
+                      "length_threshold": 5,
+                      "clean_rounds": 10}}},
+        seg_algo="afq",
+        resample_to=afd.read_pediatric_templates()[
+            'UNCNeo-withCerebellum-for-babyAFQ'])
 
 
 def callosal_bd():
@@ -939,39 +1185,6 @@ class PediatricBundleDict(BundleDict):
                 self._gen(bundle_name)
         del self.templates
 
-    def load_templates(self):
-        # Pediatric bundles differ from adult bundles:
-        #   - A third ROI has been introduced for curvy tracts:
-        #     ARC, ATR, CGC, IFO, and UCI
-        #   - ILF posterior ROI has been split into two
-        #     to separate ILF and mdLF
-        #   - Addition of pAF and VOF ROIs
-        #   - SLF ROIs are restricted to parietal cortex
-        self.templates = afd.read_pediatric_templates()
-
-        # pediatric probability maps
-        prob_map_order = [
-            "ATR_L", "ATR_R", "CST_L", "CST_R", "CGC_L", "CGC_R",
-            "FP", "FA", "IFO_L", "IFO_R", "ILF_L",
-            "ILF_R", "SLF_L", "SLF_R", "UNC_L", "UNC_R",
-            "ARC_L", "ARC_R", "MdLF_L", "MdLF_R"]
-
-        prob_maps = self.templates[
-            'UNCNeo_JHU_tracts_prob-for-babyAFQ']
-        prob_map_data = prob_maps.get_fdata()
-
-        self.templates["Callosum_midsag"] = self.templates["mid-saggital"]
-
-        for bundle_name in prob_map_order:
-            self.templates[bundle_name + "_prob_map"] = nib.Nifti1Image(
-                prob_map_data[
-                    ...,
-                    prob_map_order.index(bundle_name)], prob_maps.affine)
-
-        # reuse probability map from ILF
-        self.templates["MdLF_L_prob_map"] = self.templates["ILF_L_prob_map"]
-        self.templates["MdLF_R_prob_map"] = self.templates["ILF_R_prob_map"]
-
     def _gen(self, bundle_name):
         if bundle_name == "OR_L":
             self._dict["OR_L"] = {
@@ -1025,3 +1238,6 @@ class PediatricBundleDict(BundleDict):
             }
         else:
             super()._gen(bundle_name)
+
+        # baby brains prefer this level of cleaning
+        self._dict[bundle_name]["mahal"] = {'distance_threshold': 4}

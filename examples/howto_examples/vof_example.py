@@ -31,9 +31,7 @@ myafq = GroupAFQ(
         "n_seeds": 50000,
         "random_seeds": True,
         "seed_mask": RoiImage(use_waypoints=True, use_endpoints=True),
-    },
-    clean_params={"distance_threshold": 3,
-                  "length_threshold": 5, "clean_rounds": 20}
+    }
 )
 
 

@@ -321,8 +321,7 @@ class Segmentation:
 
     def segment(self, bundle_dict, tg, mapping, fdata=None, fbval=None,
                 fbvec=None, reg_prealign=None,
-                reg_template=None, img_affine=None, reset_tg_space=False,
-                clean_params={}):
+                reg_template=None, img_affine=None, reset_tg_space=False):
         """
         Segment streamlines into bundles based on either waypoint ROIs
         [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
@@ -354,8 +353,6 @@ class Segmentation:
         reset_tg_space : bool, optional
             Whether to reset the space of the input tractogram after
             segmentation is complete. Default: False.
-        clean_params : dict, optional
-            Parameters for Mahalanobis cleaning. Default: {}
 
         Returns
         -------
@@ -405,7 +402,7 @@ class Segmentation:
             self.bundle_dict = BundleDict(self.bundle_dict)
 
         if self.seg_algo == "afq":
-            fiber_groups = self.segment_afq(clean_params=clean_params)
+            fiber_groups = self.segment_afq()
         elif self.seg_algo.startswith("reco"):
             fiber_groups = self.segment_reco()
         else:
@@ -492,7 +489,7 @@ class Segmentation:
         else:
             self.fiber_groups[b_name] = sl
 
-    def segment_afq(self, clean_params={}, tg=None):
+    def segment_afq(self, tg=None):
         """
         Assign streamlines to bundles using the waypoint ROI approach
         Parameters
@@ -501,8 +498,6 @@ class Segmentation:
         """
         tg = self._read_tg(tg=tg)
         tg.to_vox()
-
-        clean_params["return_idx"] = True
 
         fgarray = np.array(_resample_tg(tg, 20))  # for prob map
         self.cross_streamlines(fgarray)
@@ -787,6 +782,8 @@ class Segmentation:
 
             if b_sls:
                 accept_idx = b_sls.initiate_selection("Mahalanobis")
+                clean_params = bundle_def.get("mahal", {})
+                clean_params["return_idx"] = True
                 cut = self.clip_edges or ("bundlesection" in bundle_def)
                 _, cleaned_idx = clean_bundle(
                     b_sls.get_selected_sls(cut=cut),

@@ -789,8 +789,6 @@ def test_AFQ_data_waypoint():
                                seg_algo="AFQ",
                                return_idx=True)
 
-    clean_params = dict(return_idx=True)
-
     afq_folder = op.join(bids_path, "derivatives/afq/sub-01/ses-01")
     os.makedirs(afq_folder, exist_ok=True)
     myafq = ParticipantAFQ(
@@ -807,8 +805,7 @@ def test_AFQ_data_waypoint():
             ImageFile(path=t1_path_other),
             TemplateImage(t1_path)],
         tracking_params=tracking_params,
-        segmentation_params=segmentation_params,
-        clean_params=clean_params)
+        segmentation_params=segmentation_params)
 
     # Replace the mapping and streamlines with precomputed:
     file_dict = afd.read_stanford_hardi_tractography()
@@ -911,8 +908,7 @@ def test_AFQ_data_waypoint():
                 f"ImageFile('{t1_path_other}')",
                 f"TemplateImage('{t1_path}')"]),
         TRACTOGRAPHY_PARAMS=tracking_params,
-        SEGMENTATION_PARAMS=segmentation_params,
-        CLEANING_PARAMS=clean_params)
+        SEGMENTATION_PARAMS=segmentation_params)
 
     config_file = op.join(tmpdir, "afq_config.toml")
     with open(config_file, 'w') as ff:

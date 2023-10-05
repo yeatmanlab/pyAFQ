@@ -111,6 +111,11 @@ bundles = abd.BundleDict({
             template_dir + 'SLFt_roi2_L.nii.gz'],
 
         "cross_midline": False,
+
+        "mahal": {
+            "clean_rounds": 20,
+            "length_threshold": 4,
+            "distance_threshold": 2}
     },
     "L_SLF2": {
         "include": [
@@ -120,6 +125,11 @@ bundles = abd.BundleDict({
             template_dir + 'SLFt_roi2_L.nii.gz'],
 
         "cross_midline": False,
+
+        "mahal": {
+            "clean_rounds": 20,
+            "length_threshold": 4,
+            "distance_threshold": 2}
     },
     "L_SLF3": {
         "include": [
@@ -129,6 +139,11 @@ bundles = abd.BundleDict({
             template_dir + 'SLFt_roi2_L.nii.gz'],
 
         "cross_midline": False,
+
+        "mahal": {
+            "clean_rounds": 20,
+            "length_threshold": 4,
+            "distance_threshold": 2}
     }
 })
 
@@ -169,10 +184,6 @@ my_afq = GroupAFQ(
                      "directions": "prob",
                      "odf_model": "CSD",
                      "seed_mask": RoiImage()},
-    clean_params={"clean_rounds": 20,
-                  "length_threshold": 4,
-                  "distance_threshold": 2,
-                  },
     segmentation_params={"parallel_segmentation": {"engine": "serial"}},
     bundle_info=bundles)
 
