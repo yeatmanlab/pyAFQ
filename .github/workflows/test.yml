@@ -2,12 +2,15 @@ name: Test suite
 
 on: [push, pull_request]
 
-jobs:
-  build:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
+
+jobs:
+  test:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 4
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
         nibabel-pre: [true, false]
