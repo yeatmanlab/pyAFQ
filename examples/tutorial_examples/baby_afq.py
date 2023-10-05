@@ -80,7 +80,7 @@ with zipfile.ZipFile(op.join(data_folder, "baby_example.zip"), 'r') as zip_ref:
 #    `preproc_pipeline = "vistasoft"`.
 # 2. We use the UNC neonatal template, which can be read on a call to the
 #    `read_pediatric_templates` function in `AFQ.data.fetch`.
-# 3. We use the `PediatricBundleDict` to define the bundles that we want to
+# 3. We use the `baby_bd` to define the bundles that we want to
 #    segment. This dictionary is different from the default behavior in that it
 #    uses the waypoint ROIs from [Grotheer2022]_.
 # 4. In this case, tractography has already been run using
@@ -96,7 +96,7 @@ myafq = GroupAFQ(
     reg_template_spec=afd.read_pediatric_templates(
     )["UNCNeo-withCerebellum-for-babyAFQ"],
     reg_subject_spec="b0",
-    bundle_info=abd.PediatricBundleDict(),
+    bundle_info=abd.baby_bd(),
     import_tract={
         "suffix": "tractography", "scope": "mrtrix"},
     segmentation_params={
