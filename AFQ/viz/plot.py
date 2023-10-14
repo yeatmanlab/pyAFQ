@@ -165,7 +165,9 @@ class BrainAxes():
         sns.lineplot(
             x=x, y=y,
             data=data,
-            estimator='mean', ci=95, n_boot=n_boot,
+            estimator='mean',
+            errorbar=('ci', 95),
+            n_boot=n_boot,
             legend=False, ax=ax, alpha=alpha,
             style=[True] * len(data.index), **lineplot_kwargs_mean)
 
