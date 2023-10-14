@@ -80,7 +80,7 @@ with zipfile.ZipFile(op.join(data_folder, "baby_example.zip"), 'r') as zip_ref:
 #    `preproc_pipeline = "vistasoft"`.
 # 2. We use the UNC neonatal template, which can be read on a call to the
 #    `read_pediatric_templates` function in `AFQ.data.fetch`.
-# 3. We use the `PediatricBundleDict` to define the bundles that we want to
+# 3. We use the `baby_bd` to define the bundles that we want to
 #    segment. This dictionary is different from the default behavior in that it
 #    uses the waypoint ROIs from [Grotheer2022]_.
 # 4. In this case, tractography has already been run using
@@ -88,24 +88,19 @@ with zipfile.ZipFile(op.join(data_folder, "baby_example.zip"), 'r') as zip_ref:
 #    `import_tract` key-word argument.
 # 5. We set `filter_by_endpoints = False` in the `segmentation_params` because
 #    endpoint ROIs are not defined from newborn bundles.
-# 6. We set `distance_threshold = 4` in the `clean_params` because the bundles
-#    need to be cleaned slightly less aggressively than in grownup brains. This
-#    is something that should be evaluated empirically, and may differ in
-#    different datasets.
 
 myafq = GroupAFQ(
     bids_path=op.join(op.expanduser('~'),
                       "AFQ_data/baby_example/example_bids_subject"),
     preproc_pipeline="vistasoft",
-    reg_template_spec=afd.read_pediatric_templates()["UNCNeo-withCerebellum-for-babyAFQ"],
+    reg_template_spec=afd.read_pediatric_templates(
+    )["UNCNeo-withCerebellum-for-babyAFQ"],
     reg_subject_spec="b0",
-    bundle_info=abd.PediatricBundleDict(),
+    bundle_info=abd.baby_bd(),
     import_tract={
         "suffix": "tractography", "scope": "mrtrix"},
     segmentation_params={
         "filter_by_endpoints": False},
-    clean_params={
-        'distance_threshold': 4},
 )
 
 ##########################################################################

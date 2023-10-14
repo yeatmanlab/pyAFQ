@@ -210,7 +210,7 @@ def func_dict_to_arg_dict(func_dict=None, logger=None):
             arg_dict[section] = {}
         for arg, info in arg_info.items():
             if arg not in [
-                    "clean_params", "segmentation_params",
+                    "segmentation_params",
                     "tracking_params"]:
                 arg_dict[section][arg] = info
 
@@ -234,7 +234,6 @@ def parse_config_run_afq(toml_file, default_arg_dict, to_call="export_all",
                          verbose=False,
                          dry_run=False,
                          special_args={
-                             "CLEANING_PARAMS": "clean_params",
                              "SEGMENTATION_PARAMS": "segmentation_params",
                              "TRACTOGRAPHY_PARAMS": "tracking_params"}):
     from AFQ.api.group import GroupAFQ

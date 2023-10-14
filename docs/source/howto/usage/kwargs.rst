@@ -152,11 +152,6 @@ segmentation_params: dict, optional
 	The parameters for segmentation.
 	Default: use the default behavior of the seg.Segmentation object.
 
-clean_params: dict, optional
-	The parameters for cleaning.
-	Default: use the default behavior of the seg.clean_bundle
-	function.
-
 profile_weights: str, 1D array, 2D array callable, optional
 	How to weight each streamline (1D) or each node (2D)
 	when calculating the tract-profiles. If callable, this is a
