@@ -40,6 +40,7 @@ def visualize_bundles(sft, n_points=None, bundle_dict=None,
                       bundle=None, colors=None,
                       color_by_direction=False,
                       opacity=1.0,
+                      line_width=2.0,
                       flip_axes=[False, False, False],
                       figure=None, background=(1, 1, 1), interact=False,
                       inline=False, **kwargs):
@@ -127,7 +128,7 @@ def visualize_bundles(sft, n_points=None, bundle_dict=None,
             sl_actor = actor.line(sls, color, opacity=opacity)
         figure.add(sl_actor)
         sl_actor.GetProperty().SetRenderLinesAsTubes(1)
-        sl_actor.GetProperty().SetLineWidth(6)
+        sl_actor.GetProperty().SetLineWidth(line_width)
 
     return _inline_interact(figure, inline, interact)
 
