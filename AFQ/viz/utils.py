@@ -104,6 +104,65 @@ BEST_BUNDLE_ORIENTATIONS = {
     "pARC_L": ("Coronal", "Back"), "pARC_R": ("Coronal", "Back")}
 
 
+def altair_color_dict(names_to_include=None):
+    altair_cd = dict(COLOR_DICT.copy())
+    callosal_colors = [
+        (255 / 255, 0 / 255, 0 / 255),
+        (224 / 255, 0 / 255, 31 / 255),
+        (192 / 255, 0 / 255, 63 / 255),
+        (160 / 255, 0 / 255, 95 / 255),
+        (128 / 255, 0 / 255, 127 / 255),
+        (96 / 255, 0 / 255, 159 / 255),
+        (64 / 255, 0 / 255, 191 / 255),
+        (0 / 255, 0 / 255, 255 / 255)
+    ]
+
+    altair_cd["AntFrontal"] = callosal_colors[0]
+    altair_cd["Motor"] = callosal_colors[1]
+    altair_cd["Occipital"] = callosal_colors[2]
+    altair_cd["Orbital"] = callosal_colors[3]
+    altair_cd["PostParietal"] = callosal_colors[4]
+    altair_cd["SupFrontal"] = callosal_colors[5]
+    altair_cd["SupParietal"] = callosal_colors[6]
+    altair_cd["Temporal"] = callosal_colors[7]
+    for key in list(altair_cd.keys()):
+        value = altair_cd[key]
+        if (names_to_include is None) or (key in names_to_include):
+            altair_cd[key] = (
+                f"rgb({int(value[0]*255)},"
+                f"{int(value[1]*255)},"
+                f"{int(value[2]*255)})")
+        else:
+            del altair_cd[key]
+    return altair_cd
+
+
+FORMAL_BUNDLE_NAMES = {
+    "ATR_L": "Left Anterior Thalamic Radiation",
+    "ATR_R": "Right Anterior Thalamic Radiation",
+    "CST_L": "Left Corticospinal Tract",
+    "CST_R": "Right Corticospinal Tract",
+    "CGC_L": "Left Cingulum Cingulate",
+    "CGC_R": "Right Cingulum Cingulate",
+    "FP": "Forceps Major",
+    "FA": "Forceps Minor",
+    "IFO_L": "Left Inferior Fronto-Occipital Fasciculus",
+    "IFO_R": "Right Inferior Fronto-Occipital Fasciculus",
+    "ILF_L": "Left Inferior Longitudinal Fasciculus",
+    "ILF_R": "Right Inferior Longitudinal Fasciculus",
+    "SLF_L": "Left Superior Longitudinal Fasciculus",
+    "SLF_R": "Right Superior Longitudinal Fasciculus",
+    "UNC_L": "Left Uncinate Fasciculus",
+    "UNC_R": "Right Uncinate Fasciculus",
+    "ARC_L": "Left Arcuate Fasciculus",
+    "ARC_R": "Right Arcuate Fasciculus",
+    "VOF_L": "Left Vertical Occipital Fasciculus",
+    "VOF_R": "Right Vertical Occipital Fasciculus",
+    "pARC_L": "Left Posterior Arcuate Fasciculus",
+    "pARC_R": "Right Posterior Arcuate Fasciculus"
+}
+
+
 def get_eye(view, direc):
     direc = direc.lower()
     view = view.lower()
