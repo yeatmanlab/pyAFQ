@@ -849,12 +849,14 @@ class Segmentation:
                     select_sl[ii] = sl[::-1]
 
             roi_dists = bundle_roi_dists[:, bundle_idx, :]
-            if self.clip_edges:
+            n_includes = len(self.bundle_dict.get_b_info(
+                bundle).get("include", []))
+            if self.clip_edges and n_includes > 1:
                 if np.sum(roi_dists == -1) == 0:
                     self.logger.info("Clipping Streamlines by ROI")
                     _cut_sls_by_dist(
                         select_sl, select_idx, roi_dists,
-                        in_place=True)
+                        (0, n_includes - 1), in_place=True)
             if "bundlesection" in self.bundle_dict[bundle]:
                 for sb_name, sb_include_cuts in self.bundle_dict.get_b_info(
                         bundle)["bundlesection"].items():
@@ -1272,8 +1274,7 @@ def _check_sl_with_exclusion(sl, exclude_rois,
     return True
 
 
-def _cut_sls_by_dist(select_sl, select_idx, roi_dists,
-                     roi_idxs=None,
+def _cut_sls_by_dist(select_sl, select_idx, roi_dists, roi_idxs,
                      in_place=False):
     """
     Helper function to cut streamlines according to which points
@@ -1291,9 +1292,6 @@ def _cut_sls_by_dist(select_sl, select_idx, roi_dists,
         cut_sls = select_sl
     else:
         cut_sls = [None] * len(select_sl)
-
-    if roi_idxs is None:
-        roi_idxs = (0, roi_dists.shape[1] - 1)
 
     for bundle_sl_idx, idx in enumerate(select_idx):
         if roi_idxs[0] == -1:
