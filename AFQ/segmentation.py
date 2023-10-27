@@ -85,7 +85,7 @@ class _SlsBeingRecognized:
                 bbox_valid_check=False)
 
     def get_selected_sls(self, cut=False):
-        if cut:
+        if cut and hasattr(self, "roi_dists"):
             cut_sls = [None] * len(self)
             for idx, sl_idx in enumerate(self.selected_fiber_idxs):
                 cut_sls[idx] = self.ref_sls[sl_idx][
@@ -854,8 +854,7 @@ class Segmentation:
                     self.logger.info("Clipping Streamlines by ROI")
                     _cut_sls_by_dist(
                         select_sl, select_idx, roi_dists,
-                        (0, len(self.bundle_dict.get_b_info(
-                            bundle)["include"]) - 1), in_place=True)
+                        in_place=True)
             if "bundlesection" in self.bundle_dict[bundle]:
                 for sb_name, sb_include_cuts in self.bundle_dict.get_b_info(
                         bundle)["bundlesection"].items():
@@ -1273,7 +1272,8 @@ def _check_sl_with_exclusion(sl, exclude_rois,
     return True
 
 
-def _cut_sls_by_dist(select_sl, select_idx, roi_dists, roi_idxs,
+def _cut_sls_by_dist(select_sl, select_idx, roi_dists,
+                     roi_idxs=None,
                      in_place=False):
     """
     Helper function to cut streamlines according to which points
@@ -1291,6 +1291,9 @@ def _cut_sls_by_dist(select_sl, select_idx, roi_dists, roi_idxs,
         cut_sls = select_sl
     else:
         cut_sls = [None] * len(select_sl)
+
+    if roi_idxs is None:
+        roi_idxs = (0, roi_dists.shape[1] - 1)
 
     for bundle_sl_idx, idx in enumerate(select_idx):
         if roi_idxs[0] == -1:
