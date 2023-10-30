@@ -842,7 +842,7 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         myafq.export("results_dir"),
         'bundles',
-        'sub-01_ses-01_coordsys-RASMM_trkmethod-probCSD_recogmethod-AFQ_desc-SLFL_tractography.trk'))  # noqa
+        'sub-01_ses-01_coordsys-RASMM_trkmethod-probCSD_recogmethod-AFQ_desc-SLFR_tractography.trk'))  # noqa
 
     tract_profile_fname = myafq.export("profiles")
     tract_profiles = pd.read_csv(tract_profile_fname)
@@ -932,9 +932,9 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         results_dir,
         'ROIs',
-        'sub-01_ses-01_space-subject_desc-SLFLinclude1_mask.json'))
+        'sub-01_ses-01_space-subject_desc-SLFRinclude1_mask.json'))
 
     assert op.exists(op.join(
         results_dir,
         'bundles',
-        'sub-01_ses-01_coordsys-RASMM_trkmethod-probCSD_recogmethod-AFQ_desc-SLFL_tractography.trk'))  # noqa
+        'sub-01_ses-01_coordsys-RASMM_trkmethod-probCSD_recogmethod-AFQ_desc-SLFR_tractography.trk'))  # noqa
