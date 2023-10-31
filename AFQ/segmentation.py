@@ -84,16 +84,18 @@ class _SlsBeingRecognized:
                         f'sls_after_{clean_name}_for_{self.b_name}.trk'),
                 bbox_valid_check=False)
 
-    def get_selected_sls(self, cut=False):
-        if cut:
-            cut_sls = [None] * len(self)
-            for idx, sl_idx in enumerate(self.selected_fiber_idxs):
-                cut_sls[idx] = self.ref_sls[sl_idx][
-                    self.roi_dists[idx, 0]:
-                    self.roi_dists[idx, self.n_roi_dists - 1] + 1]
-            return cut_sls
-        else:
-            return self.ref_sls[self.selected_fiber_idxs]
+    def get_selected_sls(self, cut=False, flip=False):
+        selected_sls = self.ref_sls[self.selected_fiber_idxs]
+        if cut and hasattr(self, "roi_dists") and self.n_roi_dists > 1:
+            selected_sls = _cut_sls_by_dist(
+                selected_sls, self.roi_dists,
+                (0, self.n_roi_dists - 1),
+                in_place=False)
+        if flip:
+            selected_sls = _flip_sls(
+                selected_sls, self.sls_flipped,
+                in_place=False)
+        return selected_sls
 
     def reorient(self, idx):
         if self.oriented_yet:
@@ -472,11 +474,15 @@ class Segmentation:
             self.fiber_groups[bundle] = StatefulTractogram(
                 [], self.img, Space.VOX)
 
-    def _add_bundle_to_fiber_group(self, b_name, sl, idx):
+    def _add_bundle_to_fiber_group(self, b_name, sl, idx, to_flip):
         """
         Helper function for segment_afq, to add a bundle
         to a fiber group.
         """
+        sl = _flip_sls(
+            sl, to_flip,
+            in_place=False)
+
         sl = StatefulTractogram(
             sl,
             self.img,
@@ -739,10 +745,8 @@ class Segmentation:
                 ref_curve_threshold = np.radians(bundle_def["curvature"].get(
                     "thresh", 10))
                 cut = bundle_def["curvature"].get("cut", True)
-                for idx, sl in enumerate(b_sls.get_selected_sls(cut=cut)):
-                    if b_sls.oriented_yet\
-                            and b_sls.sls_flipped[idx]:
-                        sl = sl[::-1]
+                for idx, sl in enumerate(b_sls.get_selected_sls(
+                        cut=cut, flip=True)):
                     if len(sl) > 1:
                         this_sl_curve = sl_curve(sl, len(moved_ref_sl))
                         dist = sl_curve_dist(this_sl_curve, moved_ref_curve)
@@ -775,7 +779,8 @@ class Segmentation:
                     bundle_def["qb_thresh"] / vox_dim,
                     AveragePointwiseEuclideanMetric(
                         ResampleFeature(nb_points=12)))
-                clusters = qbx.cluster(b_sls.get_selected_sls(cut=cut))
+                clusters = qbx.cluster(b_sls.get_selected_sls(
+                    cut=cut, flip=True))
                 cleaned_idx = clusters[np.argmax(
                     clusters.clusters_sizes())].indices
                 b_sls.select(cleaned_idx, "qb_thresh", cut=cut)
@@ -786,7 +791,7 @@ class Segmentation:
                 clean_params["return_idx"] = True
                 cut = self.clip_edges or ("bundlesection" in bundle_def)
                 _, cleaned_idx = clean_bundle(
-                    b_sls.get_selected_sls(cut=cut),
+                    b_sls.get_selected_sls(cut=cut, flip=True),
                     **clean_params)
                 b_sls.select(cleaned_idx, "Mahalanobis", cut=cut)
 
@@ -843,29 +848,27 @@ class Segmentation:
             # Use a list here, because ArraySequence doesn't support item
             # assignment:
             select_sl = list(tg.streamlines[select_idx])
-            to_flip = bundle_to_flip[select_idx, bundle_idx]
-            for ii, sl in enumerate(select_sl):
-                if to_flip[ii]:
-                    select_sl[ii] = sl[::-1]
+            roi_dists = bundle_roi_dists[select_idx, bundle_idx, :]
+            n_includes = len(self.bundle_dict.get_b_info(
+                bundle).get("include", []))
+            if self.clip_edges and n_includes > 1:
+                self.logger.info("Clipping Streamlines by ROI")
+                _cut_sls_by_dist(
+                    select_sl, roi_dists,
+                    (0, n_includes - 1), in_place=True)
 
-            roi_dists = bundle_roi_dists[:, bundle_idx, :]
-            if self.clip_edges:
-                if np.sum(roi_dists == -1) == 0:
-                    self.logger.info("Clipping Streamlines by ROI")
-                    _cut_sls_by_dist(
-                        select_sl, select_idx, roi_dists,
-                        (0, len(self.bundle_dict.get_b_info(
-                            bundle)["include"]) - 1), in_place=True)
+            to_flip = bundle_to_flip[select_idx, bundle_idx]
             if "bundlesection" in self.bundle_dict[bundle]:
                 for sb_name, sb_include_cuts in self.bundle_dict.get_b_info(
                         bundle)["bundlesection"].items():
                     bundlesection_select_sl = _cut_sls_by_dist(
-                        select_sl, select_idx, roi_dists,
+                        select_sl, roi_dists,
                         sb_include_cuts, in_place=False)
                     self._add_bundle_to_fiber_group(
-                        sb_name, bundlesection_select_sl, select_idx)
+                        sb_name, bundlesection_select_sl, select_idx, to_flip)
             else:
-                self._add_bundle_to_fiber_group(bundle, select_sl, select_idx)
+                self._add_bundle_to_fiber_group(
+                    bundle, select_sl, select_idx, to_flip)
         return self.fiber_groups
 
     def move_streamlines(self, tg, to="template"):
@@ -1171,7 +1174,14 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
     lengths = np.array([sl.shape[0] for sl in streamlines])
     # We'll only do this for clean_rounds
     rounds_elapsed = 0
-    while rounds_elapsed < clean_rounds and len(streamlines) > min_sl:
+    idx_belong = idx
+    while (rounds_elapsed < clean_rounds) and (np.sum(idx_belong) > min_sl):
+        # Update by selection:
+        idx = idx[idx_belong]
+        fgarray = fgarray[idx_belong]
+        lengths = lengths[idx_belong]
+        rounds_elapsed += 1
+
         # This calculates the Mahalanobis for each streamline/node:
         m_dist = gaussian_weights(
             fgarray, return_mahalnobis=True,
@@ -1213,12 +1223,6 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
                 f"Rounds elapsed: {rounds_elapsed}, "
                 f"num removed: {np.sum(idx_removed)}"))
             logger.debug(f"Removed indicies: {np.where(idx_removed)[0]}")
-
-        # Update by selection:
-        idx = idx[idx_belong]
-        fgarray = fgarray[idx_belong]
-        lengths = lengths[idx_belong]
-        rounds_elapsed += 1
 
     # Select based on the variable that was keeping track of things for us:
     if hasattr(tg, "streamlines"):
@@ -1273,7 +1277,23 @@ def _check_sl_with_exclusion(sl, exclude_rois,
     return True
 
 
-def _cut_sls_by_dist(select_sl, select_idx, roi_dists, roi_idxs,
+def _flip_sls(select_sl, idx_to_flip, in_place=False):
+    """
+    Helper function to flip streamlines
+    """
+    if in_place:
+        flipped_sl = select_sl
+    else:
+        flipped_sl = [None] * len(select_sl)
+    for ii, sl in enumerate(select_sl):
+        if idx_to_flip[ii]:
+            flipped_sl[ii] = sl[::-1]
+        else:
+            flipped_sl[ii] = sl
+    return flipped_sl
+
+
+def _cut_sls_by_dist(select_sl, roi_dists, roi_idxs,
                      in_place=False):
     """
     Helper function to cut streamlines according to which points
@@ -1282,25 +1302,28 @@ def _cut_sls_by_dist(select_sl, select_idx, roi_dists, roi_idxs,
     Parameters
     ----------
     select_sl, streamlines to cut
-    select_idx, indices of these streamlines into the original tractography
     roi_dists, distances from a given streamline to a given inclusion roi
     roi_idxs, two indices into the list of inclusion rois to use for the cut
     in_place, whether to modify select_sl
     """
     if in_place:
-        cut_sls = select_sl
+        cut_sl = select_sl
     else:
-        cut_sls = [None] * len(select_sl)
+        cut_sl = [None] * len(select_sl)
 
-    for bundle_sl_idx, idx in enumerate(select_idx):
+    for idx, this_sl in enumerate(select_sl):
         if roi_idxs[0] == -1:
             min0 = 0
         else:
             min0 = int(roi_dists[idx, roi_idxs[0]])
         if roi_idxs[1] == -1:
-            min1 = None
+            min1 = len(this_sl)
         else:
             min1 = int(roi_dists[idx, roi_idxs[1]])
+
+        # handle if sls not flipped
+        if min0 > min1:
+            min0, min1 = min1, min0
 
         # If the point that is closest to the first ROI
         # is the same as the point closest to the second ROI,
@@ -1309,10 +1332,9 @@ def _cut_sls_by_dist(select_sl, select_idx, roi_dists, roi_idxs,
             min1 = min1 + 1
             min0 = min0 - 1
 
-        cut_sls[bundle_sl_idx] = select_sl[
-            bundle_sl_idx][min0:min1]
+        cut_sl[idx] = this_sl[min0:min1]
 
-    return cut_sls
+    return cut_sl
 
 
 def clean_by_orientation(streamlines, primary_axis, tol=None):

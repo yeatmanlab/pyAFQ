@@ -18,13 +18,14 @@ import AFQ.utils.volume as auv
 
 try:
     from trx.io import load as load_trx
+    from trx.io import save as save_trx
     from trx.trx_file_memmap import TrxFile
     has_trx = True
 except ModuleNotFoundError:
     has_trx = False
 
 from dipy.io.streamline import load_tractogram, save_tractogram
-from dipy.io.stateful_tractogram import Space
+from dipy.io.stateful_tractogram import Space, StatefulTractogram
 from dipy.stats.analysis import afq_profile, gaussian_weights
 from dipy.tracking.streamline import set_number_of_points, values_from_volume
 
@@ -113,8 +114,9 @@ def export_bundles(base_fname, results_dir,
     """
     is_trx = tracking_params.get("trx", False)
     if is_trx:
-        raise ValueError(
-            "Cannot export individual bundles when using trx format")
+        extension = ".trx"
+    else:
+        extension = ".trk"
 
     bundles_dir = op.join(results_dir, "bundles")
     os.makedirs(bundles_dir, exist_ok=True)
@@ -125,14 +127,25 @@ def export_bundles(base_fname, results_dir,
                 get_fname(
                     base_fname,
                     f'_desc-{str_to_desc(bundle)}'
-                    f'_tractography.trk',
+                    f'_tractography{extension}',
                     tracking_params=tracking_params,
                     segmentation_params=segmentation_params))
             fname = op.join(bundles_dir, fname[1])
-            logger.info(f"Saving {fname}")
-            save_tractogram(
-                seg_sft.get_bundle(bundle), fname,
-                bbox_valid_check=False)
+            bundle_sft = seg_sft.get_bundle(bundle)
+            if len(bundle_sft) > 0:
+                logger.info(f"Saving {fname}")
+                if is_trx:
+                    seg_sft.sft.dtype_dict = {
+                        'positions': np.float16,
+                        'offsets': np.uint32}
+                    trxfile = TrxFile.from_sft(bundle_sft)
+                    save_trx(trxfile, fname)
+                else:
+                    save_tractogram(
+                        bundle_sft, fname,
+                        bbox_valid_check=False)
+            else:
+                logger.info(f"No bundle to save for {bundle}")
             meta = dict(source=bundles)
             meta_fname = drop_extension(fname) + '.json'
             write_json(meta_fname, meta)

@@ -175,8 +175,7 @@ def test_segment_clip_edges():
     bundle_roi_dists[11, :] = [10, 10, 10]
     cut_sls = seg._cut_sls_by_dist(
         accepted_sls,
-        accepted_ix,
-        bundle_roi_dists,
+        bundle_roi_dists[accepted_ix],
         [0, 2])
     npt.assert_array_equal(
         cut_sls[0],
