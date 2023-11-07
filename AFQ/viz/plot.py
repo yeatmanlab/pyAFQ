@@ -175,7 +175,7 @@ class BrainAxes():
         ax.set_ylabel(ylabel, fontsize=vut.medium_font)
         ax.set_ylim(ylim)
 
-    def format(self, disable_x=True):
+    def format(self, disable_x=True, disable_y=True):
         '''
         Call this functions once after all axes that you intend to use
         have been plotted on. Automatically formats brain axes.
@@ -193,14 +193,14 @@ class BrainAxes():
                     axis='x', which='major', labelsize=vut.small_font)
                 if not self.on_grid[i, j]:
                     self.axes[i, j].axis("off")
-                if self. twinning:
+                if self.twinning:
                     if j != self.size[1] - 1 and self.on_grid[i][j + 1]:
                         self.axes[i, j].set_yticklabels([])
                         self.axes[i, j].set_ylabel("")
                     self.axes[i, j].set_xticklabels([])
                     self.axes[i, j].set_xlabel("")
                 else:
-                    if j != 0 and self.on_grid[i][j - 1]:
+                    if disable_y and (j != 0 and self.on_grid[i][j - 1]):
                         self.axes[i, j].set_yticklabels([])
                         self.axes[i, j].set_ylabel("")
                     if disable_x or (i != self.size[0] - 1

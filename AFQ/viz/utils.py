@@ -6,6 +6,10 @@ import numpy as np
 import imageio as io
 from PIL import Image, ImageChops
 
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import matplotlib.transforms as mtransforms
+
 import nibabel as nib
 import dipy.tracking.streamlinespeed as dps
 from dipy.align import resample
@@ -64,7 +68,15 @@ COLOR_DICT = OrderedDict({
     "UNC_R": tableau_20[17], "UF_R": tableau_20[17],
     "ARC_L": tableau_20[18], "AF_L": tableau_20[18],
     "ARC_R": tableau_20[19], "AF_R": tableau_20[19],
-    "median": tableau_20[6]})
+    "median": tableau_20[6],
+    "Orbital": (0.2, 0.13, 0.53),  # Paul Tol's palette for callosal bundles
+    "AntFrontal": (0.07, 0.47, 0.2),
+    "SupFrontal": (0.27, 0.67, 0.6),
+    "Motor": (0.53, 0.8, 0.93),
+    "SupParietal": (0.87, 0.8, 0.47),
+    "PostParietal": (0.8, 0.4, 0.47),
+    "Occipital": (0.67, 0.27, 0.6),
+    "Temporal": (0.53, 0.13, 0.33)})
 
 POSITIONS = OrderedDict({
     "ATR_L": (1, 0), "ATR_R": (1, 4), "C_L": (1, 0), "C_R": (1, 4),
@@ -104,39 +116,6 @@ BEST_BUNDLE_ORIENTATIONS = {
     "pARC_L": ("Coronal", "Back"), "pARC_R": ("Coronal", "Back")}
 
 
-def altair_color_dict(names_to_include=None):
-    altair_cd = dict(COLOR_DICT.copy())
-    callosal_colors = [
-        (255 / 255, 0 / 255, 0 / 255),
-        (224 / 255, 0 / 255, 31 / 255),
-        (192 / 255, 0 / 255, 63 / 255),
-        (160 / 255, 0 / 255, 95 / 255),
-        (128 / 255, 0 / 255, 127 / 255),
-        (96 / 255, 0 / 255, 159 / 255),
-        (64 / 255, 0 / 255, 191 / 255),
-        (0 / 255, 0 / 255, 255 / 255)
-    ]
-
-    altair_cd["AntFrontal"] = callosal_colors[0]
-    altair_cd["Motor"] = callosal_colors[1]
-    altair_cd["Occipital"] = callosal_colors[2]
-    altair_cd["Orbital"] = callosal_colors[3]
-    altair_cd["PostParietal"] = callosal_colors[4]
-    altair_cd["SupFrontal"] = callosal_colors[5]
-    altair_cd["SupParietal"] = callosal_colors[6]
-    altair_cd["Temporal"] = callosal_colors[7]
-    for key in list(altair_cd.keys()):
-        value = altair_cd[key]
-        if (names_to_include is None) or (key in names_to_include):
-            altair_cd[key] = (
-                f"rgb({int(value[0]*255)},"
-                f"{int(value[1]*255)},"
-                f"{int(value[2]*255)})")
-        else:
-            del altair_cd[key]
-    return altair_cd
-
-
 FORMAL_BUNDLE_NAMES = {
     "ATR_L": "Left Anterior Thalamic Radiation",
     "ATR_R": "Right Anterior Thalamic Radiation",
@@ -161,6 +140,109 @@ FORMAL_BUNDLE_NAMES = {
     "pARC_L": "Left Posterior Arcuate Fasciculus",
     "pARC_R": "Right Posterior Arcuate Fasciculus"
 }
+
+
+class PanelFigure():
+    """
+    Super useful class for organizing existing images
+    into subplots using matplotlib
+    """
+
+    def __init__(self, num_rows, num_cols, width, height):
+        """
+        Initialize PanelFigure.
+
+        Parameters
+        ----------
+        num_rows : int
+            Number of rows in figure
+        num_cols : int
+            Number of columns in figure
+        width : int
+            Width of figure in inches
+        height : int
+            Height of figure in inches
+        """
+        self.fig = plt.figure(figsize=(width, height))
+        self.grid = plt.GridSpec(num_rows, num_cols, hspace=0, wspace=0)
+        self.subplot_count = 0
+
+    def add_img(self, fname, x_coord, y_coord, reduct_count=1,
+                subplot_label_ypos=1.0, legend=None, legend_kwargs={},
+                add_panel_label=True, panel_label_font_size="medium"):
+        """
+        Add image from fname into figure as a panel.
+
+        Parameters
+        ----------
+        fname : str
+            path to image file to add to subplot
+        x_coord : int or slice
+            x coordinate(s) of subplot in matlotlib figure
+        y_coord : int or slice
+            y coordinate(s) of subplot in matlotlib figure
+        reduct_count : int
+            number of times to trim whitespace around image
+            Default: 1
+        subplot_label_ypos : float
+            y position of subplot label
+            Default: 1.0
+        legend : dict
+            dictionary of legend items, where keys are labels
+            and values are colors
+            Default: None
+        legend_kwargs : dict
+            ADditional arguments for matplotlib's legend method
+        add_panel_label : bool
+            Whether or not to add a panel label to the subplot
+            Default: True
+        panel_label_font_size : str
+            Font size of panel label
+            Default: "medium"
+        """
+        ax = self.fig.add_subplot(self.grid[y_coord, x_coord])
+        im1 = Image.open(fname)
+        for _ in range(reduct_count):
+            im1 = trim(im1)
+        if legend is not None:
+            patches = []
+            for value, color in legend.items():
+                patches.append(mpatches.Patch(
+                    color=color,
+                    label=value))
+            ax.legend(handles=patches, borderaxespad=0., **legend_kwargs)
+        if add_panel_label:
+            trans = mtransforms.ScaledTranslation(
+                10 / 72, -5 / 72, self.fig.dpi_scale_trans)
+            ax.text(
+                0.1, subplot_label_ypos,
+                f"{chr(65+self.subplot_count)})",
+                transform=ax.transAxes + trans,
+                fontsize=panel_label_font_size, verticalalignment="top",
+                fontfamily='serif',
+                bbox=dict(facecolor='0.7', edgecolor='none', pad=3.0))
+        ax.imshow(np.asarray(im1), aspect=1)
+        ax.axis('off')
+        self.subplot_count = self.subplot_count + 1
+        return ax
+
+    def format_and_save_figure(self, fname, trim_final=True):
+        """
+        Format and save figure to fname.
+        Parameters
+        ----------
+        fname : str
+            Path to save figure to
+        trim : bool
+            Whether or not to trim whitespace around figure.
+            Default: True
+        """
+        self.fig.tight_layout()
+        self.fig.savefig(fname, dpi=300)
+        if trim_final:
+            im1 = Image.open(fname)
+            im1 = trim(im1)
+            im1.save(fname)
 
 
 def get_eye(view, direc):
