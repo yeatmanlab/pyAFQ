@@ -25,15 +25,9 @@ Examples of using the API are provided in the :ref:`examples` documentation sect
     :maxdepth: 2
 
     data
-    usage
     kwargs
-    methods
-    bundledict
     config
-    viz_backend
     mask
-    mapping
     scalars
     converter
-    tracking
     docker
