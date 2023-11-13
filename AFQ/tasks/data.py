@@ -887,7 +887,7 @@ def get_bundle_dict(segmentation_params,
         elif segmentation_params["seg_algo"] == "reco80":
             bundle_info = abd.reco_bd(80)
         else:
-            bundle_info = abd.default18_bd()
+            bundle_info = abd.default18_bd() + abd.callosal_bd()
 
     use_brain_mask = True
     brain_mask = nib.load(brain_mask).get_fdata()

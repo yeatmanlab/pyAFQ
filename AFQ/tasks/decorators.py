@@ -161,7 +161,9 @@ def as_file(suffix, include_track=False, include_seg=False):
 
                 # these are used to determine dependencies
                 # when clobbering derivatives
-                if include_seg:
+                if "_desc-profiles" in suffix:
+                    meta["dependent"] = "prof"
+                elif include_seg:
                     meta["dependent"] = "rec"
                 elif include_track:
                     meta["dependent"] = "trk"

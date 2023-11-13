@@ -1061,7 +1061,7 @@ def organize_stanford_data(path=None, clear_previous_afq=None):
         Path to download dataset to, by default it is ~/AFQ_data/.
     clear_previous_afq : str or None
         Whether to clear previous afq results in the stanford
-        hardi dataset. If not None, can be "all", "track", or "recog".
+        hardi dataset. If not None, can be "all", "track", "recog", "prof".
         Default: None
     """
     logger = logging.getLogger('AFQ')
