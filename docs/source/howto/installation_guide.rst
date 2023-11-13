@@ -53,8 +53,8 @@ On some platforms, you may need to add quotes around the ``.[]`` part::
 
 .. note::
 
-  Some of the examples in the documentation require additional dependencies. To install these, you can run `pip 
-  install pyAFQ[plot]`, which will include visualization tools that are required in these examples. For examples 
+  Some of the examples in the documentation require additional dependencies. To install these, you can run `pip
+  install pyAFQ[plot]`, which will include visualization tools that are required in these examples. For examples
   involving the cloudknot distributed computing library, you will also need to set up an [AWS account]([Create Account - aws.amazon.com](https://aws.amazon.com/resources/create-account/)) and have [docker](https://www.docker.com/) installed.
 
 

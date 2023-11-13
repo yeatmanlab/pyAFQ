@@ -1,7 +1,7 @@
 Getting started with pyAFQ
 --------------------------
 
-After you :ref:`_installation_guide`_ the software, you can start using pyAFQ to analyze your data.
+After you :doc:`install </howto/installation_guide>` the software, you can start using pyAFQ to analyze your data.
 
 pyAFQ assumes that preprocessed diffusion MRI data is organized according to
 the BIDS standard.
