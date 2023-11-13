@@ -221,6 +221,7 @@ image_scrapers = ('matplotlib', plotly_sg_scraper, PNGScraper())
 
 from _progressbars import reset_progressbars  # noqa
 
+from sphinx_gallery.sorting import FileNameSortKey
 sphinx_gallery_conf = {
 
     # path to your examples scripts
@@ -231,6 +232,7 @@ sphinx_gallery_conf = {
     'image_scrapers': image_scrapers,
     'reset_modules': (reset_progressbars),
     'show_memory': True,
+    'within_subsection_order': FileNameSortKey,
 }
 
 # Auto API
