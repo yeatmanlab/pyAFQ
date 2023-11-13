@@ -10,8 +10,10 @@ processing pipeline for tractometry, from raw DTI data to white matter tract ide
 , as well as quantification of tissue properties along the length of the
 major long-range brain white matter connections.
 
-- To get started, please refer to the `getting started`_ page.
-- What is the difference between tractography and tractometry?
+- To get started, please refer to the `getting started <tutorials/index.html>`_ page.
+- What is the difference between tractography and tractometry? See in the `explanations <explanations/index.html>`_ page.
+- For more detailed information on the variety of uses of pyAFQ, see the `how to <howto/index.html>`_ page.
+- For a detailed description of the methods and objects used in pyAFQ, see the `API reference <reference/index.html>`_ page.
 
 .. todo::
   create and link to page that lists the `major fiber tracts` supported by
@@ -20,15 +22,6 @@ major long-range brain white matter connections.
 .. todo::
   create and link to page that identifies the supported `tissue properties`
   (believe this includes both dti and dki? fa, md, cfa?, and pdd?)
-
-.. note::
-
-  Tractography is concerned with the visualization and mapping of white matter
-  tracts in the brain, while tractometry involves the quantitative analysis of
-  the structural properties of these tracts. Both techniques are valuable in
-  understanding the brain's connectivity and can provide insights into various
-  neurological conditions and cognitive processes. More information can be found in
-  the Explanations page.
 
 .. toctree::
     :maxdepth: 2
@@ -43,20 +36,6 @@ major long-range brain white matter connections.
 .. grid:: 2
 
     .. grid-item-card::
-        :link: howto/index.html
-
-        :octicon:`rocket;3em;sd-text-center`
-
-        How To
-        ^^^^^^
-
-        User's guide to pyAFQ. This guide assumes you know
-        the basics and walks through more commonly used examples.
-
-        +++
-
-
-    .. grid-item-card::
         :link: tutorials/index.html
 
         :octicon:`book;3em;sd-text-center`
@@ -69,6 +48,18 @@ major long-range brain white matter connections.
 
         +++
 
+    .. grid-item-card::
+        :link: howto/index.html
+
+        :octicon:`rocket;3em;sd-text-center`
+
+        How To
+        ^^^^^^
+
+        User's guide to pyAFQ. This guide assumes you know
+        the basics and walks through more commonly used examples.
+
+        +++
 
     .. grid-item-card::
         :link: explanations/index.html
