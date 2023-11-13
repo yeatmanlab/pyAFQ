@@ -222,6 +222,7 @@ image_scrapers = ('matplotlib', plotly_sg_scraper, PNGScraper())
 from _progressbars import reset_progressbars  # noqa
 
 sphinx_gallery_conf = {
+
     # path to your examples scripts
     'examples_dirs': ['../../examples/howto_examples',
                       '../../examples/tutorial_examples'],

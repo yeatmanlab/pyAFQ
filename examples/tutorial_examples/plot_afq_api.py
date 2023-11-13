@@ -117,14 +117,17 @@ myafq = GroupAFQ(
     viz_backend_spec='plotly_no_gif')
 
 ##########################################################################
-# Reading in DTI FA (Diffusion Tensor Imaging Fractional Anisotropy)
+# Calculating DTI FA (Diffusion Tensor Imaging Fractional Anisotropy)
 # ------------------------------------------------------------------
-# The GroupAFQ object holds a table with file names to various data derivatives.
+# The GroupAFQ object has a method called `export`, which allows the user
+# to calculate various derived quantities from the data.
 #
-# For example, the file where the FA computed from DTI is stored can be
-# retrieved by inspecting the ``dti_fa`` property. The measures are stored
-# in a series, and since we only have one subject and one session we will
-# access the first (and only) file name from the example data.
+# For example, FA can be computed using the DTI model, by explicitly
+# calling `myafq.export("dti_fa")`. This triggers the computation of DTI
+# parameters for all subjects in the dataset, and stores the results in
+# the AFQ derivatives directory. In addition, it calculates the FA
+# from these parameters and stores it in a different file in the same
+# directory.
 #
 # .. note::
 #
@@ -132,10 +135,16 @@ myafq = GroupAFQ(
 #    are not computed until they are required. This means that the first
 #    line below is the one that requires time.
 #
+# The result of the call to `export` is a dictionary, with the subject
+# IDs as keys, and the filenames of the corresponding files as values.
+# This means that to extract the filename corresponding to the FA of the first
+# subject, we can do:
+
+FA_fname = myafq.export("dti_fa")["01"]
+
 # We will then use `nibabel` to load the deriviative file and retrieve the
 # data array.
 
-FA_fname = myafq.export("dti_fa")["01"]
 FA_img = nib.load(FA_fname)
 FA = FA_img.get_fdata()
 
@@ -157,8 +166,23 @@ ax.matshow(FA[:, :, FA.shape[-1] // 2], cmap='viridis')
 ax.axis("off")
 
 ##########################################################################
-# Visualizing bundles and tract profiles:
-# ---------------------------------------
+# Recognizing the bundles and calculating act profiles:
+# -----------------------------------------------------
+# Typically, users of pyAFQ are interested in calculating not only an overall
+# map of the FA, but also the major white matter pathways (or bundles) and
+# tract profiles of tissue properties along their length. To trigger the
+# entire pyAFQ pipeline, users can call the `export_all` method:
+#
+# .. note::
+#    Running the code below triggers the full pipeline of operations
+#    leading to the computation of the tract profiles. Therefore, it
+#    takes a little while to run (about 40 minutes, typically).
+
+myafq.export_all()
+
+##########################################################################
+# Visualizing the bundles and calculating act profiles:
+# -----------------------------------------------------
 # The pyAFQ API provides several ways to visualize bundles and profiles.
 #
 # First, we will run a function that exports an html file that contains
@@ -170,11 +194,6 @@ ax.axis("off")
 #
 # Once it is done running, it should pop a browser window open and let you
 # interact with the bundles.
-#
-# .. note::
-#    Running the code below triggers the full pipeline of operations
-#    leading to the computation of the tract profiles. Therefore, it
-#    takes a little while to run (about 40 minutes, typically).
 #
 # .. note::
 #    You can hide or show a bundle by clicking the legend, or select a
