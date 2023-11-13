@@ -30,7 +30,7 @@ from fury.colormap import create_colormap
 
 import AFQ.data.fetch as afd
 
-# #############################################################################
+##############################################################################
 # Get some data from HBN POD2
 # ----------------------------
 # The Healthy Brain Network Preprocessed Open Diffusion Derivatives (HBN POD2)
