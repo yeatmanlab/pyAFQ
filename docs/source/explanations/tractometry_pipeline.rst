@@ -16,20 +16,20 @@ AFQ Tractometry Pipeline
 ..      - |rArr| `Profiling <https://dipy.org/documentation/1.4.0./reference/dipy.stats/#afq-profile>`_
 ..      - |rArr| `Visualization <http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/viz/index.html>`_
 
+.. figure:: _static/tract_modeling2.png
+   :figclass: top-image
+   :target: modeling.html
+
+   :ref:`modeling`
+
+.. figure:: _static/right_arrow.png
+   :figclass: right-arrow
+
 .. figure:: _static/tract_tractography.png
    :figclass: top-image
    :target: tractography.html
 
    :ref:`tractography`
-
-.. figure:: _static/right_arrow.png
-   :figclass: right-arrow
-
-.. figure:: _static/tract_modeling.png
-   :figclass: top-image
-   :target: modeling.html
-
-   :ref:`modeling`
 
 .. figure:: _static/right_arrow.png
    :figclass: right-arrow
@@ -43,29 +43,11 @@ AFQ Tractometry Pipeline
 .. image:: _static/down_arrow.png
    :width: 8%
 
-.. figure:: _static/tract_cleaning.png
-   :figclass: bottom-image
-   :target: cleaning.html
-
-   :ref:`cleaning`
-
-.. figure:: _static/left_arrow.png
-   :figclass: left-arrow
-
-.. figure:: _static/tract_profiling.png
+.. figure:: _static/tract_visualization.png
    :figclass: bottom-image
    :target: profiling.html
 
    :ref:`profiling`
-
-.. figure:: _static/left_arrow.png
-   :figclass: left-arrow
-
-.. figure:: _static/tract_visualization.png
-   :figclass: bottom-image
-   :target: visualization.html
-
-   :ref:`visualization`
 
 
 

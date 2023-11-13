@@ -99,10 +99,9 @@ brain_mask_definition: instance from `AFQ.definitions.image`, optional
 	If None, use B0Image()
 	Default: None
 
-bundle_info: strings, dict, or BundleDict, optional
-	List of bundle names to include in segmentation,
-	or a bundle dictionary (see BundleDict for inspiration),
-	or a BundleDict. See `Defining Custom Bundle Dictionaries`
+bundle_info: dict or BundleDict, optional
+	A dictionary or BundleDict for use in segmentation.
+	See `Defining Custom Bundle Dictionaries`
 	in the `usage` section of pyAFQ's documentation for details.
 	If None, will get all appropriate bundles for the chosen
 	segmentation algorithm.

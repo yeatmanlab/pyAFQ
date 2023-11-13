@@ -36,7 +36,7 @@ ARTIFACTS := $(strip \
 distclean: clean
 	@echo Removing files created by sphinx-build
 	rm -rf $(BUILDDIR)
-	rm -f $(SOURCEDIR)/usage/config.rst
+	rm -f $(SOURCEDIR)/usage/howto/config.rst
 	rm -rf $(SOURCEDIR)/auto_examples/
 	$(if $(ARTIFACTS),rm -f $(ARTIFACTS))
 
