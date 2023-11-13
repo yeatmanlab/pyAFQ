@@ -1,6 +1,4 @@
 """
-.. bids_tutorial_
-
 ====================
 How pyAFQ uses BIDS
 ====================

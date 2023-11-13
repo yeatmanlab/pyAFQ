@@ -1,7 +1,7 @@
 .. _tutorial_examples:
 
-Tutorials
-=========
+Tutorials: getting started with the pyAFQ Python library
+=========================================================
 
 These tutorials provide a walk-through of basic pyAFQ usage and some more
 advanced use-cases. Each one of these pages contains code that users can run

@@ -136,6 +136,7 @@ cp_afq = GroupAFQ(
         "directions": "prob",
         "odf_model": "CSD",
         "seed_mask": RoiImage()},
+    clip_edges=True,
     bundle_info=cp_bundles)
 
 

@@ -221,7 +221,10 @@ image_scrapers = ('matplotlib', plotly_sg_scraper, PNGScraper())
 
 from _progressbars import reset_progressbars  # noqa
 
+sphinx_gallery_thumbnail_path = '../source/_static/logo.png'
+
 from sphinx_gallery.sorting import FileNameSortKey
+
 sphinx_gallery_conf = {
 
     # path to your examples scripts

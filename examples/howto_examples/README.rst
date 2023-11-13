@@ -1,4 +1,4 @@
-.. _tutorial_examples:
+.. _howto_examples:
 
 How to examples
 ================

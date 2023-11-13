@@ -1,7 +1,7 @@
 """
-========================================================
-Adding new bundles into pyAFQ (Optic Radiations Example)
-========================================================
+===========================================================
+How to add new bundles into pyAFQ(Optic Radiations Example)
+===========================================================
 
 pyAFQ is designed to be customizable and extensible. This example shows how you
 can customize it to define a new bundle based on a definition of waypoint and
