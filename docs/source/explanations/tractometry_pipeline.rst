@@ -26,3 +26,6 @@ AFQ Tractometry Pipeline
           :width: 50%
           :target: profiling.html
           :align: right
+.. image:: _static/greencheck.png
+          :align: left
+          :width: 30%
