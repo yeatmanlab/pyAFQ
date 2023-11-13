@@ -1,53 +1,120 @@
 AFQ Tractometry Pipeline
-~~~~~~~~~~~~~~~~~~~~
-.. include:: <isonum.txt>
+~~~~~~~~~~~~~~~~~~~~~~~~
+.. .. |logomo| figure:: _static/tract_modeling2.png
+..    :figclass: top-image
+..    :target: modeling.html
+..    :width: 30%
+..    :ref:`modeling`
 
-.. todo::
-  include tractometry pipeline process flow diagram. create and link detail
-  paged that elaborates on the process and each step within.
+.. .. |logora| figure:: _static/right_arrow.png
+..    :figclass: right-arrow
+..    :width: 30%
 
-.. .. list-table:: AFQ Tractometry Pipeline
-..    :widths: auto
+.. .. |logotr| figure:: _static/tract_tractography.png
+..    :figclass: top-image
+..    :target: tractography.html
+..    :width: 30%
+..    :ref:`tractography`
 
-..    * - Tractography
-..      - |rArr| `Registration <http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/registration/index.html>`_
-..      - |rArr| `Segmentation <http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/segmentation/index.html>`_
-..      - |rArr| `Cleaning <http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/segmentation/index.html#AFQ.segmentation.clean_bundles>`_
-..      - |rArr| `Profiling <https://dipy.org/documentation/1.4.0./reference/dipy.stats/#afq-profile>`_
-..      - |rArr| `Visualization <http://yeatmanlab.github.io/pyAFQ/autoapi/AFQ/viz/index.html>`_
+.. .. |logoda| image:: _static/down_arrow.png
+..    :width: 30%
 
-.. figure:: _static/tract_modeling2.png
-   :figclass: top-image
-   :target: modeling.html
+.. .. |logore| figure:: _static/tract_recognition.png
+..    :figclass: bottom-image
+..    :target: recognition.html
+..    :width: 40%
+..    :ref:`recognition`
 
-   :ref:`modeling`
+.. .. |logola| figure:: _static/left_arrow.png
+..    :figclass: left-arrow
+..    :width: 10%
 
-.. figure:: _static/right_arrow.png
-   :figclass: right-arrow
+.. .. |logopr| figure:: _static/tract_visualization.png
+..    :figclass: bottom-image
+..    :width: 40%
+..    :target: profiling.html
+..    :ref:`profiling`
 
-.. figure:: _static/tract_tractography.png
-   :figclass: top-image
-   :target: tractography.html
+.. +----------+----------+----------+
+.. | |logomo| | |logora| | |logotr| |
+.. +----------+----------+----------+
+.. |          |          | |logoda| |
+.. +----------+----------+----------+
+.. | |logore| | |logola| | |logopr| |
+.. +----------+----------+----------+
 
-   :ref:`tractography`
+.. image:: _static/tract_modeling2.png
+          :target: modeling.html
+          :align: left
+          :width: 50%
+.. image:: _static/down_left_arrow.png
+          :align: right
+          :width: 30%
+.. image:: _static/tract_tractography.png
+          :target: tractography.html
+          :align: right
+          :width: 50%
+.. image:: _static/down_right_arrow.png
+          :align: left
+          :width: 30%
+.. image:: _static/tract_recognition.png
+          :target: recognition.html
+          :align: left
+          :width: 50%
+.. image:: _static/down_left_arrow.png
+          :align: right
+          :width: 30%
+.. image:: _static/tract_profiling.png
+          :width: 50%
+          :target: profiling.html
+          :align: right
 
-.. figure:: _static/right_arrow.png
-   :figclass: right-arrow
 
-.. figure:: _static/tract_recognition.png
-   :figclass: top-image
-   :target: recognition.html
+.. .. list-table:: simple image grid
+..    :class: borderless
 
-   :ref:`recognition`
+..    * - .. image:: _static/tract_modeling2.png
+..           :target: modeling.html
+..           :align: left
+..           :width: 20%
+..      - .. image:: _static/right_arrow.png
+..           :align: middle
+..           :width: 10%
+..      - .. image:: _static/tract_tractography.png
+..           :target: tractography.html
+..           :align: right
+..           :width: 20%
+..    * - 
+..      - 
+..      - .. image:: _static/down_arrow.png
+..           :width: 10%
+..    * - .. image:: _static/tract_recognition.png
+..           :target: recognition.html
+..           :width: 20%
+..      - .. image:: _static/left_arrow.png
+..           :width: 10%
+..      - .. image:: _static/tract_visualization.png
+..           :width: 20%
+..           :target: profiling.html
 
-.. image:: _static/down_arrow.png
-   :width: 8%
-
-.. figure:: _static/tract_visualization.png
-   :figclass: bottom-image
-   :target: profiling.html
-
-   :ref:`profiling`
 
 
+.. +---------------------------------------------+-------------------------------------+---------------------------------------------+
+.. | .. image:: _static/tract_modeling2.png      | .. image:: _static/right_arrow.png  | .. image:: _static/tract_tractography.png   |
+.. |    :width: 30%                              |    :width: 30%                      |    :width: 30%                              |
+.. |    :target: modeling.html                   |                                     |    :target: tractography.html               |
+.. +---------------------------------------------+-------------------------------------+---------------------------------------------+
+.. |                                             |                                     | .. image:: _static/down_arrow.png           |
+.. |                                             |                                     |    :width: 30%                              |
+.. |                                             |                                     |                                             |
+.. +---------------------------------------------+-------------------------------------+---------------------------------------------+
+.. | .. image:: _static/tract_visualization.png  | .. image:: _static/left_arrow.png   | .. image:: _static/tract_recognition.png    |
+.. |    :width: 30%                              |    :width: 30%                      |    :width: 30%                              |
+.. |    :target: profiling.html                  |                                     |    :target: recognition.html                |
+.. +---------------------------------------------+-------------------------------------+---------------------------------------------+
 
+
+.. |    :ref:`modeling`                          |                                     |    :ref:`tractography`                      |
+
+
+.. |    :ref:`profiling`                         |                                     |    :ref:`recognition`                       |

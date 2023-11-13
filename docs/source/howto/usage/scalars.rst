@@ -1,3 +1,4 @@
+.. _custom-scalars:
 
 How to add custom tissue properties from another pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
