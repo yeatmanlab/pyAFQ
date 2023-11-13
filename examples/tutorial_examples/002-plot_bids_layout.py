@@ -1,12 +1,15 @@
 """
+.. bids_tutorial_
+
 ====================
 How pyAFQ uses BIDS
 ====================
 
 The pyAFQ API relies heavily on the
-`Brain Imaging Data Standard (BIDS) <https://bids-specification.readthedocs.io/en/stable/>`_. This means that the software assumes that its inputs are organized
-according to the BIDS spec and its outputs conform where possible with the
-BIDS spec.
+`Brain Imaging Data Standard (BIDS) <https://bids-specification.readthedocs.io/en/stable/>`_,
+a widely used standard for organizing and describing neuroimaging data. This
+means that the software assumes that its inputs are organized according to the
+BIDS specification and its outputs conform where possible with BIDS.
 
 .. note::
 
@@ -19,7 +22,6 @@ BIDS spec.
 In this example, we will explore the use of BIDS in pyAFQ and see
 how BIDS allows us to extend and provide flexibility to the users
 of the software.
-
 """
 
 import os
@@ -32,7 +34,7 @@ import AFQ.data.fetch as afd
 
 ##########################################################################
 # To interact with and query BIDS datasets, we use
-#  `pyBIDS <https://bids-standard.github.io/pybids/>`_.
+#  `pyBIDS <https://bids-standard.github.io/pybids/>`_, which we import here:
 
 import bids
 from bids.layout import BIDSLayout
@@ -69,21 +71,27 @@ afd.organize_stanford_data(clear_previous_afq="all")
 # |                     ├── sub-01_ses-01_dwi.bvecs
 # |                     └── sub-01_ses-01_dwi.nii.gz
 #
-# The top level directory is our overall bids dataset folder. In most
-# cases, this folder will include a `raw` folder that will contain the
-# raw data. In this case, we do not include the raw folder and only have
-# the pipelines that contains the outputs of preprocessing the data.
-# In general, only the preprocessed diffusion data is required.
-# See the "Organizing your data" section of "Using pyAFQ" for more details.
-# In this case, one folder containing Freesurfer derivatives and another
-# folder containing the DWI data that has been preprocessed with Vistasoft.
+# The top level directory (`stanford_hardi`) is our overall BIDS dataset folder.
+# In many cases, this folder will include folders with raw data for each subject
+# in the dataset. In this case, we do not include the raw data folders and only
+# have the outputs of pipelines that were used to preprocess the data (e.g.,
+# correct the data for subject motion, eddy currents, and so forth).
+# In general, only the preprocessed diffusion data is required for pyAFQ to run.
+# See the :doc:`"Organizing your data" </howto/usage/organizing>` section of the
+# documentation for more details.
+# In this case, one folder contains derivative of the Freesurfer software and
+# another folder contains the DWI data that has been preprocessed with the
+# Vistasoft software.
 # pyAFQ provides facilities to segment tractography results obtained
-# using other software. For example, we often use
+# using other software as well. For example, we often use
 # `qsiprep <https://qsiprep.readthedocs.io/en/latest/>`_ to preprocess
 # our data and reconstruct tractographies with software such as
 # `MRTRIX <https://www.mrtrix.org/>`_. Here, we will demonstrate how to use
 # these reconstructions in the pyAFQ segmentation and tractometry pipeline
 # We fetch this data and add it as a separate pipeline
+# The following code will download a previously-created tractography and
+# organize it by adding it to the BIDS dataset folder and renaming them to be
+# BIDS-compliant (e.g., `sub-01_ses_01_dwi_tractography.trk`).
 
 afd.fetch_stanford_hardi_tractography()
 

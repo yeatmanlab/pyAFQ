@@ -1,3 +1,5 @@
+.. organizing_
+
 Organizing your data
 ~~~~~~~~~~~~~~~~~~~~
 
