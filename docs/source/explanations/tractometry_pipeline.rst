@@ -31,17 +31,17 @@ AFQ Tractometry Pipeline
 
    :ref:`tractography`
 
-.. image:: _static/down_arrow.png
-   :width: 8%
+.. figure:: _static/right_arrow.png
+   :figclass: right-arrow
 
 .. figure:: _static/tract_recognition.png
-   :figclass: bottom-image
+   :figclass: top-image
    :target: recognition.html
 
    :ref:`recognition`
 
-.. figure:: _static/left_arrow.png
-   :figclass: left-arrow
+.. image:: _static/down_arrow.png
+   :width: 8%
 
 .. figure:: _static/tract_visualization.png
    :figclass: bottom-image

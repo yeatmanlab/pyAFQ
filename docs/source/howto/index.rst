@@ -8,7 +8,7 @@ software.
     :maxdepth: 2
 
     installation_guide
-    usage
+    usage/index
     contributing
     developing/index
     getting_help
