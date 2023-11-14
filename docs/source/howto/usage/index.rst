@@ -31,3 +31,5 @@ Examples of using the API are provided in the :ref:`examples` documentation sect
     scalars
     converter
     docker
+    methods
+    image

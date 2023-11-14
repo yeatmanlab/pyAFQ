@@ -10,3 +10,4 @@ Reference Documentation
     methods
     viz_backend
     mapping
+    config
