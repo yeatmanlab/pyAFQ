@@ -1,7 +1,7 @@
 """
-=================================================
-Adding new bundles into pyAFQ (SLF 1/2/3 Example)
-=================================================
+=====================================================
+How to add new bundles into pyAFQ (SLF 1/2/3 Example)
+=====================================================
 
 pyAFQ is designed to be customizable and extensible. This example shows how you
 can customize it to define a new bundle based on a definition of waypoint and

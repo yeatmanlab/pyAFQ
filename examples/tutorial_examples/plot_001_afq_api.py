@@ -1,10 +1,12 @@
 """
-==========================
-AFQ API
-==========================
+======================================
+Getting started programming with pyAFQ
+======================================
 
-An example using the AFQ API
-
+There are two ways to :doc:`use pyAFQ </howto/getting_started>`: through the
+command line interface, and by writing Python code. This tutorial will walk you
+through the basics of the latter, using pyAFQ's Python Application Programming
+Interface (API).
 
 """
 import os.path as op
@@ -18,40 +20,41 @@ from AFQ.api.group import GroupAFQ
 import AFQ.data.fetch as afd
 
 ##########################################################################
-# Get some example data
-# ---------------------
+# Example data
+# ------------
+# pyAFQ assumes that the data is organized in a BIDS compliant directory.
+# To get users started with this tutorial, we will download some example
+# data and organize it in a BIDS compliant way (for more details on how
+# BIDS is used in pyAFQ, refer to :ref:`bids_tutorial`).
 #
-# Retrieves High angular resolution diffusion imaging (HARDI) dataset from
-# Stanford's Vista Lab
+# The following call dowloads a dataset that contains a single subject's
+# high angular resolution diffusion imaging (HARDI) data, collected at the
+# Stanford Vista Lab
 #
-#   see https://purl.stanford.edu/ng782rw8378 for details on dataset.
+# .. note::
+#   See https://purl.stanford.edu/ng782rw8378 for details on dataset.
 #
-# The data for the first subject and first session are downloaded locally
-# (by default into the users home directory) under:
+# The data are downloaded and organized locally into a BIDS compliant
+# anatomical data folder (``anat``) and a diffusion-weighted imaging data
+# (``dwi``) folder, which are both placed in the user's home directory under::
 #
-#   ``.dipy/stanford_hardi/``
+#   ``~/AFQ_data/stanford_hardi/``
 #
-# Anatomical data (``anat``) and Diffusion-weighted imaging data (``dwi``) are
-# then extracted, formatted to be BIDS compliant, and placed in the AFQ
-# data directory (by default in the users home directory) under:
-#
-#   ``AFQ_data/stanford_hardi/``
-#
-# This data represents the required preprocessed diffusion data necessary for
-# intializing the GroupAFQ object (which we will do next)
+# The data is also placed in a derivatives directory, signifying that it has
+# already undergone the required preprocessing necessary for pyAFQ to run.
 #
 # The clear_previous_afq is used to remove any previous runs of the afq object
-# stored in the AFQ_data/stanford_hardi/ BIDS directory. Set it to None if
+# stored in the `~/AFQ_data/stanford_hardi/` BIDS directory. Set it to None if
 # you want to use the results of previous runs.
 
 afd.organize_stanford_data(clear_previous_afq="track")
 
 ##########################################################################
 # Set tractography parameters (optional)
-# ---------------------
-# We make this tracking_params which we will pass to the GroupAFQ object
-# which specifies that we want 25,000 seeds randomly distributed
-# in the white matter.
+# ---------------------------------------
+# We make create a `tracking_params` variable, which we will pass to the
+# GroupAFQ object which specifies that we want 25,000 seeds randomly
+# distributed in the white matter.
 #
 # We only do this to make this example faster and consume less space.
 
@@ -65,7 +68,7 @@ tracking_params = dict(n_seeds=25000,
 # -------------------------
 #
 # Creates a GroupAFQ object, that encapsulates tractometry. This object can be
-# used to manage the entire AFQ pipeline, including:
+# used to manage the entire :doc:`AFQ pipeline`, including:
 #
 # - Tractography
 # - Registration
@@ -74,41 +77,17 @@ tracking_params = dict(n_seeds=25000,
 # - Profiling
 # - Visualization
 #
-# In this example we will load the subjects session data from the previous step
-# using the default AFQ parameters.
-#
-# .. note::
-#
-#    The first time intializing the GroupAFQ object will download necessary
-#    waypoint regions of interest (ROIs) templates into AFQ data directory:
-#
-# - Human corpus callosum templates: ``AFQ_data/callosum_templates/``
-#
-#   see https://digital.lib.washington.edu/researchworks/handle/1773/34926
-#
-# - Tract probability maps: ``AFQ_data/templates/``
-#
-#   see https://figshare.com/articles/Tract_probability_maps_for_automated_fiber_quantification/6270434  # noqa
-#
-# These waypoints ROIs will used to identify the desired white matter tracts.
-#
 # This will also create an output folder for the corresponding AFQ derivatives
 # in the AFQ data directory: ``AFQ_data/stanford_hardi/derivatives/afq/``
 #
 # To initialize this object we will pass in the path location to our BIDS
-# compliant data.
-#
-# .. note::
-#
-#    As noted above, the Stanford HARDI data contains anatomical and
-#    diffusion weighted imaging (dwi) data. In this example, we are interested
-#    in the vistasoft dwi. For our dataset the `dmriprep` is optional, but
-#    we have included it to make the initialization more explicit.
-#
-# .. note::
-#
-#    We will also be using plotly to generate an interactive visualization.
-#    So we will specify plotly_no_gif as the visualization backend.
+# compliant data, the name of the preprocessing pipeline we want to use, and
+# the tracking parameters we defined above. We will also specify the
+# visualization backend we want to use (see below for more details).
+# We will also be using plotly to generate an interactive visualization.
+# The value `plotly_no_gif` indicates that interactive visualizations will be
+# generated as html web-pages that can be opened in a browser, but not as
+# static gif files.
 
 myafq = GroupAFQ(
     bids_path=op.join(afd.afq_home, 'stanford_hardi'),
@@ -117,14 +96,17 @@ myafq = GroupAFQ(
     viz_backend_spec='plotly_no_gif')
 
 ##########################################################################
-# Reading in DTI FA (Diffusion Tensor Imaging Fractional Anisotropy)
+# Calculating DTI FA (Diffusion Tensor Imaging Fractional Anisotropy)
 # ------------------------------------------------------------------
-# The GroupAFQ object holds a table with file names to various data derivatives.
+# The GroupAFQ object has a method called `export`, which allows the user
+# to calculate various derived quantities from the data.
 #
-# For example, the file where the FA computed from DTI is stored can be
-# retrieved by inspecting the ``dti_fa`` property. The measures are stored
-# in a series, and since we only have one subject and one session we will
-# access the first (and only) file name from the example data.
+# For example, FA can be computed using the DTI model, by explicitly
+# calling `myafq.export("dti_fa")`. This triggers the computation of DTI
+# parameters for all subjects in the dataset, and stores the results in
+# the AFQ derivatives directory. In addition, it calculates the FA
+# from these parameters and stores it in a different file in the same
+# directory.
 #
 # .. note::
 #
@@ -132,10 +114,16 @@ myafq = GroupAFQ(
 #    are not computed until they are required. This means that the first
 #    line below is the one that requires time.
 #
+# The result of the call to `export` is a dictionary, with the subject
+# IDs as keys, and the filenames of the corresponding files as values.
+# This means that to extract the filename corresponding to the FA of the first
+# subject, we can do:
+
+FA_fname = myafq.export("dti_fa")["01"]
+
 # We will then use `nibabel` to load the deriviative file and retrieve the
 # data array.
 
-FA_fname = myafq.export("dti_fa")["01"]
 FA_img = nib.load(FA_fname)
 FA = FA_img.get_fdata()
 
@@ -157,8 +145,24 @@ ax.matshow(FA[:, :, FA.shape[-1] // 2], cmap='viridis')
 ax.axis("off")
 
 ##########################################################################
-# Visualizing bundles and tract profiles:
-# ---------------------------------------
+# Recognizing the bundles and calculating act profiles:
+# -----------------------------------------------------
+# Typically, users of pyAFQ are interested in calculating not only an overall
+# map of the FA, but also the major white matter pathways (or bundles) and
+# tract profiles of tissue properties along their length. To trigger the
+# pyAFQ pipeline that calculates the profiles, users can call the
+# `export('profiles')` method:
+#
+# .. note::
+#    Running the code below triggers the full pipeline of operations
+#    leading to the computation of the tract profiles. Therefore, it
+#    takes a little while to run (about 40 minutes, typically).
+
+myafq.export('profiles')
+
+##########################################################################
+# Visualizing the bundles and calculating act profiles:
+# -----------------------------------------------------
 # The pyAFQ API provides several ways to visualize bundles and profiles.
 #
 # First, we will run a function that exports an html file that contains
@@ -170,11 +174,6 @@ ax.axis("off")
 #
 # Once it is done running, it should pop a browser window open and let you
 # interact with the bundles.
-#
-# .. note::
-#    Running the code below triggers the full pipeline of operations
-#    leading to the computation of the tract profiles. Therefore, it
-#    takes a little while to run (about 40 minutes, typically).
 #
 # .. note::
 #    You can hide or show a bundle by clicking the legend, or select a

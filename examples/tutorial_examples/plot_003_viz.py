@@ -3,11 +3,19 @@
 Visualizing AFQ derivatives
 ============================
 
-"""
+Visualizing the results of a pyAFQ analysis is useful because it allows us to
+inspect the results of the analysis and to communicate the results to others.
+The pyAFQ pipeline produces a number of different kinds of outputs, including
+visualizations that can be used for quality control and for quick examination
+of the results of the analysis.
 
-# #############################################################################
-# # In this set of examples, we will use the `fury <https://fury.gl/>`_
-# # library to visualize outputs of pyAFQ as publication-ready figures.
+However, when communicating the results of pyAFQ analysis, it is often useful
+to have more specific control over the visualization that is produced. In
+addition, it is often useful to have visualizations that are visually appealing
+and striking. In this tutorial, we will use the `fury <https://fury.gl/>`_
+library [1]_ to visualize outputs of pyAFQ as publication-ready figures.
+
+"""
 
 import os
 import os.path as op
@@ -22,20 +30,20 @@ from fury.colormap import create_colormap
 
 import AFQ.data.fetch as afd
 
-# #############################################################################
-# # Get some data from HBN POD2
-# # ----------------------------
-# # The Healthy Brain Network Preprocessed Open Diffusion Derivatives (HBN POD2)
-# # is a collection of resources based on the Healthy Brain Network dataset
-# # [1, 2]_. HBN POD2 includes data derivatives - including pyAFQ derivatives -
-# # from more than 2,000 subjects. The data and the derivatives can be browsed at
-# # https://fcp-indi.s3.amazonaws.com/index.html#data/Projects/HBN/BIDS_curated/
-# #
-# # Here, we will visualize the results from one subject, together with their
-# # anatomy and using several variations. We start by downloading their
-# # pyAFQ-processed data using fetcher functions that download both the
-# # preprocessed data, as well as the pyAFQ-processed data (Note that this
-# # will take up about 1.75 GB of disk space):
+##############################################################################
+# Get some data from HBN POD2
+# ----------------------------
+# The Healthy Brain Network Preprocessed Open Diffusion Derivatives (HBN POD2)
+# is a collection of resources based on the Healthy Brain Network dataset
+# [2, 3]_. HBN POD2 includes data derivatives - including pyAFQ derivatives -
+# from more than 2,000 subjects. The data and the derivatives can be browsed at
+# https://fcp-indi.s3.amazonaws.com/index.html#data/Projects/HBN/BIDS_curated/
+#
+# Here, we will visualize the results from one subject, together with their
+# anatomy and using several variations. We start by downloading their
+# pyAFQ-processed data using fetcher functions that download both the
+# preprocessed data, as well as the pyAFQ-processed data (Note that this
+# will take up about 1.75 GB of disk space):
 
 afd.fetch_hbn_preproc(["NDARAA948VFH"])
 study_path = afd.fetch_hbn_afq(["NDARAA948VFH"])[1]
@@ -96,7 +104,9 @@ cst_t1w = transform_streamlines(sft_cst.streamlines,
 # .. note::
 #   A virtual frame buffer is needed if you are running this example on
 #   a machine that is not connected to a display ("headless"). If this is
-#   the case, you can either
+#   the case, you can either set an environment variable called `XVFB` to `1`
+#   or you can deindent the following code (and comment out the `if` statement)
+#   to inivialize the virtual frame buffer.
 
 if os.environ.get("XVFB", False):
     print("Initializing XVFB")
@@ -421,11 +431,14 @@ if os.environ.get("XVFB", False):
 #############################################################################
 # References
 # ----------
+# .. [1] Garyfallidis et al., (2021). FURY: advanced scientific visualization.
+#    Journal of Open Source Software, 6(64), 3384,
+#    https://doi.org/10.21105/joss.03384
 #
-# .. [1] Alexander LM, Escalera J, Ai L, et al. An open resource for
+# .. [2] Alexander LM, Escalera J, Ai L, et al. An open resource for
 #     transdiagnostic research in pediatric mental health and learning
 #     disorders. Sci Data. 2017;4:170181.
 #
-# .. [2] Richie-Halford A, Cieslak M, Ai L, et al. An analysis-ready and
+# .. [3] Richie-Halford A, Cieslak M, Ai L, et al. An analysis-ready and
 #     quality controlled resource for pediatric brain white-matter research.
 #     Scientific Data. 2022;9(1):1-27.

@@ -1,11 +1,13 @@
 """
-===============================
-Finding only the ARC, pARC, VOF
-===============================
+====================================
+How to segment out only some bundles
+====================================
 
-pyAFQ generates the pARC and VOF as default bundles. This example shows how you
-can choose to track and recognize only certain bundles that you are interested
-in.
+The pyAFQ software can be configured to find all of its default set of white
+matter pathways, or bundles. Alternatively, it can be configured to find only
+some bundles. This example shows how to track and recognize only certain
+bundles that you are interested in, though note that ARC, pARC and VOF are all
+also part of the set of bundles that are segmented per default.
 
 """
 
@@ -33,7 +35,6 @@ myafq = GroupAFQ(
         "seed_mask": RoiImage(use_waypoints=True, use_endpoints=True),
     }
 )
-
 
 for b_name in bundle_names:
     b_len = len(aus.SegmentedSFT.fromfile(myafq.export("bundles")[
