@@ -150,14 +150,15 @@ ax.axis("off")
 # Typically, users of pyAFQ are interested in calculating not only an overall
 # map of the FA, but also the major white matter pathways (or bundles) and
 # tract profiles of tissue properties along their length. To trigger the
-# entire pyAFQ pipeline, users can call the `export_all` method:
+# pyAFQ pipeline that calculates the profiles, users can call the
+# `export('profiles')` method:
 #
 # .. note::
 #    Running the code below triggers the full pipeline of operations
 #    leading to the computation of the tract profiles. Therefore, it
 #    takes a little while to run (about 40 minutes, typically).
 
-myafq.export_all()
+myafq.export('profiles')
 
 ##########################################################################
 # Visualizing the bundles and calculating act profiles:
