@@ -901,6 +901,7 @@ def test_AFQ_data_waypoint():
         DATA=dict(
             bundle_info=bundle_dict_as_str),
         SEGMENTATION=dict(
+            n_points_profile=50,
             scalars=[
                 "dti_fa",
                 "dti_md",
