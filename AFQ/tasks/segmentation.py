@@ -279,7 +279,9 @@ def tract_profiles(bundles,
             continue
         if profile_weights == "gauss":
             # calculate only once per bundle
-            bundle_profile_weights = gaussian_weights(this_sl)
+            bundle_profile_weights = gaussian_weights(
+                this_sl,
+                n_points=n_points_profile)
         for ii, (scalar, scalar_file) in enumerate(scalar_dict.items()):
             if isinstance(scalar_file, str):
                 scalar_file = nib.load(scalar_file)
@@ -309,7 +311,8 @@ def tract_profiles(bundles,
                 scalar_data,
                 this_sl,
                 dwi_affine,
-                weights=this_prof_weights)
+                weights=this_prof_weights,
+                n_points=n_points_profile)
             profiles[ii].extend(list(this_profile[ii]))
         nodes = list(np.arange(this_profile[0].shape[0]))
         bundle_names.extend([bundle_name] * len(nodes))

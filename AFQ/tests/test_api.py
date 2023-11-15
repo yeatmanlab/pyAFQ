@@ -804,6 +804,7 @@ def test_AFQ_data_waypoint():
             "dti_lt2",
             ImageFile(path=t1_path_other),
             TemplateImage(t1_path)],
+        n_points_profile=50,
         tracking_params=tracking_params,
         segmentation_params=segmentation_params)
 
@@ -848,7 +849,7 @@ def test_AFQ_data_waypoint():
     tract_profiles = pd.read_csv(tract_profile_fname)
 
     assert tract_profiles.select_dtypes(include=[np.number]).sum().sum() != 0
-    assert tract_profiles.shape[0] >= 400
+    assert tract_profiles.shape[0] >= 200
     assert tract_profiles.shape[1] == 9
 
     myafq.export("indiv_bundles_figures")
@@ -924,7 +925,7 @@ def test_AFQ_data_waypoint():
     # The tract profiles should already exist from the CLI Run:
     from_file = pd.read_csv(tract_profile_fname)
 
-    assert from_file.shape[0] >= 400
+    assert from_file.shape[0] >= 200
     assert from_file.shape[1] == 9
     assert_series_equal(tract_profiles['dti_fa'], from_file['dti_fa'])
 
