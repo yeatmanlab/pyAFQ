@@ -292,7 +292,8 @@ def tract_profiles(bundles,
                 elif profile_weights == "median":
                     # weights bundle to only return the mean
                     def _median_weight(bundle):
-                        fgarray = set_number_of_points(bundle, n_points_profile)
+                        fgarray = set_number_of_points(
+                            bundle, n_points_profile)
                         values = np.array(
                             values_from_volume(
                                 scalar_data,
