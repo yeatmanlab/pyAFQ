@@ -67,7 +67,7 @@ for task_module in task_modules:
                         kind=info["metavar"],
                         default=default)
                 if arg not in methods_sections:
-                    methods_sections[arg] = task_modules[-1]
+                    methods_sections[arg] = task_module
 
 
 AFQclass_doc = (

@@ -353,6 +353,8 @@ class ParticipantAFQ(object):
             tractography.
             If "recog", perform on all derivatives that depend on the
             bundle recognition.
+            If "prof", perform on all derivatives that depend on the
+            bundle profiling.
             Default: None
         exceptions : list of str
             Name outputs that the command should not be applied to.

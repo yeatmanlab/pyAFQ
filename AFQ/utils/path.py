@@ -50,15 +50,17 @@ def apply_cmd_to_afq_derivs(
         derivs_dir, base_fname, cmd="rm", exception_file_names=[], suffix="",
         dependent_on=None):
     if dependent_on is None:
-        dependent_on_list = ["trk", "rec", "dwi"]
+        dependent_on_list = ["dwi", "trk", "rec", "prof"]
     elif dependent_on.lower() == "track":
-        dependent_on_list = ["trk", "rec"]
+        dependent_on_list = ["trk", "rec", "prof"]
     elif dependent_on.lower() == "recog":
-        dependent_on_list = ["rec"]
+        dependent_on_list = ["rec", "prof"]
+    elif dependent_on.lower() == "prof":
+        dependent_on_list = ["prof"]
     else:
         raise ValueError((
             "dependent_on must be one of "
-            "None, 'track', or 'recog'."))
+            "None, 'track', 'recog', 'prof'."))
 
     for filename in os.listdir(derivs_dir):
         full_path = os.path.join(derivs_dir, filename)

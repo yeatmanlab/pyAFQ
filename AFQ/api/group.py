@@ -881,10 +881,18 @@ class GroupAFQ(object):
         """
         if not using_afqb:
             self.logger.warning((
-                "AFQ Browser is not installed, so AFQ Browswer instance "
+                "AFQ Browser is not installed, so AFQ Browser instance "
                 "cannot be assembled. AFQ Browser can be installed with: "
                 "`pip install pyAFQ[afqbrowser]` or "
                 "`pip install AFQ-Browser>=0.3`"))
+            return
+        n_points_profile = self.export("n_points_profile", collapse=False)[
+            self.valid_sub_list[0]][
+                self.valid_ses_list[0]]
+        if n_points_profile != 100:
+            self.logger.warning((
+                "AFQ Browser requires 100 points per tract profile, "
+                "so AFQ Browser instance cannot be assembled."))
             return
 
         if output_path is None:

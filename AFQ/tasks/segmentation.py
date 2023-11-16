@@ -228,7 +228,8 @@ def export_density_maps(bundles, dwi):
 @as_file('_desc-profiles_dwi.csv', include_track=True, include_seg=True)
 def tract_profiles(bundles,
                    scalar_dict, dwi_affine,
-                   profile_weights="gauss"):
+                   profile_weights="gauss",
+                   n_points_profile=100):
     """
     full path to a CSV file containing tract profiles
 
@@ -242,6 +243,10 @@ def tract_profiles(bundles,
         If "median", the median of values at each node will be used
         instead of a mean or weighted mean.
         Default: "gauss"
+    n_points_profile : int, optional
+        Number of points to resample each streamline to before
+        calculating the tract-profiles.
+        Default: 100
     """
     if not (profile_weights is None
             or isinstance(profile_weights, str)
@@ -261,7 +266,7 @@ def tract_profiles(bundles,
     bundle_names = []
     node_numbers = []
     profiles = np.empty((len(scalar_dict), 0)).tolist()
-    this_profile = np.zeros((len(scalar_dict), 100))
+    this_profile = np.zeros((len(scalar_dict), n_points_profile))
     reference = nib.load(scalar_dict[list(scalar_dict.keys())[0]])
     seg_sft = aus.SegmentedSFT.fromfile(
         bundles,
@@ -274,7 +279,9 @@ def tract_profiles(bundles,
             continue
         if profile_weights == "gauss":
             # calculate only once per bundle
-            bundle_profile_weights = gaussian_weights(this_sl)
+            bundle_profile_weights = gaussian_weights(
+                this_sl,
+                n_points=n_points_profile)
         for ii, (scalar, scalar_file) in enumerate(scalar_dict.items()):
             if isinstance(scalar_file, str):
                 scalar_file = nib.load(scalar_file)
@@ -285,7 +292,8 @@ def tract_profiles(bundles,
                 elif profile_weights == "median":
                     # weights bundle to only return the mean
                     def _median_weight(bundle):
-                        fgarray = set_number_of_points(bundle, 100)
+                        fgarray = set_number_of_points(
+                            bundle, n_points_profile)
                         values = np.array(
                             values_from_volume(
                                 scalar_data,
@@ -304,7 +312,8 @@ def tract_profiles(bundles,
                 scalar_data,
                 this_sl,
                 dwi_affine,
-                weights=this_prof_weights)
+                weights=this_prof_weights,
+                n_points=n_points_profile)
             profiles[ii].extend(list(this_profile[ii]))
         nodes = list(np.arange(this_profile[0].shape[0]))
         bundle_names.extend([bundle_name] * len(nodes))
