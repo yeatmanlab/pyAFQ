@@ -117,28 +117,28 @@ BEST_BUNDLE_ORIENTATIONS = {
 
 
 FORMAL_BUNDLE_NAMES = {
-    "ATR_L": "Left Anterior Thalamic Radiation",
-    "ATR_R": "Right Anterior Thalamic Radiation",
-    "CST_L": "Left Corticospinal Tract",
-    "CST_R": "Right Corticospinal Tract",
+    "ATR_L": "Left Anterior Thalamic",
+    "ATR_R": "Right Anterior Thalamic",
+    "CST_L": "Left Corticospinal",
+    "CST_R": "Right Corticospinal",
     "CGC_L": "Left Cingulum Cingulate",
     "CGC_R": "Right Cingulum Cingulate",
     "FP": "Forceps Major",
     "FA": "Forceps Minor",
-    "IFO_L": "Left Inferior Fronto-Occipital Fasciculus",
-    "IFO_R": "Right Inferior Fronto-Occipital Fasciculus",
-    "ILF_L": "Left Inferior Longitudinal Fasciculus",
-    "ILF_R": "Right Inferior Longitudinal Fasciculus",
-    "SLF_L": "Left Superior Longitudinal Fasciculus",
-    "SLF_R": "Right Superior Longitudinal Fasciculus",
-    "UNC_L": "Left Uncinate Fasciculus",
-    "UNC_R": "Right Uncinate Fasciculus",
-    "ARC_L": "Left Arcuate Fasciculus",
-    "ARC_R": "Right Arcuate Fasciculus",
-    "VOF_L": "Left Vertical Occipital Fasciculus",
-    "VOF_R": "Right Vertical Occipital Fasciculus",
-    "pARC_L": "Left Posterior Arcuate Fasciculus",
-    "pARC_R": "Right Posterior Arcuate Fasciculus"
+    "IFO_L": "Left Inferior Fronto-Occipital",
+    "IFO_R": "Right Inferior Fronto-Occipital",
+    "ILF_L": "Left Inferior Longitudinal",
+    "ILF_R": "Right Inferior Longitudinal",
+    "SLF_L": "Left Superior Longitudinal",
+    "SLF_R": "Right Superior Longitudinal",
+    "UNC_L": "Left Uncinate",
+    "UNC_R": "Right Uncinate",
+    "ARC_L": "Left Arcuate",
+    "ARC_R": "Right Arcuate",
+    "VOF_L": "Left Vertical Occipital",
+    "VOF_R": "Right Vertical Occipital",
+    "pARC_L": "Left Posterior Arcuate",
+    "pARC_R": "Right Posterior Arcuate"
 }
 
 
