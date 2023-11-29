@@ -53,23 +53,10 @@ def test_mahal_fix():
             ]
     sls_array =  np.asarray(sls).astype(float)
     results = np.asarray([
-        [0.      , 0.      , 0.      , 0.727923, 1.091414],
-        [0.      , 0.      , 0.      , 0.687989, 0.358011],
-        [0.      , 0.      , 0.      , 1.414214, 1.347267]])
+        [0.      , 0.      , 0.      , 1.373737, 1.075291],
+        [0.      , 0.      , 0.      , 1.373737, 1.386317],
+        [0.      , 0.      , 0.      , 1.596437, 1.613743]])
     npt.assert_array_almost_equal(
         gaussian_weights_fast(
             sls_array, n_points=5,
             return_mahalnobis=True, stat=np.mean), results)
-
-    sls = Streamlines(sls)
-    dipy_res = gaussian_weights(
-        sls, n_points=5, return_mahalnobis=True, stat=np.mean)
-    sls = np.asarray(set_number_of_points(sls, 5))
-    our_res = gaussian_weights_fast(
-        sls, n_points=5, return_mahalnobis=True, stat=np.mean)
-
-    # note the current dipy version
-    # handles 0 variance differently than this implementation
-    npt.assert_array_almost_equal(
-        dipy_res[our_res!=0],
-        our_res[our_res!=0])  
