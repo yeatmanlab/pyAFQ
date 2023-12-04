@@ -294,11 +294,18 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
         # reorganized as an upper diagonal matrix for expected Mahalanobis
         cov = np.cov(sls[:, i, :].T, ddof=0)
 
+        # This is useful for getting around the calculation of
+        # the inverse covariance matrix.
+        # it exploits the symmetry of the covariance matrix.
+        s, u = np.linalg.eigh(cov)
+
         # calculate Mahalanobis for node in every fiber
         if np.any(cov > 0):
             # calculate inverse covariance matrix
-            ci = np.linalg.inv(cov)
-            # calculate Mahalanobis distance
+            ci = u @ (1 / s[..., None] * u.T)
+            # ci = np.linalg.inv(cov)
+            print(ci)
+
             dist = (diff[:, i, :] @ ci) * diff[:, i, :]
             weights[:, i] = np.sqrt(np.sum(dist, axis=1))
 
