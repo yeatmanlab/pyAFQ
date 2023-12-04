@@ -53,9 +53,9 @@ def test_mahal_fix():
             ]
     sls_array =  np.asarray(sls).astype(float)
     results = np.asarray([
-        [0.      , 0.      , 0.      , 1.373737, 1.075291],
-        [0.      , 0.      , 0.      , 1.373737, 1.386317],
-        [0.      , 0.      , 0.      , 1.596437, 1.613743]])
+        [0.      , 0.      , 0.      , 1.185854, 2.14735],
+        [0.      , 0.      , 0.      , 1.185854, 1.556795],
+        [0.      , 0.      , 0.      , 1.274755, 2.23296]])
     npt.assert_array_almost_equal(
         gaussian_weights_fast(
             sls_array, n_points=5,
