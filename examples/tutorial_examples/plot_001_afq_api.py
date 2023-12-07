@@ -203,7 +203,7 @@ fig_files = myafq.export("tract_profile_plots")["01"]
 bundle_counts = pd.read_csv(myafq.export("sl_counts")["01"], index_col=[0])
 for ind in bundle_counts.index:
     if ind == "Total Recognized":
-        threshold = 1500
+        threshold = 1000
     else:
         threshold = 10
     if bundle_counts["n_streamlines"][ind] < threshold:

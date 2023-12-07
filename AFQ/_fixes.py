@@ -292,13 +292,13 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
         # This should come back as a 3D covariance matrix with the spatial
         # variance covariance of this node across the different streamlines,
         # reorganized as an upper diagonal matrix for expected Mahalanobis
-        v_inv = np.triu(np.cov(sls[:, i, :].T, ddof=0))
+        cov = np.cov(sls[:, i, :].T, ddof=0)
 
         # calculate Mahalanobis for node in every fiber
-        if np.linalg.matrix_rank(v_inv) == n_dim:
-            v_inv = np.linalg.inv(v_inv)
+        if np.any(cov > 0):
+            ci = np.linalg.inv(cov)
 
-            dist = (diff[:, i, :] @ v_inv) * diff[:, i, :]
+            dist = (diff[:, i, :] @ ci) * diff[:, i, :]
             weights[:, i] = np.sqrt(np.sum(dist, axis=1))
 
         # In the special case where all the streamlines have the exact same
