@@ -287,7 +287,7 @@ def baby_bd():
         "ATR_L", "ATR_R", "CST_L", "CST_R", "CGC_L", "CGC_R",
         "CCH_L", "CCH_R", "FP", "FA", "IFO_L", "IFO_R", "ILF_L",
         "ILF_R", "SLF_L", "SLF_R", "UNC_L", "UNC_R",
-        "ARC_L", "ARC_R", "MdLF_L", "MdLF_R"]
+        "ARC_L", "ARC_R"]
 
     prob_maps = templates[
         'UNCNeo_JHU_tracts_prob-for-babyAFQ']
