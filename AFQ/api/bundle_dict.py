@@ -60,7 +60,7 @@ RECO_BUNDLES_80 = ["AC", "AF", "AR", "AST", "C", "CB", "CC_ForcepsMajor",
 RECO_BUNDLES_80 = append_l_r(RECO_BUNDLES_80, RECO_UNIQUE)
 
 PEDIATRIC_BUNDLES = [
-    "CCH", "ARC", "ATR", "CGC", "CST", "FA", "FP", "IFO", "ILF", "MdLF", "SLF", "UNC"]
+    "ARC", "ATR", "CGC", "CST", "FA", "FP", "IFO", "ILF", "MdLF", "SLF", "UNC"]
 PEDIATRIC_BUNDLES = append_l_r(PEDIATRIC_BUNDLES, ["FA", "FP"])
 
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
@@ -721,7 +721,7 @@ class PediatricBundleDict(BundleDict):
         # pediatric probability maps
         prob_map_order = [
             "ATR_L", "ATR_R", "CST_L", "CST_R", "CGC_L", "CGC_R",
-            "CCH_L", "CCH_R", "FP", "FA", "IFO_L", "IFO_R", "ILF_L",
+            "MdLF_L", "MdLF_R", "FP", "FA", "IFO_L", "IFO_R", "ILF_L",
             "ILF_R", "SLF_L", "SLF_R", "UNC_L", "UNC_R",
             "ARC_L", "ARC_R"]
 
