@@ -116,54 +116,67 @@ def altair_df_to_chart(profiles, position_domain=(20, 80),
         profiles.nodeID < position_domain[1])]
 
     tp_units = {
-        "DKI AWF": " (%)",
+        "DKI AWF": "",
         "DKI FA": "",
         "DKI MD": " (µm²/ms)",
         "DKI MK": ""}
 
-    charts = []
-    kwargs.update(dict(
-        x=alt.X(
-            'nodeID',
-            axis=alt.Axis(title="Position (%)"))
-    ))
-    for ii, tp in enumerate(profiles.TP.unique()):
-        this_dataframe = profiles[profiles.TP == tp]
-        title_name = tp + tp_units[tp]
-        prof_chart = alt.Chart(this_dataframe, title=title_name).mark_line(
-            size=line_size).encode(
-            y=alt.Y('mean', scale=alt.Scale(
-                zero=False), axis=alt.Axis(title="")),
-            **kwargs)
-        prof_chart = prof_chart + alt.Chart(this_dataframe).mark_line(
-            size=line_size, opacity=0.5, strokeDash=[1, 1]).encode(
-            y=alt.Y('IQR_lower', scale=alt.Scale(
-                zero=False), axis=alt.Axis(title="")),
-            **kwargs)
-        prof_chart = prof_chart + alt.Chart(this_dataframe).mark_line(
-            size=line_size, opacity=0.5, strokeDash=[1, 1]).encode(
-            y=alt.Y('IQR_upper', scale=alt.Scale(
-                zero=False), axis=alt.Axis(title="")),
-            **kwargs)
-        prof_chart = prof_chart + alt.Chart(this_dataframe).mark_line(
-            size=line_size, opacity=0.5).encode(
-            y=alt.Y('CI_lower', scale=alt.Scale(
-                zero=False), axis=alt.Axis(title="")),
-            **kwargs)
-        prof_chart = prof_chart + alt.Chart(this_dataframe).mark_line(
-            size=line_size, opacity=0.5).encode(
-            y=alt.Y('CI_upper', scale=alt.Scale(
-                zero=False), axis=alt.Axis(title="")),
-            **kwargs)
-        prof_chart = prof_chart.facet(
-            row=alt.Row(
-                "Bundle Name",
-                header=alt.Header(
-                    title="", labels=ii == 0,
-                    labelFontSize=font_size,
-                    labelAngle=row_label_angle)))
-        charts.append(prof_chart)
-    return alt.HConcatChart(hconcat=charts).configure_axis(
+    row_charts = []
+    for jj, b_name in enumerate(profiles["Bundle Name"].unique()):
+        row_dataframe = profiles[profiles["Bundle Name"] == b_name]
+        charts = []
+        for ii, tp in enumerate(profiles.TP.unique()):
+            this_dataframe = row_dataframe[row_dataframe.TP == tp]
+            if jj == 0:
+                title_name = tp + tp_units[tp]
+            else:
+                title_name = ""
+            if ii == 0:
+                y_axis_title = b_name
+            else:
+                y_axis_title = ""
+            if jj == len(profiles["Bundle Name"].unique()) - 1:
+                x_axis_title = "Position (%)"
+                useXlab = True
+            else:
+                x_axis_title = ""
+                useXlab = False
+            y_kwargs = dict(
+                scale=alt.Scale(zero=False),
+                # axis=alt.Axis(title=""),
+                title=y_axis_title
+            )
+            x_kwargs = dict(
+                axis=alt.Axis(title=x_axis_title, labels=useXlab))
+            prof_chart = alt.Chart(
+                this_dataframe, title=title_name).mark_line(
+                    size=line_size).encode(
+                y=alt.Y('mean', **y_kwargs),
+                x=alt.X('nodeID', **x_kwargs),
+                **kwargs)
+            prof_chart = prof_chart + alt.Chart(this_dataframe).mark_line(
+                size=line_size, opacity=0.5, strokeDash=[1, 1]).encode(
+                y=alt.Y('IQR_lower', **y_kwargs),
+                x=alt.X('nodeID', **x_kwargs),
+                **kwargs)
+            prof_chart = prof_chart + alt.Chart(this_dataframe).mark_line(
+                size=line_size, opacity=0.5, strokeDash=[1, 1]).encode(
+                y=alt.Y('IQR_upper', **y_kwargs),
+                x=alt.X('nodeID', **x_kwargs),
+                **kwargs)
+            prof_chart = prof_chart + alt.Chart(this_dataframe).mark_line(
+                size=line_size, opacity=0.5).encode(
+                y=alt.Y('CI_lower', **y_kwargs),
+                x=alt.X('nodeID', **x_kwargs),
+                **kwargs)
+            prof_chart = prof_chart + alt.Chart(this_dataframe).mark_line(
+                size=line_size, opacity=0.5).encode(
+                y=alt.Y('CI_upper', **y_kwargs),
+                x=alt.X('nodeID', **x_kwargs),
+                **kwargs)
+            charts.append(prof_chart)
+        row_charts.append(alt.HConcatChart(hconcat=charts))
+    return alt.VConcatChart(vconcat=row_charts).configure_axis(
         labelFontSize=font_size,
         titleFontSize=font_size,
         labelLimit=0
@@ -175,7 +188,7 @@ def altair_df_to_chart(profiles, position_domain=(20, 80),
         columns=column_count,
         symbolStrokeWidth=legend_line_size * 10,
         symbolSize=legend_line_size * 100,
-        orient='bottom'
+        orient='right'
     ).configure_title(
-        fontSize=font_size - 10
+        fontSize=font_size
     )
