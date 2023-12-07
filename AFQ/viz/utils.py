@@ -168,7 +168,7 @@ class PanelFigure():
         self.subplot_count = 0
 
     def add_img(self, fname, x_coord, y_coord, reduct_count=1,
-                subplot_label_ypos=1.0, legend=None, legend_kwargs={},
+                subplot_label_pos=(0.1, 1.0), legend=None, legend_kwargs={},
                 add_panel_label=True, panel_label_font_size="medium"):
         """
         Add image from fname into figure as a panel.
@@ -184,9 +184,9 @@ class PanelFigure():
         reduct_count : int
             number of times to trim whitespace around image
             Default: 1
-        subplot_label_ypos : float
-            y position of subplot label
-            Default: 1.0
+        subplot_label_pos : tuple of floats
+            position of subplot label
+            Default: (0.1, 1.0)
         legend : dict
             dictionary of legend items, where keys are labels
             and values are colors
@@ -215,7 +215,7 @@ class PanelFigure():
             trans = mtransforms.ScaledTranslation(
                 10 / 72, -5 / 72, self.fig.dpi_scale_trans)
             ax.text(
-                0.1, subplot_label_ypos,
+                subplot_label_pos[0], subplot_label_pos[1],
                 f"{chr(65+self.subplot_count)})",
                 transform=ax.transAxes + trans,
                 fontsize=panel_label_font_size, verticalalignment="top",

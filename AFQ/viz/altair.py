@@ -115,6 +115,12 @@ def altair_df_to_chart(profiles, position_domain=(20, 80),
         profiles.nodeID >= position_domain[0],
         profiles.nodeID < position_domain[1])]
 
+    tp_units = {
+        "DKI AWF": " (%)",
+        "DKI FA": "",
+        "DKI MD": " (µm²/ms)",
+        "DKI MK": ""}
+
     charts = []
     kwargs.update(dict(
         x=alt.X(
@@ -123,7 +129,8 @@ def altair_df_to_chart(profiles, position_domain=(20, 80),
     ))
     for ii, tp in enumerate(profiles.TP.unique()):
         this_dataframe = profiles[profiles.TP == tp]
-        prof_chart = alt.Chart(this_dataframe).mark_line(
+        title_name = tp + tp_units[tp]
+        prof_chart = alt.Chart(this_dataframe, title=title_name).mark_line(
             size=line_size).encode(
             y=alt.Y('mean', scale=alt.Scale(
                 zero=False), axis=alt.Axis(title="")),
@@ -169,4 +176,6 @@ def altair_df_to_chart(profiles, position_domain=(20, 80),
         symbolStrokeWidth=legend_line_size * 10,
         symbolSize=legend_line_size * 100,
         orient='bottom'
+    ).configure_title(
+        fontSize=font_size - 10
     )
