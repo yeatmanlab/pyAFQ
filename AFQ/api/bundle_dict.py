@@ -60,7 +60,7 @@ RECO_BUNDLES_80 = ["AC", "AF", "AR", "AST", "C", "CB", "CC_ForcepsMajor",
 RECO_BUNDLES_80 = append_l_r(RECO_BUNDLES_80, RECO_UNIQUE)
 
 PEDIATRIC_BUNDLES = [
-    "ARC", "ATR", "CGC", "CST", "FA", "FP", "IFO", "ILF", "MdLF", "SLF", "UNC"]
+    "CCH", "ARC", "ATR", "CGC", "CST", "FA", "FP", "IFO", "ILF", "MdLF", "SLF", "UNC"]
 PEDIATRIC_BUNDLES = append_l_r(PEDIATRIC_BUNDLES, ["FA", "FP"])
 
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
