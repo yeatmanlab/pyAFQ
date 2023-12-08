@@ -15,25 +15,6 @@ known as pillow).
 
 """
 
-#############################################################################
-#
-# .. note::
-#   A virtual frame buffer is needed if you are running this example on
-#   a machine that is not connected to a display ("headless"). If this is
-#   the case, you can either set an environment variable called `XVFB` to `1`
-#   or you can deindent the following code (and comment out the `if` statement)
-#   to inivialize the virtual frame buffer.
-
-import os
-if os.environ.get("XVFB", False):
-    print("Initializing XVFB")
-    import xvfbwrapper
-    from xvfbwrapper import Xvfb
-
-    vdisplay = Xvfb()
-    vdisplay.start()
-
-
 ##############################################################################
 # Imports
 # -------
@@ -213,6 +194,7 @@ def slice_volume(data, x=None, y=None, z=None):
         slicer_actors.append(slicer_actor_x)
 
     return slicer_actors
+
 
 slicers_b0 = slice_volume(dmri_b0, x=dmri_b0.shape[0] // 2, y=dmri_b0.shape[1] // 2, z=dmri_b0.shape[-1] // 3)
 slicers_b1000 = slice_volume(dmri_b1000, x=dmri_b0.shape[0] // 2, y=dmri_b0.shape[1] // 2, z=dmri_b0.shape[-1] // 3)
