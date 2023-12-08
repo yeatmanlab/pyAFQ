@@ -56,12 +56,15 @@ import AFQ.data.fetch as afd
 # (Note that this is 2.69GB of data, so it can take a while to download). Or
 # you can download it and unzip it using the following block of code.
 
-print("Downloading processed pediatric data; this could take a while...")
 data_folder = op.join(op.expanduser('~'), "AFQ_data/")
-wget.download("https://figshare.com/ndownloader/files/38053692",
-              op.join(data_folder, "baby_example.zip"))
+baby_zip = op.join(data_folder, "baby_example.zip")
+if not op.exists(baby_zip):
+    print("Downloading processed pediatric data; this could take a while...")
+    wget.download(
+        "https://figshare.com/ndownloader/files/38053692",
+        baby_zip)
 
-with zipfile.ZipFile(op.join(data_folder, "baby_example.zip"), 'r') as zip_ref:
+with zipfile.ZipFile(baby_zip, 'r') as zip_ref:
     zip_ref.extractall(op.join(data_folder, "baby_example"))
 
 ##########################################################################
