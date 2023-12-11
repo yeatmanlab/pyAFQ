@@ -14,7 +14,6 @@ from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.io.streamline import load_trk
 
 from nibabel.tmpdirs import TemporaryDirectory
-from nibabel.orientations import aff2axcodes
 import nibabel as nib
 
 from AFQ.tractography.tractography import get_percentile_threshold
@@ -63,8 +62,6 @@ def gpu_track(data, gtab, seed_img, stop_img,
     """
     chunk_size = 100000
     sh_order = 6
-
-    voxel_order = "".join(aff2axcodes(seed_img.affine))
 
     seed_data = seed_img.get_fdata()
     stop_data = stop_img.get_fdata()
@@ -123,7 +120,7 @@ def gpu_track(data, gtab, seed_img, stop_img,
                     seed_mask[idx * global_chunk_sz:(idx + 1) * global_chunk_sz].shape[0])
                 gpu_tracker.dump_streamlines(
                     op.join(tmpdir, 'tmp'),
-                    voxel_order, seed_mask.shape,
+                    "RAS", seed_mask.shape,
                     seed_img.header.get_zooms(), seed_img.affine)
 
         for filename in os.listdir(tmpdir):

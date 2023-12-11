@@ -62,8 +62,20 @@ def get_data_gtab(dwi, bval, bvec, min_bval=None,
         it is considered to be b0. Default: 50.
     """
     img = nib.load(dwi)
-    data = img.get_fdata()
     bvals, bvecs = read_bvals_bvecs(bval, bvec)
+
+    voxel_order = "".join(nib.orientations.aff2axcodes(img.affine))
+    if not voxel_order == "RAS":
+        # this code adapted from qsiprep.interfaces.images
+        input_orientation = nib.orientations.axcodes2ornt(voxel_order)
+        desired_orientation = nib.orientations.axcodes2ornt("RAS")
+        transform_orientation = nib.orientations.ornt_transform(
+            input_orientation, desired_orientation)
+        img = img.as_reoriented(transform_orientation)
+        for this_axnum, (axnum, flip) in enumerate(transform_orientation):
+            bvecs[this_axnum] = bvecs[int(axnum)] * flip
+
+    data = img.get_fdata()
     if filter_b and (min_bval is not None):
         valid_b = np.logical_or(
             (bvals >= min_bval), (bvals <= b0_threshold))
