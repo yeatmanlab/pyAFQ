@@ -15,6 +15,24 @@ known as pillow).
 
 """
 
+#############################################################################
+#
+# .. note::
+#   A virtual frame buffer is needed if you are running this example on
+#   a machine that is not connected to a display ("headless"). If this is
+#   the case, you can either set an environment variable called `XVFB` to `1`
+#   or you can deindent the following code (and comment out the `if` statement)
+#   to inivialize the virtual frame buffer.
+
+if os.environ.get("XVFB", False):
+    print("Initializing XVFB")
+    import xvfbwrapper
+    from xvfbwrapper import Xvfb
+
+    vdisplay = Xvfb()
+    vdisplay.start()
+
+
 ##############################################################################
 # Imports
 # -------
