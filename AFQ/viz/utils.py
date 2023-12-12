@@ -6,6 +6,10 @@ import numpy as np
 import imageio as io
 from PIL import Image, ImageChops
 
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import matplotlib.transforms as mtransforms
+
 import nibabel as nib
 import dipy.tracking.streamlinespeed as dps
 from dipy.align import resample
@@ -64,7 +68,15 @@ COLOR_DICT = OrderedDict({
     "UNC_R": tableau_20[17], "UF_R": tableau_20[17],
     "ARC_L": tableau_20[18], "AF_L": tableau_20[18],
     "ARC_R": tableau_20[19], "AF_R": tableau_20[19],
-    "median": tableau_20[6]})
+    "median": tableau_20[6],
+    "Orbital": (0.2, 0.13, 0.53),  # Paul Tol's palette for callosal bundles
+    "AntFrontal": (0.07, 0.47, 0.2),
+    "SupFrontal": (0.27, 0.67, 0.6),
+    "Motor": (0.53, 0.8, 0.93),
+    "SupParietal": (0.87, 0.8, 0.47),
+    "PostParietal": (0.8, 0.4, 0.47),
+    "Occipital": (0.67, 0.27, 0.6),
+    "Temporal": (0.53, 0.13, 0.33)})
 
 POSITIONS = OrderedDict({
     "ATR_L": (1, 0), "ATR_R": (1, 4), "C_L": (1, 0), "C_R": (1, 4),
@@ -102,6 +114,135 @@ BEST_BUNDLE_ORIENTATIONS = {
     "ARC_L": ("Sagittal", "Left"), "ARC_R": ("Sagittal", "Right"),
     "VOF_L": ("Coronal", "Back"), "VOF_R": ("Coronal", "Back"),
     "pARC_L": ("Coronal", "Back"), "pARC_R": ("Coronal", "Back")}
+
+
+FORMAL_BUNDLE_NAMES = {
+    "ATR_L": "Left Anterior Thalamic",
+    "ATR_R": "Right Anterior Thalamic",
+    "CST_L": "Left Corticospinal",
+    "CST_R": "Right Corticospinal",
+    "CGC_L": "Left Cingulum Cingulate",
+    "CGC_R": "Right Cingulum Cingulate",
+    "FP": "Forceps Major",
+    "FA": "Forceps Minor",
+    "IFO_L": "Left Inferior Fronto-Occipital",
+    "IFO_R": "Right Inferior Fronto-Occipital",
+    "ILF_L": "Left Inferior Longitudinal",
+    "ILF_R": "Right Inferior Longitudinal",
+    "SLF_L": "Left Superior Longitudinal",
+    "SLF_R": "Right Superior Longitudinal",
+    "UNC_L": "Left Uncinate",
+    "UNC_R": "Right Uncinate",
+    "ARC_L": "Left Arcuate",
+    "ARC_R": "Right Arcuate",
+    "VOF_L": "Left Vertical Occipital",
+    "VOF_R": "Right Vertical Occipital",
+    "pARC_L": "Left Posterior Arcuate",
+    "pARC_R": "Right Posterior Arcuate"
+}
+
+
+class PanelFigure():
+    """
+    Super useful class for organizing existing images
+    into subplots using matplotlib
+    """
+
+    def __init__(self, num_rows, num_cols, width, height):
+        """
+        Initialize PanelFigure.
+
+        Parameters
+        ----------
+        num_rows : int
+            Number of rows in figure
+        num_cols : int
+            Number of columns in figure
+        width : int
+            Width of figure in inches
+        height : int
+            Height of figure in inches
+        """
+        self.fig = plt.figure(figsize=(width, height))
+        self.grid = plt.GridSpec(num_rows, num_cols, hspace=0, wspace=0)
+        self.subplot_count = 0
+
+    def add_img(self, fname, x_coord, y_coord, reduct_count=1,
+                subplot_label_pos=(0.1, 1.0), legend=None, legend_kwargs={},
+                add_panel_label=True, panel_label_font_size="medium"):
+        """
+        Add image from fname into figure as a panel.
+
+        Parameters
+        ----------
+        fname : str
+            path to image file to add to subplot
+        x_coord : int or slice
+            x coordinate(s) of subplot in matlotlib figure
+        y_coord : int or slice
+            y coordinate(s) of subplot in matlotlib figure
+        reduct_count : int
+            number of times to trim whitespace around image
+            Default: 1
+        subplot_label_pos : tuple of floats
+            position of subplot label
+            Default: (0.1, 1.0)
+        legend : dict
+            dictionary of legend items, where keys are labels
+            and values are colors
+            Default: None
+        legend_kwargs : dict
+            ADditional arguments for matplotlib's legend method
+        add_panel_label : bool
+            Whether or not to add a panel label to the subplot
+            Default: True
+        panel_label_font_size : str
+            Font size of panel label
+            Default: "medium"
+        """
+        ax = self.fig.add_subplot(self.grid[y_coord, x_coord])
+        im1 = Image.open(fname)
+        for _ in range(reduct_count):
+            im1 = trim(im1)
+        if legend is not None:
+            patches = []
+            for value, color in legend.items():
+                patches.append(mpatches.Patch(
+                    color=color,
+                    label=value))
+            ax.legend(handles=patches, borderaxespad=0., **legend_kwargs)
+        if add_panel_label:
+            trans = mtransforms.ScaledTranslation(
+                10 / 72, -5 / 72, self.fig.dpi_scale_trans)
+            ax.text(
+                subplot_label_pos[0], subplot_label_pos[1],
+                f"{chr(65+self.subplot_count)})",
+                transform=ax.transAxes + trans,
+                fontsize=panel_label_font_size, verticalalignment="top",
+                fontfamily='serif',
+                bbox=dict(facecolor='0.7', edgecolor='none', pad=3.0))
+        ax.imshow(np.asarray(im1), aspect=1)
+        ax.axis('off')
+        self.subplot_count = self.subplot_count + 1
+        return ax
+
+    def format_and_save_figure(self, fname, trim_final=True):
+        """
+        Format and save figure to fname.
+        Parameters
+        ----------
+        fname : str
+            Path to save figure to
+        trim : bool
+            Whether or not to trim whitespace around figure.
+            Default: True
+        """
+        self.fig.tight_layout()
+        self.fig.savefig(fname, dpi=300)
+        if trim_final:
+            im1 = Image.open(fname)
+            im1 = trim(im1)
+            im1.save(fname)
 
 
 def get_eye(view, direc):
