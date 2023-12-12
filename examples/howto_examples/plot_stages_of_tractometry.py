@@ -24,6 +24,7 @@ known as pillow).
 #   or you can deindent the following code (and comment out the `if` statement)
 #   to inivialize the virtual frame buffer.
 
+import os
 if os.environ.get("XVFB", False):
     print("Initializing XVFB")
     import xvfbwrapper
