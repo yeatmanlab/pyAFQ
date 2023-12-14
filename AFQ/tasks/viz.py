@@ -37,7 +37,6 @@ def _viz_prepare_vol(vol, xform, mapping, scalar_dict):
 
 @pimms.calc("all_bundles_figure")
 def viz_bundles(base_fname,
-                dwi_affine,
                 viz_backend,
                 data_imap,
                 mapping_imap,
@@ -88,7 +87,7 @@ def viz_bundles(base_fname,
 
     flip_axes = [False, False, False]
     for i in range(3):
-        flip_axes[i] = (dwi_affine[i, i] < 0)
+        flip_axes[i] = (data_imap["dwi_affine"][i, i] < 0)
 
     if "plotly" in viz_backend.backend:
         figure = make_subplots(
@@ -146,7 +145,6 @@ def viz_bundles(base_fname,
 @pimms.calc("indiv_bundles_figures")
 def viz_indivBundle(base_fname,
                     results_dir,
-                    dwi_affine,
                     viz_backend,
                     data_imap,
                     mapping_imap,
@@ -194,7 +192,7 @@ def viz_indivBundle(base_fname,
 
     flip_axes = [False, False, False]
     for i in range(3):
-        flip_axes[i] = (dwi_affine[i, i] < 0)
+        flip_axes[i] = (data_imap["dwi_affine"][i, i] < 0)
 
     bundles = aus.SegmentedSFT.fromfile(
         segmentation_imap["bundles"])

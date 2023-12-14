@@ -35,19 +35,19 @@ def export_registered_b0(data_imap, mapping):
 
 @pimms.calc("template_xform")
 @as_file('_space-subject_desc-template_dwi.nii.gz')
-def template_xform(dwi_affine, mapping, data_imap):
+def template_xform(mapping, data_imap):
     """
     full path to a nifti file containing
     registration template transformed to subject space
     """
     template_xform = mapping.transform_inverse(
         data_imap["reg_template"].get_fdata())
-    template_xform = nib.Nifti1Image(template_xform, dwi_affine)
+    template_xform = nib.Nifti1Image(template_xform, data_imap["dwi_affine"])
     return template_xform, dict()
 
 
 @pimms.calc("rois")
-def export_rois(base_fname, results_dir, data_imap, mapping, dwi_affine):
+def export_rois(base_fname, results_dir, data_imap, mapping):
     """
     dictionary of full paths to Nifti1Image files of ROIs
     transformed to subject space
@@ -60,7 +60,7 @@ def export_rois(base_fname, results_dir, data_imap, mapping, dwi_affine):
     for bundle_name in bundle_dict:
         roi_files[bundle_name] = []
         for roi_fname in bundle_dict.transform_rois(
-                bundle_name, mapping, dwi_affine,
+                bundle_name, mapping, data_imap["dwi_affine"],
                 base_fname=base_roi_fname):
             logger.info(f"Saving {roi_fname}")
             roi_files[bundle_name].append(roi_fname)

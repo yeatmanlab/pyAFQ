@@ -227,7 +227,7 @@ def export_density_maps(bundles, dwi):
 @pimms.calc("profiles")
 @as_file('_desc-profiles_dwi.csv', include_track=True, include_seg=True)
 def tract_profiles(bundles,
-                   scalar_dict, dwi_affine,
+                   scalar_dict, data_imap,
                    profile_weights="gauss",
                    n_points_profile=100):
     """
@@ -298,7 +298,7 @@ def tract_profiles(bundles,
                             values_from_volume(
                                 scalar_data,
                                 fgarray,
-                                dwi_affine))
+                                data_imap["dwi_affine"]))
                         weights = np.zeros(values.shape)
                         for ii, jj in enumerate(
                             np.argsort(values, axis=0)[
@@ -311,7 +311,7 @@ def tract_profiles(bundles,
             this_profile[ii] = afq_profile(
                 scalar_data,
                 this_sl,
-                dwi_affine,
+                data_imap["dwi_affine"],
                 weights=this_prof_weights,
                 n_points=n_points_profile)
             profiles[ii].extend(list(this_profile[ii]))
