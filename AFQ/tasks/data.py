@@ -1,4 +1,5 @@
 import nibabel as nib
+import nibabel.orientations as nio
 import numpy as np
 import logging
 
@@ -43,7 +44,7 @@ DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 @pimms.calc("data", "gtab", "img")
 def get_data_gtab(dwi, bval, bvec, min_bval=None,
                   max_bval=None, filter_b=True, b0_threshold=50,
-                  prefered_orientation="RAS"):
+                  prefered_orientation=None):
     """
     DWI data as an ndarray for selected b values,
     A DIPY GradientTable with all the gradient information,
@@ -65,30 +66,33 @@ def get_data_gtab(dwi, bval, bvec, min_bval=None,
     b0_threshold : int, optional
         The value of b under which
         it is considered to be b0. Default: 50.
-    prefered_orientation : str, optional
+    prefered_orientation : str or None, optional
         pyAFQ reorients the data into this orientation.
         Note that the GPU tractography only works with RAS.
-        Default: "RAS"
+        Default: None
     """
     img = nib.load(dwi)
     bvals, bvecs = read_bvals_bvecs(bval, bvec)
 
-    voxel_order = "".join(nib.orientations.aff2axcodes(img.affine))
-    if not voxel_order == prefered_orientation:
-        logger.warning(
-            "Re-orienting DWI data from %s to %s",
-            voxel_order,
-            prefered_orientation)
-        # this code adapted from qsiprep.interfaces.images
-        input_orientation = nib.orientations.axcodes2ornt(
-            voxel_order)
-        desired_orientation = nib.orientations.axcodes2ornt(
-            prefered_orientation)
-        transform_orientation = nib.orientations.ornt_transform(
-            input_orientation, desired_orientation)
-        img = img.as_reoriented(transform_orientation)
-        for this_axnum, (axnum, flip) in enumerate(transform_orientation):
-            bvecs[this_axnum] = bvecs[int(axnum)] * flip
+    if prefered_orientation is not None:
+        voxel_order = "".join(nio.aff2axcodes(img.affine))
+        if not voxel_order == prefered_orientation:
+            logger.warning(
+                "Re-orienting DWI data from %s to %s",
+                voxel_order,
+                prefered_orientation)
+            # this code adapted from
+            # qsiprep.interfaces.images
+            input_orientation = nio.axcodes2ornt(
+                voxel_order)
+            desired_orientation = nio.axcodes2ornt(
+                prefered_orientation)
+            transform_orientation = nio.ornt_transform(
+                input_orientation, desired_orientation)
+            img = img.as_reoriented(transform_orientation)
+            for this_axnum, (axnum, flip) in enumerate(
+                    transform_orientation):
+                bvecs[this_axnum] = bvecs[int(axnum)] * flip
 
     data = img.get_fdata()
     if filter_b and (min_bval is not None):
