@@ -41,14 +41,15 @@ logger = logging.getLogger('AFQ')
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
 
-@pimms.calc("data", "gtab", "img")
+@pimms.calc("data", "gtab", "img", "dwi_affine")
 def get_data_gtab(dwi, bval, bvec, min_bval=None,
                   max_bval=None, filter_b=True, b0_threshold=50,
                   prefered_orientation=None):
     """
     DWI data as an ndarray for selected b values,
     A DIPY GradientTable with all the gradient information,
-    and unaltered DWI data in a Nifti1Image.
+    and DWI data in a Nifti1Image,
+    and the affine transformation of the DWI data.
 
     Parameters
     ----------
@@ -110,7 +111,7 @@ def get_data_gtab(dwi, bval, bvec, min_bval=None,
     gtab = dpg.gradient_table(
         bvals, bvecs,
         b0_threshold=b0_threshold)
-    return data, gtab, img
+    return data, gtab, img, img.affine
 
 
 @pimms.calc("b0")
