@@ -3,18 +3,14 @@ import cuslines
 import numpy as np
 from math import radians
 from tqdm import tqdm
-import os.path as op
-import os
 
 from dipy.data import small_sphere
 from dipy.reconst.shm import OpdtModel
 from dipy.reconst import shm
 from dipy.tracking import utils
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
-from dipy.io.streamline import load_trk
 
-from nibabel.tmpdirs import TemporaryDirectory
-import nibabel as nib
+from nibabel.streamlines.array_sequence import concatenate
 
 from AFQ.tractography.tractography import get_percentile_threshold
 
@@ -105,34 +101,21 @@ def gpu_track(data, gtab, seed_img, stop_img,
         ngpus=ngpus, rng_seed=0)
 
     seed_mask = utils.seeds_from_mask(
-        seed_data, density=sampling_density, affine=seed_img.affine)
+        seed_data, density=sampling_density, affine=np.eye(4))
 
     global_chunk_sz = chunk_size * ngpus
     nchunks = (seed_mask.shape[0] + global_chunk_sz - 1) // global_chunk_sz
 
-    all_streamlines = nib.Streamlines()
-    with TemporaryDirectory() as tmpdir:
-        with tqdm(total=seed_mask.shape[0]) as pbar:
-            for idx in range(int(nchunks)):
-                gpu_tracker.generate_streamlines(
-                    seed_mask[idx * global_chunk_sz:(idx + 1) * global_chunk_sz])
-                pbar.update(
-                    seed_mask[idx * global_chunk_sz:(idx + 1) * global_chunk_sz].shape[0])
-                gpu_tracker.dump_streamlines(
-                    op.join(tmpdir, 'tmp'),
-                    "RAS", seed_mask.shape,
-                    seed_img.header.get_zooms(), seed_img.affine)
-
-        for filename in os.listdir(tmpdir):
-            if filename.endswith(".trk"):
-                file_path = os.path.join(tmpdir, filename)
-                streamlines, _ = load_trk(
-                    file_path, reference='same',
-                    bbox_valid_check=False)
-                all_streamlines.extend(streamlines)
+    streamlines_ls = [None] * nchunks
+    with tqdm(total=seed_mask.shape[0]) as pbar:
+        for idx in range(int(nchunks)):
+            streamlines_ls[idx] = gpu_tracker.generate_streamlines(
+                seed_mask[idx * global_chunk_sz:(idx + 1) * global_chunk_sz])
+            pbar.update(
+                seed_mask[idx * global_chunk_sz:(idx + 1) * global_chunk_sz].shape[0])
 
     sft = StatefulTractogram(
-        all_streamlines,
-        seed_img, Space.RASMM)
+        concatenate(streamlines_ls, 0),
+        seed_img, Space.VOX)
 
     return sft

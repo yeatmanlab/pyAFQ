@@ -1,5 +1,6 @@
 import nibabel as nib
 import numpy as np
+import logging
 
 from dipy.io.gradients import read_bvals_bvecs
 import dipy.core.gradients as dpg
@@ -31,6 +32,9 @@ from AFQ.models.dti import _fit as dti_fit_model
 from AFQ.models.fwdti import _fit as fwdti_fit_model
 from AFQ.models.QBallTP import (
     extract_odf, anisotropic_index, anisotropic_power)
+
+
+logger = logging.getLogger('AFQ')
 
 
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
@@ -71,6 +75,10 @@ def get_data_gtab(dwi, bval, bvec, min_bval=None,
 
     voxel_order = "".join(nib.orientations.aff2axcodes(img.affine))
     if not voxel_order == prefered_orientation:
+        logger.warning(
+            "Re-orienting DWI data from %s to %s",
+            voxel_order,
+            prefered_orientation)
         # this code adapted from qsiprep.interfaces.images
         input_orientation = nib.orientations.axcodes2ornt(
             voxel_order)
