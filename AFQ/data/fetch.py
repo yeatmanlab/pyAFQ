@@ -883,6 +883,72 @@ or_md5_hashes = [
     "60a748567e4dd81b40ad8967a14cb09e",
 ]
 
+ar_fnames = [
+    "AAL_Thal_R.nii.gz",
+    "AAL_Thal_L.nii.gz",
+    "AAL_TempSup_L.nii.gz",
+    "AAL_TempSup_R.nii.gz",
+]
+
+ar_remote_fnames = [
+    "43817367",
+    "43817370",
+    "43817373",
+    "43817376",
+]
+
+ar_md5_hashes = [
+    "5f2c0c0f1b7b32ba0a8474a460a2b980",
+    "a8d308a93b26242c04b878c733cb252f",
+    "92a255f706dd4e09268c5bc6bf2876e4",
+    "ec0a3ef3cb3a4c549dd783dc8aeceeee",
+]
+
+
+fetch_ar_templates = _make_reusable_fetcher(
+    "fetch_ar_templates",
+    op.join(afq_home,
+            'ar_templates'),
+    baseurl, ar_remote_fnames,
+    ar_fnames,
+    md5_list=ar_md5_hashes,
+    doc="Download AFQ or templates")
+
+
+def read_ar_templates(as_img=True, resample_to=False):
+    """Load AFQ AR templates from file
+
+    Parameters
+    ----------
+    as_img : bool, optional
+        If True, values are `Nifti1Image`. Otherwise, values are
+        paths to Nifti files. Default: True
+    resample_to : str or nibabel image class instance, optional
+        A template image to resample to. Typically, this should be the
+        template to which individual-level data are registered. Defaults to
+        the MNI template. Default: False
+
+    Returns
+    -------
+    dict with: keys: names of template ROIs and values: nibabel Nifti1Image
+    objects from each of the ROI nifti files.
+    """
+    logger = logging.getLogger('AFQ')
+
+    logger.debug('loading ar templates')
+    tic = time.perf_counter()
+
+    template_dict = _fetcher_to_template(
+        fetch_ar_templates,
+        as_img=as_img,
+        resample_to=resample_to)
+
+    toc = time.perf_counter()
+    logger.debug(f'or templates loaded in {toc - tic:0.4f} seconds')
+
+    return template_dict
+
+
 fetch_or_templates = _make_reusable_fetcher(
     "fetch_or_templates",
     op.join(afq_home,
@@ -1303,196 +1369,6 @@ def read_aal_atlas(resample_to=None):
         out_dict['atlas'] = nib.Nifti1Image(np.stack(oo, -1),
                                             resample_to.affine)
     return out_dict
-
-
-def aal_to_regions(regions, atlas=None):
-    """
-    Queries for large regions containing multiple AAL ROIs
-
-    Parameters
-    ----------
-    regions : string or list of strings
-        The name of the requested region. This can either be an AAL-defined ROI
-        name (e.g, 'Occipital_Sup_L') or one of:
-        {'leftfrontal' | 'leftoccipital' | 'lefttemporal' | 'leftparietal'
-        | 'leftanttemporal' | 'leftparietal' | 'leftanttemporal'
-        | 'leftuncinatefront' | 'leftifoffront' | 'leftinfparietal'
-        | 'cerebellum' | 'leftarcfrontal' | 'leftarctemp' | 'leftcingpost'}
-        each of which there is an equivalent 'right' region for. In addition,
-        there are a few bilateral regions: {'occipital' | 'temporal'}, which
-        encompass both the right and left region of this name, as well as:
-        {'cstinferior' | 'cstsuperior'}
-
-    atlas : 4D array
-       Contains the AAL atlas in the correct coordinate frame with additional
-       volumes for CST and cingulate ROIs ("AAL and more").
-
-    Returns
-    ------
-    3D indices to the requested region in the atlas volume
-
-    Notes
-    -----
-    Several regions can be referred to by multiple names:
-           'leftuncinatetemp' = 'leftilftemp'= 'leftanttemporal'
-           'rightuncinatetemp' = 'rightilftemp' = 'rightanttemporal'
-           'leftslfpar'] = 'leftinfparietal'
-           'rightslfpar' = 'rightinfparietal'
-           'leftslffrontal' = 'leftarcfrontal'
-           'rightslffrontal' = 'rightarcfrontal'
-    """
-    if atlas is None:
-        atlas = read_aal_atlas()['atlas']
-    atlas_vals = {'leftfrontal': np.arange(1, 26, 2),
-                  # Occipital regions do not include fusiform:
-                  'leftoccipital': np.arange(43, 54, 2),
-                  # Temporal regions include fusiform:
-                  'lefttemporal': np.concatenate([np.arange(37, 42, 2),
-                                                  np.array([55]),
-                                                  np.arange(79, 90, 2)]),
-                  'leftanttemporal': np.array([41, 83, 87]),
-                  'leftuncinatefront': np.array([5, 9, 15, 25]),
-                  'leftifoffront': np.array([3, 5, 7, 9, 13, 15, 25]),
-                  'leftinfparietal': np.array([61, 63, 65]),
-                  'cerebellum': np.arange(91, 117),
-                  'leftarcfrontal': np.array([1, 11, 13]),
-                  'leftarctemp': np.array([79, 81, 85, 89]),
-                  'leftthalamus': np.array([77]),
-                  'leftventral': np.array([47, 53, 55, 89]),
-                  'leftdorsal': np.array([49, 51]),
-                  'leftparietal': np.array([59, 61, 63, 65])
-                  }
-
-    # Right symmetrical is off by one:
-    atlas_vals['rightfrontal'] = atlas_vals['leftfrontal'] + 1
-    atlas_vals['rightoccipital'] = atlas_vals['leftoccipital'] + 1
-    atlas_vals['righttemporal'] = atlas_vals['lefttemporal'] + 1
-    atlas_vals['rightanttemporal'] = atlas_vals['leftanttemporal'] + 1
-    atlas_vals['rightuncinatefront'] = atlas_vals['leftuncinatefront'] + 1
-    atlas_vals['rightifoffront'] = atlas_vals['leftifoffront'] + 1
-    atlas_vals['rightinfparietal'] = atlas_vals['leftinfparietal'] + 1
-    atlas_vals['rightarcfrontal'] = atlas_vals['leftarcfrontal'] + 1
-    atlas_vals['rightarctemp'] = atlas_vals['leftarctemp'] + 1
-    atlas_vals['rightthalamus'] = atlas_vals['leftthalamus'] + 1
-    atlas_vals['rightventral'] = atlas_vals['leftventral'] + 1
-    atlas_vals['rightdorsal'] = atlas_vals['leftdorsal'] + 1
-    atlas_vals['rightparietal'] = atlas_vals['leftparietal'] + 1
-
-    # Multiply named regions:
-    atlas_vals['leftuncinatetemp'] = atlas_vals['leftilftemp'] =\
-        atlas_vals['leftanttemporal']
-    atlas_vals['rightuncinatetemp'] = atlas_vals['rightilftemp'] =\
-        atlas_vals['rightanttemporal']
-    atlas_vals['leftslfpar'] = atlas_vals['leftinfparietal']
-    atlas_vals['rightslfpar'] = atlas_vals['rightinfparietal']
-    atlas_vals['leftslffrontal'] = atlas_vals['leftarcfrontal']
-    atlas_vals['rightslffrontal'] = atlas_vals['rightarcfrontal']
-
-    # Bilateral regions:
-    atlas_vals['occipital'] = np.union1d(atlas_vals['leftoccipital'],
-                                         atlas_vals['rightoccipital'])
-    atlas_vals['temporal'] = np.union1d(atlas_vals['lefttemporal'],
-                                        atlas_vals['righttemporal'])
-
-    if isinstance(regions, str):
-        regions = [regions]
-
-    idxes = []
-    for region in regions:
-        region = region.lower()  # Just to be sure
-        if region in atlas_vals.keys():
-            vol_idx = 0
-            vals = atlas_vals[region]
-        elif region == 'cstinferior':
-            vol_idx = 1
-            vals = np.array([1])
-        elif region == 'cstsuperior':
-            vol_idx = 2
-            vals = np.array([1])
-        elif region == 'leftcingpost':
-            vol_idx = 3
-            vals = np.array([1])
-        elif region == 'rightcingpost':
-            vol_idx = 4
-            vals = np.array([1])
-
-        # Broadcast vals, to test for equality over all three dimensions:
-        is_in = atlas[..., vol_idx] == vals[:, None, None, None]
-        # Then collapse the 4th dimension (each val), to get the 3D array:
-        is_in = np.sum(is_in, 0)
-        idxes.append(np.array(np.where(is_in)).T)
-
-    return np.concatenate(idxes, axis=0)
-
-
-def bundles_to_aal(bundles, atlas=None):
-    """
-    Given a sequence of AFQ bundle names, give back a sequence of lists
-    with [target0, target1] being each NX3 arrays of the endpoint indices
-    for the first and last node of the streamlines in this bundle.
-    """
-    if atlas is None:
-        atlas = read_aal_atlas()['atlas']
-
-    endpoint_dict = {
-        "ATR_L": [['leftfrontal'], ['leftthalamus']],
-        "ATR_R": [['rightfrontal'], ['rightthalamus']],
-        "CST_L": [['cstinferior'], ['cstsuperior']],
-        "CST_R": [['cstinferior'], ['cstsuperior']],
-        "CGC_L": [['leftcingpost'], None],
-        "CGC_R": [['rightcingpost'], None],
-        "HCC_L": [None, None],
-        "HCC_R": [None, None],
-        "FP": [['rightoccipital'], ['leftoccipital']],
-        "FA": [['rightfrontal'], ['leftfrontal']],
-        "IFO_L": [['leftoccipital'], ['leftifoffront']],
-        "IFO_R": [['rightoccipital'], ['rightifoffront']],
-        "ILF_L": [['leftoccipital'], ['leftilftemp']],
-        "ILF_R": [['rightoccipital'], ['rightilftemp']],
-        "SLF_L": [['leftslffrontal'], ['leftinfparietal']],
-        "SLF_R": [['rightslffrontal'], ['rightinfparietal']],
-        "UNC_L": [['leftanttemporal'], ['leftuncinatefront']],
-        "UNC_R": [['rightanttemporal'], ['rightuncinatefront']],
-        "ARC_L": [['leftfrontal'], ['leftarctemp']],
-        "ARC_R": [['rightfrontal'], ['rightarctemp']],
-        "AntFrontal": [None, None],
-        "Motor": [None, None],
-        "Occipital": [None, None],
-        "Orbital": [None, None],
-        "PostParietal": [None, None],
-        "SupFrontal": [None, None],
-        "SupParietal": [None, None],
-        "Temporal": [None, None],
-        "pARC_L": [['leftparietal'], None],
-        "pARC_R": [['rightparietal'], None],
-        "VOF_L": [['leftdorsal'], ['leftventral']],
-        "VOF_R": [['rightdorsal'], ['rightventral']]}
-
-    targets = {}
-
-    for bundle in bundles:
-        if bundle in endpoint_dict:
-            for region_name, region in zip(
-                    ["start", "end"], endpoint_dict[bundle]):
-                if region is None:
-                    targets[bundle + "_" + region_name] = region
-                else:
-                    region_list = aal_to_regions(
-                        region, atlas=atlas.get_fdata())
-                    aal_roi = np.zeros(atlas.get_fdata().shape[:3])
-                    aal_roi[region_list[:, 0],
-                            region_list[:, 1],
-                            region_list[:, 2]] = 1
-                    targets[bundle + "_" + region_name] = nib.Nifti1Image(
-                        aal_roi, atlas.affine)
-        else:
-            logger = logging.getLogger('AFQ')
-            logger.warning(f"Segmentation end points undefined for {bundle},"
-                           + " continuing without end points")
-            targets[bundle + "_start"] = None
-            targets[bundle + "_end"] = None
-
-    return targets
 
 
 def _apply_mask(template_img, resolution=1):
