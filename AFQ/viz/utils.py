@@ -226,7 +226,7 @@ class PanelFigure():
                 10 / 72, -5 / 72, self.fig.dpi_scale_trans)
             ax.text(
                 subplot_label_pos[0], subplot_label_pos[1],
-                f"{chr(65+self.subplot_count)})",
+                f"{chr(65+self.subplot_count)}",
                 transform=ax.transAxes + trans,
                 **self.panel_label_kwargs)
         ax.imshow(np.asarray(im1), aspect=1)
