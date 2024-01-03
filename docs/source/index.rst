@@ -91,12 +91,12 @@ of the major long-range brain white matter connections.
 Acknowledgements
 ~~~~~~~~~~~~~~~~
 
-Work on this software is supported through grant `1RF1MH121868-01 <https://projectreporter.nih.gov/project_info_details.cfm?aid=9886761&icde=46874320&ddparam=&ddvalue=&ddsub=&cr=2&csb=default&cs=ASC&pball=>`_ from the `National Institutes for Mental Health <https://www.nimh.nih.gov/index.shtml>`_ / `The BRAIN Initiative <https://braininitiative.nih.gov>`_
+Work on this software was supported through grant `1RF1MH121868-01 <https://projectreporter.nih.gov/project_info_details.cfm?aid=9886761&icde=46874320&ddparam=&ddvalue=&ddsub=&cr=2&csb=default&cs=ASC&pball=>`_ from the `National Institutes for Mental Health <https://www.nimh.nih.gov/index.shtml>`_ / `The BRAIN Initiative <https://braininitiative.nih.gov>`_
 and by a grant from the
 `Gordon & Betty Moore Foundation <https://www.moore.org/>`_,  and from the
 `Alfred P. Sloan Foundation <http://www.sloan.org/>`_ to the
-`University of Washington eScience Institute <http://escience.washington.edu/>`_, by a `CRCNS <https://www.nsf.gov/funding/pgm_summ.jsp?pims_id=5147>`_ grant (NIH
-R01EB027585) to Eleftherios Garyfallidis and to Ariel Rokem , and by `NSF grant 1551330 <https://www.nsf.gov/awardsearch/showAward?AWD_ID=1551330>`_ to Jason Yeatman.
+`University of Washington eScience Institute <http://escience.washington.edu/>`_, by grant `R01EB027585 <https://reporter.nih.gov/search/jnnzzQ8Rj0CLD3R3l92GPg/project-details/10735068>_` to Eleftherios Garyfallidis (PI) and Ariel Rokem, grant `R01HD095861 <https://reporter.nih.gov/search/j2JXd89oR0i4cCnIDo7fFA/project-details/10669103>`_ to Jason Yeatman, `R21HD092771 <https://reporter.nih.gov/search/j2JXd89oR0i4cCnIDo7fFA/project-details/9735358>`_  to Jason Yeatman and Pat Kuhl, by NSF grants `1551330 <https://www.nsf.gov/awardsearch/showAward?AWD_ID=1551330>`_ to Jason Yeatman and `1934292 <https://www.nsf.gov/awardsearch/showAward?AWD_ID=1934292>_` to Magda Balazinska (PI) and Ariel Rokem (co-PI). John Kruper's work on pyAFQ has been supported through the NSF Graduate Research Fellowship program (DGE-2140004).
+
 
 .. figure:: _static/eScience_Logo_HR.png
    :align: center
