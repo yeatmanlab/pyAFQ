@@ -148,7 +148,8 @@ class PanelFigure():
     into subplots using matplotlib
     """
 
-    def __init__(self, num_rows, num_cols, width, height):
+    def __init__(self, num_rows, num_cols, width, height,
+                 panel_label_kwargs={}):
         """
         Initialize PanelFigure.
 
@@ -162,14 +163,26 @@ class PanelFigure():
             Width of figure in inches
         height : int
             Height of figure in inches
+        panel_label_kwargs : dict
+            Additional arguments for matplotlib's text method,
+            which is used to add panel labels to each subplot
         """
         self.fig = plt.figure(figsize=(width, height))
         self.grid = plt.GridSpec(num_rows, num_cols, hspace=0, wspace=0)
         self.subplot_count = 0
+        self.panel_label_kwargs = dict(
+            fontsize="medium",
+            verticalalignment="top",
+            fontfamily='serif',
+            bbox=dict(
+                facecolor='0.7',
+                edgecolor='none',
+                pad=3.0))
+        self.panel_label_kwargs.update(panel_label_kwargs)
 
     def add_img(self, fname, x_coord, y_coord, reduct_count=1,
                 subplot_label_pos=(0.1, 1.0), legend=None, legend_kwargs={},
-                add_panel_label=True, panel_label_font_size="medium"):
+                add_panel_label=True):
         """
         Add image from fname into figure as a panel.
 
@@ -196,9 +209,6 @@ class PanelFigure():
         add_panel_label : bool
             Whether or not to add a panel label to the subplot
             Default: True
-        panel_label_font_size : str
-            Font size of panel label
-            Default: "medium"
         """
         ax = self.fig.add_subplot(self.grid[y_coord, x_coord])
         im1 = Image.open(fname)
@@ -218,9 +228,7 @@ class PanelFigure():
                 subplot_label_pos[0], subplot_label_pos[1],
                 f"{chr(65+self.subplot_count)})",
                 transform=ax.transAxes + trans,
-                fontsize=panel_label_font_size, verticalalignment="top",
-                fontfamily='serif',
-                bbox=dict(facecolor='0.7', edgecolor='none', pad=3.0))
+                **self.panel_label_kwargs)
         ax.imshow(np.asarray(im1), aspect=1)
         ax.axis('off')
         self.subplot_count = self.subplot_count + 1
