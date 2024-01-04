@@ -106,7 +106,7 @@ cst_t1w = transform_streamlines(sft_cst.streamlines,
 #   a machine that is not connected to a display ("headless"). If this is
 #   the case, you can either set an environment variable called `XVFB` to `1`
 #   or you can deindent the following code (and comment out the `if` statement)
-#   to inivialize the virtual frame buffer.
+#   to initialize the virtual frame buffer.
 
 if os.environ.get("XVFB", False):
     print("Initializing XVFB")
@@ -384,7 +384,7 @@ waypoint1 = nib.load(
 waypoint2 = nib.load(
     op.join(
         afq_path,
-        "ROIs", "sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_desc-ROI-ARC_L-1-include.nii.gz"))
+        "ROIs", "sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_desc-ROI-ARC_L-2-include.nii.gz"))
 
 waypoint1_xform = resample(waypoint1, t1w_img)
 waypoint2_xform = resample(waypoint2, t1w_img)
