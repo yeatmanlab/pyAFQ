@@ -171,13 +171,14 @@ class PanelFigure():
         self.grid = plt.GridSpec(num_rows, num_cols, hspace=0, wspace=0)
         self.subplot_count = 0
         self.panel_label_kwargs = dict(
-            fontsize="medium",
+            fontfamily="Helvetica-Bold",
+            fontsize="xx-large",
+            color="white",
+            fontweight='bold',
             verticalalignment="top",
-            fontfamily='serif',
             bbox=dict(
-                facecolor='0.7',
-                edgecolor='none',
-                pad=3.0))
+                facecolor='none',
+                edgecolor='none'))
         self.panel_label_kwargs.update(panel_label_kwargs)
 
     def add_img(self, fname, x_coord, y_coord, reduct_count=1,
