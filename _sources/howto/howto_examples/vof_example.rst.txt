@@ -18,17 +18,19 @@
 .. _sphx_glr_howto_howto_examples_vof_example.py:
 
 
-===============================
-Finding only the ARC, pARC, VOF
-===============================
+====================================
+How to segment out only some bundles
+====================================
 
-pyAFQ generates the pARC and VOF as default bundles. This example shows how you
-can choose to track and recognize only certain bundles that you are interested
-in.
+The pyAFQ software can be configured to find all of its default set of white
+matter pathways, or bundles. Alternatively, it can be configured to find only
+some bundles. This example shows how to track and recognize only certain
+bundles that you are interested in, though note that ARC, pARC and VOF are all
+also part of the set of bundles that are segmented per default.
 
-.. GENERATED FROM PYTHON SOURCE LINES 11-48
+.. GENERATED FROM PYTHON SOURCE LINES 13-47
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import AFQ.api.bundle_dict as abd
@@ -42,7 +44,7 @@ in.
     afd.organize_stanford_data(clear_previous_afq="track")
 
     bundle_names = ["ARC_L", "ARC_R", "pARC_L", "pARC_R", "VOF_L", "VOF_R"]
-    bundle_dict = abd.BundleDict(bundle_names)
+    bundle_dict = abd.default18_bd()[bundle_names]
 
 
     myafq = GroupAFQ(
@@ -53,11 +55,8 @@ in.
             "n_seeds": 50000,
             "random_seeds": True,
             "seed_mask": RoiImage(use_waypoints=True, use_endpoints=True),
-        },
-        clean_params={"distance_threshold": 3,
-                      "length_threshold": 5, "clean_rounds": 20}
+        }
     )
-
 
     for b_name in bundle_names:
         b_len = len(aus.SegmentedSFT.fromfile(myafq.export("bundles")[
@@ -68,11 +67,6 @@ in.
 
     myafq.export("all_bundles_figure")["01"][0]
 
-
-.. rst-class:: sphx-glr-timing
-
-   **Total running time of the script:** (0 minutes 0.000 seconds)
-
 **Estimated memory usage:**  0 MB
 
 
@@ -82,16 +76,13 @@ in.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: vof_example.ipynb <vof_example.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: vof_example.py <vof_example.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: vof_example.ipynb <vof_example.ipynb>`
 
 
 .. only:: html

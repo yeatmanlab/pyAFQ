@@ -13,9 +13,13 @@ Functions
 
 .. autoapisummary::
 
+   AFQ.tasks.utils.get_base_fname
    AFQ.tasks.utils.get_fname
    AFQ.tasks.utils.with_name
 
+
+
+.. py:function:: get_base_fname(output_dir, dwi_data_file)
 
 
 .. py:function:: get_fname(base_fname, suffix, tracking_params=None, segmentation_params=None)

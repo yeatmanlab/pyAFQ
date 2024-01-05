@@ -60,7 +60,7 @@ Attributes
 .. py:function:: func_dict_to_arg_dict(func_dict=None, logger=None)
 
 
-.. py:function:: parse_config_run_afq(toml_file, default_arg_dict, to_call='export_all', overwrite=False, logger=None, verbose=False, dry_run=False, special_args={'CLEANING_PARAMS': 'clean_params', 'SEGMENTATION_PARAMS': 'segmentation_params', 'TRACTOGRAPHY_PARAMS': 'tracking_params'})
+.. py:function:: parse_config_run_afq(toml_file, default_arg_dict, to_call='export_all', overwrite=False, logger=None, verbose=False, dry_run=False, special_args={'SEGMENTATION_PARAMS': 'segmentation_params', 'TRACTOGRAPHY_PARAMS': 'tracking_params'})
 
 
 .. py:function:: generate_config(toml_file, default_arg_dict, overwrite=False, logger=None)

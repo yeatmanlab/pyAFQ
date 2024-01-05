@@ -29,9 +29,9 @@ cerebellar peduncles using a subject from the Healthy Brain Network dataset.
 This how-to will focus on the definition of the Cerebellar Peduncles (CP) based
 on [1]_, [2].
 
-.. GENERATED FROM PYTHON SOURCE LINES 14-160
+.. GENERATED FROM PYTHON SOURCE LINES 14-161
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import AFQ.data.fetch as afd
@@ -158,6 +158,7 @@ on [1]_, [2].
             "directions": "prob",
             "odf_model": "CSD",
             "seed_mask": RoiImage()},
+        clip_edges=True,
         bundle_info=cp_bundles)
 
 
@@ -180,11 +181,6 @@ on [1]_, [2].
            doi: https://doi.org/10.1162/nol_a_00098
 
     """
-
-.. rst-class:: sphx-glr-timing
-
-   **Total running time of the script:** (0 minutes 0.000 seconds)
-
 **Estimated memory usage:**  0 MB
 
 
@@ -194,16 +190,13 @@ on [1]_, [2].
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: cerebellar_peduncles.ipynb <cerebellar_peduncles.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: cerebellar_peduncles.py <cerebellar_peduncles.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: cerebellar_peduncles.ipynb <cerebellar_peduncles.ipynb>`
 
 
 .. only:: html

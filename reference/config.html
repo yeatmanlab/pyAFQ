@@ -3,12 +3,12 @@
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html lang="en" data-content_root="" >
 
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The pyAFQ configuration file &#8212; AFQ 1.1 documentation</title>
+    <title>The pyAFQ configuration file &#8212; AFQ 1.2 documentation</title>
   
   
   
@@ -18,12 +18,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
@@ -39,8 +39,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -52,6 +53,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference/config';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="The pyAFQ Mapping API" href="mapping.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -62,6 +64,15 @@
   
   
   <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
   
   <input type="checkbox"
           class="sidebar-toggle"
@@ -102,9 +113,11 @@
     <span class="fa-solid fa-bars"></span>
   </label>
   
-  <div class="navbar-header-items__start">
+  
+  <div class="col-lg-3 navbar-header-items__start">
     
       <div class="navbar-item">
+
   
 
 <a class="navbar-brand logo" href="../index.html">
@@ -112,25 +125,26 @@
   
   
   
+  
     
     
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="Logo image"/>
-    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+    <img src="../_static/logo.png" class="logo__image only-light" alt="AFQ 1.2 documentation - Home"/>
+    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.2 documentation - Home"/>`);</script>
   
   
 </a></div>
     
   </div>
   
-  
   <div class="col-lg-9 navbar-header-items">
     
     <div class="me-auto navbar-header-items__center">
       
-        <div class="navbar-item"><nav class="navbar-nav">
+        <div class="navbar-item">
+<nav class="navbar-nav">
   <p class="sidebar-header-items__title"
      role="heading"
      aria-level="1"
@@ -140,15 +154,15 @@
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../howto/index.html">
-                        How To
+                      <a class="nav-link nav-internal" href="../tutorials/index.html">
+                        Getting started with pyAFQ
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../tutorials/index.html">
-                        Tutorials
+                      <a class="nav-link nav-internal" href="../howto/index.html">
+                        How To
                       </a>
                     </li>
                 
@@ -160,7 +174,7 @@
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item current active">
                       <a class="nav-link nav-internal" href="index.html">
                         Reference Documentation
                       </a>
@@ -183,23 +197,27 @@
       
         <div class="navbar-item navbar-persistent--container">
           
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
         </div>
       
       
         <div class="navbar-item">
+
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script></div>
@@ -215,8 +233,8 @@ document.write(`
           
           
           
-          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label></a>
+          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -226,18 +244,21 @@ document.write(`
   
   
     <div class="navbar-persistent--mobile">
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
     </div>
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
       <span class="fa-solid fa-outdent"></span>
     </label>
   
@@ -257,7 +278,8 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item"><nav class="navbar-nav">
+          <div class="navbar-item">
+<nav class="navbar-nav">
   <p class="sidebar-header-items__title"
      role="heading"
      aria-level="1"
@@ -267,15 +289,15 @@ document.write(`
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../howto/index.html">
-                        How To
+                      <a class="nav-link nav-internal" href="../tutorials/index.html">
+                        Getting started with pyAFQ
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../tutorials/index.html">
-                        Tutorials
+                      <a class="nav-link nav-internal" href="../howto/index.html">
+                        How To
                       </a>
                     </li>
                 
@@ -287,7 +309,7 @@ document.write(`
                     </li>
                 
 
-                    <li class="nav-item">
+                    <li class="nav-item current active">
                       <a class="nav-link nav-internal" href="index.html">
                         Reference Documentation
                       </a>
@@ -310,12 +332,13 @@ document.write(`
       <div class="sidebar-header-items__end">
         
           <div class="navbar-item">
+
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script></div>
@@ -331,8 +354,8 @@ document.write(`
           
           
           
-          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label></a>
+          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -358,6 +381,89 @@ document.write(`
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="api/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="api/AFQ/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/AFQ/api/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/api/bundle_dict/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.bundle_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/api/group/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.group</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/api/participant/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.participant</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/api/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.utils</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/AFQ/data/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/data/fetch/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data.fetch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/data/s3bids/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data.s3bids</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/data/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data.utils</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/AFQ/definitions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/definitions/image/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.image</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/definitions/mapping/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.mapping</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/definitions/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.utils</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/AFQ/models/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/models/QBallTP/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.QBallTP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/models/csd/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.csd</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/models/dki/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.dki</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/models/dti/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.dti</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/models/fwdti/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.fwdti</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/AFQ/tasks/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/tasks/data/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/tasks/decorators/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.decorators</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/tasks/mapping/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.mapping</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/tasks/segmentation/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.segmentation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/tasks/tractography/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.tractography</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/tasks/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.utils</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/tasks/viz/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.viz</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/AFQ/tractography/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/tractography/gputractography/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography.gputractography</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/tractography/tractography/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography.tractography</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/AFQ/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/utils/bin/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.bin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/utils/docs/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.docs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/utils/models/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.models</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/utils/path/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/utils/stats/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.stats</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/utils/streamlines/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.streamlines</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/utils/volume/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.volume</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="api/AFQ/viz/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/viz/altair/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.altair</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/viz/fury_backend/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.fury_backend</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/viz/plot/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.plot</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/viz/plotly_backend/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.plotly_backend</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/AFQ/viz/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.utils</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/AFQ/registration/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.registration</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/AFQ/segmentation/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.segmentation</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bundledict.html">Defining Custom Bundle Dictionaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kwargs.html">The pyAFQ API optional arguments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="methods.html">The pyAFQ API methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="viz_backend.html">Visualization Backends</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="mapping.html">The pyAFQ Mapping API</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">The pyAFQ configuration file</a></li>
+</ul>
+</div>
+</nav></div>
     </div>
   
   
@@ -384,15 +490,18 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumbs">
-  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../index.html" class="nav-link" aria-label="Home">
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page">The pyAFQ configuration file</li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Reference Documentation</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">The pyAFQ...</li>
   </ul>
 </nav>
 </div>
@@ -552,6 +661,11 @@ See an example configuration file below:</p>
 <span class="c1"># One of {&quot;local&quot;, &quot;pft&quot;}. Default: &quot;local&quot;</span>
 <span class="n">tracker</span> <span class="o">=</span> <span class="s2">&quot;local&quot;</span>
 
+<span class="c1"># Whether to return the streamlines compatible with input to TRX file</span>
+<span class="c1"># (i.e., as a LazyTractogram class instance).</span>
+<span class="c1"># Default: False</span>
+<span class="n">trx</span> <span class="o">=</span> <span class="n">false</span>
+
 <span class="p">[</span><span class="n">SEGMENTATION_PARAMS</span><span class="p">]</span>
 
 <span class="c1"># Resample streamlines to nb_points number of points.</span>
@@ -576,11 +690,11 @@ See an example configuration file below:</p>
 
 <span class="c1"># How to parallelize segmentation across processes when performing</span>
 <span class="c1"># waypoint ROI segmentation. Set to {&quot;engine&quot;: &quot;serial&quot;} to not</span>
-<span class="c1"># perform parallelization. See ``AFQ.utils.parallel.pafor`` for</span>
+<span class="c1"># perform parallelization. Some engines may cause errors, depending</span>
+<span class="c1"># on the system. See ``dipy.utils.parallel.paramap`` for</span>
 <span class="c1"># details.</span>
-<span class="c1"># Default: {&quot;n_jobs&quot;: -1, &quot;engine&quot;: &quot;joblib&quot;,</span>
-<span class="c1"># &quot;backend&quot;: &quot;loky&quot;}</span>
-<span class="n">parallel_segmentation</span> <span class="o">=</span> <span class="s2">&quot;{&#39;n_jobs&#39;: 4, &#39;engine&#39;: &#39;dask&#39;}&quot;</span>
+<span class="c1"># Default: {&quot;engine&quot;: &quot;serial&quot;}</span>
+<span class="n">parallel_segmentation</span> <span class="o">=</span> <span class="s2">&quot;{&#39;engine&#39;: &#39;serial&#39;}&quot;</span>
 
 <span class="c1"># Using RecoBundles Algorithm.</span>
 <span class="c1"># Whether or not to use progressive technique</span>
@@ -807,9 +921,8 @@ See an example configuration file below:</p>
 <span class="c1"># Default: None</span>
 <span class="n">brain_mask_definition</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-<span class="c1"># List of bundle names to include in segmentation,</span>
-<span class="c1"># or a bundle dictionary (see BundleDict for inspiration),</span>
-<span class="c1"># or a BundleDict. See `Defining Custom Bundle Dictionaries`</span>
+<span class="c1"># A dictionary or BundleDict for use in segmentation.</span>
+<span class="c1"># See `Defining Custom Bundle Dictionaries`</span>
 <span class="c1"># in the `usage` section of pyAFQ&#39;s documentation for details.</span>
 <span class="c1"># If None, will get all appropriate bundles for the chosen</span>
 <span class="c1"># segmentation algorithm.</span>
@@ -854,6 +967,11 @@ See an example configuration file below:</p>
 <span class="c1"># instead of a mean or weighted mean.</span>
 <span class="c1"># Default: &quot;gauss&quot;</span>
 <span class="n">profile_weights</span> <span class="o">=</span> <span class="s2">&quot;gauss&quot;</span>
+
+<span class="c1"># Number of points to resample each streamline to before</span>
+<span class="c1"># calculating the tract-profiles.</span>
+<span class="c1"># Default: 100</span>
+<span class="n">n_points_profile</span> <span class="o">=</span> <span class="mi">100</span>
 
 <span class="c1"># List of scalars to use.</span>
 <span class="c1"># Can be any of: &quot;dti_fa&quot;, &quot;dti_md&quot;, &quot;dki_fa&quot;, &quot;dki_md&quot;, &quot;dki_awf&quot;,</span>
@@ -934,16 +1052,21 @@ ignore them.</p>
               
               
               
-                <footer class="bd-footer-article">
+              
+              
+                <footer class="prev-next-footer">
                   
-<div class="footer-article-items footer-article__inner">
-  
-    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
-</div></div>
-  
+    <a class="left-prev"
+       href="mapping.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">The pyAFQ Mapping API</p>
+      </div>
+    </a>
 </div>
-
                 </footer>
               
             </div>
@@ -953,6 +1076,7 @@ ignore them.</p>
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
   <div class="sidebar-secondary-item">
+
   
   <div class="tocsection editthispage">
     <a href="https://github.com/yeatmanlab/pyAFQ/edit/master/docs/source/reference/config.rst">
@@ -968,6 +1092,7 @@ ignore them.</p>
 </div>
 
   <div class="sidebar-secondary-item">
+
   <div class="tocsection sourcelink">
     <a href="../_sources/reference/config.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
@@ -988,8 +1113,8 @@ ignore them.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
 
 
   <footer class="bd-footer">
@@ -998,6 +1123,7 @@ ignore them.</p>
     <div class="footer-items__start">
       
         <div class="footer-item">
+
   <p class="copyright">
     
       © Copyright 2018--, The pyAFQ Contributors.
@@ -1007,6 +1133,7 @@ ignore them.</p>
 </div>
       
         <div class="footer-item">
+
   <p class="sphinx-version">
     Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
     <br/>
@@ -1016,10 +1143,12 @@ ignore them.</p>
     </div>
   
   
+  
     <div class="footer-items__end">
       
-        <div class="footer-item"><p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
 </p></div>
       
     </div>

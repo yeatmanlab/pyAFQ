@@ -225,7 +225,7 @@ Attributes
 
        **clear_previous_afq** : str or None
            Whether to clear previous afq results in the stanford
-           hardi dataset. If not None, can be "all", "track", or "recog".
+           hardi dataset. If not None, can be "all", "track", "recog", "prof".
            Default: None
 
 

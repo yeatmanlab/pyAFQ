@@ -10,6 +10,7 @@ Submodules
    :titlesonly:
    :maxdepth: 1
 
+   altair/index.rst
    fury_backend/index.rst
    plot/index.rst
    plotly_backend/index.rst

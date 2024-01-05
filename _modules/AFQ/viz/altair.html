@@ -1,0 +1,714 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AFQ.viz.altair &#8212; AFQ 1.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/design-tabs.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/AFQ/viz/altair';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.2 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.2 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+                        Getting started with pyAFQ
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../howto/index.html">
+                        How To
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../explanations/index.html">
+                        Explanations
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../reference/index.html">
+                        Reference Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../reference/api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+                        Getting started with pyAFQ
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../howto/index.html">
+                        How To
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../explanations/index.html">
+                        Explanations
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../reference/index.html">
+                        Reference Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../reference/api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../../AFQ.html" class="nav-link">AFQ</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">AFQ.viz.altair</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for AFQ.viz.altair</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">AFQ.viz.utils</span> <span class="kn">import</span> <span class="n">COLOR_DICT</span><span class="p">,</span> <span class="n">FORMAL_BUNDLE_NAMES</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
+<span class="kn">import</span> <span class="nn">altair</span> <span class="k">as</span> <span class="nn">alt</span>
+
+
+<div class="viewcode-block" id="altair_color_dict"><a class="viewcode-back" href="../../../reference/api/AFQ/viz/altair/index.html#AFQ.viz.altair.altair_color_dict">[docs]</a><span class="k">def</span> <span class="nf">altair_color_dict</span><span class="p">(</span><span class="n">names_to_include</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a list of bundle names, return a dictionary of colors for each</span>
+<span class="sd">    Formatted for Altair.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">altair_cd</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">COLOR_DICT</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">altair_cd</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">altair_cd</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">names_to_include</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">key</span> <span class="ow">in</span> <span class="n">names_to_include</span><span class="p">):</span>
+            <span class="n">altair_cd</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;rgb(</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">255</span><span class="p">)</span><span class="si">}</span><span class="s2">,&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">255</span><span class="p">)</span><span class="si">}</span><span class="s2">,&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="mi">255</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">altair_cd</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">altair_cd</span></div>
+
+
+<div class="viewcode-block" id="combined_profiles_df_to_altair_df"><a class="viewcode-back" href="../../../reference/api/AFQ/viz/altair/index.html#AFQ.viz.altair.combined_profiles_df_to_altair_df">[docs]</a><span class="k">def</span> <span class="nf">combined_profiles_df_to_altair_df</span><span class="p">(</span>
+        <span class="n">profiles</span><span class="p">,</span>
+        <span class="n">tissue_properties</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;dti_fa&#39;</span><span class="p">,</span> <span class="s1">&#39;dti_md&#39;</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a profiles dataframe that is combined</span>
+<span class="sd">    from many subjects, return a dataframe formatted for Altair.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">profiles</span> <span class="o">=</span> <span class="n">profiles</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s1">&#39;dki_md&#39;</span> <span class="ow">in</span> <span class="n">tissue_properties</span><span class="p">:</span>
+        <span class="n">profiles</span><span class="o">.</span><span class="n">dki_md</span> <span class="o">=</span> <span class="n">profiles</span><span class="o">.</span><span class="n">dki_md</span> <span class="o">*</span> <span class="mf">1000.</span>
+    <span class="k">if</span> <span class="s1">&#39;dti_md&#39;</span> <span class="ow">in</span> <span class="n">tissue_properties</span><span class="p">:</span>
+        <span class="n">profiles</span><span class="o">.</span><span class="n">dti_md</span> <span class="o">=</span> <span class="n">profiles</span><span class="o">.</span><span class="n">dti_md</span> <span class="o">*</span> <span class="mf">1000.</span>
+
+    <span class="n">id_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;tractID&#39;</span><span class="p">,</span> <span class="s1">&#39;nodeID&#39;</span><span class="p">,</span> <span class="s1">&#39;subjectID&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s1">&#39;sessionID&#39;</span> <span class="ow">in</span> <span class="n">profiles</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">id_vars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sessionID&#39;</span><span class="p">)</span>
+
+    <span class="n">profiles</span> <span class="o">=</span> <span class="n">profiles</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span>
+        <span class="n">id_vars</span><span class="o">=</span><span class="n">id_vars</span><span class="p">,</span>
+        <span class="n">value_vars</span><span class="o">=</span><span class="n">tissue_properties</span><span class="p">,</span>
+        <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;TP&#39;</span><span class="p">,</span>
+        <span class="n">value_name</span><span class="o">=</span><span class="s1">&#39;Value&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Function to calculate 95% CI using a normal distribution</span>
+    <span class="k">def</span> <span class="nf">calculate_95CI</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="n">ci</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">interval</span><span class="p">(</span>
+            <span class="mf">0.95</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">scale</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">ci</span>
+
+    <span class="c1"># Group by &#39;tractID&#39;, &#39;nodeID&#39;, &#39;TP&#39; and apply the aggregation functions</span>
+    <span class="n">profiles</span> <span class="o">=</span> <span class="n">profiles</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;tractID&#39;</span><span class="p">,</span> <span class="s1">&#39;nodeID&#39;</span><span class="p">,</span> <span class="s1">&#39;TP&#39;</span><span class="p">])[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span>
+        <span class="n">mean</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span>
+        <span class="n">CI_lower</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">calculate_95CI</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">CI_upper</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">calculate_95CI</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">IQR_lower</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.25</span><span class="p">),</span>
+        <span class="n">IQR_upper</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.75</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">get_hemi</span><span class="p">(</span><span class="n">cc</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">cc</span> <span class="o">==</span> <span class="s2">&quot;L&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;Left&quot;</span>
+        <span class="k">elif</span> <span class="n">cc</span> <span class="o">==</span> <span class="s2">&quot;R&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;Right&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;Callosal&quot;</span>
+
+    <span class="k">def</span> <span class="nf">get_bname</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Left &quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">s</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span>
+        <span class="k">elif</span> <span class="n">s</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Right &quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">s</span><span class="p">[</span><span class="mi">6</span><span class="p">:]</span>
+        <span class="k">return</span> <span class="n">s</span>
+
+    <span class="k">def</span> <span class="nf">formal_tp</span><span class="p">(</span><span class="n">tp_name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">tp_name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
+
+    <span class="n">profiles</span><span class="p">[</span><span class="s2">&quot;Hemi&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">profiles</span><span class="p">[</span><span class="s2">&quot;tractID&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">get_hemi</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">profiles</span><span class="p">[</span><span class="s2">&quot;Bundle Name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">profiles</span><span class="p">[</span><span class="s2">&quot;tractID&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+        <span class="n">FORMAL_BUNDLE_NAMES</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">get_bname</span><span class="p">)</span>
+    <span class="n">profiles</span><span class="p">[</span><span class="s2">&quot;TP&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">profiles</span><span class="p">[</span><span class="s2">&quot;TP&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">formal_tp</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">profiles</span></div>
+
+
+<div class="viewcode-block" id="altair_df_to_chart"><a class="viewcode-back" href="../../../reference/api/AFQ/viz/altair/index.html#AFQ.viz.altair.altair_df_to_chart">[docs]</a><span class="k">def</span> <span class="nf">altair_df_to_chart</span><span class="p">(</span><span class="n">profiles</span><span class="p">,</span> <span class="n">position_domain</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span>
+                       <span class="n">column_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                       <span class="n">line_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">row_label_angle</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
+                       <span class="n">legend_line_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                       <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a dataframe formatted for Altair, probably from</span>
+<span class="sd">    combined_profiles_df_to_altair_df, return a chart.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">        call_results = results[results.Hemi == &quot;Callosal&quot;]</span>
+<span class="sd">        stand_results = results[results.Hemi != &quot;Callosal&quot;]</span>
+<span class="sd">        prof_chart = altair_df_to_chart(call_results)</span>
+<span class="sd">        prof_chart.save(&quot;supp_chart_call.png&quot;, dpi=300)</span>
+<span class="sd">        prof_chart = altair_df_to_chart(stand_results,</span>
+<span class="sd">            column_count=2, color=&quot;Hemi&quot;)</span>
+<span class="sd">        prof_chart.save(&quot;supp_chart_stand.png&quot;, dpi=300)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">this_cd</span> <span class="o">=</span> <span class="n">altair_color_dict</span><span class="p">(</span><span class="n">profiles</span><span class="o">.</span><span class="n">tractID</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+    <span class="n">this_cd</span> <span class="o">=</span> <span class="p">{</span><span class="n">FORMAL_BUNDLE_NAMES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="n">key</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">this_cd</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="n">alt</span><span class="o">.</span><span class="n">data_transformers</span><span class="o">.</span><span class="n">disable_max_rows</span><span class="p">()</span>
+
+    <span class="n">profiles</span> <span class="o">=</span> <span class="n">profiles</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span>
+        <span class="n">profiles</span><span class="o">.</span><span class="n">nodeID</span> <span class="o">&gt;=</span> <span class="n">position_domain</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">profiles</span><span class="o">.</span><span class="n">nodeID</span> <span class="o">&lt;</span> <span class="n">position_domain</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+
+    <span class="n">tp_units</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;DKI AWF&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;DKI FA&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;DKI MD&quot;</span><span class="p">:</span> <span class="s2">&quot; (µm²/ms)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;DKI MK&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">}</span>
+
+    <span class="n">row_charts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">jj</span><span class="p">,</span> <span class="n">b_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">profiles</span><span class="p">[</span><span class="s2">&quot;Bundle Name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()):</span>
+        <span class="n">row_dataframe</span> <span class="o">=</span> <span class="n">profiles</span><span class="p">[</span><span class="n">profiles</span><span class="p">[</span><span class="s2">&quot;Bundle Name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">b_name</span><span class="p">]</span>
+        <span class="n">charts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">tp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">profiles</span><span class="o">.</span><span class="n">TP</span><span class="o">.</span><span class="n">unique</span><span class="p">()):</span>
+            <span class="n">this_dataframe</span> <span class="o">=</span> <span class="n">row_dataframe</span><span class="p">[</span><span class="n">row_dataframe</span><span class="o">.</span><span class="n">TP</span> <span class="o">==</span> <span class="n">tp</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">jj</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">title_name</span> <span class="o">=</span> <span class="n">tp</span> <span class="o">+</span> <span class="n">tp_units</span><span class="p">[</span><span class="n">tp</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">title_name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">ii</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">y_axis_title</span> <span class="o">=</span> <span class="n">b_name</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">y_axis_title</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">jj</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">profiles</span><span class="p">[</span><span class="s2">&quot;Bundle Name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">x_axis_title</span> <span class="o">=</span> <span class="s2">&quot;Position (%)&quot;</span>
+                <span class="n">useXlab</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">x_axis_title</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">useXlab</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">y_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">scale</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Scale</span><span class="p">(</span><span class="n">zero</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                <span class="c1"># axis=alt.Axis(title=&quot;&quot;),</span>
+                <span class="n">title</span><span class="o">=</span><span class="n">y_axis_title</span>
+            <span class="p">)</span>
+            <span class="n">x_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">axis</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Axis</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">x_axis_title</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">useXlab</span><span class="p">))</span>
+            <span class="n">prof_chart</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">(</span>
+                <span class="n">this_dataframe</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title_name</span><span class="p">)</span><span class="o">.</span><span class="n">mark_line</span><span class="p">(</span>
+                    <span class="n">size</span><span class="o">=</span><span class="n">line_size</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+                <span class="n">y</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Y</span><span class="p">(</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">y_kwargs</span><span class="p">),</span>
+                <span class="n">x</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="s1">&#39;nodeID&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">x_kwargs</span><span class="p">),</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">prof_chart</span> <span class="o">=</span> <span class="n">prof_chart</span> <span class="o">+</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">(</span><span class="n">this_dataframe</span><span class="p">)</span><span class="o">.</span><span class="n">mark_line</span><span class="p">(</span>
+                <span class="n">size</span><span class="o">=</span><span class="n">line_size</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">strokeDash</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+                <span class="n">y</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Y</span><span class="p">(</span><span class="s1">&#39;IQR_lower&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">y_kwargs</span><span class="p">),</span>
+                <span class="n">x</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="s1">&#39;nodeID&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">x_kwargs</span><span class="p">),</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">prof_chart</span> <span class="o">=</span> <span class="n">prof_chart</span> <span class="o">+</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">(</span><span class="n">this_dataframe</span><span class="p">)</span><span class="o">.</span><span class="n">mark_line</span><span class="p">(</span>
+                <span class="n">size</span><span class="o">=</span><span class="n">line_size</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">strokeDash</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+                <span class="n">y</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Y</span><span class="p">(</span><span class="s1">&#39;IQR_upper&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">y_kwargs</span><span class="p">),</span>
+                <span class="n">x</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="s1">&#39;nodeID&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">x_kwargs</span><span class="p">),</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">prof_chart</span> <span class="o">=</span> <span class="n">prof_chart</span> <span class="o">+</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">(</span><span class="n">this_dataframe</span><span class="p">)</span><span class="o">.</span><span class="n">mark_line</span><span class="p">(</span>
+                <span class="n">size</span><span class="o">=</span><span class="n">line_size</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+                <span class="n">y</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Y</span><span class="p">(</span><span class="s1">&#39;CI_lower&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">y_kwargs</span><span class="p">),</span>
+                <span class="n">x</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="s1">&#39;nodeID&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">x_kwargs</span><span class="p">),</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">prof_chart</span> <span class="o">=</span> <span class="n">prof_chart</span> <span class="o">+</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">(</span><span class="n">this_dataframe</span><span class="p">)</span><span class="o">.</span><span class="n">mark_line</span><span class="p">(</span>
+                <span class="n">size</span><span class="o">=</span><span class="n">line_size</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+                <span class="n">y</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">Y</span><span class="p">(</span><span class="s1">&#39;CI_upper&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">y_kwargs</span><span class="p">),</span>
+                <span class="n">x</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="s1">&#39;nodeID&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">x_kwargs</span><span class="p">),</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">charts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prof_chart</span><span class="p">)</span>
+        <span class="n">row_charts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alt</span><span class="o">.</span><span class="n">HConcatChart</span><span class="p">(</span><span class="n">hconcat</span><span class="o">=</span><span class="n">charts</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">alt</span><span class="o">.</span><span class="n">VConcatChart</span><span class="p">(</span><span class="n">vconcat</span><span class="o">=</span><span class="n">row_charts</span><span class="p">)</span><span class="o">.</span><span class="n">configure_axis</span><span class="p">(</span>
+        <span class="n">labelFontSize</span><span class="o">=</span><span class="n">font_size</span><span class="p">,</span>
+        <span class="n">titleFontSize</span><span class="o">=</span><span class="n">font_size</span><span class="p">,</span>
+        <span class="n">labelLimit</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">configure_legend</span><span class="p">(</span>
+        <span class="n">labelFontSize</span><span class="o">=</span><span class="n">font_size</span><span class="p">,</span>
+        <span class="n">titleFontSize</span><span class="o">=</span><span class="n">font_size</span><span class="p">,</span>
+        <span class="n">titleLimit</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">labelLimit</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">columns</span><span class="o">=</span><span class="n">column_count</span><span class="p">,</span>
+        <span class="n">symbolStrokeWidth</span><span class="o">=</span><span class="n">legend_line_size</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="n">symbolSize</span><span class="o">=</span><span class="n">legend_line_size</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;right&#39;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">configure_title</span><span class="p">(</span>
+        <span class="n">fontSize</span><span class="o">=</span><span class="n">font_size</span>
+    <span class="p">)</span></div>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2018--, The pyAFQ Contributors.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

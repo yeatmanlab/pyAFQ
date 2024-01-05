@@ -3,12 +3,12 @@
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html lang="en" data-content_root="" >
 
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.data.fetch &#8212; AFQ 1.1 documentation</title>
+    <title>AFQ.data.fetch &#8212; AFQ 1.2 documentation</title>
   
   
   
@@ -18,12 +18,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
 
   
-  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
@@ -39,8 +39,9 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -62,6 +63,15 @@
   
   
   <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
   
   <input type="checkbox"
           class="sidebar-toggle"
@@ -102,9 +112,11 @@
     <span class="fa-solid fa-bars"></span>
   </label>
   
-  <div class="navbar-header-items__start">
+  
+  <div class="col-lg-3 navbar-header-items__start">
     
       <div class="navbar-item">
+
   
 
 <a class="navbar-brand logo" href="../../../index.html">
@@ -112,25 +124,26 @@
   
   
   
+  
     
     
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="Logo image"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.2 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.2 documentation - Home"/>`);</script>
   
   
 </a></div>
     
   </div>
   
-  
   <div class="col-lg-9 navbar-header-items">
     
     <div class="me-auto navbar-header-items__center">
       
-        <div class="navbar-item"><nav class="navbar-nav">
+        <div class="navbar-item">
+<nav class="navbar-nav">
   <p class="sidebar-header-items__title"
      role="heading"
      aria-level="1"
@@ -140,15 +153,15 @@
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../howto/index.html">
-                        How To
+                      <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+                        Getting started with pyAFQ
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../tutorials/index.html">
-                        Tutorials
+                      <a class="nav-link nav-internal" href="../../../howto/index.html">
+                        How To
                       </a>
                     </li>
                 
@@ -183,23 +196,27 @@
       
         <div class="navbar-item navbar-persistent--container">
           
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
         </div>
       
       
         <div class="navbar-item">
+
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script></div>
@@ -215,8 +232,8 @@ document.write(`
           
           
           
-          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label></a>
+          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -226,13 +243,16 @@ document.write(`
   
   
     <div class="navbar-persistent--mobile">
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
     </div>
   
 
@@ -253,7 +273,8 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item"><nav class="navbar-nav">
+          <div class="navbar-item">
+<nav class="navbar-nav">
   <p class="sidebar-header-items__title"
      role="heading"
      aria-level="1"
@@ -263,15 +284,15 @@ document.write(`
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../howto/index.html">
-                        How To
+                      <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+                        Getting started with pyAFQ
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../tutorials/index.html">
-                        Tutorials
+                      <a class="nav-link nav-internal" href="../../../howto/index.html">
+                        How To
                       </a>
                     </li>
                 
@@ -306,12 +327,13 @@ document.write(`
       <div class="sidebar-header-items__end">
         
           <div class="navbar-item">
+
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script></div>
@@ -327,8 +349,8 @@ document.write(`
           
           
           
-          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label></a>
+          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -380,8 +402,8 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumbs">
-  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../../index.html" class="nav-link" aria-label="Home">
@@ -470,7 +492,11 @@ document.write(`
            <span class="s2">&quot;fetch_stanford_hardi_lv1&quot;</span><span class="p">]</span>
 
 
-<span class="n">afq_home</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;AFQ_data&#39;</span><span class="p">)</span>
+<span class="c1"># Set a user-writeable file-system location to put files:</span>
+<span class="k">if</span> <span class="s1">&#39;AFQ_HOME&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+    <span class="n">afq_home</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;AFQ_HOME&#39;</span><span class="p">]</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">afq_home</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;AFQ_data&#39;</span><span class="p">)</span>
 
 <span class="n">baseurl</span> <span class="o">=</span> <span class="s2">&quot;https://ndownloader.figshare.com/files/&quot;</span>
 
@@ -1236,7 +1262,8 @@ document.write(`
         <span class="n">resample_to</span><span class="o">=</span><span class="n">resample_to</span><span class="p">)</span>
 
     <span class="n">toc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Cerebellar peduncles templates loaded in </span><span class="si">{</span><span class="n">toc</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">tic</span><span class="si">:</span><span class="s1">0.4f</span><span class="si">}</span><span class="s1"> seconds&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s1">&#39;Cerebellar peduncles templates loaded in </span><span class="si">{</span><span class="n">toc</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">tic</span><span class="si">:</span><span class="s1">0.4f</span><span class="si">}</span><span class="s1"> seconds&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">template_dict</span>
 
@@ -1291,6 +1318,72 @@ document.write(`
     <span class="s2">&quot;f239aa3140809152da8884ff879dde1b&quot;</span><span class="p">,</span>
     <span class="s2">&quot;60a748567e4dd81b40ad8967a14cb09e&quot;</span><span class="p">,</span>
 <span class="p">]</span>
+
+<span class="n">ar_fnames</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;AAL_Thal_R.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAL_Thal_L.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAL_TempSup_L.nii.gz&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AAL_TempSup_R.nii.gz&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">ar_remote_fnames</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;43817367&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;43817370&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;43817373&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;43817376&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">ar_md5_hashes</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;5f2c0c0f1b7b32ba0a8474a460a2b980&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;a8d308a93b26242c04b878c733cb252f&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;92a255f706dd4e09268c5bc6bf2876e4&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ec0a3ef3cb3a4c549dd783dc8aeceeee&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="n">fetch_ar_templates</span> <span class="o">=</span> <span class="n">_make_reusable_fetcher</span><span class="p">(</span>
+    <span class="s2">&quot;fetch_ar_templates&quot;</span><span class="p">,</span>
+    <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">afq_home</span><span class="p">,</span>
+            <span class="s1">&#39;ar_templates&#39;</span><span class="p">),</span>
+    <span class="n">baseurl</span><span class="p">,</span> <span class="n">ar_remote_fnames</span><span class="p">,</span>
+    <span class="n">ar_fnames</span><span class="p">,</span>
+    <span class="n">md5_list</span><span class="o">=</span><span class="n">ar_md5_hashes</span><span class="p">,</span>
+    <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Download AFQ or templates&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">read_ar_templates</span><span class="p">(</span><span class="n">as_img</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resample_to</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load AFQ AR templates from file</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    as_img : bool, optional</span>
+<span class="sd">        If True, values are `Nifti1Image`. Otherwise, values are</span>
+<span class="sd">        paths to Nifti files. Default: True</span>
+<span class="sd">    resample_to : str or nibabel image class instance, optional</span>
+<span class="sd">        A template image to resample to. Typically, this should be the</span>
+<span class="sd">        template to which individual-level data are registered. Defaults to</span>
+<span class="sd">        the MNI template. Default: False</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict with: keys: names of template ROIs and values: nibabel Nifti1Image</span>
+<span class="sd">    objects from each of the ROI nifti files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ&#39;</span><span class="p">)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;loading ar templates&#39;</span><span class="p">)</span>
+    <span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+
+    <span class="n">template_dict</span> <span class="o">=</span> <span class="n">_fetcher_to_template</span><span class="p">(</span>
+        <span class="n">fetch_ar_templates</span><span class="p">,</span>
+        <span class="n">as_img</span><span class="o">=</span><span class="n">as_img</span><span class="p">,</span>
+        <span class="n">resample_to</span><span class="o">=</span><span class="n">resample_to</span><span class="p">)</span>
+
+    <span class="n">toc</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;or templates loaded in </span><span class="si">{</span><span class="n">toc</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">tic</span><span class="si">:</span><span class="s1">0.4f</span><span class="si">}</span><span class="s1"> seconds&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">template_dict</span>
+
 
 <div class="viewcode-block" id="fetch_or_templates"><a class="viewcode-back" href="../../../reference/api/AFQ/data/fetch/index.html#AFQ.data.fetch.fetch_or_templates">[docs]</a><span class="n">fetch_or_templates</span> <span class="o">=</span> <span class="n">_make_reusable_fetcher</span><span class="p">(</span>
     <span class="s2">&quot;fetch_or_templates&quot;</span><span class="p">,</span>
@@ -1434,7 +1527,8 @@ document.write(`
     <span class="n">to_bids_description</span><span class="p">(</span>
         <span class="n">dmriprep_folder</span><span class="p">,</span>
         <span class="o">**</span><span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;CFIN&quot;</span><span class="p">,</span>
-           <span class="s2">&quot;PipelineDescription&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;dipy&quot;</span><span class="p">}})</span>
+           <span class="s2">&quot;PipelineDescription&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;dipy&quot;</span><span class="p">},</span>
+           <span class="s2">&quot;GeneratedBy&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;dipy&quot;</span><span class="p">}]})</span>
 
 
 <div class="viewcode-block" id="organize_stanford_data"><a class="viewcode-back" href="../../../reference/api/AFQ/data/fetch/index.html#AFQ.data.fetch.organize_stanford_data">[docs]</a><span class="k">def</span> <span class="nf">organize_stanford_data</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clear_previous_afq</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -1469,7 +1563,7 @@ document.write(`
 <span class="sd">        Path to download dataset to, by default it is ~/AFQ_data/.</span>
 <span class="sd">    clear_previous_afq : str or None</span>
 <span class="sd">        Whether to clear previous afq results in the stanford</span>
-<span class="sd">        hardi dataset. If not None, can be &quot;all&quot;, &quot;track&quot;, or &quot;recog&quot;.</span>
+<span class="sd">        hardi dataset. If not None, can be &quot;all&quot;, &quot;track&quot;, &quot;recog&quot;, &quot;prof&quot;.</span>
 <span class="sd">        Default: None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ&#39;</span><span class="p">)</span>
@@ -1497,7 +1591,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="n">apply_cmd_to_afq_derivs</span><span class="p">(</span>
                 <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">afq_folder</span><span class="p">,</span> <span class="s2">&quot;sub-01/ses-01&quot;</span><span class="p">),</span>
-                <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">afq_folder</span><span class="p">,</span> <span class="s2">&quot;sub-01/ses-01/sub-01_ses-01_dwi&quot;</span><span class="p">),</span>
+                <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">afq_folder</span><span class="p">,</span> <span class="s2">&quot;sub-01/ses-01/sub-01_ses-01&quot;</span><span class="p">),</span>
                 <span class="n">dependent_on</span><span class="o">=</span><span class="n">clear_previous_afq</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">derivatives_path</span><span class="p">):</span>
@@ -1534,10 +1628,12 @@ document.write(`
     <span class="c1"># And descriptions of the pipelines in the derivatives:</span>
     <span class="n">to_bids_description</span><span class="p">(</span><span class="n">dmriprep_folder</span><span class="p">,</span>
                         <span class="o">**</span><span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;Stanford HARDI&quot;</span><span class="p">,</span>
-                           <span class="s2">&quot;PipelineDescription&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;vistasoft&quot;</span><span class="p">}})</span>
+                           <span class="s2">&quot;PipelineDescription&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;vistasoft&quot;</span><span class="p">},</span>
+                           <span class="s2">&quot;GeneratedBy&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;vistasoft&quot;</span><span class="p">}]})</span>
     <span class="n">to_bids_description</span><span class="p">(</span><span class="n">freesurfer_folder</span><span class="p">,</span>
                         <span class="o">**</span><span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;Stanford HARDI&quot;</span><span class="p">,</span>
-                           <span class="s2">&quot;PipelineDescription&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;freesurfer&quot;</span><span class="p">}})</span></div>
+                           <span class="s2">&quot;PipelineDescription&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;freesurfer&quot;</span><span class="p">},</span>
+                           <span class="s2">&quot;GeneratedBy&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;freesurfer&quot;</span><span class="p">}]})</span></div>
 
 
 <div class="viewcode-block" id="fetch_stanford_hardi_lv1"><a class="viewcode-back" href="../../../reference/api/AFQ/data/fetch/index.html#AFQ.data.fetch.fetch_stanford_hardi_lv1">[docs]</a><span class="n">fetch_stanford_hardi_lv1</span> <span class="o">=</span> <span class="n">_make_reusable_fetcher</span><span class="p">(</span>
@@ -1709,196 +1805,6 @@ document.write(`
         <span class="n">out_dict</span><span class="p">[</span><span class="s1">&#39;atlas&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">oo</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
                                             <span class="n">resample_to</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">out_dict</span>
-
-
-<span class="k">def</span> <span class="nf">aal_to_regions</span><span class="p">(</span><span class="n">regions</span><span class="p">,</span> <span class="n">atlas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Queries for large regions containing multiple AAL ROIs</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    regions : string or list of strings</span>
-<span class="sd">        The name of the requested region. This can either be an AAL-defined ROI</span>
-<span class="sd">        name (e.g, &#39;Occipital_Sup_L&#39;) or one of:</span>
-<span class="sd">        {&#39;leftfrontal&#39; | &#39;leftoccipital&#39; | &#39;lefttemporal&#39; | &#39;leftparietal&#39;</span>
-<span class="sd">        | &#39;leftanttemporal&#39; | &#39;leftparietal&#39; | &#39;leftanttemporal&#39;</span>
-<span class="sd">        | &#39;leftuncinatefront&#39; | &#39;leftifoffront&#39; | &#39;leftinfparietal&#39;</span>
-<span class="sd">        | &#39;cerebellum&#39; | &#39;leftarcfrontal&#39; | &#39;leftarctemp&#39; | &#39;leftcingpost&#39;}</span>
-<span class="sd">        each of which there is an equivalent &#39;right&#39; region for. In addition,</span>
-<span class="sd">        there are a few bilateral regions: {&#39;occipital&#39; | &#39;temporal&#39;}, which</span>
-<span class="sd">        encompass both the right and left region of this name, as well as:</span>
-<span class="sd">        {&#39;cstinferior&#39; | &#39;cstsuperior&#39;}</span>
-
-<span class="sd">    atlas : 4D array</span>
-<span class="sd">       Contains the AAL atlas in the correct coordinate frame with additional</span>
-<span class="sd">       volumes for CST and cingulate ROIs (&quot;AAL and more&quot;).</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    ------</span>
-<span class="sd">    3D indices to the requested region in the atlas volume</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    Several regions can be referred to by multiple names:</span>
-<span class="sd">           &#39;leftuncinatetemp&#39; = &#39;leftilftemp&#39;= &#39;leftanttemporal&#39;</span>
-<span class="sd">           &#39;rightuncinatetemp&#39; = &#39;rightilftemp&#39; = &#39;rightanttemporal&#39;</span>
-<span class="sd">           &#39;leftslfpar&#39;] = &#39;leftinfparietal&#39;</span>
-<span class="sd">           &#39;rightslfpar&#39; = &#39;rightinfparietal&#39;</span>
-<span class="sd">           &#39;leftslffrontal&#39; = &#39;leftarcfrontal&#39;</span>
-<span class="sd">           &#39;rightslffrontal&#39; = &#39;rightarcfrontal&#39;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">atlas</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">atlas</span> <span class="o">=</span> <span class="n">read_aal_atlas</span><span class="p">()[</span><span class="s1">&#39;atlas&#39;</span><span class="p">]</span>
-    <span class="n">atlas_vals</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;leftfrontal&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-                  <span class="c1"># Occipital regions do not include fusiform:</span>
-                  <span class="s1">&#39;leftoccipital&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">43</span><span class="p">,</span> <span class="mi">54</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-                  <span class="c1"># Temporal regions include fusiform:</span>
-                  <span class="s1">&#39;lefttemporal&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">37</span><span class="p">,</span> <span class="mi">42</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-                                                  <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">55</span><span class="p">]),</span>
-                                                  <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">79</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]),</span>
-                  <span class="s1">&#39;leftanttemporal&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">41</span><span class="p">,</span> <span class="mi">83</span><span class="p">,</span> <span class="mi">87</span><span class="p">]),</span>
-                  <span class="s1">&#39;leftuncinatefront&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">25</span><span class="p">]),</span>
-                  <span class="s1">&#39;leftifoffront&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">25</span><span class="p">]),</span>
-                  <span class="s1">&#39;leftinfparietal&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">61</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="mi">65</span><span class="p">]),</span>
-                  <span class="s1">&#39;cerebellum&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">91</span><span class="p">,</span> <span class="mi">117</span><span class="p">),</span>
-                  <span class="s1">&#39;leftarcfrontal&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">13</span><span class="p">]),</span>
-                  <span class="s1">&#39;leftarctemp&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">79</span><span class="p">,</span> <span class="mi">81</span><span class="p">,</span> <span class="mi">85</span><span class="p">,</span> <span class="mi">89</span><span class="p">]),</span>
-                  <span class="s1">&#39;leftthalamus&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">77</span><span class="p">]),</span>
-                  <span class="s1">&#39;leftventral&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">47</span><span class="p">,</span> <span class="mi">53</span><span class="p">,</span> <span class="mi">55</span><span class="p">,</span> <span class="mi">89</span><span class="p">]),</span>
-                  <span class="s1">&#39;leftdorsal&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">49</span><span class="p">,</span> <span class="mi">51</span><span class="p">]),</span>
-                  <span class="s1">&#39;leftparietal&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">59</span><span class="p">,</span> <span class="mi">61</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="mi">65</span><span class="p">])</span>
-                  <span class="p">}</span>
-
-    <span class="c1"># Right symmetrical is off by one:</span>
-    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightfrontal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftfrontal&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightoccipital&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftoccipital&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;righttemporal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;lefttemporal&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightanttemporal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftanttemporal&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightuncinatefront&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftuncinatefront&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightifoffront&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftifoffront&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightinfparietal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftinfparietal&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightarcfrontal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftarcfrontal&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightarctemp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftarctemp&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightthalamus&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftthalamus&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightventral&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftventral&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightdorsal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftdorsal&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightparietal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftparietal&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-
-    <span class="c1"># Multiply named regions:</span>
-    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftuncinatetemp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftilftemp&#39;</span><span class="p">]</span> <span class="o">=</span>\
-        <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftanttemporal&#39;</span><span class="p">]</span>
-    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightuncinatetemp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightilftemp&#39;</span><span class="p">]</span> <span class="o">=</span>\
-        <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightanttemporal&#39;</span><span class="p">]</span>
-    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftslfpar&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftinfparietal&#39;</span><span class="p">]</span>
-    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightslfpar&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightinfparietal&#39;</span><span class="p">]</span>
-    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftslffrontal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftarcfrontal&#39;</span><span class="p">]</span>
-    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightslffrontal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightarcfrontal&#39;</span><span class="p">]</span>
-
-    <span class="c1"># Bilateral regions:</span>
-    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;occipital&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">union1d</span><span class="p">(</span><span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;leftoccipital&#39;</span><span class="p">],</span>
-                                         <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;rightoccipital&#39;</span><span class="p">])</span>
-    <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;temporal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">union1d</span><span class="p">(</span><span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;lefttemporal&#39;</span><span class="p">],</span>
-                                        <span class="n">atlas_vals</span><span class="p">[</span><span class="s1">&#39;righttemporal&#39;</span><span class="p">])</span>
-
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">regions</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">regions</span> <span class="o">=</span> <span class="p">[</span><span class="n">regions</span><span class="p">]</span>
-
-    <span class="n">idxes</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">regions</span><span class="p">:</span>
-        <span class="n">region</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>  <span class="c1"># Just to be sure</span>
-        <span class="k">if</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">atlas_vals</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">vol_idx</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="n">vals</span> <span class="o">=</span> <span class="n">atlas_vals</span><span class="p">[</span><span class="n">region</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="n">region</span> <span class="o">==</span> <span class="s1">&#39;cstinferior&#39;</span><span class="p">:</span>
-            <span class="n">vol_idx</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
-        <span class="k">elif</span> <span class="n">region</span> <span class="o">==</span> <span class="s1">&#39;cstsuperior&#39;</span><span class="p">:</span>
-            <span class="n">vol_idx</span> <span class="o">=</span> <span class="mi">2</span>
-            <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
-        <span class="k">elif</span> <span class="n">region</span> <span class="o">==</span> <span class="s1">&#39;leftcingpost&#39;</span><span class="p">:</span>
-            <span class="n">vol_idx</span> <span class="o">=</span> <span class="mi">3</span>
-            <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
-        <span class="k">elif</span> <span class="n">region</span> <span class="o">==</span> <span class="s1">&#39;rightcingpost&#39;</span><span class="p">:</span>
-            <span class="n">vol_idx</span> <span class="o">=</span> <span class="mi">4</span>
-            <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span>
-
-        <span class="c1"># Broadcast vals, to test for equality over all three dimensions:</span>
-        <span class="n">is_in</span> <span class="o">=</span> <span class="n">atlas</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">vol_idx</span><span class="p">]</span> <span class="o">==</span> <span class="n">vals</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
-        <span class="c1"># Then collapse the 4th dimension (each val), to get the 3D array:</span>
-        <span class="n">is_in</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">is_in</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="n">idxes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_in</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">idxes</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">bundles_to_aal</span><span class="p">(</span><span class="n">bundles</span><span class="p">,</span> <span class="n">atlas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Given a sequence of AFQ bundle names, give back a sequence of lists</span>
-<span class="sd">    with [target0, target1] being each NX3 arrays of the endpoint indices</span>
-<span class="sd">    for the first and last node of the streamlines in this bundle.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">atlas</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">atlas</span> <span class="o">=</span> <span class="n">read_aal_atlas</span><span class="p">()[</span><span class="s1">&#39;atlas&#39;</span><span class="p">]</span>
-
-    <span class="n">endpoint_dict</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;ATR_L&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;leftfrontal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;leftthalamus&#39;</span><span class="p">]],</span>
-        <span class="s2">&quot;ATR_R&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;rightfrontal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;rightthalamus&#39;</span><span class="p">]],</span>
-        <span class="s2">&quot;CST_L&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;cstinferior&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;cstsuperior&#39;</span><span class="p">]],</span>
-        <span class="s2">&quot;CST_R&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;cstinferior&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;cstsuperior&#39;</span><span class="p">]],</span>
-        <span class="s2">&quot;CGC_L&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;leftcingpost&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
-        <span class="s2">&quot;CGC_R&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;rightcingpost&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
-        <span class="s2">&quot;HCC_L&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
-        <span class="s2">&quot;HCC_R&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
-        <span class="s2">&quot;FP&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;rightoccipital&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;leftoccipital&#39;</span><span class="p">]],</span>
-        <span class="s2">&quot;FA&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;rightfrontal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;leftfrontal&#39;</span><span class="p">]],</span>
-        <span class="s2">&quot;IFO_L&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;leftoccipital&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;leftifoffront&#39;</span><span class="p">]],</span>
-        <span class="s2">&quot;IFO_R&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;rightoccipital&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;rightifoffront&#39;</span><span class="p">]],</span>
-        <span class="s2">&quot;ILF_L&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;leftoccipital&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;leftilftemp&#39;</span><span class="p">]],</span>
-        <span class="s2">&quot;ILF_R&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;rightoccipital&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;rightilftemp&#39;</span><span class="p">]],</span>
-        <span class="s2">&quot;SLF_L&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;leftslffrontal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;leftinfparietal&#39;</span><span class="p">]],</span>
-        <span class="s2">&quot;SLF_R&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;rightslffrontal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;rightinfparietal&#39;</span><span class="p">]],</span>
-        <span class="s2">&quot;UNC_L&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;leftanttemporal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;leftuncinatefront&#39;</span><span class="p">]],</span>
-        <span class="s2">&quot;UNC_R&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;rightanttemporal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;rightuncinatefront&#39;</span><span class="p">]],</span>
-        <span class="s2">&quot;ARC_L&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;leftfrontal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;leftarctemp&#39;</span><span class="p">]],</span>
-        <span class="s2">&quot;ARC_R&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;rightfrontal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;rightarctemp&#39;</span><span class="p">]],</span>
-        <span class="s2">&quot;AntFrontal&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
-        <span class="s2">&quot;Motor&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
-        <span class="s2">&quot;Occipital&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
-        <span class="s2">&quot;Orbital&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
-        <span class="s2">&quot;PostParietal&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
-        <span class="s2">&quot;SupFrontal&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
-        <span class="s2">&quot;SupParietal&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
-        <span class="s2">&quot;Temporal&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
-        <span class="s2">&quot;pARC_L&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;leftparietal&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
-        <span class="s2">&quot;pARC_R&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;rightparietal&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
-        <span class="s2">&quot;VOF_L&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;leftdorsal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;leftventral&#39;</span><span class="p">]],</span>
-        <span class="s2">&quot;VOF_R&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;rightdorsal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;rightventral&#39;</span><span class="p">]]}</span>
-
-    <span class="n">targets</span> <span class="o">=</span> <span class="p">{}</span>
-
-    <span class="k">for</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">endpoint_dict</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">region_name</span><span class="p">,</span> <span class="n">region</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
-                    <span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">],</span> <span class="n">endpoint_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">]):</span>
-                <span class="k">if</span> <span class="n">region</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">targets</span><span class="p">[</span><span class="n">bundle</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">region_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">region</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">region_list</span> <span class="o">=</span> <span class="n">aal_to_regions</span><span class="p">(</span>
-                        <span class="n">region</span><span class="p">,</span> <span class="n">atlas</span><span class="o">=</span><span class="n">atlas</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">())</span>
-                    <span class="n">aal_roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">atlas</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
-                    <span class="n">aal_roi</span><span class="p">[</span><span class="n">region_list</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
-                            <span class="n">region_list</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
-                            <span class="n">region_list</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
-                    <span class="n">targets</span><span class="p">[</span><span class="n">bundle</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">region_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span>
-                        <span class="n">aal_roi</span><span class="p">,</span> <span class="n">atlas</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ&#39;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Segmentation end points undefined for </span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2">,&quot;</span>
-                           <span class="o">+</span> <span class="s2">&quot; continuing without end points&quot;</span><span class="p">)</span>
-            <span class="n">targets</span><span class="p">[</span><span class="n">bundle</span> <span class="o">+</span> <span class="s2">&quot;_start&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">targets</span><span class="p">[</span><span class="n">bundle</span> <span class="o">+</span> <span class="s2">&quot;_end&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-
-    <span class="k">return</span> <span class="n">targets</span>
 
 
 <span class="k">def</span> <span class="nf">_apply_mask</span><span class="p">(</span><span class="n">template_img</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
@@ -2164,7 +2070,8 @@ document.write(`
     <span class="n">to_bids_description</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span>
                         <span class="o">**</span><span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="n">study</span><span class="p">,</span>
                            <span class="s2">&quot;Acknowledgements&quot;</span><span class="p">:</span> <span class="n">hcp_acknowledgements</span><span class="p">,</span>
-                           <span class="s2">&quot;PipelineDescription&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;dmriprep&#39;</span><span class="p">}})</span>
+                           <span class="s2">&quot;PipelineDescription&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;dmriprep&#39;</span><span class="p">},</span>
+                           <span class="s2">&quot;GeneratedBy&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;dmriprep&#39;</span><span class="p">}]})</span>
 
     <span class="k">return</span> <span class="n">data_files</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_path</span><span class="p">,</span> <span class="n">study</span><span class="p">)</span>
 
@@ -2258,7 +2165,8 @@ document.write(`
     <span class="n">to_bids_description</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span>
                         <span class="o">**</span><span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;HBN&quot;</span><span class="p">,</span>
                            <span class="s2">&quot;Acknowledgements&quot;</span><span class="p">:</span> <span class="n">hbn_acknowledgements</span><span class="p">,</span>
-                           <span class="s2">&quot;PipelineDescription&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;qsiprep&#39;</span><span class="p">}})</span>
+                           <span class="s2">&quot;PipelineDescription&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;qsiprep&#39;</span><span class="p">},</span>
+                           <span class="s2">&quot;GeneratedBy&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;qsiprep&#39;</span><span class="p">}]})</span>
 
     <span class="k">return</span> <span class="n">data_files</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_path</span><span class="p">,</span> <span class="s2">&quot;HBN&quot;</span><span class="p">)</span>
 
@@ -2355,7 +2263,8 @@ document.write(`
     <span class="c1"># Create the BIDS derivatives description file text</span>
     <span class="n">to_bids_description</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span>
                         <span class="o">**</span><span class="p">{</span><span class="s2">&quot;Name&quot;</span><span class="p">:</span> <span class="s2">&quot;HBN&quot;</span><span class="p">,</span>
-                           <span class="s2">&quot;PipelineDescription&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;afq&#39;</span><span class="p">}})</span>
+                           <span class="s2">&quot;PipelineDescription&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;afq&#39;</span><span class="p">},</span>
+                           <span class="s2">&quot;GeneratedBy&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;afq&#39;</span><span class="p">}]})</span>
 
     <span class="k">return</span> <span class="n">data_files</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_path</span><span class="p">,</span> <span class="s2">&quot;HBN&quot;</span><span class="p">)</span>
 </pre></div>
@@ -2364,16 +2273,12 @@ document.write(`
               
               
               
-                <footer class="bd-footer-article">
+              
+              
+                <footer class="prev-next-footer">
                   
-<div class="footer-article-items footer-article__inner">
-  
-    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
-</div></div>
-  
 </div>
-
                 </footer>
               
             </div>
@@ -2391,8 +2296,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+  <script src="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
 
 
   <footer class="bd-footer">
@@ -2401,6 +2306,7 @@ document.write(`
     <div class="footer-items__start">
       
         <div class="footer-item">
+
   <p class="copyright">
     
       © Copyright 2018--, The pyAFQ Contributors.
@@ -2410,6 +2316,7 @@ document.write(`
 </div>
       
         <div class="footer-item">
+
   <p class="sphinx-version">
     Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
     <br/>
@@ -2419,10 +2326,12 @@ document.write(`
     </div>
   
   
+  
     <div class="footer-items__end">
       
-        <div class="footer-item"><p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
 </p></div>
       
     </div>

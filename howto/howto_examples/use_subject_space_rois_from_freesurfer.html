@@ -1,0 +1,796 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Using Subject Space ROIs from Freesurfer &#8212; AFQ 1.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'howto/howto_examples/use_subject_space_rois_from_freesurfer';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="How to segment out only some bundles" href="vof_example.html" />
+    <link rel="prev" title="Using RecoBundles for bundle recognition" href="plot_recobundles.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.2 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.2 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../tutorials/index.html">
+                        Getting started with pyAFQ
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        How To
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../explanations/index.html">
+                        Explanations
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../reference/index.html">
+                        Reference Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../reference/api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../tutorials/index.html">
+                        Getting started with pyAFQ
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        How To
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../explanations/index.html">
+                        Explanations
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../reference/index.html">
+                        Reference Documentation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../reference/api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">How to install <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../usage/index.html">How to use <cite>pyAFQ</cite></a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/data.html">Organizing your data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/kwargs.html">The pyAFQ API optional arguments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/scalars.html">How to add custom tissue properties from another pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/converter.html">Tractography from other pipelines</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../usage/docker.html">The pyAFQ docker image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/methods.html">The pyAFQ API methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/image.html">The pyAFQ Image API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">How to contribute to pyAFQ</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../developing/index.html">How to develop <cite>pyAFQ</cite></a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../developing/tasks.html">Adding Tasks to the pyAFQ Workflow</a></li>
+
+
+<li class="toctree-l2"><a class="reference internal" href="../developing/definitions.html">Adding Definitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../developing/releasing.html">How to create a release</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_help.html">How to get help using pyAFQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cite.html">How to cite our work</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">How to examples</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="add_custom_bundle.html">How to add new bundles into pyAFQ (SLF 1/2/3 Example)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="baby_afq.html">BabyAFQ : tractometry for infant dMRI data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cerebellar_peduncles.html">Delineating cerebellar peduncles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cloudknot_example.html">Using cloudknot to run pyAFQ on AWS batch:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cloudknot_hcp_example.html">AFQ with HCP data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_accoustic_radiations.html">How to add new bundles into pyAFQ(Accoustic Radiations Example)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_callosal.html">Callosal bundles using AFQ API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_fwdti.html">How to use Free water DTI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_optic_radiations.html">How to add new bundles into pyAFQ(Optic Radiations Example)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_recobundles.html">Using RecoBundles for bundle recognition</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Using Subject Space ROIs from Freesurfer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vof_example.html">How to segment out only some bundles</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">How To</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">How to examples</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Using...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-howto-howto-examples-use-subject-space-rois-from-freesurfer-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="using-subject-space-rois-from-freesurfer">
+<span id="sphx-glr-howto-howto-examples-use-subject-space-rois-from-freesurfer-py"></span><h1>Using Subject Space ROIs from Freesurfer<a class="headerlink" href="#using-subject-space-rois-from-freesurfer" title="Permalink to this heading">#</a></h1>
+<p>An example using the AFQ API to find bundles
+as defined by endpoint ROIs from freesurfer.
+This example can be modified to work with ROIs
+in subject space from pipelines other than freesurfer.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+
+<span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
+<span class="kn">import</span> <span class="nn">plotly</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">AFQ.api.group</span> <span class="kn">import</span> <span class="n">GroupAFQ</span>
+<span class="kn">import</span> <span class="nn">AFQ.data.fetch</span> <span class="k">as</span> <span class="nn">afd</span>
+<span class="kn">from</span> <span class="nn">AFQ.definitions.image</span> <span class="kn">import</span> <span class="n">RoiImage</span>
+<span class="kn">import</span> <span class="nn">AFQ.api.bundle_dict</span> <span class="k">as</span> <span class="nn">abd</span>
+</pre></div>
+</div>
+<div class="section" id="get-some-example-data">
+<h2>Get some example data<a class="headerlink" href="#get-some-example-data" title="Permalink to this heading">#</a></h2>
+<p>Retrieves High angular resolution diffusion imaging (HARDI) dataset from
+Stanford’s Vista Lab</p>
+<blockquote>
+<div><p>see <a class="reference external" href="https://purl.stanford.edu/ng782rw8378">https://purl.stanford.edu/ng782rw8378</a> for details on dataset.</p>
+</div></blockquote>
+<p>The data for the first subject and first session are downloaded locally
+(by default into the users home directory) under:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">.dipy/stanford_hardi/</span></code></p>
+</div></blockquote>
+<p>Anatomical data (<code class="docutils literal notranslate"><span class="pre">anat</span></code>) and Diffusion-weighted imaging data (<code class="docutils literal notranslate"><span class="pre">dwi</span></code>) are
+then extracted, formatted to be BIDS compliant, and placed in the AFQ
+data directory (by default in the users home directory) under:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">AFQ_data/stanford_hardi/</span></code></p>
+</div></blockquote>
+<p>This data represents the required preprocessed diffusion data necessary for
+intializing the GroupAFQ object (which we will do next)</p>
+<p>The clear_previous_afq is used to remove any previous runs of the afq object
+stored in the AFQ_data/stanford_hardi/ BIDS directory. Set it to None if
+you want to use the results of previous runs. Setting it to “track”
+as here will only clear derivatives that depend on the tractography stage
+(i.e., bundle delination and tract profile calculation),
+as well as the tractography itself, to save time on recomputation.
+If you want to only clear derivatives that depend on bundle delineation,
+and keep the tractography, you can set clear_previous_afq to
+“recog” instead.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">afd</span><span class="o">.</span><span class="n">organize_stanford_data</span><span class="p">(</span><span class="n">clear_previous_afq</span><span class="o">=</span><span class="s2">&quot;track&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="generate-left-thalamus-roi-from-freesurfer-segmentation-file">
+<h2>Generate left thalamus ROI from freesurfer segmentation file<a class="headerlink" href="#generate-left-thalamus-roi-from-freesurfer-segmentation-file" title="Permalink to this heading">#</a></h2>
+<ol class="arabic">
+<li><p>Load the segmentation file that was generated by Freesurfer for
+the specific subject.</p></li>
+<li><p>Identify the left thalamus within the file, which has the label
+number 41</p></li>
+<li><p>Create a Nifti image representing the left thalamus ROI:
+- Assign a value of 1 to the voxels that Freesurfer</p>
+<blockquote>
+<div><p>has labeled as 41 (i.e., the left thalamus).</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>Assign a value of 0 to all other voxels.</p></li>
+</ul>
+</li>
+</ol>
+<p>This binary mask format is the expected input for pyAFQ when
+dealing with subject space ROIs. If it’s already in binary format,
+there is no need to do this step.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">freesurfer_subject_folder</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span>
+    <span class="n">afd</span><span class="o">.</span><span class="n">afq_home</span><span class="p">,</span> <span class="s2">&quot;stanford_hardi&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;derivatives&quot;</span><span class="p">,</span> <span class="s2">&quot;freesurfer&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sub-01&quot;</span><span class="p">,</span> <span class="s2">&quot;ses-01&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;anat&quot;</span><span class="p">)</span>
+
+<span class="n">seg_file</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span>
+    <span class="n">freesurfer_subject_folder</span><span class="p">,</span> <span class="s2">&quot;sub-01_ses-01_seg.nii.gz&quot;</span><span class="p">))</span>
+<span class="n">left_thal</span> <span class="o">=</span> <span class="n">seg_file</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span> <span class="o">==</span> <span class="mi">41</span>
+<span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+    <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span>
+        <span class="n">left_thal</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">np</span><span class="o">.</span><span class="n">float32</span></a><span class="p">),</span>
+        <span class="n">seg_file</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span>
+    <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span>
+        <span class="n">freesurfer_subject_folder</span><span class="p">,</span>
+        <span class="s2">&quot;sub-01_ses-01_desc-leftThal_mask.nii.gz&quot;</span><span class="p">))</span>
+
+<span class="c1"># Fetch LV1 ROI</span>
+<span class="c1"># which was already generated using the process above</span>
+<span class="n">afd</span><span class="o">.</span><span class="n">fetch_stanford_hardi_lv1</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="set-tractography-parameters-optional">
+<h2>Set tractography parameters (optional)<a class="headerlink" href="#set-tractography-parameters-optional" title="Permalink to this heading">#</a></h2>
+<p>We make this tracking_params which we will pass to the GroupAFQ object
+which specifies that we want 10,000 seeds randomly distributed
+only within the endpoint ROIs and not throughout the white matter.
+This is controlled by passing
+<cite>“seed_mask”: RoiImage()</cite> in the <cite>tracking_params</cite> dict.</p>
+<p>We only do this to make this example faster and consume less space.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">tracking_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">n_seeds</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
+                       <span class="n">random_seeds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                       <span class="n">rng_seed</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+                       <span class="n">seed_mask</span><span class="o">=</span><span class="n">RoiImage</span><span class="p">(</span><span class="n">use_endpoints</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="define-custom-bundledict-object">
+<h2>Define custom <cite>BundleDict</cite> object<a class="headerlink" href="#define-custom-bundledict-object" title="Permalink to this heading">#</a></h2>
+<p>In a typical <cite>BundleDict</cite> object, ROIs are passed as paths to Nifti files.
+Here, we define ROIs as dictionaries instead, containing BIDS filters.
+Then pyAFQ can find the respective ROI for each subject and session.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">bundles</span> <span class="o">=</span> <span class="n">abd</span><span class="o">.</span><span class="n">BundleDict</span><span class="p">({</span>
+    <span class="s2">&quot;L_OR&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;scope&quot;</span><span class="p">:</span> <span class="s2">&quot;freesurfer&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;suffix&quot;</span><span class="p">:</span> <span class="s2">&quot;mask&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;desc&quot;</span><span class="p">:</span> <span class="s2">&quot;leftThal&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;scope&quot;</span><span class="p">:</span> <span class="s2">&quot;freesurfer&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;suffix&quot;</span><span class="p">:</span> <span class="s2">&quot;anat&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;desc&quot;</span><span class="p">:</span> <span class="s2">&quot;LV1&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;cross_midline&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;space&quot;</span><span class="p">:</span> <span class="s2">&quot;subject&quot;</span>
+    <span class="p">}})</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="initialize-a-groupafq-object">
+<h2>Initialize a GroupAFQ object:<a class="headerlink" href="#initialize-a-groupafq-object" title="Permalink to this heading">#</a></h2>
+<p>Creates a GroupAFQ object, that encapsulates tractometry,
+passing in our custom bundle info. Then we run the pipeline
+and generate a visualization of the bundle we found.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">myafq</span> <span class="o">=</span> <span class="n">GroupAFQ</span><span class="p">(</span>
+    <span class="n">bids_path</span><span class="o">=</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><span class="n">afd</span><span class="o">.</span><span class="n">afq_home</span><span class="p">,</span> <span class="s1">&#39;stanford_hardi&#39;</span><span class="p">),</span>
+    <span class="n">preproc_pipeline</span><span class="o">=</span><span class="s1">&#39;vistasoft&#39;</span><span class="p">,</span>
+    <span class="n">tracking_params</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">,</span>
+    <span class="n">bundle_info</span><span class="o">=</span><span class="n">bundles</span><span class="p">)</span>
+
+<span class="n">bundle_html</span> <span class="o">=</span> <span class="n">myafq</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;indiv_bundles_figures&quot;</span><span class="p">)</span>
+<span class="n">plotly</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">bundle_html</span><span class="p">[</span><span class="s2">&quot;01&quot;</span><span class="p">][</span><span class="s2">&quot;L_OR&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p><strong>Estimated memory usage:</strong>  0 MB</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-howto-howto-examples-use-subject-space-rois-from-freesurfer-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/f0ba1f961839c9ea532a4062c5c60803/use_subject_space_rois_from_freesurfer.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">use_subject_space_rois_from_freesurfer.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/e49d55163f18d47ca8c7d175d133731d/use_subject_space_rois_from_freesurfer.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">use_subject_space_rois_from_freesurfer.py</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="plot_recobundles.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Using RecoBundles for bundle recognition</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="vof_example.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">How to segment out only some bundles</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#get-some-example-data">Get some example data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-left-thalamus-roi-from-freesurfer-segmentation-file">Generate left thalamus ROI from freesurfer segmentation file</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-tractography-parameters-optional">Set tractography parameters (optional)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#define-custom-bundledict-object">Define custom <cite>BundleDict</cite> object</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#initialize-a-groupafq-object">Initialize a GroupAFQ object:</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/yeatmanlab/pyAFQ/edit/master/docs/source/howto/howto_examples/use_subject_space_rois_from_freesurfer.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/howto/howto_examples/use_subject_space_rois_from_freesurfer.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2018--, The pyAFQ Contributors.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-156363454-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>

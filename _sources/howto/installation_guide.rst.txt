@@ -31,7 +31,7 @@ The other requires that you clone the source code to your machine::
 
   git clone https://github.com/yeatmanlab/pyAFQ.git
 
-Then, change your working directory into the top-level directory of this repo
+With both installation methods, you can include extensions to the base installation in square brackets. Change your working directory into the top-level directory of this repo
 and issue::
 
   pip install -e .[dev,fury,afqbrowser,plot]
@@ -39,8 +39,6 @@ and issue::
 On some platforms, you may need to add quotes around the ``.[]`` part::
 
   pip install -e .'[dev,fury,afqbrowser,plot]'
-
-which will install pyAFQ locally in editible mode and include extensions.
 
 .. note::
 
@@ -55,8 +53,8 @@ which will install pyAFQ locally in editible mode and include extensions.
 
 .. note::
 
-  Some of the examples in the documentation require additional dependencies. To install these, you can run `pip 
-  install pyAFQ[plot]`, which will include visualization tools that are required in these examples. For examples 
+  Some of the examples in the documentation require additional dependencies. To install these, you can run `pip
+  install pyAFQ[plot]`, which will include visualization tools that are required in these examples. For examples
   involving the cloudknot distributed computing library, you will also need to set up an [AWS account]([Create Account - aws.amazon.com](https://aws.amazon.com/resources/create-account/)) and have [docker](https://www.docker.com/) installed.
 
 

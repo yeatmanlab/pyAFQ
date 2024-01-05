@@ -16,6 +16,17 @@ Classes
 
 
 
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.api.group.get_afq_bids_entities_fname
+
+
+
+.. py:function:: get_afq_bids_entities_fname()
+
 
 .. py:class:: GroupAFQ(bids_path, bids_filters={'suffix': 'dwi'}, preproc_pipeline='all', participant_labels=None, output_dir=None, parallel_params={'engine': 'serial'}, bids_layout_kwargs={}, **kwargs)
 

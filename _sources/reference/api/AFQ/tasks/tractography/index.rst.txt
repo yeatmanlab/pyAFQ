@@ -29,9 +29,15 @@ Attributes
 
 .. autoapisummary::
 
+   AFQ.tasks.tractography.has_trx
    AFQ.tasks.tractography.has_gputrack
    AFQ.tasks.tractography.logger
 
+
+.. py:data:: has_trx
+   :value: True
+
+   
 
 .. py:data:: has_gputrack
    :value: True
@@ -42,7 +48,7 @@ Attributes
 
    
 
-.. py:function:: _meta_from_tracking_params(tracking_params, start_time, sft, seed, stop)
+.. py:function:: _meta_from_tracking_params(tracking_params, start_time, n_streamlines, seed, stop)
 
 
 .. py:function:: export_seed_mask(tracking_params)

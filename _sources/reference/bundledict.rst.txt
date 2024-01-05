@@ -25,5 +25,7 @@ key-value pairs::
     - 'exc_addtol' : List of floats describing how much tolerance to add or
       subtract in mm from each of the exclusion ROIs. The list must be the
       same length as 'exclude'. optional. 
+    - 'mahal': Dict describing the parameters for cleaning. By default, we
+      use the default behavior of the seg.clean_bundle function.
 
 For an example, see "Plotting the Optic Radiations" in :ref:`examples`.

@@ -59,7 +59,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: visualize_bundles(sft, n_points=None, bundle_dict=None, bundle=None, colors=None, color_by_direction=False, opacity=1.0, flip_axes=[False, False, False], figure=None, background=(1, 1, 1), interact=False, inline=False, **kwargs)
+.. py:function:: visualize_bundles(sft, n_points=None, bundle_dict=None, bundle=None, colors=None, color_by_direction=False, opacity=1.0, line_width=2.0, flip_axes=[False, False, False], figure=None, background=(1, 1, 1), interact=False, inline=False, **kwargs)
 
    
    Visualize bundles in 3D using VTK.

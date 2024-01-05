@@ -26,13 +26,13 @@ Functions
 
 
 
-.. py:class:: Segmentation(nb_points=False, nb_streamlines=False, seg_algo='AFQ', clip_edges=False, parallel_segmentation={'n_jobs': 4, 'engine': 'dask'}, progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=1.25, reduction_thr=25, refine=False, pruning_thr=12, b0_threshold=50, prob_threshold=0, roi_dist_tie_break=False, dist_to_waypoint=None, rng=None, return_idx=False, presegment_bundle_dict=None, presegment_kwargs={}, filter_by_endpoints=True, dist_to_atlas=4, save_intermediates=None)
+.. py:class:: Segmentation(nb_points=False, nb_streamlines=False, seg_algo='AFQ', clip_edges=False, parallel_segmentation={'engine': 'serial'}, progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=1.25, reduction_thr=25, refine=False, pruning_thr=12, b0_threshold=50, prob_threshold=0, roi_dist_tie_break=False, dist_to_waypoint=None, rng=None, return_idx=False, presegment_bundle_dict=None, presegment_kwargs={}, filter_by_endpoints=True, dist_to_atlas=4, save_intermediates=None)
 
 
    .. py:method:: _read_tg(tg=None)
 
 
-   .. py:method:: segment(bundle_dict, tg, mapping, fdata=None, fbval=None, fbvec=None, reg_prealign=None, reg_template=None, img_affine=None, reset_tg_space=False, clean_params={})
+   .. py:method:: segment(bundle_dict, tg, mapping, fdata=None, fbval=None, fbvec=None, reg_prealign=None, reg_template=None, img_affine=None, reset_tg_space=False)
 
       
       Segment streamlines into bundles based on either waypoint ROIs
@@ -65,8 +65,6 @@ Functions
       reset_tg_space : bool, optional
           Whether to reset the space of the input tractogram after
           segmentation is complete. Default: False.
-      clean_params : dict, optional
-          Parameters for Mahalanobis cleaning. Default: {}
 
 
 
@@ -185,7 +183,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: _add_bundle_to_fiber_group(b_name, sl, idx)
+   .. py:method:: _add_bundle_to_fiber_group(b_name, sl, idx, to_flip)
 
       
       Helper function for segment_afq, to add a bundle
@@ -209,7 +207,7 @@ Functions
       ..
           !! processed by numpydoc !!
 
-   .. py:method:: segment_afq(clean_params={}, tg=None)
+   .. py:method:: segment_afq(tg=None)
 
       
       Assign streamlines to bundles using the waypoint ROI approach

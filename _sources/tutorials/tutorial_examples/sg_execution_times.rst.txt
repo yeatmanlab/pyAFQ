@@ -6,18 +6,38 @@
 
 Computation times
 =================
-**76:51.163** total execution time for **tutorials_tutorial_examples** files:
+**17:15.765** total execution time for 3 files **from tutorials/tutorial_examples**:
 
-+---------------------------------------------------------------------------------------------------------------------------------------+-----------+-----------+
-| :ref:`sphx_glr_tutorials_tutorial_examples_plot_optic_radiations.py` (``plot_optic_radiations.py``)                                   | 24:38.844 | 3980.8 MB |
-+---------------------------------------------------------------------------------------------------------------------------------------+-----------+-----------+
-| :ref:`sphx_glr_tutorials_tutorial_examples_plot_bids_layout.py` (``plot_bids_layout.py``)                                             | 16:46.330 | 2687.7 MB |
-+---------------------------------------------------------------------------------------------------------------------------------------+-----------+-----------+
-| :ref:`sphx_glr_tutorials_tutorial_examples_plot_tract_profile.py` (``plot_tract_profile.py``)                                         | 15:20.599 | 4609.4 MB |
-+---------------------------------------------------------------------------------------------------------------------------------------+-----------+-----------+
-| :ref:`sphx_glr_tutorials_tutorial_examples_plot_afq_reco80.py` (``plot_afq_reco80.py``)                                               | 13:41.682 | 3154.9 MB |
-+---------------------------------------------------------------------------------------------------------------------------------------+-----------+-----------+
-| :ref:`sphx_glr_tutorials_tutorial_examples_plot_afq_api.py` (``plot_afq_api.py``)                                                     | 06:23.708 | 2567.7 MB |
-+---------------------------------------------------------------------------------------------------------------------------------------+-----------+-----------+
-| :ref:`sphx_glr_tutorials_tutorial_examples_use_subject_space_rois_from_freesurfer.py` (``use_subject_space_rois_from_freesurfer.py``) | 00:00.000 | 0.0 MB    |
-+---------------------------------------------------------------------------------------------------------------------------------------+-----------+-----------+
+.. container::
+
+  .. raw:: html
+
+    <style scoped>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    </style>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script type="text/javascript" class="init">
+    $(document).ready( function () {
+        $('table.sg-datatable').DataTable({order: [[1, 'desc']]});
+    } );
+    </script>
+
+  .. list-table::
+   :header-rows: 1
+   :class: table table-striped sg-datatable
+
+   * - Example
+     - Time
+     - Mem (MB)
+   * - :ref:`sphx_glr_tutorials_tutorial_examples_plot_002_bids_layout.py` (``plot_002_bids_layout.py``)
+     - 10:47.730
+     - 2596.8
+   * - :ref:`sphx_glr_tutorials_tutorial_examples_plot_001_afq_api.py` (``plot_001_afq_api.py``)
+     - 04:42.253
+     - 2383.5
+   * - :ref:`sphx_glr_tutorials_tutorial_examples_plot_003_viz.py` (``plot_003_viz.py``)
+     - 01:45.782
+     - 794.5

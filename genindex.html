@@ -3,12 +3,12 @@
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html lang="en" data-content_root="" >
 
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; AFQ 1.1 documentation</title>
+    <title>Index &#8212; AFQ 1.2 documentation</title>
   
   
   
@@ -18,12 +18,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
 
   
-  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
@@ -39,8 +39,9 @@
     <link rel="stylesheet" type="text/css" href="_static/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
 
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
@@ -62,6 +63,15 @@
   
   
   <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
   
   <input type="checkbox"
           class="sidebar-toggle"
@@ -102,9 +112,11 @@
     <span class="fa-solid fa-bars"></span>
   </label>
   
-  <div class="navbar-header-items__start">
+  
+  <div class="col-lg-3 navbar-header-items__start">
     
       <div class="navbar-item">
+
   
 
 <a class="navbar-brand logo" href="index.html">
@@ -112,25 +124,26 @@
   
   
   
+  
     
     
       
     
     
-    <img src="_static/logo.png" class="logo__image only-light" alt="Logo image"/>
-    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+    <img src="_static/logo.png" class="logo__image only-light" alt="AFQ 1.2 documentation - Home"/>
+    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="AFQ 1.2 documentation - Home"/>`);</script>
   
   
 </a></div>
     
   </div>
   
-  
   <div class="col-lg-9 navbar-header-items">
     
     <div class="me-auto navbar-header-items__center">
       
-        <div class="navbar-item"><nav class="navbar-nav">
+        <div class="navbar-item">
+<nav class="navbar-nav">
   <p class="sidebar-header-items__title"
      role="heading"
      aria-level="1"
@@ -140,15 +153,15 @@
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="howto/index.html">
-                        How To
+                      <a class="nav-link nav-internal" href="tutorials/index.html">
+                        Getting started with pyAFQ
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="tutorials/index.html">
-                        Tutorials
+                      <a class="nav-link nav-internal" href="howto/index.html">
+                        How To
                       </a>
                     </li>
                 
@@ -183,23 +196,27 @@
       
         <div class="navbar-item navbar-persistent--container">
           
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
         </div>
       
       
         <div class="navbar-item">
+
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script></div>
@@ -215,8 +232,8 @@ document.write(`
           
           
           
-          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label></a>
+          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -226,13 +243,16 @@ document.write(`
   
   
     <div class="navbar-persistent--mobile">
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
     </div>
   
 
@@ -253,7 +273,8 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item"><nav class="navbar-nav">
+          <div class="navbar-item">
+<nav class="navbar-nav">
   <p class="sidebar-header-items__title"
      role="heading"
      aria-level="1"
@@ -263,15 +284,15 @@ document.write(`
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="howto/index.html">
-                        How To
+                      <a class="nav-link nav-internal" href="tutorials/index.html">
+                        Getting started with pyAFQ
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="tutorials/index.html">
-                        Tutorials
+                      <a class="nav-link nav-internal" href="howto/index.html">
+                        How To
                       </a>
                     </li>
                 
@@ -306,12 +327,13 @@ document.write(`
       <div class="sidebar-header-items__end">
         
           <div class="navbar-item">
+
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script></div>
@@ -327,8 +349,8 @@ document.write(`
           
           
           
-          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label></a>
+          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -464,16 +486,10 @@ document.write(`
 </li>
       <li><a href="reference/api/AFQ/viz/plotly_backend/index.html#AFQ.viz.plotly_backend._draw_streamlines">_draw_streamlines() (in module AFQ.viz.plotly_backend)</a>
 </li>
-      <li><a href="reference/api/AFQ/index.html#AFQ._ga_id">_ga_id (in module AFQ)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/api/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.BundleDict._gen">_gen() (AFQ.api.bundle_dict.BundleDict method)</a>
-
-      <ul>
-        <li><a href="reference/api/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.PediatricBundleDict._gen">(AFQ.api.bundle_dict.PediatricBundleDict method)</a>
+      <li><a href="reference/api/AFQ/index.html#AFQ._ga_id">_ga_id (in module AFQ)</a>
 </li>
-      </ul></li>
       <li><a href="reference/api/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSite._get_derivative_types">_get_derivative_types() (AFQ.data.s3bids.HBNSite method)</a>
 
       <ul>
@@ -718,8 +734,6 @@ document.write(`
         <li><a href="reference/api/AFQ/tasks/mapping/index.html#module-AFQ.tasks.mapping">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     AFQ.tasks.segmentation
 
@@ -727,6 +741,8 @@ document.write(`
         <li><a href="reference/api/AFQ/tasks/segmentation/index.html#module-AFQ.tasks.segmentation">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     AFQ.tasks.tractography
 
@@ -833,6 +849,13 @@ document.write(`
 </li>
       </ul></li>
       <li>
+    AFQ.viz.altair
+
+      <ul>
+        <li><a href="reference/api/AFQ/viz/altair/index.html#module-AFQ.viz.altair">module</a>
+</li>
+      </ul></li>
+      <li>
     AFQ.viz.fury_backend
 
       <ul>
@@ -861,6 +884,10 @@ document.write(`
 </li>
       </ul></li>
       <li><a href="reference/api/AFQ/api/utils/index.html#AFQ.api.utils.AFQclass_doc">AFQclass_doc (in module AFQ.api.utils)</a>, <a href="reference/api/AFQ/api/utils/index.html#id0">[1]</a>
+</li>
+      <li><a href="reference/api/AFQ/viz/altair/index.html#AFQ.viz.altair.altair_color_dict">altair_color_dict() (in module AFQ.viz.altair)</a>
+</li>
+      <li><a href="reference/api/AFQ/viz/altair/index.html#AFQ.viz.altair.altair_df_to_chart">altair_df_to_chart() (in module AFQ.viz.altair)</a>
 </li>
       <li><a href="reference/api/AFQ/models/QBallTP/index.html#AFQ.models.QBallTP.anisotropic_index">anisotropic_index() (in module AFQ.models.QBallTP)</a>
 </li>
@@ -902,10 +929,12 @@ document.write(`
 </li>
       <li><a href="reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.B0Image">B0Image (class in AFQ.definitions.image)</a>
 </li>
-      <li><a href="reference/api/AFQ/tasks/data/index.html#AFQ.tasks.data.brain_mask">brain_mask() (in module AFQ.tasks.data)</a>
+      <li><a href="reference/api/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.baby_bd">baby_bd() (in module AFQ.api.bundle_dict)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/api/AFQ/tasks/data/index.html#AFQ.tasks.data.brain_mask">brain_mask() (in module AFQ.tasks.data)</a>
+</li>
       <li><a href="reference/api/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.bucket">bucket (AFQ.data.s3bids.S3BIDSStudy property)</a>
 </li>
       <li><a href="reference/api/AFQ/data/utils/index.html#AFQ.data.utils.BUNDLE_MAT_2_PYTHON">BUNDLE_MAT_2_PYTHON (in module AFQ.data.utils)</a>
@@ -920,6 +949,10 @@ document.write(`
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/api/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.callosal_bd">callosal_bd() (in module AFQ.api.bundle_dict)</a>
+</li>
+      <li><a href="reference/api/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.cerebellar_bd">cerebellar_bd() (in module AFQ.api.bundle_dict)</a>
+</li>
       <li><a href="reference/api/AFQ/segmentation/index.html#AFQ.segmentation.clean_bundle">clean_bundle() (in module AFQ.segmentation)</a>
 </li>
       <li><a href="reference/api/AFQ/segmentation/index.html#AFQ.segmentation.clean_by_endpoints">clean_by_endpoints() (in module AFQ.segmentation)</a>
@@ -940,10 +973,12 @@ document.write(`
 </li>
       <li><a href="reference/api/AFQ/api/group/index.html#AFQ.api.group.GroupAFQ.combine_profiles">combine_profiles() (AFQ.api.group.GroupAFQ method)</a>
 </li>
-      <li><a href="reference/api/AFQ/utils/stats/index.html#AFQ.utils.stats.contrast_index">contrast_index() (in module AFQ.utils.stats)</a>
+      <li><a href="reference/api/AFQ/viz/altair/index.html#AFQ.viz.altair.combined_profiles_df_to_altair_df">combined_profiles_df_to_altair_df() (in module AFQ.viz.altair)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/api/AFQ/utils/stats/index.html#AFQ.utils.stats.contrast_index">contrast_index() (in module AFQ.utils.stats)</a>
+</li>
       <li><a href="reference/api/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.BundleDict.copy">copy() (AFQ.api.bundle_dict.BundleDict method)</a>
 </li>
       <li><a href="reference/api/AFQ/viz/fury_backend/index.html#AFQ.viz.fury_backend.create_gif">create_gif() (in module AFQ.viz.fury_backend)</a>
@@ -972,6 +1007,8 @@ document.write(`
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/api/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.default18_bd">default18_bd() (in module AFQ.api.bundle_dict)</a>
+</li>
       <li><a href="reference/api/AFQ/definitions/utils/index.html#AFQ.definitions.utils.Definition">Definition (class in AFQ.definitions.utils)</a>
 </li>
       <li><a href="reference/api/AFQ/utils/volume/index.html#AFQ.utils.volume.density_map">density_map() (in module AFQ.utils.volume)</a>
@@ -1004,10 +1041,10 @@ document.write(`
 </li>
       <li><a href="reference/api/AFQ/tasks/data/index.html#AFQ.tasks.data.dki_md">dki_md() (in module AFQ.tasks.data)</a>
 </li>
-      <li><a href="reference/api/AFQ/tasks/data/index.html#AFQ.tasks.data.dki_mk">dki_mk() (in module AFQ.tasks.data)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/api/AFQ/tasks/data/index.html#AFQ.tasks.data.dki_mk">dki_mk() (in module AFQ.tasks.data)</a>
+</li>
       <li><a href="reference/api/AFQ/tasks/data/index.html#AFQ.tasks.data.dki_params">dki_params() (in module AFQ.tasks.data)</a>
 </li>
       <li><a href="reference/api/AFQ/tasks/data/index.html#AFQ.tasks.data.dki_rd">dki_rd() (in module AFQ.tasks.data)</a>
@@ -1172,8 +1209,6 @@ document.write(`
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/api/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.BundleDict.gen_all">gen_all() (AFQ.api.bundle_dict.BundleDict method)</a>
-</li>
       <li><a href="reference/api/AFQ/definitions/mapping/index.html#AFQ.definitions.mapping.AffMap.gen_mapping">gen_mapping() (AFQ.definitions.mapping.AffMap method)</a>
 
       <ul>
@@ -1186,7 +1221,11 @@ document.write(`
 </li>
       <li><a href="reference/api/AFQ/utils/bin/index.html#AFQ.utils.bin.generate_json">generate_json() (in module AFQ.utils.bin)</a>
 </li>
+      <li><a href="reference/api/AFQ/api/group/index.html#AFQ.api.group.get_afq_bids_entities_fname">get_afq_bids_entities_fname() (in module AFQ.api.group)</a>
+</li>
       <li><a href="reference/api/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.BundleDict.get_b_info">get_b_info() (AFQ.api.bundle_dict.BundleDict method)</a>
+</li>
+      <li><a href="reference/api/AFQ/tasks/utils/index.html#AFQ.tasks.utils.get_base_fname">get_base_fname() (in module AFQ.tasks.utils)</a>
 </li>
       <li><a href="reference/api/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.SegmentedSFT.get_bundle">get_bundle() (AFQ.utils.streamlines.SegmentedSFT method)</a>
 </li>
@@ -1280,6 +1319,14 @@ document.write(`
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/api/AFQ/tasks/tractography/index.html#AFQ.tasks.tractography.has_gputrack">has_gputrack (in module AFQ.tasks.tractography)</a>
 </li>
+      <li><a href="reference/api/AFQ/tasks/segmentation/index.html#AFQ.tasks.segmentation.has_trx">has_trx (in module AFQ.tasks.segmentation)</a>
+
+      <ul>
+        <li><a href="reference/api/AFQ/tasks/tractography/index.html#AFQ.tasks.tractography.has_trx">(in module AFQ.tasks.tractography)</a>
+</li>
+        <li><a href="reference/api/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.has_trx">(in module AFQ.utils.streamlines)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/api/AFQ/data/s3bids/index.html#AFQ.data.s3bids.HBNSite">HBNSite (class in AFQ.data.s3bids)</a>
@@ -1316,16 +1363,8 @@ document.write(`
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.LabelledImageFile">LabelledImageFile (class in AFQ.definitions.image)</a>
 </li>
-      <li><a href="reference/api/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.BundleDict.load_templates">load_templates() (AFQ.api.bundle_dict.BundleDict method)</a>
-
-      <ul>
-        <li><a href="reference/api/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.PediatricBundleDict.load_templates">(AFQ.api.bundle_dict.PediatricBundleDict method)</a>
-</li>
-      </ul></li>
       <li><a href="reference/api/AFQ/data/s3bids/index.html#AFQ.data.s3bids.S3BIDSStudy.local_directories">local_directories (AFQ.data.s3bids.S3BIDSStudy property)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/api/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.logger">logger (in module AFQ.tasks.mapping)</a>
 
       <ul>
@@ -1444,6 +1483,8 @@ document.write(`
 </li>
         <li><a href="reference/api/AFQ/viz/index.html#module-AFQ.viz">AFQ.viz</a>
 </li>
+        <li><a href="reference/api/AFQ/viz/altair/index.html#module-AFQ.viz.altair">AFQ.viz.altair</a>
+</li>
         <li><a href="reference/api/AFQ/viz/fury_backend/index.html#module-AFQ.viz.fury_backend">AFQ.viz.fury_backend</a>
 </li>
         <li><a href="reference/api/AFQ/viz/plot/index.html#module-AFQ.viz.plot">AFQ.viz.plot</a>
@@ -1499,12 +1540,10 @@ document.write(`
 </li>
       <li><a href="reference/api/AFQ/utils/volume/index.html#AFQ.utils.volume.patch_up_roi">patch_up_roi() (in module AFQ.utils.volume)</a>
 </li>
-      <li><a href="reference/api/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.PediatricBundleDict">PediatricBundleDict (class in AFQ.api.bundle_dict)</a>
+      <li><a href="reference/api/AFQ/tasks/viz/index.html#AFQ.tasks.viz.plot_tract_profiles">plot_tract_profiles() (in module AFQ.tasks.viz)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/api/AFQ/tasks/viz/index.html#AFQ.tasks.viz.plot_tract_profiles">plot_tract_profiles() (in module AFQ.tasks.viz)</a>
-</li>
       <li><a href="reference/api/AFQ/utils/docs/index.html#AFQ.utils.docs.PNGScraper">PNGScraper (class in AFQ.utils.docs)</a>
 </li>
       <li><a href="reference/api/AFQ/models/dki/index.html#AFQ.models.dki.predict">predict() (in module AFQ.models.dki)</a>
@@ -1546,6 +1585,8 @@ document.write(`
       <li><a href="reference/api/AFQ/data/fetch/index.html#AFQ.data.fetch.read_stanford_hardi_tractography">read_stanford_hardi_tractography() (in module AFQ.data.fetch)</a>
 </li>
       <li><a href="reference/api/AFQ/data/fetch/index.html#AFQ.data.fetch.read_templates">read_templates() (in module AFQ.data.fetch)</a>
+</li>
+      <li><a href="reference/api/AFQ/api/bundle_dict/index.html#AFQ.api.bundle_dict.reco_bd">reco_bd() (in module AFQ.api.bundle_dict)</a>
 </li>
       <li><a href="reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.RoiImage">RoiImage (class in AFQ.definitions.image)</a>
 </li>
@@ -1764,16 +1805,12 @@ document.write(`
               
               
               
-                <footer class="bd-footer-article">
+              
+              
+                <footer class="prev-next-footer">
                   
-<div class="footer-article-items footer-article__inner">
-  
-    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
-</div></div>
-  
 </div>
-
                 </footer>
               
             </div>
@@ -1791,8 +1828,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+  <script src="_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
 
 
   <footer class="bd-footer">
@@ -1801,6 +1838,7 @@ document.write(`
     <div class="footer-items__start">
       
         <div class="footer-item">
+
   <p class="copyright">
     
       © Copyright 2018--, The pyAFQ Contributors.
@@ -1810,6 +1848,7 @@ document.write(`
 </div>
       
         <div class="footer-item">
+
   <p class="sphinx-version">
     Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
     <br/>
@@ -1819,10 +1858,12 @@ document.write(`
     </div>
   
   
+  
     <div class="footer-items__end">
       
-        <div class="footer-item"><p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
 </p></div>
       
     </div>

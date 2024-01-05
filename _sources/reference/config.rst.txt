@@ -145,6 +145,11 @@ See an example configuration file below::
     # One of {"local", "pft"}. Default: "local"
     tracker = "local"
     
+    # Whether to return the streamlines compatible with input to TRX file
+    # (i.e., as a LazyTractogram class instance).
+    # Default: False
+    trx = false
+    
     [SEGMENTATION_PARAMS]
     
     # Resample streamlines to nb_points number of points.
@@ -169,11 +174,11 @@ See an example configuration file below::
     
     # How to parallelize segmentation across processes when performing
     # waypoint ROI segmentation. Set to {"engine": "serial"} to not
-    # perform parallelization. See ``AFQ.utils.parallel.pafor`` for
+    # perform parallelization. Some engines may cause errors, depending
+    # on the system. See ``dipy.utils.parallel.paramap`` for
     # details.
-    # Default: {"n_jobs": -1, "engine": "joblib",
-    # "backend": "loky"}
-    parallel_segmentation = "{'n_jobs': 4, 'engine': 'dask'}"
+    # Default: {"engine": "serial"}
+    parallel_segmentation = "{'engine': 'serial'}"
     
     # Using RecoBundles Algorithm.
     # Whether or not to use progressive technique
@@ -400,9 +405,8 @@ See an example configuration file below::
     # Default: None
     brain_mask_definition = ""
     
-    # List of bundle names to include in segmentation,
-    # or a bundle dictionary (see BundleDict for inspiration),
-    # or a BundleDict. See `Defining Custom Bundle Dictionaries`
+    # A dictionary or BundleDict for use in segmentation.
+    # See `Defining Custom Bundle Dictionaries`
     # in the `usage` section of pyAFQ's documentation for details.
     # If None, will get all appropriate bundles for the chosen
     # segmentation algorithm.
@@ -447,6 +451,11 @@ See an example configuration file below::
     # instead of a mean or weighted mean.
     # Default: "gauss"
     profile_weights = "gauss"
+    
+    # Number of points to resample each streamline to before
+    # calculating the tract-profiles.
+    # Default: 100
+    n_points_profile = 100
     
     # List of scalars to use.
     # Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md", "dki_awf",

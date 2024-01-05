@@ -1,4 +1,0 @@
-.. _cleaning:
-
-Cleaning
-========

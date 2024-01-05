@@ -3,12 +3,12 @@
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html lang="en" data-content_root="" >
 
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Plotting tract profiles using RecoBundles &#8212; AFQ 1.1 documentation</title>
+    <title>Using RecoBundles for bundle recognition &#8212; AFQ 1.2 documentation</title>
   
   
   
@@ -18,12 +18,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
 
   
-  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
@@ -39,8 +39,9 @@
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -52,8 +53,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'howto/howto_examples/plot_recobundles';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Visualizing AFQ derivatives" href="plot_viz.html" />
-    <link rel="prev" title="Delineating cerebellar peduncles" href="cerebellar_peduncles.html" />
+    <link rel="next" title="Using Subject Space ROIs from Freesurfer" href="use_subject_space_rois_from_freesurfer.html" />
+    <link rel="prev" title="How to add new bundles into pyAFQ(Optic Radiations Example)" href="plot_optic_radiations.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -64,6 +65,15 @@
   
   
   <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
   
   <input type="checkbox"
           class="sidebar-toggle"
@@ -104,9 +114,11 @@
     <span class="fa-solid fa-bars"></span>
   </label>
   
-  <div class="navbar-header-items__start">
+  
+  <div class="col-lg-3 navbar-header-items__start">
     
       <div class="navbar-item">
+
   
 
 <a class="navbar-brand logo" href="../../index.html">
@@ -114,25 +126,26 @@
   
   
   
+  
     
     
       
     
     
-    <img src="../../_static/logo.png" class="logo__image only-light" alt="Logo image"/>
-    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.2 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.2 documentation - Home"/>`);</script>
   
   
 </a></div>
     
   </div>
   
-  
   <div class="col-lg-9 navbar-header-items">
     
     <div class="me-auto navbar-header-items__center">
       
-        <div class="navbar-item"><nav class="navbar-nav">
+        <div class="navbar-item">
+<nav class="navbar-nav">
   <p class="sidebar-header-items__title"
      role="heading"
      aria-level="1"
@@ -141,16 +154,16 @@
   </p>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../index.html">
-                        How To
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../tutorials/index.html">
+                        Getting started with pyAFQ
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../tutorials/index.html">
-                        Tutorials
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        How To
                       </a>
                     </li>
                 
@@ -185,23 +198,27 @@
       
         <div class="navbar-item navbar-persistent--container">
           
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
         </div>
       
       
         <div class="navbar-item">
+
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script></div>
@@ -217,8 +234,8 @@ document.write(`
           
           
           
-          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label></a>
+          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
       
@@ -228,18 +245,21 @@ document.write(`
   
   
     <div class="navbar-persistent--mobile">
-<script>
-document.write(`
-  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
-  </button>
-`);
-</script>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
     </div>
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
       <span class="fa-solid fa-outdent"></span>
     </label>
   
@@ -259,7 +279,8 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item"><nav class="navbar-nav">
+          <div class="navbar-item">
+<nav class="navbar-nav">
   <p class="sidebar-header-items__title"
      role="heading"
      aria-level="1"
@@ -268,16 +289,16 @@ document.write(`
   </p>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../index.html">
-                        How To
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../tutorials/index.html">
+                        Getting started with pyAFQ
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../tutorials/index.html">
-                        Tutorials
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        How To
                       </a>
                     </li>
                 
@@ -312,12 +333,13 @@ document.write(`
       <div class="sidebar-header-items__end">
         
           <div class="navbar-item">
+
 <script>
 document.write(`
-  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
-    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
-    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
   </button>
 `);
 </script></div>
@@ -333,8 +355,8 @@ document.write(`
           
           
           
-          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label></a>
+          <a href="https://github.com/yeatmanlab/pyAFQ" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
         </li>
 </ul></div>
         
@@ -360,13 +382,25 @@ document.write(`
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
-        <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../installation_guide.html">How to install <code class="docutils literal notranslate"><span class="pre">pyAFQ</span></code></a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../usage/index.html">How to use <cite>pyAFQ</cite></a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/data.html">Organizing your data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/kwargs.html">The pyAFQ API optional arguments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/scalars.html">How to add custom tissue properties from another pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/converter.html">Tractography from other pipelines</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../usage/docker.html">The pyAFQ docker image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/methods.html">The pyAFQ API methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/image.html">The pyAFQ Image API</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">How to contribute to pyAFQ</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../developing/index.html">How to develop <cite>pyAFQ</cite></a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../developing/index.html">How to develop <cite>pyAFQ</cite></a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../developing/tasks.html">Adding Tasks to the pyAFQ Workflow</a></li>
 
 
@@ -376,14 +410,19 @@ document.write(`
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_help.html">How to get help using pyAFQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cite.html">How to cite our work</a></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">Examples</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="vof_example.html">Finding only the ARC, pARC, VOF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_afq_callosal.html">Callosal bundles using AFQ API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_afq_fwdti.html">Free water DTI</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">How to examples</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="add_custom_bundle.html">How to add new bundles into pyAFQ (SLF 1/2/3 Example)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="baby_afq.html">BabyAFQ : tractometry for infant dMRI data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cerebellar_peduncles.html">Delineating cerebellar peduncles</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Plotting tract profiles using RecoBundles</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_viz.html">Visualizing AFQ derivatives</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_callosal_tract_profile.html">Plotting Novel Tract Profiles:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cloudknot_example.html">Using cloudknot to run pyAFQ on AWS batch:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cloudknot_hcp_example.html">AFQ with HCP data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_accoustic_radiations.html">How to add new bundles into pyAFQ(Accoustic Radiations Example)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_callosal.html">Callosal bundles using AFQ API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_afq_fwdti.html">How to use Free water DTI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_optic_radiations.html">How to add new bundles into pyAFQ(Optic Radiations Example)</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Using RecoBundles for bundle recognition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="use_subject_space_rois_from_freesurfer.html">Using Subject Space ROIs from Freesurfer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vof_example.html">How to segment out only some bundles</a></li>
 </ul>
 </li>
 </ul>
@@ -415,8 +454,8 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumbs">
-  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../index.html" class="nav-link" aria-label="Home">
@@ -427,9 +466,9 @@ document.write(`
     <li class="breadcrumb-item"><a href="../index.html" class="nav-link">How To</a></li>
     
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Examples</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">How to examples</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">Plotting tract profiles using RecoBundles</li>
+    <li class="breadcrumb-item active" aria-current="page">Using...</li>
   </ul>
 </nav>
 </div>
@@ -451,292 +490,544 @@ document.write(`
 <p><a class="reference internal" href="#sphx-glr-download-howto-howto-examples-plot-recobundles-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="plotting-tract-profiles-using-recobundles">
-<span id="sphx-glr-howto-howto-examples-plot-recobundles-py"></span><h1>Plotting tract profiles using RecoBundles<a class="headerlink" href="#plotting-tract-profiles-using-recobundles" title="Permalink to this heading">#</a></h1>
-<p>An example of tracking and segmenting two tracts with RecoBundles
-<a class="reference internal" href="#garyfallidis2017" id="id1"><span>[Garyfallidis2017]</span></a>, and plotting their tract profiles for FA (calculated with
-DTI).</p>
-<p>See <cite>plot_tract_profile</cite> for explanations of each stage here. The main
-difference here is that segmentation uses the RecoBundles algorithm, instead of
-the AFQ waypoint ROI approach.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
-<span class="kn">import</span> <span class="nn">dipy.data</span> <span class="k">as</span> <span class="nn">dpd</span>
-<span class="kn">from</span> <span class="nn">dipy.data</span> <span class="kn">import</span> <span class="n">fetcher</span>
-<span class="kn">import</span> <span class="nn">dipy.tracking.utils</span> <span class="k">as</span> <span class="nn">dtu</span>
-<span class="kn">import</span> <span class="nn">dipy.tracking.streamline</span> <span class="k">as</span> <span class="nn">dts</span>
-<span class="kn">from</span> <span class="nn">dipy.io.streamline</span> <span class="kn">import</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.streamline.save_tractogram" title="dipy.io.streamline.save_tractogram" class="sphx-glr-backref-module-dipy-io-streamline sphx-glr-backref-type-py-function"><span class="n">save_tractogram</span></a><span class="p">,</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.streamline.load_tractogram" title="dipy.io.streamline.load_tractogram" class="sphx-glr-backref-module-dipy-io-streamline sphx-glr-backref-type-py-function"><span class="n">load_tractogram</span></a>
-<span class="kn">from</span> <span class="nn">dipy.stats.analysis</span> <span class="kn">import</span> <a href="https://dipy.org/documentation/latest/reference/dipy.stats/#dipy.stats.analysis.afq_profile" title="dipy.stats.analysis.afq_profile" class="sphx-glr-backref-module-dipy-stats-analysis sphx-glr-backref-type-py-function"><span class="n">afq_profile</span></a><span class="p">,</span> <a href="https://dipy.org/documentation/latest/reference/dipy.stats/#dipy.stats.analysis.gaussian_weights" title="dipy.stats.analysis.gaussian_weights" class="sphx-glr-backref-module-dipy-stats-analysis sphx-glr-backref-type-py-function"><span class="n">gaussian_weights</span></a>
-<span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class"><span class="n">StatefulTractogram</span></a>
-<span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">Space</span>
-<span class="kn">from</span> <span class="nn">dipy.align</span> <span class="kn">import</span> <a href="https://dipy.org/documentation/latest/reference/dipy.align/#dipy.align.affine_registration" title="dipy.align.affine_registration" class="sphx-glr-backref-module-dipy-align sphx-glr-backref-type-py-function"><span class="n">affine_registration</span></a>
-
-
+<div class="sphx-glr-example-title section" id="using-recobundles-for-bundle-recognition">
+<span id="sphx-glr-howto-howto-examples-plot-recobundles-py"></span><h1>Using RecoBundles for bundle recognition<a class="headerlink" href="#using-recobundles-for-bundle-recognition" title="Permalink to this heading">#</a></h1>
+<p>For bundle recognition, pyAFQ defaults to use the waypoint ROI approach
+described in <a class="reference internal" href="../cite.html#yeatman2012" id="id1"><span>[Yeatman2012]</span></a>. However, as an alternative approach, pyAFQ also
+supports using the RecoBundles algorithm <a class="reference internal" href="#garyfallidis2017" id="id2"><span>[Garyfallidis2017]</span></a>, which uses an
+atlas of bundles in streamlines. This example shows how to
+use RecoBundles for bundle recognition.</p>
+<p>The code closely resembles the code used in <span class="xref std std-ref">sphx_glr_tutorial_examples_plot_001-plot_afq_api.py</span>.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
 <span class="kn">import</span> <span class="nn">AFQ.data.fetch</span> <span class="k">as</span> <span class="nn">afd</span>
-<span class="kn">import</span> <span class="nn">AFQ.tractography.tractography</span> <span class="k">as</span> <span class="nn">aft</span>
-<span class="kn">import</span> <span class="nn">AFQ.registration</span> <span class="k">as</span> <span class="nn">reg</span>
-<span class="kn">import</span> <span class="nn">AFQ.models.dti</span> <span class="k">as</span> <span class="nn">dti</span>
-<span class="kn">import</span> <span class="nn">AFQ.segmentation</span> <span class="k">as</span> <span class="nn">seg</span>
-<span class="kn">import</span> <span class="nn">AFQ.api.bundle_dict</span> <span class="k">as</span> <span class="nn">abd</span>
+<span class="kn">from</span> <span class="nn">AFQ.api.group</span> <span class="kn">import</span> <span class="n">GroupAFQ</span>
 
-<span class="c1"># Target directory for this example&#39;s output files</span>
-<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a> <span class="o">=</span> <span class="s2">&quot;./recobundles&quot;</span>
+<span class="n">afd</span><span class="o">.</span><span class="n">organize_stanford_data</span><span class="p">(</span><span class="n">clear_previous_afq</span><span class="o">=</span><span class="s2">&quot;track&quot;</span><span class="p">)</span>
 
-<a href="https://dipy.org/documentation/latest/reference/dipy.data/#dipy.data.fetch_stanford_hardi" title="dipy.data.fetch_stanford_hardi" class="sphx-glr-backref-module-dipy-data sphx-glr-backref-type-py-function"><span class="n">dpd</span><span class="o">.</span><span class="n">fetch_stanford_hardi</span></a><span class="p">()</span>
-
-<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_dir</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fetcher</span><span class="o">.</span><span class="n">dipy_home</span></a><span class="p">,</span> <span class="s2">&quot;stanford_hardi&quot;</span><span class="p">)</span>
-<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fdata</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_dir</span></a><span class="p">,</span> <span class="s2">&quot;HARDI150.nii.gz&quot;</span><span class="p">)</span>
-<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fbval</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_dir</span></a><span class="p">,</span> <span class="s2">&quot;HARDI150.bval&quot;</span><span class="p">)</span>
-<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fbvec</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_dir</span></a><span class="p">,</span> <span class="s2">&quot;HARDI150.bvec&quot;</span><span class="p">)</span>
-
-<span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fdata</span></a><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating DTI...&quot;</span><span class="p">)</span>
-<span class="k">if</span> <span class="ow">not</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.exists" title="os.path.exists" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">exists</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="s1">&#39;dti_FA.nii.gz&#39;</span><span class="p">)):</span>
-    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dti_params</span></a> <span class="o">=</span> <span class="n">dti</span><span class="o">.</span><span class="n">fit_dti</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fdata</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fbval</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fbvec</span></a><span class="p">,</span>
-                             <span class="n">out_dir</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>
-    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dti_params</span></a> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;FA&#39;</span><span class="p">:</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="s1">&#39;dti_FA.nii.gz&#39;</span><span class="p">),</span>
-                  <span class="s1">&#39;params&#39;</span><span class="p">:</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="s1">&#39;dti_params.nii.gz&#39;</span><span class="p">)}</span>
-
-<span class="n">FA_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dti_params</span></a><span class="p">[</span><span class="s1">&#39;FA&#39;</span><span class="p">])</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">FA_data</span></a> <span class="o">=</span> <span class="n">FA_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Registering to template...&quot;</span><span class="p">)</span>
-<span class="n">MNI_T2_img</span> <span class="o">=</span> <span class="n">afd</span><span class="o">.</span><span class="n">read_mni_template</span><span class="p">()</span>
-
-<span class="k">if</span> <span class="ow">not</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.exists" title="os.path.exists" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">exists</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">)):</span>
-    <span class="kn">import</span> <span class="nn">dipy.core.gradients</span> <span class="k">as</span> <span class="nn">dpg</span>
-    <a href="https://dipy.org/documentation/latest/reference/dipy.core/#dipy.core.gradients.GradientTable" title="dipy.core.gradients.GradientTable" class="sphx-glr-backref-module-dipy-core-gradients sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">gtab</span></a> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.core/#dipy.core.gradients.gradient_table" title="dipy.core.gradients.gradient_table" class="sphx-glr-backref-module-dipy-core-gradients sphx-glr-backref-type-py-function"><span class="n">dpg</span><span class="o">.</span><span class="n">gradient_table</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fbval</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fbvec</span></a><span class="p">)</span>
-    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">b0</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.mean.html#numpy.mean" title="numpy.mean" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">mean</span></a><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()[</span><span class="o">...</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">gtab</span><span class="o">.</span><span class="n">b0s_mask</span></a><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="c1"># Prealign using affine registration</span>
-    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">_</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">prealign</span></a> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.align/#dipy.align.affine_registration" title="dipy.align.affine_registration" class="sphx-glr-backref-module-dipy-align sphx-glr-backref-type-py-function"><span class="n">affine_registration</span></a><span class="p">(</span>
-        <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">b0</span></a><span class="p">,</span>
-        <span class="n">MNI_T2_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
-        <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
-        <span class="n">MNI_T2_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
-
-    <span class="c1"># Then register using a non-linear registration using the affine for</span>
-    <span class="c1"># prealignment</span>
-    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">warped_hardi</span></a><span class="p">,</span> <a href="https://dipy.org/documentation/latest/reference/dipy.align/#dipy.align.imwarp.DiffeomorphicMap" title="dipy.align.imwarp.DiffeomorphicMap" class="sphx-glr-backref-module-dipy-align-imwarp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">syn_register_dwi</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fdata</span></a><span class="p">,</span> <a href="https://dipy.org/documentation/latest/reference/dipy.core/#dipy.core.gradients.GradientTable" title="dipy.core.gradients.GradientTable" class="sphx-glr-backref-module-dipy-core-gradients sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">gtab</span></a><span class="p">,</span>
-                                                 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">prealign</span></a><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">prealign</span></a><span class="p">)</span>
-    <span class="n">reg</span><span class="o">.</span><span class="n">write_mapping</span><span class="p">(</span><a href="https://dipy.org/documentation/latest/reference/dipy.align/#dipy.align.imwarp.DiffeomorphicMap" title="dipy.align.imwarp.DiffeomorphicMap" class="sphx-glr-backref-module-dipy-align-imwarp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">))</span>
-<span class="k">else</span><span class="p">:</span>
-    <a href="https://dipy.org/documentation/latest/reference/dipy.align/#dipy.align.imwarp.DiffeomorphicMap" title="dipy.align.imwarp.DiffeomorphicMap" class="sphx-glr-backref-module-dipy-align-imwarp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">read_mapping</span><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="s1">&#39;mapping.nii.gz&#39;</span><span class="p">),</span>
-                               <span class="n">img</span><span class="p">,</span> <span class="n">MNI_T2_img</span><span class="p">)</span>
-
-
-<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle_names</span></a> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;CST_L&quot;</span><span class="p">,</span> <span class="s2">&quot;CST_R&quot;</span><span class="p">,</span> <span class="s2">&quot;UF_L&quot;</span><span class="p">,</span> <span class="s2">&quot;UF_R&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;CC_ForcepsMajor&quot;</span><span class="p">,</span> <span class="s2">&quot;CC_ForcepsMinor&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;OR_L&quot;</span><span class="p">,</span> <span class="s2">&quot;OR_R&quot;</span><span class="p">,</span> <span class="s2">&quot;VOF_L&quot;</span><span class="p">,</span> <span class="s2">&quot;VOF_R&quot;</span><span class="p">]</span>
-<span class="n">bundles</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.MutableMapping" title="collections.abc.MutableMapping" class="sphx-glr-backref-module-collections-abc sphx-glr-backref-type-py-class"><span class="n">abd</span><span class="o">.</span><span class="n">BundleDict</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle_names</span></a><span class="p">,</span> <span class="n">seg_algo</span><span class="o">=</span><span class="s2">&quot;reco80&quot;</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tracking...&quot;</span><span class="p">)</span>
-<span class="k">if</span> <span class="ow">not</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.exists" title="os.path.exists" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">exists</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="s1">&#39;dti_streamlines_reco.trk&#39;</span><span class="p">)):</span>
-    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seed_roi</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
-        <span class="k">if</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a> <span class="o">!=</span> <span class="s1">&#39;whole_brain&#39;</span><span class="p">:</span>
-            <span class="n">sl_xform</span> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.tracking/#dipy.tracking.Streamlines" title="dipy.tracking.Streamlines" class="sphx-glr-backref-module-dipy-tracking sphx-glr-backref-type-py-attribute"><span class="n">dts</span><span class="o">.</span><span class="n">Streamlines</span></a><span class="p">(</span>
-                <a href="https://dipy.org/documentation/latest/reference/dipy.tracking/#dipy.tracking.utils.transform_tracking_output" title="dipy.tracking.utils.transform_tracking_output" class="sphx-glr-backref-module-dipy-tracking-utils sphx-glr-backref-type-py-function"><span class="n">dtu</span><span class="o">.</span><span class="n">transform_tracking_output</span></a><span class="p">(</span><span class="n">bundles</span><span class="p">[</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a><span class="p">][</span><span class="s1">&#39;sl&#39;</span><span class="p">],</span>
-                                              <span class="n">MNI_T2_img</span><span class="o">.</span><span class="n">affine</span><span class="p">))</span>
-
-            <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">delta</span></a> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.tracking/#dipy.tracking.streamline.values_from_volume" title="dipy.tracking.streamline.values_from_volume" class="sphx-glr-backref-module-dipy-tracking-streamline sphx-glr-backref-type-py-function"><span class="n">dts</span><span class="o">.</span><span class="n">values_from_volume</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span><span class="o">.</span><span class="n">backward</span></a><span class="p">,</span>
-                                           <span class="n">sl_xform</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.eye.html#numpy.eye" title="numpy.eye" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">eye</span></a><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
-            <span class="n">sl_xform</span> <span class="o">=</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">delta</span></a><span class="p">,</span> <span class="n">sl_xform</span><span class="p">)]</span>
-
-            <span class="n">sl_xform</span> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.tracking/#dipy.tracking.Streamlines" title="dipy.tracking.Streamlines" class="sphx-glr-backref-module-dipy-tracking sphx-glr-backref-type-py-attribute"><span class="n">dts</span><span class="o">.</span><span class="n">Streamlines</span></a><span class="p">(</span>
-                <a href="https://dipy.org/documentation/latest/reference/dipy.tracking/#dipy.tracking.utils.transform_tracking_output" title="dipy.tracking.utils.transform_tracking_output" class="sphx-glr-backref-module-dipy-tracking-utils sphx-glr-backref-type-py-function"><span class="n">dtu</span><span class="o">.</span><span class="n">transform_tracking_output</span></a><span class="p">(</span>
-                    <span class="n">sl_xform</span><span class="p">,</span>
-                    <a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.inv.html#numpy.linalg.inv" title="numpy.linalg.inv" class="sphx-glr-backref-module-numpy-linalg sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span></a><span class="p">(</span><span class="n">MNI_T2_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)))</span>
-
-            <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sft</span></a> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class"><span class="n">StatefulTractogram</span></a><span class="p">(</span><span class="n">sl_xform</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.Space" title="dipy.io.stateful_tractogram.Space" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Space</span><span class="o">.</span><span class="n">RASMM</span></a><span class="p">)</span>
-            <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.streamline.save_tractogram" title="dipy.io.streamline.save_tractogram" class="sphx-glr-backref-module-dipy-io-streamline sphx-glr-backref-type-py-function"><span class="n">save_tractogram</span></a><span class="p">(</span><a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sft</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a><span class="si">}</span><span class="s1">_atlas.trk&#39;</span><span class="p">))</span>
-
-            <span class="n">sl_xform</span> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.tracking/#dipy.tracking.Streamlines" title="dipy.tracking.Streamlines" class="sphx-glr-backref-module-dipy-tracking sphx-glr-backref-type-py-attribute"><span class="n">dts</span><span class="o">.</span><span class="n">Streamlines</span></a><span class="p">(</span>
-                <a href="https://dipy.org/documentation/latest/reference/dipy.tracking/#dipy.tracking.utils.transform_tracking_output" title="dipy.tracking.utils.transform_tracking_output" class="sphx-glr-backref-module-dipy-tracking-utils sphx-glr-backref-type-py-function"><span class="n">dtu</span><span class="o">.</span><span class="n">transform_tracking_output</span></a><span class="p">(</span>
-                    <span class="n">sl_xform</span><span class="p">,</span>
-                    <a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.inv.html#numpy.linalg.inv" title="numpy.linalg.inv" class="sphx-glr-backref-module-numpy-linalg sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span></a><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">)))</span>
-
-            <span class="k">for</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sl</span></a> <span class="ow">in</span> <span class="n">sl_xform</span><span class="p">:</span>
-                <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sl_as_idx</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sl</span></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-                <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seed_roi</span></a><span class="p">[</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sl_as_idx</span></a><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
-                         <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sl_as_idx</span></a><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
-                         <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sl_as_idx</span></a><span class="p">[:,</span> <span class="mi">2</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
-
-    <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seed_roi</span></a><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span>
-             <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="s1">&#39;seed_roi.nii.gz&#39;</span><span class="p">))</span>
-    <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sft</span></a> <span class="o">=</span> <span class="n">aft</span><span class="o">.</span><span class="n">track</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dti_params</span></a><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">],</span> <span class="n">seed_mask</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">seed_roi</span></a><span class="p">,</span>
-                    <span class="n">directions</span><span class="o">=</span><span class="s1">&#39;det&#39;</span><span class="p">,</span> <span class="n">stop_mask</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">FA_data</span></a><span class="p">,</span>
-                    <span class="n">stop_threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">odf_model</span><span class="o">=</span><span class="s2">&quot;dti&quot;</span><span class="p">,</span>
-                    <span class="n">n_seeds</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">random_seeds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">rng_seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram.streamlines" title="dipy.io.stateful_tractogram.StatefulTractogram.streamlines" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-method"><span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span></a><span class="p">))</span>
-    <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.streamline.save_tractogram" title="dipy.io.streamline.save_tractogram" class="sphx-glr-backref-module-dipy-io-streamline sphx-glr-backref-type-py-function"><span class="n">save_tractogram</span></a><span class="p">(</span><a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sft</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="s1">&#39;dti_streamlines_reco.trk&#39;</span><span class="p">),</span>
-                    <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>
-    <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sft</span></a> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.streamline.load_tractogram" title="dipy.io.streamline.load_tractogram" class="sphx-glr-backref-module-dipy-io-streamline sphx-glr-backref-type-py-function"><span class="n">load_tractogram</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="s1">&#39;dti_streamlines_reco.trk&#39;</span><span class="p">),</span>
-                          <span class="n">img</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Segmenting fiber groups...&quot;</span><span class="p">)</span>
-<span class="n">segmentation</span> <span class="o">=</span> <span class="n">seg</span><span class="o">.</span><span class="n">Segmentation</span><span class="p">(</span><span class="n">seg_algo</span><span class="o">=</span><span class="s1">&#39;reco80&#39;</span><span class="p">,</span>
-                                <span class="n">rng</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/random/legacy.html#numpy.random.RandomState" title="numpy.random.RandomState" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-class"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span></a><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
-
-<span class="n">segmentation</span><span class="o">.</span><span class="n">segment</span><span class="p">(</span><span class="n">bundles</span><span class="p">,</span>
-                     <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sft</span></a><span class="p">,</span>
-                     <span class="n">fdata</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fdata</span></a><span class="p">,</span>
-                     <span class="n">fbval</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fbval</span></a><span class="p">,</span>
-                     <span class="n">fbvec</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">hardi_fbvec</span></a><span class="p">,</span>
-                     <a href="https://dipy.org/documentation/latest/reference/dipy.align/#dipy.align.imwarp.DiffeomorphicMap" title="dipy.align.imwarp.DiffeomorphicMap" class="sphx-glr-backref-module-dipy-align-imwarp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="o">=</span><a href="https://dipy.org/documentation/latest/reference/dipy.align/#dipy.align.imwarp.DiffeomorphicMap" title="dipy.align.imwarp.DiffeomorphicMap" class="sphx-glr-backref-module-dipy-align-imwarp sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">mapping</span></a><span class="p">,</span>
-                     <span class="n">reg_template</span><span class="o">=</span><span class="n">MNI_T2_img</span><span class="p">)</span>
-
-<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fiber_groups</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">segmentation</span><span class="o">.</span><span class="n">fiber_groups</span></a>
-
-<span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">kk</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fiber_groups</span></a><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">kk</span></a><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fiber_groups</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">kk</span></a><span class="p">]))</span>
-    <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sft</span></a> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class"><span class="n">StatefulTractogram</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fiber_groups</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">kk</span></a><span class="p">]</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span>
-                             <span class="n">img</span><span class="p">,</span>
-                             <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.Space" title="dipy.io.stateful_tractogram.Space" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Space</span><span class="o">.</span><span class="n">RASMM</span></a><span class="p">)</span>
-    <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.streamline.save_tractogram" title="dipy.io.streamline.save_tractogram" class="sphx-glr-backref-module-dipy-io-streamline sphx-glr-backref-type-py-function"><span class="n">save_tractogram</span></a><span class="p">(</span><a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sft</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_reco.trk&#39;</span> <span class="o">%</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">kk</span></a><span class="p">),</span>
-                    <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Extracting tract profiles...&quot;</span><span class="p">)</span>
-<span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a> <span class="ow">in</span> <span class="n">bundles</span><span class="p">:</span>
-    <span class="k">if</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a> <span class="o">!=</span> <span class="s1">&#39;whole_brain&#39;</span><span class="p">:</span>
-
-        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram" title="dipy.io.stateful_tractogram.StatefulTractogram" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sft</span></a> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.streamline.load_tractogram" title="dipy.io.streamline.load_tractogram" class="sphx-glr-backref-module-dipy-io-streamline sphx-glr-backref-type-py-function"><span class="n">load_tractogram</span></a><span class="p">(</span>
-            <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">working_dir</span></a><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a><span class="si">}</span><span class="s1">_reco.trk&#39;</span><span class="p">),</span>
-            <span class="n">img</span><span class="p">,</span>
-            <span class="n">to_space</span><span class="o">=</span><a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.Space" title="dipy.io.stateful_tractogram.Space" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Space</span><span class="o">.</span><span class="n">VOX</span></a><span class="p">,</span>
-            <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights</span></a> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.stats/#dipy.stats.analysis.gaussian_weights" title="dipy.stats.analysis.gaussian_weights" class="sphx-glr-backref-module-dipy-stats-analysis sphx-glr-backref-type-py-function"><span class="n">gaussian_weights</span></a><span class="p">(</span><a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram.streamlines" title="dipy.io.stateful_tractogram.StatefulTractogram.streamlines" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-method"><span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span></a><span class="p">)</span>
-        <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">profile</span></a> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.stats/#dipy.stats.analysis.afq_profile" title="dipy.stats.analysis.afq_profile" class="sphx-glr-backref-module-dipy-stats-analysis sphx-glr-backref-type-py-function"><span class="n">afq_profile</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">FA_data</span></a><span class="p">,</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.stateful_tractogram.StatefulTractogram.streamlines" title="dipy.io.stateful_tractogram.StatefulTractogram.streamlines" class="sphx-glr-backref-module-dipy-io-stateful_tractogram sphx-glr-backref-type-py-method"><span class="n">sft</span><span class="o">.</span><span class="n">streamlines</span></a><span class="p">,</span>
-                              <a href="https://numpy.org/doc/stable/reference/generated/numpy.eye.html#numpy.eye" title="numpy.eye" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">eye</span></a><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights</span></a><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights</span></a><span class="p">)</span>
-
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">profile</span></a><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">bundle</span></a><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tracking_params</span></a> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">n_seeds</span><span class="o">=</span><span class="mi">25000</span><span class="p">,</span>
+                       <span class="n">random_seeds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                       <span class="n">rng_seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 </pre></div>
 </div>
-<ul class="sphx-glr-horizontal">
-<li><img src="../../_images/sphx_glr_plot_recobundles_001.png" srcset="../../_images/sphx_glr_plot_recobundles_001.png" alt="CST_L" class = "sphx-glr-multi-img"/></li>
-<li><img src="../../_images/sphx_glr_plot_recobundles_002.png" srcset="../../_images/sphx_glr_plot_recobundles_002.png" alt="CST_R" class = "sphx-glr-multi-img"/></li>
-<li><img src="../../_images/sphx_glr_plot_recobundles_003.png" srcset="../../_images/sphx_glr_plot_recobundles_003.png" alt="UF_L" class = "sphx-glr-multi-img"/></li>
-<li><img src="../../_images/sphx_glr_plot_recobundles_004.png" srcset="../../_images/sphx_glr_plot_recobundles_004.png" alt="UF_R" class = "sphx-glr-multi-img"/></li>
-<li><img src="../../_images/sphx_glr_plot_recobundles_005.png" srcset="../../_images/sphx_glr_plot_recobundles_005.png" alt="CC_ForcepsMajor" class = "sphx-glr-multi-img"/></li>
-<li><img src="../../_images/sphx_glr_plot_recobundles_006.png" srcset="../../_images/sphx_glr_plot_recobundles_006.png" alt="CC_ForcepsMinor" class = "sphx-glr-multi-img"/></li>
-<li><img src="../../_images/sphx_glr_plot_recobundles_007.png" srcset="../../_images/sphx_glr_plot_recobundles_007.png" alt="OR_L" class = "sphx-glr-multi-img"/></li>
-<li><img src="../../_images/sphx_glr_plot_recobundles_008.png" srcset="../../_images/sphx_glr_plot_recobundles_008.png" alt="OR_R" class = "sphx-glr-multi-img"/></li>
-<li><img src="../../_images/sphx_glr_plot_recobundles_009.png" srcset="../../_images/sphx_glr_plot_recobundles_009.png" alt="VOF_L" class = "sphx-glr-multi-img"/></li>
-<li><img src="../../_images/sphx_glr_plot_recobundles_010.png" srcset="../../_images/sphx_glr_plot_recobundles_010.png" alt="VOF_R" class = "sphx-glr-multi-img"/></li>
-</ul>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Calculating DTI...
-Registering to template...
-Optimizing level 2 [max iter: 10000]
-Optimizing level 1 [max iter: 1000]
-Optimizing level 0 [max iter: 100]
-Optimizing level 2 [max iter: 10000]
-Optimizing level 1 [max iter: 1000]
-Optimizing level 0 [max iter: 100]
-Optimizing level 2 [max iter: 10000]
-Optimizing level 1 [max iter: 1000]
-Optimizing level 0 [max iter: 100]
-Tracking...
+<div class="section" id="defining-the-segmentation-params">
+<h2>Defining the segmentation params<a class="headerlink" href="#defining-the-segmentation-params" title="Permalink to this heading">#</a></h2>
+<p>We also refer to bundle recognition as the “segmentation” of the tractogram.
+Parameters of this process are set through a dictionary input to the
+<cite>segmentation_params</cite> argument of the GroupAFQ object. In this case, we
+set the <cite>seg_algo</cite> to “reco”, which tells pyAFQ to use the RecoBundles
+algorithm for bundle recognition.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">myafq</span> <span class="o">=</span> <span class="n">GroupAFQ</span><span class="p">(</span>
+    <span class="n">output_dir</span><span class="o">=</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">afd</span><span class="o">.</span><span class="n">afq_home</span></a><span class="p">,</span> <span class="s1">&#39;stanford_hardi&#39;</span><span class="p">,</span> <span class="s1">&#39;derivatives&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;recobundles&#39;</span><span class="p">),</span>
+    <span class="n">bids_path</span><span class="o">=</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">afd</span><span class="o">.</span><span class="n">afq_home</span></a><span class="p">,</span> <span class="s1">&#39;stanford_hardi&#39;</span><span class="p">),</span>
+    <span class="c1"># Set the algorithm to use RecoBundles for bundle recognition:</span>
+    <span class="n">segmentation_params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;seg_algo&#39;</span><span class="p">:</span> <span class="s1">&#39;reco&#39;</span><span class="p">},</span>
+    <span class="n">preproc_pipeline</span><span class="o">=</span><span class="s1">&#39;vistasoft&#39;</span><span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tracking_params</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tracking_params</span></a><span class="p">,</span>
+    <span class="n">viz_backend_spec</span><span class="o">=</span><span class="s1">&#39;plotly_no_gif&#39;</span><span class="p">)</span>
 
-  0%|          | 0/19503 [00:00&lt;?, ? MB/s]
-  0%|          | 4/19503 [00:00&lt;11:17, 28.77 MB/s]
-  0%|          | 17/19503 [00:00&lt;04:55, 66.02 MB/s]
-  0%|          | 69/19503 [00:00&lt;01:35, 203.86 MB/s]
-  1%|▏         | 277/19503 [00:00&lt;00:27, 703.21 MB/s]
-  3%|▎         | 650/19503 [00:00&lt;00:13, 1396.94 MB/s]
-  5%|▌         | 1016/19503 [00:00&lt;00:10, 1797.22 MB/s]
-  7%|▋         | 1389/19503 [00:00&lt;00:08, 2066.31 MB/s]
-  9%|▉         | 1754/19503 [00:01&lt;00:07, 2232.30 MB/s]
- 10%|█         | 2027/19503 [00:01&lt;00:08, 2069.29 MB/s]
- 12%|█▏        | 2336/19503 [00:01&lt;00:08, 2100.19 MB/s]
- 14%|█▍        | 2709/19503 [00:01&lt;00:07, 2261.30 MB/s]
- 16%|█▌        | 3078/19503 [00:01&lt;00:07, 2317.58 MB/s]
- 18%|█▊        | 3446/19503 [00:01&lt;00:06, 2473.42 MB/s]
- 19%|█▉        | 3735/19503 [00:01&lt;00:06, 2571.18 MB/s]
- 21%|██        | 3999/19503 [00:02&lt;00:06, 2417.36 MB/s]
- 22%|██▏       | 4364/19503 [00:02&lt;00:05, 2530.16 MB/s]
- 24%|██▍       | 4704/19503 [00:02&lt;00:05, 2743.92 MB/s]
- 26%|██▌       | 4984/19503 [00:02&lt;00:05, 2521.54 MB/s]
- 27%|██▋       | 5277/19503 [00:02&lt;00:05, 2459.15 MB/s]
- 29%|██▊       | 5560/19503 [00:02&lt;00:06, 2209.17 MB/s]
- 30%|███       | 5919/19503 [00:02&lt;00:05, 2300.89 MB/s]
- 32%|███▏      | 6285/19503 [00:03&lt;00:05, 2380.56 MB/s]
- 34%|███▍      | 6642/19503 [00:03&lt;00:05, 2419.08 MB/s]
- 36%|███▌      | 7003/19503 [00:03&lt;00:05, 2449.83 MB/s]
- 38%|███▊      | 7373/19503 [00:03&lt;00:04, 2497.00 MB/s]
- 40%|███▉      | 7734/19503 [00:03&lt;00:04, 2563.00 MB/s]
- 41%|████      | 7992/19503 [00:03&lt;00:04, 2555.86 MB/s]
- 42%|████▏     | 8286/19503 [00:03&lt;00:04, 2579.45 MB/s]
- 44%|████▍     | 8545/19503 [00:03&lt;00:04, 2547.43 MB/s]
- 45%|████▌     | 8835/19503 [00:04&lt;00:04, 2588.45 MB/s]
- 47%|████▋     | 9095/19503 [00:04&lt;00:04, 2545.91 MB/s]
- 48%|████▊     | 9373/19503 [00:04&lt;00:03, 2562.99 MB/s]
- 49%|████▉     | 9630/19503 [00:04&lt;00:03, 2548.09 MB/s]
- 51%|█████     | 9930/19503 [00:04&lt;00:03, 2600.93 MB/s]
- 52%|█████▏    | 10190/19503 [00:04&lt;00:03, 2561.19 MB/s]
- 54%|█████▍    | 10488/19503 [00:04&lt;00:03, 2626.70 MB/s]
- 55%|█████▌    | 10751/19503 [00:04&lt;00:03, 2564.31 MB/s]
- 57%|█████▋    | 11043/19503 [00:04&lt;00:03, 2634.67 MB/s]
- 58%|█████▊    | 11307/19503 [00:04&lt;00:03, 2551.50 MB/s]
- 59%|█████▉    | 11603/19503 [00:05&lt;00:02, 2661.74 MB/s]
- 61%|██████    | 11871/19503 [00:05&lt;00:03, 2532.49 MB/s]
- 63%|██████▎   | 12190/19503 [00:05&lt;00:02, 2593.22 MB/s]
- 64%|██████▍   | 12451/19503 [00:05&lt;00:02, 2583.48 MB/s]
- 65%|██████▌   | 12742/19503 [00:05&lt;00:02, 2532.19 MB/s]
- 67%|██████▋   | 13027/19503 [00:05&lt;00:02, 2607.46 MB/s]
- 68%|██████▊   | 13301/19503 [00:05&lt;00:02, 2564.39 MB/s]
- 70%|██████▉   | 13566/19503 [00:05&lt;00:02, 2565.93 MB/s]
- 71%|███████   | 13824/19503 [00:06&lt;00:04, 1147.59 MB/s]
- 73%|███████▎  | 14157/19503 [00:06&lt;00:03, 1394.27 MB/s]
- 74%|███████▍  | 14512/19503 [00:06&lt;00:03, 1642.04 MB/s]
- 76%|███████▌  | 14868/19503 [00:06&lt;00:02, 1905.47 MB/s]
- 78%|███████▊  | 15212/19503 [00:06&lt;00:01, 2214.93 MB/s]
- 79%|███████▉  | 15482/19503 [00:07&lt;00:01, 2104.95 MB/s]
- 81%|████████  | 15802/19503 [00:07&lt;00:01, 2242.04 MB/s]
- 83%|████████▎ | 16093/19503 [00:07&lt;00:01, 2396.95 MB/s]
- 84%|████████▍ | 16359/19503 [00:07&lt;00:01, 2369.59 MB/s]
- 85%|████████▌ | 16657/19503 [00:07&lt;00:01, 2525.79 MB/s]
- 87%|████████▋ | 16924/19503 [00:07&lt;00:01, 2457.30 MB/s]
- 88%|████████▊ | 17219/19503 [00:07&lt;00:00, 2589.03 MB/s]
- 90%|████████▉ | 17487/19503 [00:07&lt;00:00, 2532.38 MB/s]
- 91%|█████████ | 17746/19503 [00:07&lt;00:00, 2539.68 MB/s]
- 92%|█████████▏| 18025/19503 [00:08&lt;00:00, 2546.43 MB/s]
- 94%|█████████▎| 18283/19503 [00:08&lt;00:00, 2530.98 MB/s]
- 95%|█████████▌| 18556/19503 [00:08&lt;00:00, 2503.23 MB/s]
- 97%|█████████▋| 18837/19503 [00:08&lt;00:00, 2587.77 MB/s]
- 98%|█████████▊| 19121/19503 [00:08&lt;00:00, 2560.03 MB/s]
-100%|█████████▉| 19410/19503 [00:08&lt;00:00, 2646.71 MB/s]
-100%|██████████| 19503/19503 [00:08&lt;00:00, 2271.68 MB/s]
-6018
-Segmenting fiber groups...
-CST_L 63
-CST_R 64
-UF_L 11
-UF_R 1
-CC_ForcepsMajor 131
-CC_ForcepsMinor 376
-OR_L 4
-OR_R 4
-VOF_L 58
-VOF_R 44
-Extracting tract profiles...
+<span class="n">fig_files</span> <span class="o">=</span> <span class="n">myafq</span><span class="o">.</span><span class="n">export_all</span><span class="p">()</span>
 </pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/179864.0 [00:00&lt;?, ?it/s]
+  0%|          | 278/179864.0 [00:00&lt;01:04, 2778.52it/s]
+  0%|          | 675/179864.0 [00:00&lt;00:51, 3479.01it/s]
+  1%|          | 1088/179864.0 [00:00&lt;00:47, 3775.11it/s]
+  1%|          | 1484/179864.0 [00:00&lt;00:46, 3843.41it/s]
+  1%|          | 1891/179864.0 [00:00&lt;00:45, 3921.73it/s]
+  1%|▏         | 2298/179864.0 [00:00&lt;00:44, 3968.48it/s]
+  2%|▏         | 2713/179864.0 [00:00&lt;00:43, 4026.49it/s]
+  2%|▏         | 3123/179864.0 [00:00&lt;00:43, 4047.03it/s]
+  2%|▏         | 3549/179864.0 [00:00&lt;00:42, 4107.24it/s]
+  2%|▏         | 3973/179864.0 [00:01&lt;00:42, 4148.13it/s]
+  2%|▏         | 4393/179864.0 [00:01&lt;00:42, 4162.31it/s]
+  3%|▎         | 4823/179864.0 [00:01&lt;00:41, 4200.82it/s]
+  3%|▎         | 5254/179864.0 [00:01&lt;00:41, 4233.54it/s]
+  3%|▎         | 5678/179864.0 [00:01&lt;00:41, 4215.33it/s]
+  3%|▎         | 6106/179864.0 [00:01&lt;00:41, 4233.19it/s]
+  4%|▎         | 6546/179864.0 [00:01&lt;00:40, 4280.21it/s]
+  4%|▍         | 6982/179864.0 [00:01&lt;00:40, 4301.85it/s]
+  4%|▍         | 7413/179864.0 [00:01&lt;00:40, 4292.64it/s]
+  4%|▍         | 7863/179864.0 [00:01&lt;00:39, 4352.25it/s]
+  5%|▍         | 8317/179864.0 [00:02&lt;00:38, 4407.80it/s]
+  5%|▍         | 8758/179864.0 [00:02&lt;00:39, 4366.22it/s]
+  5%|▌         | 9195/179864.0 [00:02&lt;00:39, 4349.16it/s]
+  5%|▌         | 9637/179864.0 [00:02&lt;00:38, 4370.12it/s]
+  6%|▌         | 10084/179864.0 [00:02&lt;00:38, 4399.88it/s]
+  6%|▌         | 10531/179864.0 [00:02&lt;00:38, 4420.42it/s]
+  6%|▌         | 10974/179864.0 [00:02&lt;00:39, 4324.65it/s]
+  6%|▋         | 11423/179864.0 [00:02&lt;00:38, 4371.41it/s]
+  7%|▋         | 11868/179864.0 [00:02&lt;00:38, 4394.48it/s]
+  7%|▋         | 12325/179864.0 [00:02&lt;00:37, 4445.66it/s]
+  7%|▋         | 12770/179864.0 [00:03&lt;00:37, 4425.28it/s]
+  7%|▋         | 13213/179864.0 [00:03&lt;00:38, 4338.42it/s]
+  8%|▊         | 13666/179864.0 [00:03&lt;00:37, 4392.63it/s]
+  8%|▊         | 14118/179864.0 [00:03&lt;00:37, 4430.18it/s]
+  8%|▊         | 14592/179864.0 [00:03&lt;00:36, 4520.26it/s]
+  8%|▊         | 15045/179864.0 [00:03&lt;00:36, 4503.02it/s]
+  9%|▊         | 15496/179864.0 [00:03&lt;00:37, 4406.83it/s]
+  9%|▉         | 15946/179864.0 [00:03&lt;00:36, 4431.47it/s]
+  9%|▉         | 16418/179864.0 [00:03&lt;00:36, 4513.16it/s]
+  9%|▉         | 16888/179864.0 [00:03&lt;00:35, 4566.10it/s]
+ 10%|▉         | 17345/179864.0 [00:04&lt;00:35, 4562.50it/s]
+ 10%|▉         | 17802/179864.0 [00:04&lt;00:36, 4490.04it/s]
+ 10%|█         | 18252/179864.0 [00:04&lt;00:36, 4418.88it/s]
+ 10%|█         | 18713/179864.0 [00:04&lt;00:36, 4472.53it/s]
+ 11%|█         | 19180/179864.0 [00:04&lt;00:35, 4528.97it/s]
+ 11%|█         | 19642/179864.0 [00:04&lt;00:35, 4552.83it/s]
+ 11%|█         | 20098/179864.0 [00:04&lt;00:35, 4523.88it/s]
+ 11%|█▏        | 20551/179864.0 [00:04&lt;00:35, 4452.07it/s]
+ 12%|█▏        | 20998/179864.0 [00:04&lt;00:35, 4457.32it/s]
+ 12%|█▏        | 21474/179864.0 [00:04&lt;00:34, 4545.20it/s]
+ 12%|█▏        | 21939/179864.0 [00:05&lt;00:34, 4575.82it/s]
+ 12%|█▏        | 22399/179864.0 [00:05&lt;00:34, 4582.46it/s]
+ 13%|█▎        | 22858/179864.0 [00:05&lt;00:34, 4539.40it/s]
+ 13%|█▎        | 23313/179864.0 [00:05&lt;00:34, 4494.68it/s]
+ 13%|█▎        | 23772/179864.0 [00:05&lt;00:34, 4520.70it/s]
+ 13%|█▎        | 24249/179864.0 [00:05&lt;00:33, 4593.81it/s]
+ 14%|█▎        | 24717/179864.0 [00:05&lt;00:33, 4613.43it/s]
+ 14%|█▍        | 25179/179864.0 [00:05&lt;00:33, 4584.39it/s]
+ 14%|█▍        | 25638/179864.0 [00:05&lt;00:33, 4570.51it/s]
+ 15%|█▍        | 26096/179864.0 [00:05&lt;00:33, 4528.98it/s]
+ 15%|█▍        | 26550/179864.0 [00:06&lt;00:34, 4501.76it/s]
+ 15%|█▌        | 27023/179864.0 [00:06&lt;00:33, 4568.29it/s]
+ 15%|█▌        | 27505/179864.0 [00:06&lt;00:32, 4640.30it/s]
+ 16%|█▌        | 27976/179864.0 [00:06&lt;00:32, 4658.44it/s]
+ 16%|█▌        | 28445/179864.0 [00:06&lt;00:32, 4666.08it/s]
+ 16%|█▌        | 28912/179864.0 [00:06&lt;00:32, 4601.45it/s]
+ 16%|█▋        | 29373/179864.0 [00:06&lt;00:33, 4496.20it/s]
+ 17%|█▋        | 29836/179864.0 [00:06&lt;00:33, 4532.93it/s]
+ 17%|█▋        | 30310/179864.0 [00:06&lt;00:32, 4592.85it/s]
+ 17%|█▋        | 30783/179864.0 [00:06&lt;00:32, 4631.99it/s]
+ 17%|█▋        | 31255/179864.0 [00:07&lt;00:31, 4657.69it/s]
+ 18%|█▊        | 31722/179864.0 [00:07&lt;00:32, 4626.91it/s]
+ 18%|█▊        | 32185/179864.0 [00:07&lt;00:32, 4597.92it/s]
+ 18%|█▊        | 32645/179864.0 [00:07&lt;00:32, 4519.94it/s]
+ 18%|█▊        | 33100/179864.0 [00:07&lt;00:32, 4525.86it/s]
+ 19%|█▊        | 33574/179864.0 [00:07&lt;00:31, 4587.46it/s]
+ 19%|█▉        | 34039/179864.0 [00:07&lt;00:31, 4604.81it/s]
+ 19%|█▉        | 34511/179864.0 [00:07&lt;00:31, 4638.70it/s]
+ 19%|█▉        | 34976/179864.0 [00:07&lt;00:31, 4626.59it/s]
+ 20%|█▉        | 35439/179864.0 [00:08&lt;00:31, 4610.65it/s]
+ 20%|█▉        | 35901/179864.0 [00:08&lt;00:31, 4557.56it/s]
+ 20%|██        | 36357/179864.0 [00:08&lt;00:31, 4511.20it/s]
+ 20%|██        | 36833/179864.0 [00:08&lt;00:31, 4583.20it/s]
+ 21%|██        | 37313/179864.0 [00:08&lt;00:30, 4646.99it/s]
+ 21%|██        | 37787/179864.0 [00:08&lt;00:30, 4673.98it/s]
+ 21%|██▏       | 38255/179864.0 [00:08&lt;00:30, 4673.91it/s]
+ 22%|██▏       | 38723/179864.0 [00:08&lt;00:30, 4633.70it/s]
+ 22%|██▏       | 39187/179864.0 [00:08&lt;00:30, 4566.98it/s]
+ 22%|██▏       | 39644/179864.0 [00:08&lt;00:30, 4540.35it/s]
+ 22%|██▏       | 40119/179864.0 [00:09&lt;00:30, 4600.80it/s]
+ 23%|██▎       | 40609/179864.0 [00:09&lt;00:29, 4689.47it/s]
+ 23%|██▎       | 41088/179864.0 [00:09&lt;00:29, 4716.57it/s]
+ 23%|██▎       | 41560/179864.0 [00:09&lt;00:29, 4708.51it/s]
+ 23%|██▎       | 42031/179864.0 [00:09&lt;00:29, 4660.31it/s]
+ 24%|██▎       | 42498/179864.0 [00:09&lt;00:29, 4597.22it/s]
+ 24%|██▍       | 42958/179864.0 [00:09&lt;00:30, 4563.04it/s]
+ 24%|██▍       | 43432/179864.0 [00:09&lt;00:29, 4612.85it/s]
+ 24%|██▍       | 43901/179864.0 [00:09&lt;00:29, 4634.45it/s]
+ 25%|██▍       | 44390/179864.0 [00:09&lt;00:28, 4707.73it/s]
+ 25%|██▍       | 44861/179864.0 [00:10&lt;00:28, 4691.39it/s]
+ 25%|██▌       | 45331/179864.0 [00:10&lt;00:28, 4641.63it/s]
+ 25%|██▌       | 45796/179864.0 [00:10&lt;00:29, 4554.16it/s]
+ 26%|██▌       | 46265/179864.0 [00:10&lt;00:29, 4592.71it/s]
+ 26%|██▌       | 46763/179864.0 [00:10&lt;00:28, 4704.67it/s]
+ 26%|██▋       | 47255/179864.0 [00:10&lt;00:27, 4768.38it/s]
+ 27%|██▋       | 47749/179864.0 [00:10&lt;00:27, 4816.35it/s]
+ 27%|██▋       | 48231/179864.0 [00:10&lt;00:27, 4748.59it/s]
+ 27%|██▋       | 48707/179864.0 [00:10&lt;00:27, 4718.22it/s]
+ 27%|██▋       | 49180/179864.0 [00:10&lt;00:28, 4623.65it/s]
+ 28%|██▊       | 49643/179864.0 [00:11&lt;00:28, 4599.05it/s]
+ 28%|██▊       | 50131/179864.0 [00:11&lt;00:27, 4677.12it/s]
+ 28%|██▊       | 50620/179864.0 [00:11&lt;00:27, 4739.07it/s]
+ 28%|██▊       | 51102/179864.0 [00:11&lt;00:27, 4760.59it/s]
+ 29%|██▊       | 51579/179864.0 [00:11&lt;00:27, 4710.44it/s]
+ 29%|██▉       | 52052/179864.0 [00:11&lt;00:27, 4714.89it/s]
+ 29%|██▉       | 52524/179864.0 [00:11&lt;00:27, 4617.98it/s]
+ 29%|██▉       | 52987/179864.0 [00:11&lt;00:28, 4513.38it/s]
+ 30%|██▉       | 53440/179864.0 [00:11&lt;00:28, 4502.69it/s]
+ 30%|██▉       | 53930/179864.0 [00:11&lt;00:27, 4615.24it/s]
+ 30%|███       | 54418/179864.0 [00:12&lt;00:26, 4692.34it/s]
+ 31%|███       | 54891/179864.0 [00:12&lt;00:26, 4699.85it/s]
+ 31%|███       | 55372/179864.0 [00:12&lt;00:26, 4730.57it/s]
+ 31%|███       | 55846/179864.0 [00:12&lt;00:26, 4659.15it/s]
+ 31%|███▏      | 56313/179864.0 [00:12&lt;00:26, 4636.09it/s]
+ 32%|███▏      | 56777/179864.0 [00:12&lt;00:26, 4585.91it/s]
+ 32%|███▏      | 57277/179864.0 [00:12&lt;00:26, 4703.31it/s]
+ 32%|███▏      | 57768/179864.0 [00:12&lt;00:25, 4761.66it/s]
+ 32%|███▏      | 58259/179864.0 [00:12&lt;00:25, 4802.57it/s]
+ 33%|███▎      | 58751/179864.0 [00:12&lt;00:25, 4836.19it/s]
+ 33%|███▎      | 59242/179864.0 [00:13&lt;00:24, 4856.19it/s]
+ 33%|███▎      | 59728/179864.0 [00:13&lt;00:25, 4717.81it/s]
+ 33%|███▎      | 60201/179864.0 [00:13&lt;00:26, 4588.95it/s]
+ 34%|███▎      | 60696/179864.0 [00:13&lt;00:25, 4692.93it/s]
+ 34%|███▍      | 61199/179864.0 [00:13&lt;00:24, 4790.48it/s]
+ 34%|███▍      | 61706/179864.0 [00:13&lt;00:24, 4871.93it/s]
+ 35%|███▍      | 62195/179864.0 [00:13&lt;00:24, 4814.48it/s]
+ 35%|███▍      | 62678/179864.0 [00:13&lt;00:24, 4751.11it/s]
+ 35%|███▌      | 63154/179864.0 [00:13&lt;00:24, 4684.02it/s]
+ 35%|███▌      | 63623/179864.0 [00:14&lt;00:25, 4596.93it/s]
+ 36%|███▌      | 64103/179864.0 [00:14&lt;00:24, 4654.20it/s]
+ 36%|███▌      | 64594/179864.0 [00:14&lt;00:24, 4727.46it/s]
+ 36%|███▌      | 65085/179864.0 [00:14&lt;00:24, 4779.66it/s]
+ 36%|███▋      | 65574/179864.0 [00:14&lt;00:23, 4811.73it/s]
+ 37%|███▋      | 66061/179864.0 [00:14&lt;00:23, 4828.86it/s]
+ 37%|███▋      | 66545/179864.0 [00:14&lt;00:44, 2534.99it/s]
+ 37%|███▋      | 66979/179864.0 [00:15&lt;00:39, 2864.40it/s]
+ 37%|███▋      | 67431/179864.0 [00:15&lt;00:35, 3206.34it/s]
+ 38%|███▊      | 67906/179864.0 [00:15&lt;00:31, 3557.07it/s]
+ 38%|███▊      | 68389/179864.0 [00:15&lt;00:28, 3869.22it/s]
+ 38%|███▊      | 68876/179864.0 [00:15&lt;00:26, 4129.01it/s]
+ 39%|███▊      | 69357/179864.0 [00:15&lt;00:25, 4311.48it/s]
+ 39%|███▉      | 69822/179864.0 [00:15&lt;00:25, 4362.93it/s]
+ 39%|███▉      | 70282/179864.0 [00:15&lt;00:25, 4383.21it/s]
+ 39%|███▉      | 70742/179864.0 [00:15&lt;00:24, 4442.73it/s]
+ 40%|███▉      | 71199/179864.0 [00:15&lt;00:24, 4444.23it/s]
+ 40%|███▉      | 71677/179864.0 [00:16&lt;00:23, 4539.20it/s]
+ 40%|████      | 72152/179864.0 [00:16&lt;00:23, 4599.93it/s]
+ 40%|████      | 72621/179864.0 [00:16&lt;00:23, 4624.40it/s]
+ 41%|████      | 73087/179864.0 [00:16&lt;00:23, 4615.65it/s]
+ 41%|████      | 73551/179864.0 [00:16&lt;00:23, 4551.91it/s]
+ 41%|████      | 74008/179864.0 [00:16&lt;00:23, 4485.53it/s]
+ 41%|████▏     | 74458/179864.0 [00:16&lt;00:23, 4487.51it/s]
+ 42%|████▏     | 74932/179864.0 [00:16&lt;00:23, 4560.68it/s]
+ 42%|████▏     | 75391/179864.0 [00:16&lt;00:22, 4565.66it/s]
+ 42%|████▏     | 75854/179864.0 [00:16&lt;00:22, 4582.74it/s]
+ 42%|████▏     | 76313/179864.0 [00:17&lt;00:22, 4576.31it/s]
+ 43%|████▎     | 76771/179864.0 [00:17&lt;00:22, 4528.46it/s]
+ 43%|████▎     | 77225/179864.0 [00:17&lt;00:23, 4453.90it/s]
+ 43%|████▎     | 77671/179864.0 [00:17&lt;00:23, 4437.06it/s]
+ 43%|████▎     | 78140/179864.0 [00:17&lt;00:22, 4510.02it/s]
+ 44%|████▎     | 78614/179864.0 [00:17&lt;00:22, 4574.77it/s]
+ 44%|████▍     | 79090/179864.0 [00:17&lt;00:21, 4628.29it/s]
+ 44%|████▍     | 79554/179864.0 [00:17&lt;00:21, 4612.46it/s]
+ 44%|████▍     | 80016/179864.0 [00:17&lt;00:21, 4581.17it/s]
+ 45%|████▍     | 80475/179864.0 [00:17&lt;00:22, 4491.53it/s]
+ 45%|████▍     | 80925/179864.0 [00:18&lt;00:22, 4423.81it/s]
+ 45%|████▌     | 81368/179864.0 [00:18&lt;00:22, 4424.97it/s]
+ 45%|████▌     | 81825/179864.0 [00:18&lt;00:21, 4465.27it/s]
+ 46%|████▌     | 82291/179864.0 [00:18&lt;00:21, 4522.10it/s]
+ 46%|████▌     | 82751/179864.0 [00:18&lt;00:21, 4543.65it/s]
+ 46%|████▋     | 83206/179864.0 [00:18&lt;00:21, 4488.51it/s]
+ 47%|████▋     | 83656/179864.0 [00:18&lt;00:21, 4404.80it/s]
+ 47%|████▋     | 84129/179864.0 [00:18&lt;00:21, 4497.74it/s]
+ 47%|████▋     | 84580/179864.0 [00:18&lt;00:21, 4440.99it/s]
+ 47%|████▋     | 85029/179864.0 [00:19&lt;00:21, 4455.19it/s]
+ 48%|████▊     | 85502/179864.0 [00:19&lt;00:20, 4535.38it/s]
+ 48%|████▊     | 85956/179864.0 [00:19&lt;00:20, 4536.66it/s]
+ 48%|████▊     | 86417/179864.0 [00:19&lt;00:20, 4554.46it/s]
+ 48%|████▊     | 86873/179864.0 [00:19&lt;00:20, 4462.25it/s]
+ 49%|████▊     | 87320/179864.0 [00:19&lt;00:20, 4443.90it/s]
+ 49%|████▉     | 87765/179864.0 [00:19&lt;00:20, 4388.52it/s]
+ 49%|████▉     | 88221/179864.0 [00:19&lt;00:20, 4437.39it/s]
+ 49%|████▉     | 88701/179864.0 [00:19&lt;00:20, 4543.04it/s]
+ 50%|████▉     | 89183/179864.0 [00:19&lt;00:19, 4621.78it/s]
+ 50%|████▉     | 89669/179864.0 [00:20&lt;00:19, 4690.26it/s]
+ 50%|█████     | 90139/179864.0 [00:20&lt;00:19, 4677.56it/s]
+ 50%|█████     | 90607/179864.0 [00:20&lt;00:19, 4561.96it/s]
+ 51%|█████     | 91064/179864.0 [00:20&lt;00:19, 4526.27it/s]
+ 51%|█████     | 91518/179864.0 [00:20&lt;00:19, 4433.13it/s]
+ 51%|█████     | 91975/179864.0 [00:20&lt;00:19, 4472.24it/s]
+ 51%|█████▏    | 92457/179864.0 [00:20&lt;00:19, 4573.37it/s]
+ 52%|█████▏    | 92929/179864.0 [00:20&lt;00:18, 4615.20it/s]
+ 52%|█████▏    | 93399/179864.0 [00:20&lt;00:18, 4638.79it/s]
+ 52%|█████▏    | 93864/179864.0 [00:20&lt;00:18, 4561.07it/s]
+ 52%|█████▏    | 94322/179864.0 [00:21&lt;00:18, 4562.56it/s]
+ 53%|█████▎    | 94779/179864.0 [00:21&lt;00:18, 4499.04it/s]
+ 53%|█████▎    | 95230/179864.0 [00:21&lt;00:18, 4457.13it/s]
+ 53%|█████▎    | 95703/179864.0 [00:21&lt;00:18, 4536.37it/s]
+ 53%|█████▎    | 96163/179864.0 [00:21&lt;00:18, 4554.80it/s]
+ 54%|█████▎    | 96623/179864.0 [00:21&lt;00:18, 4566.72it/s]
+ 54%|█████▍    | 97080/179864.0 [00:21&lt;00:18, 4541.75it/s]
+ 54%|█████▍    | 97535/179864.0 [00:21&lt;00:18, 4451.16it/s]
+ 54%|█████▍    | 97981/179864.0 [00:21&lt;00:18, 4423.15it/s]
+ 55%|█████▍    | 98424/179864.0 [00:21&lt;00:18, 4296.73it/s]
+ 55%|█████▍    | 98869/179864.0 [00:22&lt;00:18, 4340.18it/s]
+ 55%|█████▌    | 99342/179864.0 [00:22&lt;00:18, 4453.50it/s]
+ 55%|█████▌    | 99806/179864.0 [00:22&lt;00:17, 4508.04it/s]
+ 56%|█████▌    | 100272/179864.0 [00:22&lt;00:17, 4553.04it/s]
+ 56%|█████▌    | 100730/179864.0 [00:22&lt;00:17, 4560.90it/s]
+ 56%|█████▋    | 101187/179864.0 [00:22&lt;00:17, 4423.05it/s]
+ 57%|█████▋    | 101635/179864.0 [00:22&lt;00:17, 4437.55it/s]
+ 57%|█████▋    | 102081/179864.0 [00:22&lt;00:17, 4439.90it/s]
+ 57%|█████▋    | 102546/179864.0 [00:22&lt;00:17, 4501.86it/s]
+ 57%|█████▋    | 103022/179864.0 [00:22&lt;00:16, 4577.98it/s]
+ 58%|█████▊    | 103491/179864.0 [00:23&lt;00:16, 4609.98it/s]
+ 58%|█████▊    | 103959/179864.0 [00:23&lt;00:16, 4629.63it/s]
+ 58%|█████▊    | 104423/179864.0 [00:23&lt;00:16, 4611.64it/s]
+ 58%|█████▊    | 104885/179864.0 [00:23&lt;00:16, 4508.82it/s]
+ 59%|█████▊    | 105338/179864.0 [00:23&lt;00:16, 4514.31it/s]
+ 59%|█████▉    | 105796/179864.0 [00:23&lt;00:16, 4533.27it/s]
+ 59%|█████▉    | 106278/179864.0 [00:23&lt;00:15, 4615.30it/s]
+ 59%|█████▉    | 106759/179864.0 [00:23&lt;00:15, 4670.70it/s]
+ 60%|█████▉    | 107232/179864.0 [00:23&lt;00:15, 4686.65it/s]
+ 60%|█████▉    | 107701/179864.0 [00:24&lt;00:15, 4662.83it/s]
+ 60%|██████    | 108168/179864.0 [00:24&lt;00:15, 4563.61it/s]
+ 60%|██████    | 108625/179864.0 [00:24&lt;00:15, 4529.24it/s]
+ 61%|██████    | 109095/179864.0 [00:24&lt;00:15, 4576.66it/s]
+ 61%|██████    | 109576/179864.0 [00:24&lt;00:15, 4644.62it/s]
+ 61%|██████    | 110057/179864.0 [00:24&lt;00:14, 4692.19it/s]
+ 61%|██████▏   | 110545/179864.0 [00:24&lt;00:14, 4746.22it/s]
+ 62%|██████▏   | 111024/179864.0 [00:24&lt;00:14, 4757.91it/s]
+ 62%|██████▏   | 111508/179864.0 [00:24&lt;00:14, 4781.82it/s]
+ 62%|██████▏   | 111987/179864.0 [00:24&lt;00:14, 4737.17it/s]
+ 63%|██████▎   | 112461/179864.0 [00:25&lt;00:14, 4647.55it/s]
+ 63%|██████▎   | 112927/179864.0 [00:25&lt;00:14, 4582.90it/s]
+ 63%|██████▎   | 113414/179864.0 [00:25&lt;00:14, 4666.52it/s]
+ 63%|██████▎   | 113908/179864.0 [00:25&lt;00:13, 4746.19it/s]
+ 64%|██████▎   | 114384/179864.0 [00:25&lt;00:13, 4730.15it/s]
+ 64%|██████▍   | 114858/179864.0 [00:25&lt;00:14, 4472.59it/s]
+ 64%|██████▍   | 115322/179864.0 [00:25&lt;00:14, 4520.15it/s]
+ 64%|██████▍   | 115777/179864.0 [00:25&lt;00:14, 4519.34it/s]
+ 65%|██████▍   | 116253/179864.0 [00:25&lt;00:13, 4587.63it/s]
+ 65%|██████▍   | 116736/179864.0 [00:25&lt;00:13, 4658.87it/s]
+ 65%|██████▌   | 117227/179864.0 [00:26&lt;00:13, 4732.66it/s]
+ 65%|██████▌   | 117714/179864.0 [00:26&lt;00:13, 4772.19it/s]
+ 66%|██████▌   | 118210/179864.0 [00:26&lt;00:12, 4827.10it/s]
+ 66%|██████▌   | 118694/179864.0 [00:26&lt;00:12, 4797.44it/s]
+ 66%|██████▋   | 119175/179864.0 [00:26&lt;00:12, 4785.77it/s]
+ 67%|██████▋   | 119654/179864.0 [00:26&lt;00:12, 4769.95it/s]
+ 67%|██████▋   | 120159/179864.0 [00:26&lt;00:12, 4852.43it/s]
+ 67%|██████▋   | 120647/179864.0 [00:26&lt;00:12, 4858.88it/s]
+ 67%|██████▋   | 121134/179864.0 [00:26&lt;00:12, 4851.04it/s]
+ 68%|██████▊   | 121620/179864.0 [00:26&lt;00:12, 4845.92it/s]
+ 68%|██████▊   | 122105/179864.0 [00:27&lt;00:12, 4781.71it/s]
+ 68%|██████▊   | 122584/179864.0 [00:27&lt;00:12, 4723.69it/s]
+ 68%|██████▊   | 123057/179864.0 [00:27&lt;00:12, 4724.26it/s]
+ 69%|██████▊   | 123560/179864.0 [00:27&lt;00:11, 4812.04it/s]
+ 69%|██████▉   | 124054/179864.0 [00:27&lt;00:11, 4849.21it/s]
+ 69%|██████▉   | 124540/179864.0 [00:27&lt;00:11, 4840.22it/s]
+ 70%|██████▉   | 125029/179864.0 [00:27&lt;00:11, 4852.89it/s]
+ 70%|██████▉   | 125515/179864.0 [00:27&lt;00:11, 4815.83it/s]
+ 70%|███████   | 125997/179864.0 [00:27&lt;00:11, 4741.93it/s]
+ 70%|███████   | 126473/179864.0 [00:27&lt;00:11, 4746.85it/s]
+ 71%|███████   | 126967/179864.0 [00:28&lt;00:11, 4800.34it/s]
+ 71%|███████   | 127448/179864.0 [00:28&lt;00:10, 4778.39it/s]
+ 71%|███████   | 127926/179864.0 [00:28&lt;00:10, 4762.74it/s]
+ 71%|███████▏  | 128403/179864.0 [00:28&lt;00:10, 4729.71it/s]
+ 72%|███████▏  | 128880/179864.0 [00:28&lt;00:10, 4739.38it/s]
+ 72%|███████▏  | 129355/179864.0 [00:28&lt;00:10, 4646.73it/s]
+ 72%|███████▏  | 129822/179864.0 [00:28&lt;00:10, 4651.59it/s]
+ 72%|███████▏  | 130302/179864.0 [00:28&lt;00:10, 4694.03it/s]
+ 73%|███████▎  | 130797/179864.0 [00:28&lt;00:10, 4767.21it/s]
+ 73%|███████▎  | 131279/179864.0 [00:28&lt;00:10, 4778.54it/s]
+ 73%|███████▎  | 131758/179864.0 [00:29&lt;00:10, 4746.14it/s]
+ 74%|███████▎  | 132233/179864.0 [00:29&lt;00:10, 4736.13it/s]
+ 74%|███████▍  | 132707/179864.0 [00:29&lt;00:10, 4577.72it/s]
+ 74%|███████▍  | 133166/179864.0 [00:29&lt;00:10, 4431.58it/s]
+ 74%|███████▍  | 133626/179864.0 [00:29&lt;00:10, 4479.32it/s]
+ 75%|███████▍  | 134102/179864.0 [00:29&lt;00:10, 4559.91it/s]
+ 75%|███████▍  | 134570/179864.0 [00:29&lt;00:09, 4591.79it/s]
+ 75%|███████▌  | 135040/179864.0 [00:29&lt;00:09, 4622.70it/s]
+ 75%|███████▌  | 135515/179864.0 [00:29&lt;00:09, 4657.70it/s]
+ 76%|███████▌  | 135982/179864.0 [00:30&lt;00:09, 4574.77it/s]
+ 76%|███████▌  | 136441/179864.0 [00:30&lt;00:09, 4505.64it/s]
+ 76%|███████▌  | 136910/179864.0 [00:30&lt;00:09, 4558.34it/s]
+ 76%|███████▋  | 137395/179864.0 [00:30&lt;00:09, 4642.41it/s]
+ 77%|███████▋  | 137866/179864.0 [00:30&lt;00:09, 4660.63it/s]
+ 77%|███████▋  | 138338/179864.0 [00:30&lt;00:08, 4676.56it/s]
+ 77%|███████▋  | 138806/179864.0 [00:30&lt;00:08, 4635.63it/s]
+ 77%|███████▋  | 139270/179864.0 [00:30&lt;00:08, 4514.80it/s]
+ 78%|███████▊  | 139723/179864.0 [00:30&lt;00:09, 4445.84it/s]
+ 78%|███████▊  | 140197/179864.0 [00:30&lt;00:08, 4530.66it/s]
+ 78%|███████▊  | 140679/179864.0 [00:31&lt;00:08, 4613.56it/s]
+ 78%|███████▊  | 141142/179864.0 [00:31&lt;00:08, 4585.50it/s]
+ 79%|███████▊  | 141602/179864.0 [00:31&lt;00:08, 4585.35it/s]
+ 79%|███████▉  | 142067/179864.0 [00:31&lt;00:08, 4602.85it/s]
+ 79%|███████▉  | 142528/179864.0 [00:31&lt;00:08, 4493.70it/s]
+ 79%|███████▉  | 142986/179864.0 [00:31&lt;00:08, 4515.11it/s]
+ 80%|███████▉  | 143456/179864.0 [00:31&lt;00:07, 4567.54it/s]
+ 80%|████████  | 143936/179864.0 [00:31&lt;00:07, 4635.15it/s]
+ 80%|████████  | 144426/179864.0 [00:31&lt;00:07, 4711.87it/s]
+ 81%|████████  | 144901/179864.0 [00:31&lt;00:07, 4722.08it/s]
+ 81%|████████  | 145374/179864.0 [00:32&lt;00:07, 4665.21it/s]
+ 81%|████████  | 145841/179864.0 [00:32&lt;00:07, 4622.53it/s]
+ 81%|████████▏ | 146329/179864.0 [00:32&lt;00:07, 4697.35it/s]
+ 82%|████████▏ | 146803/179864.0 [00:32&lt;00:07, 4706.06it/s]
+ 82%|████████▏ | 147285/179864.0 [00:32&lt;00:06, 4739.40it/s]
+ 82%|████████▏ | 147763/179864.0 [00:32&lt;00:06, 4748.20it/s]
+ 82%|████████▏ | 148238/179864.0 [00:32&lt;00:06, 4702.96it/s]
+ 83%|████████▎ | 148709/179864.0 [00:32&lt;00:06, 4597.18it/s]
+ 83%|████████▎ | 149187/179864.0 [00:32&lt;00:06, 4648.51it/s]
+ 83%|████████▎ | 149659/179864.0 [00:32&lt;00:06, 4666.82it/s]
+ 83%|████████▎ | 150138/179864.0 [00:33&lt;00:06, 4703.27it/s]
+ 84%|████████▎ | 150609/179864.0 [00:33&lt;00:06, 4666.68it/s]
+ 84%|████████▍ | 151076/179864.0 [00:33&lt;00:06, 4560.08it/s]
+ 84%|████████▍ | 151533/179864.0 [00:33&lt;00:06, 4556.87it/s]
+ 85%|████████▍ | 151992/179864.0 [00:33&lt;00:06, 4564.03it/s]
+ 85%|████████▍ | 152450/179864.0 [00:33&lt;00:06, 4566.84it/s]
+ 85%|████████▌ | 152918/179864.0 [00:33&lt;00:05, 4599.07it/s]
+ 85%|████████▌ | 153386/179864.0 [00:33&lt;00:05, 4619.78it/s]
+ 86%|████████▌ | 153849/179864.0 [00:33&lt;00:05, 4572.02it/s]
+ 86%|████████▌ | 154307/179864.0 [00:33&lt;00:05, 4517.57it/s]
+ 86%|████████▌ | 154759/179864.0 [00:34&lt;00:05, 4448.31it/s]
+ 86%|████████▋ | 155218/179864.0 [00:34&lt;00:05, 4488.28it/s]
+ 87%|████████▋ | 155689/179864.0 [00:34&lt;00:05, 4553.54it/s]
+ 87%|████████▋ | 156149/179864.0 [00:34&lt;00:05, 4565.49it/s]
+ 87%|████████▋ | 156606/179864.0 [00:34&lt;00:05, 4539.76it/s]
+ 87%|████████▋ | 157061/179864.0 [00:34&lt;00:05, 4516.92it/s]
+ 88%|████████▊ | 157513/179864.0 [00:34&lt;00:05, 4411.86it/s]
+ 88%|████████▊ | 157967/179864.0 [00:34&lt;00:04, 4447.87it/s]
+ 88%|████████▊ | 158446/179864.0 [00:34&lt;00:04, 4547.21it/s]
+ 88%|████████▊ | 158919/179864.0 [00:35&lt;00:04, 4597.25it/s]
+ 89%|████████▊ | 159380/179864.0 [00:35&lt;00:04, 4565.27it/s]
+ 89%|████████▉ | 159837/179864.0 [00:35&lt;00:04, 4427.77it/s]
+ 89%|████████▉ | 160281/179864.0 [00:35&lt;00:04, 4337.67it/s]
+ 89%|████████▉ | 160738/179864.0 [00:35&lt;00:04, 4403.07it/s]
+ 90%|████████▉ | 161209/179864.0 [00:35&lt;00:04, 4491.14it/s]
+ 90%|████████▉ | 161662/179864.0 [00:35&lt;00:04, 4500.66it/s]
+ 90%|█████████ | 162114/179864.0 [00:35&lt;00:03, 4505.85it/s]
+ 90%|█████████ | 162566/179864.0 [00:35&lt;00:03, 4401.75it/s]
+ 91%|█████████ | 163009/179864.0 [00:35&lt;00:03, 4406.46it/s]
+ 91%|█████████ | 163464/179864.0 [00:36&lt;00:03, 4446.12it/s]
+ 91%|█████████ | 163926/179864.0 [00:36&lt;00:03, 4495.77it/s]
+ 91%|█████████▏| 164376/179864.0 [00:36&lt;00:03, 4451.95it/s]
+ 92%|█████████▏| 164822/179864.0 [00:36&lt;00:03, 4386.54it/s]
+ 92%|█████████▏| 165272/179864.0 [00:36&lt;00:03, 4419.16it/s]
+ 92%|█████████▏| 165732/179864.0 [00:36&lt;00:03, 4471.77it/s]
+ 92%|█████████▏| 166197/179864.0 [00:36&lt;00:03, 4522.06it/s]
+ 93%|█████████▎| 166650/179864.0 [00:36&lt;00:02, 4487.91it/s]
+ 93%|█████████▎| 167100/179864.0 [00:36&lt;00:02, 4419.61it/s]
+ 93%|█████████▎| 167560/179864.0 [00:36&lt;00:02, 4470.72it/s]
+ 93%|█████████▎| 168008/179864.0 [00:37&lt;00:04, 2491.69it/s]
+ 94%|█████████▎| 168454/179864.0 [00:37&lt;00:03, 2866.56it/s]
+ 94%|█████████▍| 168892/179864.0 [00:37&lt;00:03, 3190.16it/s]
+ 94%|█████████▍| 169321/179864.0 [00:37&lt;00:03, 3445.84it/s]
+ 94%|█████████▍| 169762/179864.0 [00:37&lt;00:02, 3687.18it/s]
+ 95%|█████████▍| 170227/179864.0 [00:37&lt;00:02, 3940.46it/s]
+ 95%|█████████▍| 170671/179864.0 [00:37&lt;00:02, 4074.61it/s]
+ 95%|█████████▌| 171106/179864.0 [00:38&lt;00:02, 4134.82it/s]
+ 95%|█████████▌| 171539/179864.0 [00:38&lt;00:01, 4184.30it/s]
+ 96%|█████████▌| 171975/179864.0 [00:38&lt;00:01, 4234.42it/s]
+ 96%|█████████▌| 172409/179864.0 [00:38&lt;00:01, 4248.97it/s]
+ 96%|█████████▌| 172841/179864.0 [00:38&lt;00:01, 4243.73it/s]
+ 96%|█████████▋| 173272/179864.0 [00:38&lt;00:01, 4260.78it/s]
+ 97%|█████████▋| 173708/179864.0 [00:38&lt;00:01, 4287.39it/s]
+ 97%|█████████▋| 174165/179864.0 [00:38&lt;00:01, 4371.19it/s]
+ 97%|█████████▋| 174604/179864.0 [00:38&lt;00:01, 4323.12it/s]
+ 97%|█████████▋| 175044/179864.0 [00:38&lt;00:01, 4342.89it/s]
+ 98%|█████████▊| 175499/179864.0 [00:39&lt;00:00, 4402.67it/s]
+ 98%|█████████▊| 175940/179864.0 [00:39&lt;00:00, 4355.73it/s]
+ 98%|█████████▊| 176377/179864.0 [00:39&lt;00:00, 4311.63it/s]
+ 98%|█████████▊| 176832/179864.0 [00:39&lt;00:00, 4381.13it/s]
+ 99%|█████████▊| 177271/179864.0 [00:39&lt;00:00, 4308.07it/s]
+ 99%|█████████▉| 177710/179864.0 [00:39&lt;00:00, 4329.35it/s]
+ 99%|█████████▉| 178160/179864.0 [00:39&lt;00:00, 4378.70it/s]
+ 99%|█████████▉| 178608/179864.0 [00:39&lt;00:00, 4408.09it/s]
+100%|█████████▉| 179065/179864.0 [00:39&lt;00:00, 4454.97it/s]
+100%|█████████▉| 179554/179864.0 [00:39&lt;00:00, 4582.05it/s]
+100%|██████████| 179864/179864.0 [00:40&lt;00:00, 4492.88it/s]
+
+  0%|          | 0/12916 [00:00&lt;?, ? MB/s]
+  0%|          | 1/12916 [00:00&lt;34:00,  6.33 MB/s]
+  0%|          | 4/12916 [00:00&lt;15:39, 13.74 MB/s]
+  0%|          | 8/12916 [00:00&lt;11:20, 18.97 MB/s]
+  0%|          | 16/12916 [00:00&lt;06:32, 32.84 MB/s]
+  0%|          | 34/12916 [00:00&lt;03:25, 62.78 MB/s]
+  1%|          | 72/12916 [00:00&lt;01:43, 124.05 MB/s]
+  1%|          | 143/12916 [00:01&lt;00:55, 231.28 MB/s]
+  2%|▏         | 289/12916 [00:01&lt;00:27, 452.54 MB/s]
+  4%|▎         | 462/12916 [00:01&lt;00:19, 653.21 MB/s]
+  5%|▌         | 647/12916 [00:01&lt;00:15, 812.16 MB/s]
+  6%|▋         | 837/12916 [00:01&lt;00:13, 898.77 MB/s]
+  8%|▊         | 1023/12916 [00:01&lt;00:12, 980.01 MB/s]
+  9%|▉         | 1213/12916 [00:02&lt;00:11, 1045.01 MB/s]
+ 11%|█         | 1386/12916 [00:02&lt;00:10, 1052.77 MB/s]
+ 12%|█▏        | 1574/12916 [00:02&lt;00:10, 1090.48 MB/s]
+ 14%|█▎        | 1762/12916 [00:02&lt;00:09, 1117.79 MB/s]
+ 15%|█▌        | 1951/12916 [00:02&lt;00:09, 1140.69 MB/s]
+ 17%|█▋        | 2139/12916 [00:02&lt;00:09, 1153.96 MB/s]
+ 18%|█▊        | 2327/12916 [00:03&lt;00:09, 1162.99 MB/s]
+ 19%|█▉        | 2508/12916 [00:03&lt;00:08, 1156.83 MB/s]
+ 21%|██        | 2677/12916 [00:03&lt;00:09, 1128.79 MB/s]
+ 22%|██▏       | 2868/12916 [00:03&lt;00:08, 1151.31 MB/s]
+ 24%|██▎       | 3058/12916 [00:03&lt;00:08, 1165.16 MB/s]
+ 25%|██▌       | 3248/12916 [00:03&lt;00:08, 1174.78 MB/s]
+ 27%|██▋       | 3431/12916 [00:03&lt;00:08, 1168.82 MB/s]
+ 28%|██▊       | 3614/12916 [00:04&lt;00:07, 1163.93 MB/s]
+ 29%|██▉       | 3798/12916 [00:04&lt;00:07, 1162.69 MB/s]
+ 31%|███       | 3983/12916 [00:04&lt;00:07, 1160.24 MB/s]
+ 32%|███▏      | 4167/12916 [00:04&lt;00:07, 1159.58 MB/s]
+ 34%|███▎      | 4357/12916 [00:04&lt;00:07, 1170.41 MB/s]
+ 35%|███▌      | 4543/12916 [00:04&lt;00:07, 1170.42 MB/s]
+ 37%|███▋      | 4728/12916 [00:05&lt;00:07, 1169.27 MB/s]
+ 38%|███▊      | 4916/12916 [00:05&lt;00:06, 1173.18 MB/s]
+ 40%|███▉      | 5102/12916 [00:05&lt;00:06, 1173.45 MB/s]
+ 41%|████      | 5288/12916 [00:05&lt;00:06, 1173.46 MB/s]
+ 42%|████▏     | 5462/12916 [00:05&lt;00:06, 1148.45 MB/s]
+ 44%|████▍     | 5652/12916 [00:05&lt;00:06, 1163.28 MB/s]
+ 45%|████▌     | 5843/12916 [00:06&lt;00:06, 1175.61 MB/s]
+ 47%|████▋     | 6032/12916 [00:06&lt;00:05, 1180.31 MB/s]
+ 48%|████▊     | 6223/12916 [00:06&lt;00:05, 1187.55 MB/s]
+ 50%|████▉     | 6413/12916 [00:06&lt;00:05, 1190.77 MB/s]
+ 51%|█████     | 6603/12916 [00:06&lt;00:05, 1193.02 MB/s]
+ 53%|█████▎    | 6790/12916 [00:06&lt;00:05, 1188.97 MB/s]
+ 54%|█████▍    | 6979/12916 [00:06&lt;00:04, 1189.29 MB/s]
+ 55%|█████▌    | 7168/12916 [00:07&lt;00:04, 1186.77 MB/s]
+ 57%|█████▋    | 7358/12916 [00:07&lt;00:04, 1193.33 MB/s]
+ 58%|█████▊    | 7543/12916 [00:07&lt;00:04, 1184.82 MB/s]
+ 60%|█████▉    | 7708/12916 [00:07&lt;00:04, 1140.91 MB/s]
+ 61%|██████    | 7897/12916 [00:07&lt;00:04, 1152.27 MB/s]
+ 63%|██████▎   | 8086/12916 [00:07&lt;00:04, 1164.00 MB/s]
+ 64%|██████▍   | 8275/12916 [00:08&lt;00:03, 1172.44 MB/s]
+ 66%|██████▌   | 8465/12916 [00:08&lt;00:03, 1180.05 MB/s]
+ 67%|██████▋   | 8655/12916 [00:08&lt;00:03, 1185.50 MB/s]
+ 68%|██████▊   | 8845/12916 [00:08&lt;00:03, 1188.62 MB/s]
+ 70%|██████▉   | 9035/12916 [00:08&lt;00:03, 1191.41 MB/s]
+ 71%|███████▏  | 9215/12916 [00:08&lt;00:03, 1173.84 MB/s]
+ 73%|███████▎  | 9399/12916 [00:09&lt;00:03, 1170.31 MB/s]
+ 74%|███████▍  | 9584/12916 [00:09&lt;00:02, 1168.77 MB/s]
+ 76%|███████▌  | 9768/12916 [00:09&lt;00:02, 1166.58 MB/s]
+ 77%|███████▋  | 9953/12916 [00:09&lt;00:02, 1166.33 MB/s]
+ 78%|███████▊  | 10137/12916 [00:09&lt;00:02, 1163.67 MB/s]
+ 80%|███████▉  | 10323/12916 [00:09&lt;00:02, 1166.04 MB/s]
+ 81%|████████▏ | 10512/12916 [00:10&lt;00:02, 1173.90 MB/s]
+ 83%|████████▎ | 10697/12916 [00:10&lt;00:01, 1171.71 MB/s]
+ 84%|████████▍ | 10886/12916 [00:10&lt;00:01, 1176.25 MB/s]
+ 86%|████████▌ | 11075/12916 [00:10&lt;00:01, 1182.09 MB/s]
+ 87%|████████▋ | 11263/12916 [00:10&lt;00:01, 1263.17 MB/s]
+ 88%|████████▊ | 11404/12916 [00:10&lt;00:01, 1270.75 MB/s]
+ 89%|████████▉ | 11533/12916 [00:10&lt;00:01, 1179.77 MB/s]
+ 90%|█████████ | 11652/12916 [00:10&lt;00:01, 1132.40 MB/s]
+ 92%|█████████▏| 11830/12916 [00:11&lt;00:00, 1248.01 MB/s]
+ 93%|█████████▎| 11956/12916 [00:11&lt;00:00, 1220.24 MB/s]
+ 94%|█████████▎| 12079/12916 [00:11&lt;00:00, 1122.38 MB/s]
+ 95%|█████████▍| 12217/12916 [00:11&lt;00:00, 1165.45 MB/s]
+ 96%|█████████▌| 12375/12916 [00:11&lt;00:00, 1190.06 MB/s]
+ 97%|█████████▋| 12518/12916 [00:11&lt;00:00, 1228.16 MB/s]
+ 98%|█████████▊| 12642/12916 [00:11&lt;00:00, 1134.11 MB/s]
+ 99%|█████████▉| 12759/12916 [00:11&lt;00:00, 1089.67 MB/s]
+100%|██████████| 12916/12916 [00:11&lt;00:00, 1077.50 MB/s]
+Optimizing level 2 [max iter: 10000]
+Optimizing level 1 [max iter: 1000]
+Optimizing level 0 [max iter: 100]
+Optimizing level 2 [max iter: 10000]
+Optimizing level 1 [max iter: 1000]
+Optimizing level 0 [max iter: 100]
+Optimizing level 2 [max iter: 10000]
+Optimizing level 1 [max iter: 1000]
+Optimizing level 0 [max iter: 100]
+
+  0%|          | 0/16 [00:00&lt;?, ?it/s]
+ 25%|██▌       | 4/16 [00:00&lt;00:00, 32.81it/s]
+ 56%|█████▋    | 9/16 [00:00&lt;00:00, 39.06it/s]
+ 88%|████████▊ | 14/16 [00:00&lt;00:00, 41.49it/s]
+100%|██████████| 16/16 [00:00&lt;00:00, 40.78it/s]
+
+  0%|          | 0/16 [00:00&lt;?, ?it/s]
+ 25%|██▌       | 4/16 [00:00&lt;00:00, 34.26it/s]
+ 56%|█████▋    | 9/16 [00:00&lt;00:00, 40.06it/s]
+ 88%|████████▊ | 14/16 [00:00&lt;00:00, 41.24it/s]
+100%|██████████| 16/16 [00:00&lt;00:00, 40.87it/s]
+</pre></div>
+</div>
 </div>
 <div class="section" id="references">
 <h2>References:<a class="headerlink" href="#references" title="Permalink to this heading">#</a></h2>
 <blockquote>
 <div><dl class="citation">
-<dt class="label" id="garyfallidis2017"><span class="brackets"><a class="fn-backref" href="#id1">Garyfallidis2017</a></span></dt>
+<dt class="label" id="garyfallidis2017"><span class="brackets"><a class="fn-backref" href="#id2">Garyfallidis2017</a></span></dt>
 <dd><p>Garyfallidis, Eleftherios, Marc-Alexandre Côté,
 Francois Rheault, Jasmeen Sidhu, Janice Hau, Laurent
 Petit, David Fortin, Stephen Cunanne, and Maxime
@@ -746,14 +1037,14 @@ Clustering.”NeuroImage 170: 283-295.</p>
 </dd>
 </dl>
 </div></blockquote>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (16 minutes 45.952 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  4785 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (13 minutes 4.759 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  2746 MB</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-howto-howto-examples-plot-recobundles-py">
-<div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../../_downloads/8c529e2fc65857f6792471af59a0dde2/plot_recobundles.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_recobundles.py</span></code></a></p>
-</div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/eb807ae6c61dd3a41a6961865b8e6a75/plot_recobundles.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_recobundles.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/8c529e2fc65857f6792471af59a0dde2/plot_recobundles.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_recobundles.py</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -765,34 +1056,30 @@ Clustering.”NeuroImage 170: 283-295.</p>
               
               
               
-                <footer class="bd-footer-article">
+              
+              
+                <footer class="prev-next-footer">
                   
-<div class="footer-article-items footer-article__inner">
-  
-    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="cerebellar_peduncles.html"
+       href="plot_optic_radiations.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Delineating cerebellar peduncles</p>
+        <p class="prev-next-title">How to add new bundles into pyAFQ(Optic Radiations Example)</p>
       </div>
     </a>
     <a class="right-next"
-       href="plot_viz.html"
+       href="use_subject_space_rois_from_freesurfer.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Visualizing AFQ derivatives</p>
+        <p class="prev-next-title">Using Subject Space ROIs from Freesurfer</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
-</div></div>
-  
 </div>
-
                 </footer>
               
             </div>
@@ -802,16 +1089,19 @@ Clustering.”NeuroImage 170: 283-295.</p>
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
   <div class="sidebar-secondary-item">
+
   <div class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-the-segmentation-params">Defining the segmentation params</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References:</a></li>
 </ul>
   </nav></div>
 
   <div class="sidebar-secondary-item">
+
   
   <div class="tocsection editthispage">
     <a href="https://github.com/yeatmanlab/pyAFQ/edit/master/docs/source/howto/howto_examples/plot_recobundles.rst">
@@ -827,6 +1117,7 @@ Clustering.”NeuroImage 170: 283-295.</p>
 </div>
 
   <div class="sidebar-secondary-item">
+
   <div class="tocsection sourcelink">
     <a href="../../_sources/howto/howto_examples/plot_recobundles.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
@@ -847,8 +1138,8 @@ Clustering.”NeuroImage 170: 283-295.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+  <script src="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
 
 
   <footer class="bd-footer">
@@ -857,6 +1148,7 @@ Clustering.”NeuroImage 170: 283-295.</p>
     <div class="footer-items__start">
       
         <div class="footer-item">
+
   <p class="copyright">
     
       © Copyright 2018--, The pyAFQ Contributors.
@@ -866,6 +1158,7 @@ Clustering.”NeuroImage 170: 283-295.</p>
 </div>
       
         <div class="footer-item">
+
   <p class="sphinx-version">
     Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
     <br/>
@@ -875,10 +1168,12 @@ Clustering.”NeuroImage 170: 283-295.</p>
     </div>
   
   
+  
     <div class="footer-items__end">
       
-        <div class="footer-item"><p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
 </p></div>
       
     </div>

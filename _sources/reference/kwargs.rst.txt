@@ -99,10 +99,9 @@ brain_mask_definition: instance from `AFQ.definitions.image`, optional
 	If None, use B0Image()
 	Default: None
 
-bundle_info: strings, dict, or BundleDict, optional
-	List of bundle names to include in segmentation,
-	or a bundle dictionary (see BundleDict for inspiration),
-	or a BundleDict. See `Defining Custom Bundle Dictionaries`
+bundle_info: dict or BundleDict, optional
+	A dictionary or BundleDict for use in segmentation.
+	See `Defining Custom Bundle Dictionaries`
 	in the `usage` section of pyAFQ's documentation for details.
 	If None, will get all appropriate bundles for the chosen
 	segmentation algorithm.
@@ -146,11 +145,6 @@ segmentation_params: dict, optional
 	The parameters for segmentation.
 	Default: use the default behavior of the seg.Segmentation object.
 
-clean_params: dict, optional
-	The parameters for cleaning.
-	Default: use the default behavior of the seg.clean_bundle
-	function.
-
 profile_weights: str, 1D array, 2D array callable, optional
 	How to weight each streamline (1D) or each node (2D)
 	when calculating the tract-profiles. If callable, this is a
@@ -159,6 +153,11 @@ profile_weights: str, 1D array, 2D array callable, optional
 	If "median", the median of values at each node will be used
 	instead of a mean or weighted mean.
 	Default: "gauss"
+
+n_points_profile: int, optional
+	Number of points to resample each streamline to before
+	calculating the tract-profiles.
+	Default: 100
 
 scalars: strings and/or scalar definitions, optional
 	List of scalars to use.

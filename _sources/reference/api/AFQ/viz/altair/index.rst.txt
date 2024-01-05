@@ -1,0 +1,93 @@
+:py:mod:`AFQ.viz.altair`
+========================
+
+.. py:module:: AFQ.viz.altair
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.viz.altair.altair_color_dict
+   AFQ.viz.altair.combined_profiles_df_to_altair_df
+   AFQ.viz.altair.altair_df_to_chart
+
+
+
+.. py:function:: altair_color_dict(names_to_include=None)
+
+   
+   Given a list of bundle names, return a dictionary of colors for each
+   Formatted for Altair.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: combined_profiles_df_to_altair_df(profiles, tissue_properties=['dti_fa', 'dti_md'])
+
+   
+   Given a profiles dataframe that is combined
+   from many subjects, return a dataframe formatted for Altair.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: altair_df_to_chart(profiles, position_domain=(20, 80), column_count=1, font_size=20, line_size=10, row_label_angle=90, legend_line_size=5, **kwargs)
+
+   
+   Given a dataframe formatted for Altair, probably from
+   combined_profiles_df_to_altair_df, return a chart.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
