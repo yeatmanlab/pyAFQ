@@ -1,3 +1,40 @@
+1.2 (January 04, 2024)
+======================
+Incorporates TRX, a new tractography file format, makes
+a new way for organizing bundle dictionaries, extensive
+documentation improvements, and many other minor fixes
+  * DOC: Small fixes to the visualization example. (#1083)
+  * [WIP/ENH] add AR from endpoint ROIs (#1078)
+  * Update grant funding (#1076)
+  * [FIX] Add exclusion ROI to IFOF (#1074)
+  * Update fury (#1080)
+  * [ENH] add some utilities for working with altair and pyafq (#1049)
+  * [FIX] possible fix to pediatric bundle dict; some convenience updates in babyafq example (#1071)
+  *  (#1067)
+  * fixed bundle prob map order (#1070)
+  * ENH allow removal of profiles.csv; allow setting n_nodes in profile; make callosal bundles the default (#1052)
+  * DOC: Extensive documentation improvements (#1051)
+  * DOC: finish tractometry figure (#1055)
+  * [doc] make afq tractometry pipeline page, reorganize usage section (#1053)
+  * [FIX] bf for roi clipping (#1048)
+  * [ENH] add line width argument to fury (#1046)
+  * RF: Update call to seaborn plotting. (#1042)
+  * [ENH,FIX] Integrate more steps into the segmentation pipeline (#1041)
+  * [ENH] more specific bids entities and fixes to be bids compatible (#1035)
+  * Removes some of the sphinx gallery ignore patterns. (#1017)
+  * [enh] set afq home (#1037)
+  * [FIX] pin astroid (#1038)
+  * [ENH] Proposal for better bd management (#1014)
+  * [FIX] download LV1 roi in this example (#1031)
+  * [FIX] set default back to serial (#1030)
+  * Adds an option to build the docs without running the examples. (#1025)
+  * Fence the TRX test by checking whether TRX is installed. (#1020)
+  * Remove unused MPL import (#1029)
+  * Update installation_guide.rst (#1026)
+  *  (#1022)
+  * add "GeneratedBy"s in `dataset_description.json` for BIDS 1.4+ compliance (#1019)
+  * Incorporate TRX (#1006)
+
 1.1 (September 08, 2023)
 ========================
 Add compatibility with GPU based tractography. Speeds
