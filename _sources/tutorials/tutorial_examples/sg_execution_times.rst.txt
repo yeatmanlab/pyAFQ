@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**17:15.765** total execution time for 3 files **from tutorials/tutorial_examples**:
+**17:11.533** total execution time for 3 files **from tutorials/tutorial_examples**:
 
 .. container::
 
@@ -33,11 +33,11 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_tutorials_tutorial_examples_plot_002_bids_layout.py` (``plot_002_bids_layout.py``)
-     - 10:47.730
-     - 2596.8
+     - 10:48.470
+     - 2377.8
    * - :ref:`sphx_glr_tutorials_tutorial_examples_plot_001_afq_api.py` (``plot_001_afq_api.py``)
-     - 04:42.253
-     - 2383.5
+     - 04:49.637
+     - 2447.7
    * - :ref:`sphx_glr_tutorials_tutorial_examples_plot_003_viz.py` (``plot_003_viz.py``)
-     - 01:45.782
-     - 794.5
+     - 01:33.426
+     - 826.2

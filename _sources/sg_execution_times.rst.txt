@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**107:05.584** total execution time for 15 files **from all galleries**:
+**108:19.760** total execution time for 15 files **from all galleries**:
 
 .. container::
 
@@ -33,29 +33,29 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_howto_howto_examples_plot_accoustic_radiations.py` (``../../examples/howto_examples/plot_accoustic_radiations.py``)
-     - 28:12.034
-     - 5362.4
+     - 29:07.364
+     - 5770.4
    * - :ref:`sphx_glr_howto_howto_examples_plot_afq_fwdti.py` (``../../examples/howto_examples/plot_afq_fwdti.py``)
-     - 22:09.868
-     - 4750.0
+     - 22:02.005
+     - 4964.5
    * - :ref:`sphx_glr_howto_howto_examples_plot_optic_radiations.py` (``../../examples/howto_examples/plot_optic_radiations.py``)
-     - 15:41.216
-     - 5421.8
+     - 15:50.721
+     - 5253.2
    * - :ref:`sphx_glr_howto_howto_examples_plot_recobundles.py` (``../../examples/howto_examples/plot_recobundles.py``)
-     - 13:04.759
-     - 2746.3
-   * - :ref:`sphx_glr_tutorials_tutorial_examples_plot_002_bids_layout.py` (``../../examples/tutorial_examples/plot_002_bids_layout.py``)
-     - 10:47.730
-     - 2596.8
+     - 13:14.843
+     - 2693.1
    * - :ref:`sphx_glr_howto_howto_examples_plot_afq_callosal.py` (``../../examples/howto_examples/plot_afq_callosal.py``)
-     - 10:41.942
-     - 2318.9
+     - 10:53.294
+     - 2363.6
+   * - :ref:`sphx_glr_tutorials_tutorial_examples_plot_002_bids_layout.py` (``../../examples/tutorial_examples/plot_002_bids_layout.py``)
+     - 10:48.470
+     - 2377.8
    * - :ref:`sphx_glr_tutorials_tutorial_examples_plot_001_afq_api.py` (``../../examples/tutorial_examples/plot_001_afq_api.py``)
-     - 04:42.253
-     - 2383.5
+     - 04:49.637
+     - 2447.7
    * - :ref:`sphx_glr_tutorials_tutorial_examples_plot_003_viz.py` (``../../examples/tutorial_examples/plot_003_viz.py``)
-     - 01:45.782
-     - 794.5
+     - 01:33.426
+     - 826.2
    * - :ref:`sphx_glr_howto_howto_examples_add_custom_bundle.py` (``../../examples/howto_examples/add_custom_bundle.py``)
      - 00:00.000
      - 0.0
