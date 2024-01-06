@@ -15,8 +15,9 @@ From: nvidia/cuda:12.0.1-devel-ubuntu20.04
     export LD_LIBRARY_PATH=/opt/anaconda/lib:${LD_LIBRARY_PATH}
 
 %post
-    # Shell settings
-    SHELL ["/bin/bash", "-c"]
+    ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime
+    echo "Etc/UTC" > /etc/timezone
+    apt-get update && apt-get install -y tzdata
 
     # Remove CUDA/NVIDIA sources
     rm /etc/apt/sources.list.d/cuda.list
@@ -56,7 +57,8 @@ From: nvidia/cuda:12.0.1-devel-ubuntu20.04
         && make && make install
 
     # Install cuslines as package
-    echo -e "from setuptools import setup, find_packages\nsetup(name='cuslines',version='0.0.1',packages=find_packages())" >> /opt/GPUStreamlines/build/cuslines/setup.py
+    echo "from setuptools import setup, find_packages" > /opt/GPUStreamlines/build/cuslines/setup.py
+    echo "setup(name='cuslines', version='0.0.1', packages=find_packages())" >> /opt/GPUStreamlines/build/cuslines/setup.py
     cd /opt/GPUStreamlines/build/cuslines && pip install -e .
 
     # Install pyAFQ
