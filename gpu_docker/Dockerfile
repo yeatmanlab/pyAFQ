@@ -1,4 +1,4 @@
-ARG NVIDIAVERSION=11.0.3-devel
+ARG NVIDIAVERSION=12.0.1-devel-ubuntu20.04
 FROM nvidia/cuda:${NVIDIAVERSION}
 
 SHELL ["/bin/bash", "-c"]
