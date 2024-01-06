@@ -1,0 +1,66 @@
+Bootstrap: docker
+From: nvidia/cuda:12.0.1-devel-ubuntu20.04
+
+%pre
+    # Default value for COMMIT if not provided
+    if [ -z "$COMMIT" ]; then
+        echo "Error: COMMIT environment variable is not set. Please set the COMMIT variable to continue."
+        exit 1
+    fi
+    export COMMIT
+
+%environment
+    export DEBIAN_FRONTEND=noninteractive
+    export PATH=/opt/anaconda/bin:${PATH}
+    export LD_LIBRARY_PATH=/opt/anaconda/lib:${LD_LIBRARY_PATH}
+
+%post
+    # Shell settings
+    SHELL ["/bin/bash", "-c"]
+
+    # Remove CUDA/NVIDIA sources
+    rm /etc/apt/sources.list.d/cuda.list
+    rm -f /etc/apt/sources.list.d/nvidia-ml.list
+
+    # System update and basic tools installation
+    apt update && apt install --assume-yes apt-transport-https \
+        ca-certificates gnupg software-properties-common gcc git wget numactl
+
+    # Kitware repository for CMake
+    wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null \
+        | gpg --dearmor - | tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+    apt-add-repository "deb https://apt.kitware.com/ubuntu/ focal main"
+    apt install -y cmake libncurses5-dev libtinfo6
+
+    # Anaconda installation
+    wget -P /tmp https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh
+    bash /tmp/Anaconda3-2022.10-Linux-x86_64.sh -b -p /opt/anaconda
+    rm -rf /tmp/Anaconda3-2022.10-Linux-x86_64.sh
+    cd /opt && eval "$(/opt/anaconda/bin/conda shell.bash hook)"
+
+    # Python prerequisites
+    pip install numpy scipy cython nibabel dipy tqdm fslpy
+
+    # Clone pyAFQ GPUStreamlines
+    git clone https://github.com/yeatmanlab/pyAFQ.git /opt/pyAFQ
+    cd /opt/pyAFQ && git reset --hard ${COMMIT}
+    git clone --recursive https://github.com/dipy/GPUStreamlines /opt/GPUStreamlines
+
+    # Compilation of GPUStreamlines
+    cd /opt/GPUStreamlines && mkdir build && cd build \
+        && cmake -DCMAKE_INSTALL_PREFIX=/opt/GPUStreamlines/build/ \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_COMPILER=g++ \
+            -DPYTHON_EXECUTABLE=$(which python) \
+            .. \
+        && make && make install
+
+    # Install cuslines as package
+    echo -e "from setuptools import setup, find_packages\nsetup(name='cuslines',version='0.0.1',packages=find_packages())" >> /opt/GPUStreamlines/build/cuslines/setup.py
+    cd /opt/GPUStreamlines/build/cuslines && pip install -e .
+
+    # Install pyAFQ
+    cd /opt/pyAFQ && pip install -e .
+
+%runscript
+    exec /opt/pyAFQ/bin/pyAFQ "$@"
