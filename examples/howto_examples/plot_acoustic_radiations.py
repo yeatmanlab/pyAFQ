@@ -1,11 +1,11 @@
 """
 ===============================================================
-How to add new bundles into pyAFQ(Accoustic Radiations Example)
+How to add new bundles into pyAFQ (Acoustic Radiations Example)
 ===============================================================
 
 pyAFQ is designed to be customizable and extensible. This example shows how you
 can customize it to define a new bundle based on a definition of waypoint and
-endpoint ROIs of your design. In this case, we add the accoustic radiations.
+endpoint ROIs of your design. In this case, we add the acoustic radiations.
 
 We start by importing some of the components that we need for this example and
 fixing the random seed for reproducibility
