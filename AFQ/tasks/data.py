@@ -78,10 +78,9 @@ def get_data_gtab(dwi, bval, bvec, min_bval=None,
     if prefered_orientation is not None:
         voxel_order = "".join(nio.aff2axcodes(img.affine))
         if not voxel_order == prefered_orientation:
-            logger.warning(
-                "Re-orienting DWI data from %s to %s",
-                voxel_order,
-                prefered_orientation)
+            logger.warning((
+                "Re-orienting DWI data from "
+                f"{voxel_order} to {prefered_orientation}"))
             # this code adapted from
             # qsiprep.interfaces.images
             input_orientation = nio.axcodes2ornt(
