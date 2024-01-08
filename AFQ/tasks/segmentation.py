@@ -35,7 +35,7 @@ logger = logging.getLogger('AFQ')
 
 @pimms.calc("bundles")
 @as_file('_tractography', include_track=True, include_seg=True)
-def segment(data_imap, dwi_path, mapping_imap,
+def segment(data_imap, mapping_imap,
             tractography_imap, segmentation_params):
     """
     full path to a trk/trx file containing containing
@@ -71,9 +71,7 @@ def segment(data_imap, dwi_path, mapping_imap,
         bundle_dict,
         tg,
         mapping_imap["mapping"],
-        dwi_path,
-        data_imap["bval"],
-        data_imap["bvec"],
+        data_imap["dwi"],
         reg_template=reg_template)
 
     seg_sft = aus.SegmentedSFT(bundles, Space.VOX)
