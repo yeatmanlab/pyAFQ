@@ -101,7 +101,7 @@ def gpu_track(data, gtab, seed_img, stop_img,
         ngpus=ngpus, rng_seed=0)
 
     seed_mask = utils.seeds_from_mask(
-        seed_data, density=sampling_density, affine=seed_img.affine)
+        seed_data, density=sampling_density, affine=np.eye(4))
 
     global_chunk_sz = chunk_size * ngpus
     nchunks = (seed_mask.shape[0] + global_chunk_sz - 1) // global_chunk_sz
