@@ -266,7 +266,7 @@ class RoiImage(ImageDefinition):
         return "roi"
 
     def get_image_getter(self, task_name):
-        def _image_getter_helper(dwi_affine, mapping,
+        def _image_getter_helper(mapping,
                                  data_imap, segmentation_params):
             image_data = None
             bundle_dict = data_imap["bundle_dict"]
@@ -280,7 +280,7 @@ class RoiImage(ImageDefinition):
                 bundle_entry = bundle_dict.transform_rois(
                     bundle_name,
                     mapping,
-                    dwi_affine)
+                    data_imap["dwi_affine"])
                 rois = []
                 if self.use_endpoints:
                     rois.extend(
@@ -316,7 +316,7 @@ class RoiImage(ImageDefinition):
                     f"an ROI Image: {bundle_dict._dict}"))
             return nib.Nifti1Image(
                 image_data.astype(np.float32),
-                dwi_affine), dict(source="ROIs")
+                data_imap["dwi_affine"]), dict(source="ROIs")
 
         if task_name == "data":
             raise ValueError((
@@ -324,17 +324,17 @@ class RoiImage(ImageDefinition):
                 "require later derivatives to be calculated"))
         elif task_name == "mapping":
             def image_getter(
-                    dwi_affine, mapping,
+                    mapping,
                     data_imap, segmentation_params):
                 return _image_getter_helper(
-                    dwi_affine, mapping,
+                    mapping,
                     data_imap, segmentation_params)
         else:
             def image_getter(
-                    dwi_affine, mapping_imap,
+                    mapping_imap,
                     data_imap, segmentation_params):
                 return _image_getter_helper(
-                    dwi_affine, mapping_imap["mapping"],
+                    mapping_imap["mapping"],
                     data_imap, segmentation_params)
         return image_getter
 
