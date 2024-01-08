@@ -71,7 +71,7 @@ def export_rois(base_fname, results_dir, data_imap, mapping):
 
 
 @pimms.calc("mapping")
-def mapping(base_fname, dwi, reg_subject, data_imap, bids_info,
+def mapping(base_fname, dwi_path, reg_subject, data_imap, bids_info,
             mapping_definition=None):
     """
     mapping from subject to template space.
@@ -96,15 +96,16 @@ def mapping(base_fname, dwi, reg_subject, data_imap, bids_info,
     if bids_info is not None:
         mapping_definition.find_path(
             bids_info["bids_layout"],
-            dwi,
+            dwi_path,
             bids_info["subject"],
             bids_info["session"])
     return mapping_definition.get_for_subses(
-        base_fname, dwi, bids_info, reg_subject, reg_template)
+        base_fname, data_imap["dwi"], bids_info,
+        reg_subject, reg_template)
 
 
 @pimms.calc("mapping")
-def sls_mapping(base_fname, dwi, reg_subject, data_imap, bids_info,
+def sls_mapping(base_fname, dwi_path, reg_subject, data_imap, bids_info,
                 tractography_imap, mapping_definition=None):
     """
     mapping from subject to template space.
@@ -129,7 +130,7 @@ def sls_mapping(base_fname, dwi, reg_subject, data_imap, bids_info,
     if bids_info is not None:
         mapping_definition.find_path(
             bids_info["bids_layout"],
-            dwi,
+            dwi_path,
             bids_info["subject"],
             bids_info["session"])
     streamlines_file = tractography_imap["streamlines"]
@@ -150,13 +151,14 @@ def sls_mapping(base_fname, dwi, reg_subject, data_imap, bids_info,
         atlas_fname,
         'same', bbox_valid_check=False)
     return mapping_definition.get_for_subses(
-        base_fname, dwi, bids_info, reg_subject, reg_template,
+        base_fname, data_imap["dwi"], bids_info,
+        reg_subject, reg_template,
         subject_sls=tg.streamlines,
         template_sls=hcp_atlas.streamlines)
 
 
 @pimms.calc("reg_subject")
-def get_reg_subject(data_imap, bids_info, base_fname, dwi,
+def get_reg_subject(data_imap,
                     reg_subject_spec="power_map"):
     """
     Nifti1Image which represents this subject
@@ -210,14 +212,14 @@ def get_mapping_plan(kwargs, use_sls=False):
             if bids_info is None:
                 scalar.find_path(
                     None,
-                    kwargs["dwi"],
+                    kwargs["dwi_path"],
                     None,
                     None
                 )
             else:
                 scalar.find_path(
                     bids_info["bids_layout"],
-                    kwargs["dwi"],
+                    kwargs["dwi_path"],
                     bids_info["subject"],
                     bids_info["session"]
                 )
@@ -235,7 +237,7 @@ def get_mapping_plan(kwargs, use_sls=False):
     if isinstance(reg_ss, ImageDefinition):
         reg_ss.find_path(
             bids_info["bids_layout"],
-            kwargs["dwi"],
+            kwargs["dwi_path"],
             bids_info["subject"],
             bids_info["session"])
         del kwargs["reg_subject_spec"]

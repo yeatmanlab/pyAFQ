@@ -35,7 +35,7 @@ logger = logging.getLogger('AFQ')
 
 @pimms.calc("bundles")
 @as_file('_tractography', include_track=True, include_seg=True)
-def segment(dwi, data_imap, mapping_imap,
+def segment(data_imap, dwi_path, mapping_imap,
             tractography_imap, segmentation_params):
     """
     full path to a trk/trx file containing containing
@@ -50,15 +50,14 @@ def segment(dwi, data_imap, mapping_imap,
     bundle_dict = data_imap["bundle_dict"]
     reg_template = data_imap["reg_template"]
     streamlines = tractography_imap["streamlines"]
-    img = nib.load(dwi)
     if streamlines.endswith(".trk") or streamlines.endswith(".tck"):
         tg = load_tractogram(
-            streamlines, img, Space.VOX,
+            streamlines, data_imap["dwi"], Space.VOX,
             bbox_valid_check=False)
         is_trx = False
     elif streamlines.endswith(".trx"):
         is_trx = True
-        trx = load_trx(streamlines, img)
+        trx = load_trx(streamlines, data_imap["dwi"])
         trx.streamlines._data = trx.streamlines._data.astype(np.float32)
         tg = trx.to_sft()
 
@@ -72,7 +71,7 @@ def segment(dwi, data_imap, mapping_imap,
         bundle_dict,
         tg,
         mapping_imap["mapping"],
-        dwi,
+        dwi_path,
         data_imap["bval"],
         data_imap["bvec"],
         reg_template=reg_template)

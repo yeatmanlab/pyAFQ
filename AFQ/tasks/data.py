@@ -41,8 +41,8 @@ logger = logging.getLogger('AFQ')
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
 
-@pimms.calc("data", "gtab", "img", "dwi_affine")
-def get_data_gtab(dwi, bval, bvec, min_bval=None,
+@pimms.calc("data", "gtab", "dwi", "dwi_affine")
+def get_data_gtab(dwi_path, bval, bvec, min_bval=None,
                   max_bval=None, filter_b=True, b0_threshold=50,
                   prefered_orientation=None):
     """
@@ -72,7 +72,7 @@ def get_data_gtab(dwi, bval, bvec, min_bval=None,
         Note that the GPU tractography only works with RAS.
         Default: None
     """
-    img = nib.load(dwi)
+    img = nib.load(dwi_path)
     bvals, bvecs = read_bvals_bvecs(bval, bvec)
 
     if prefered_orientation is not None:
@@ -115,14 +115,14 @@ def get_data_gtab(dwi, bval, bvec, min_bval=None,
 
 @pimms.calc("b0")
 @as_file('_desc-b0_dwi.nii.gz')
-def b0(dwi, data, gtab, img):
+def b0(dwi, data, gtab, dwi_path):
     """
     full path to a nifti file containing the mean b0
     """
     mean_b0 = np.mean(data[..., gtab.b0s_mask], -1)
-    mean_b0_img = nib.Nifti1Image(mean_b0, img.affine)
+    mean_b0_img = nib.Nifti1Image(mean_b0, dwi.affine)
     meta = dict(b0_threshold=gtab.b0_threshold,
-                source=dwi)
+                source=dwi_path)
     return mean_b0_img, meta
 
 
@@ -1001,7 +1001,7 @@ def get_data_plan(kwargs):
         if kwargs["bids_info"] is not None:
             bm_def.find_path(
                 kwargs["bids_info"]["bids_layout"],
-                kwargs["dwi"],
+                kwargs["dwi_path"],
                 kwargs["bids_info"]["subject"],
                 kwargs["bids_info"]["session"])
         data_tasks["brain_mask_res"] = pimms.calc("brain_mask")(

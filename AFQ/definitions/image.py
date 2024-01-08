@@ -157,7 +157,7 @@ class ImageFile(ImageDefinition):
         return name_from_path(self.fname) if self._from_path else self.suffix
 
     def get_image_getter(self, task_name):
-        def image_getter(dwi, bids_info):
+        def _image_getter_helper(dwi, bids_info):
             # Load data
             image_file, image_data_orig, image_affine = \
                 self.get_path_data_affine(bids_info)
@@ -167,15 +167,20 @@ class ImageFile(ImageDefinition):
                 image_data_orig, image_file)
 
             # Resample to DWI data:
-            dwi_img = nib.load(dwi)
             image_data = _resample_image(
                 image_data,
-                dwi_img.get_fdata(),
+                dwi.get_fdata(),
                 image_affine,
-                dwi_img.affine)
+                dwi.affine)
             return nib.Nifti1Image(
                 image_data.astype(np.float32),
-                dwi_img.affine), meta
+                dwi.affine), meta
+        if task_name == "data":
+            def image_getter(dwi, bids_info):
+                return _image_getter_helper(dwi, bids_info)
+        else:
+            def image_getter(data_imap, bids_info):
+                return _image_getter_helper(data_imap["dwi"], bids_info)
         return image_getter
 
 
@@ -198,11 +203,16 @@ class FullImage(ImageDefinition):
         return "entire_volume"
 
     def get_image_getter(self, task_name):
-        def image_getter(dwi):
-            dwi_img = nib.load(dwi)
+        def _image_getter_helper(dwi):
             return nib.Nifti1Image(
-                np.ones(dwi_img.get_fdata()[..., 0].shape, dtype=np.float32),
-                dwi_img.affine), dict(source="Entire Volume")
+                np.ones(dwi.get_fdata()[..., 0].shape, dtype=np.float32),
+                dwi.affine), dict(source="Entire Volume")
+        if task_name == "data":
+            def image_getter(dwi):
+                return _image_getter_helper(dwi)
+        else:
+            def image_getter(data_imap):
+                return _image_getter_helper(data_imap["dwi"])
         return image_getter
 
 

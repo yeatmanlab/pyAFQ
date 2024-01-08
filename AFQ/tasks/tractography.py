@@ -299,20 +299,19 @@ def get_tractography_plan(kwargs):
 
     stop_mask = kwargs["tracking_params"]['stop_mask']
     seed_mask = kwargs["tracking_params"]['seed_mask']
-    dwi = kwargs["dwi"]
     bids_info = kwargs["bids_info"]
 
     if bids_info is not None:
         if isinstance(stop_mask, Definition):
             stop_mask.find_path(
                 bids_info["bids_layout"],
-                dwi,
+                kwargs["dwi_path"],
                 bids_info["subject"],
                 bids_info["session"])
         if isinstance(seed_mask, Definition):
             seed_mask.find_path(
                 bids_info["bids_layout"],
-                dwi,
+                kwargs["dwi_path"],
                 bids_info["subject"],
                 bids_info["session"])
 
