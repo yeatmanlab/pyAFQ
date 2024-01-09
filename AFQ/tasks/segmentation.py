@@ -201,7 +201,7 @@ def export_bundle_lengths(bundles):
 
 @pimms.calc("density_maps")
 @as_file('_desc-density_dwi.nii.gz', include_track=True, include_seg=True)
-@as_img
+@as_img(False)
 def export_density_maps(bundles, dwi):
     """
     full path to 4d nifti file containing streamline counts per voxel

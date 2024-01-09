@@ -56,7 +56,7 @@ def _meta_from_tracking_params(
 
 @pimms.calc("seed")
 @as_file('_desc-seed_mask.nii.gz', include_track=True)
-@as_img
+@as_img(False)
 def export_seed_mask(tracking_params):
     """
     full path to a nifti file containing the
@@ -69,7 +69,7 @@ def export_seed_mask(tracking_params):
 
 @pimms.calc("stop")
 @as_file('_desc-stop_mask.nii.gz', include_track=True)
-@as_img
+@as_img(False)
 def export_stop_mask(tracking_params):
     """
     full path to a nifti file containing the
