@@ -966,7 +966,7 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         results_dir,
         'ROIs',
-        'sub-01_ses-01_space-subject_desc-RightSuperiorLongitudinalinclude1_mask.json'))
+        'sub-01_ses-01_space-subject_desc-RightSuperiorLongitudinalinclude1_mask.json'))  # noqa
 
     assert op.exists(op.join(
         results_dir,
