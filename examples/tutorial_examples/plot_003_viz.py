@@ -250,7 +250,11 @@ scene.set_camera(position=(238.04, 174.48, 143.04),
 # image into a png file. We use a pretty high resolution here (2400 by 2400) so
 # that we get a nice crisp image. That also means the file is pretty large.
 
-window.record(scene, out_path='arc_cst1.png', size=(2400, 2400))
+cwd = os.getcwd()
+window.record(
+    scene,
+    out_path=op.join(cwd, 'arc_cst1.png'),
+    size=(2400, 2400))
 
 
 ############################################################################
@@ -281,7 +285,10 @@ scene.add(cst_actor)
 for slicer in slicers:
     scene.add(slicer)
 
-window.record(scene, out_path='arc_cst2.png', size=(2400, 2400))
+window.record(
+    scene,
+    out_path=op.join(cwd, 'arc_cst2.png'),
+    size=(2400, 2400))
 
 
 #############################################################################
@@ -348,7 +355,10 @@ for slicer in slicers:
 scene.add(core_arc_actor)
 scene.add(core_cst_actor)
 
-window.record(scene, out_path='arc_cst3.png', size=(2400, 2400))
+window.record(
+    scene,
+    out_path=op.join(cwd, 'arc_cst3.png'),
+    size=(2400, 2400))
 
 
 #############################################################################
@@ -417,7 +427,10 @@ scene.add(waypoint1_actor)
 scene.add(waypoint2_actor)
 
 
-window.record(scene, out_path='arc_cst4.png', size=(2400, 2400))
+window.record(
+    scene,
+    out_path=op.join(cwd, 'arc_cst4.png'),
+    size=(2400, 2400))
 
 #############################################################################
 # Making a Figure out of many fury panels
@@ -429,10 +442,10 @@ window.record(scene, out_path='arc_cst4.png', size=(2400, 2400))
 # convenient methods from pyAFQ.
 
 pf = PanelFigure(3, 2, 6, 9)
-pf.add_img(f'arc_cst1.png', 0, 0)
-pf.add_img(f'arc_cst2.png', 1, 0)
-pf.add_img(f'arc_cst3.png', 0, 1)
-pf.add_img(f'arc_cst4.png', 1, 1)
+pf.add_img(op.join(cwd, 'arc_cst1.png'), 0, 0)
+pf.add_img(op.join(cwd, 'arc_cst2.png'), 1, 0)
+pf.add_img(op.join(cwd, 'arc_cst3.png'), 0, 1)
+pf.add_img(op.join(cwd, 'arc_cst4.png'), 1, 1)
 pf.format_and_save_figure(f"arc_cst_fig.png")
 
 #############################################################################
