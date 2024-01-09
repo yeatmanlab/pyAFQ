@@ -48,48 +48,57 @@ small_font = 20
 marker_size = 200
 
 COLOR_DICT = OrderedDict({
-    "ATR_L": tableau_20[0], "C_L": tableau_20[0],
-    "ATR_R": tableau_20[1], "C_R": tableau_20[1],
-    "CST_L": tableau_20[2],
-    "CST_R": tableau_20[3],
-    "CGC_L": tableau_20[4], "MCP": tableau_20[4],
-    "CGC_R": tableau_20[5], "CCMid": tableau_20[5],
-    "HCC_L": tableau_20[6],
-    "HCC_R": tableau_20[7],
-    "FP": tableau_20[8], "CC_ForcepsMinor": tableau_20[8],
-    "FA": tableau_20[9], "CC_ForcepsMajor": tableau_20[9],
-    "IFO_L": tableau_20[10], "IFOF_L": tableau_20[10],
-    "IFO_R": tableau_20[11], "IFOF_R": tableau_20[11],
-    "ILF_L": tableau_20[12], "F_L": tableau_20[12],
-    "ILF_R": tableau_20[13], "F_R": tableau_20[13],
-    "SLF_L": tableau_20[14],
-    "SLF_R": tableau_20[15],
-    "UNC_L": tableau_20[16], "UF_L": tableau_20[16],
-    "UNC_R": tableau_20[17], "UF_R": tableau_20[17],
-    "ARC_L": tableau_20[18], "AF_L": tableau_20[18],
-    "ARC_R": tableau_20[19], "AF_R": tableau_20[19],
+    "Left Anterior Thalamic": tableau_20[0], "C_L": tableau_20[0],
+    "Right Anterior Thalamic": tableau_20[1], "C_R": tableau_20[1],
+    "Left Corticospinal": tableau_20[2],
+    "Right Corticospinal": tableau_20[3],
+    "Left Cingulum": tableau_20[4], "MCP": tableau_20[4],
+    "Right Cingulum": tableau_20[5], "CCMid": tableau_20[5],
+    "Forceps Minor": tableau_20[8], "CC_ForcepsMinor": tableau_20[8],
+    "Forceps Major": tableau_20[9], "CC_ForcepsMajor": tableau_20[9],
+    "Left Inferior Fronto-Occipital": tableau_20[10],
+    "IFOF_L": tableau_20[10],
+    "Right Inferior Fronto-Occipital": tableau_20[11],
+    "IFOF_R": tableau_20[11],
+    "Left Inferior Longitudinal": tableau_20[12], "F_L": tableau_20[12],
+    "Right Inferior Longitudinal": tableau_20[13], "F_R": tableau_20[13],
+    "Left Superior Longitudinal": tableau_20[14],
+    "Right Superior Longitudinal": tableau_20[15],
+    "Left Uncinate": tableau_20[16], "UF_L": tableau_20[16],
+    "Right Uncinate": tableau_20[17], "UF_R": tableau_20[17],
+    "Left Arcuate": tableau_20[18], "AF_L": tableau_20[18],
+    "Right Arcuate": tableau_20[19], "AF_R": tableau_20[19],
     "median": tableau_20[6],
-    "Orbital": (0.2, 0.13, 0.53),  # Paul Tol's palette for callosal bundles
-    "AntFrontal": (0.07, 0.47, 0.2),
-    "SupFrontal": (0.27, 0.67, 0.6),
-    "Motor": (0.53, 0.8, 0.93),
-    "SupParietal": (0.87, 0.8, 0.47),
-    "PostParietal": (0.8, 0.4, 0.47),
-    "Occipital": (0.67, 0.27, 0.6),
-    "Temporal": (0.53, 0.13, 0.33)})
+    # Paul Tol's palette for callosal bundles
+    "Callosum Orbital": (0.2, 0.13, 0.53),
+    "Callosum Anterior Frontal": (0.07, 0.47, 0.2),
+    "Callosum Superior Frontal": (0.27, 0.67, 0.6),
+    "Callosum Motor": (0.53, 0.8, 0.93),
+    "Callosum Superior Parietal": (0.87, 0.8, 0.47),
+    "Callosum Posterior Parietal": (0.8, 0.4, 0.47),
+    "Callosum Occipital": (0.67, 0.27, 0.6),
+    "Callosum Temporal": (0.53, 0.13, 0.33)})
 
 POSITIONS = OrderedDict({
-    "ATR_L": (1, 0), "ATR_R": (1, 4), "C_L": (1, 0), "C_R": (1, 4),
-    "CST_L": (1, 1), "CST_R": (1, 3),
-    "CGC_L": (3, 1), "CGC_R": (3, 3), "MCP": (3, 1), "CCMid": (3, 3),
-    "FP": (4, 2), "FA": (0, 2),
+    "Left Anterior Thalamic": (1, 0), "Right Anterior Thalamic": (1, 4),
+    "C_L": (1, 0), "C_R": (1, 4),
+    "Left Corticospinal": (1, 1), "Right Corticospinal": (1, 3),
+    "Left Cingulum": (3, 1), "Right Cingulum": (3, 3),
+    "MCP": (3, 1), "CCMid": (3, 3),
+    "Forceps Minor": (4, 2), "Forceps Major": (0, 2),
     "CC_ForcepsMinor": (4, 2), "CC_ForcepsMajor": (0, 2),
-    "IFO_L": (4, 1), "IFO_R": (4, 3), "IFOF_L": (4, 1), "IFOF_R": (4, 3),
-    "HCC_L": (4, 0), "HCC_R": (4, 4),
-    "ILF_L": (3, 0), "ILF_R": (3, 4), "F_L": (3, 0), "F_R": (3, 4),
-    "SLF_L": (2, 1), "SLF_R": (2, 3),
-    "ARC_L": (2, 0), "ARC_R": (2, 4), "AF_L": (2, 0), "AF_R": (2, 4),
-    "UNC_L": (0, 1), "UNC_R": (0, 3), "UF_L": (0, 1), "UF_R": (0, 3)})
+    "Left Inferior Fronto-Occipital": (4, 1),
+    "Right Inferior Fronto-Occipital": (4, 3),
+    "IFOF_L": (4, 1), "IFOF_R": (4, 3),
+    "Left Inferior Longitudinal": (3, 0),
+    "Right Inferior Longitudinal": (3, 4),
+    "F_L": (3, 0), "F_R": (3, 4),
+    "Left Superior Longitudinal": (2, 1),
+    "Right Superior Longitudinal": (2, 3),
+    "Left Arcuate": (2, 0), "Right Arcuate": (2, 4),
+    "AF_L": (2, 0), "AF_R": (2, 4),
+    "Left Uncinate": (0, 1), "Right Uncinate": (0, 3),
+    "UF_L": (0, 1), "UF_R": (0, 3)})
 
 CSV_MAT_2_PYTHON = \
     {'fa': 'dti_fa', 'md': 'dti_md'}
@@ -103,43 +112,28 @@ SCALAR_REMOVE_MODEL = \
 RECO_FLIP = ["IFO_L", "IFO_R", "UNC_L", "ILF_L", "ILF_R"]
 
 BEST_BUNDLE_ORIENTATIONS = {
-    "ATR_L": ("Sagittal", "Left"), "ATR_R": ("Sagittal", "Right"),
-    "CST_L": ("Sagittal", "Left"), "CST_R": ("Sagittal", "Right"),
-    "CGC_L": ("Sagittal", "Left"), "CGC_R": ("Sagittal", "Right"),
-    "FP": ("Axial", "Top"), "FA": ("Axial", "Top"),
-    "IFO_L": ("Sagittal", "Left"), "IFO_R": ("Sagittal", "Right"),
-    "ILF_L": ("Sagittal", "Left"), "ILF_R": ("Sagittal", "Right"),
-    "SLF_L": ("Axial", "Top"), "SLF_R": ("Axial", "Top"),
-    "UNC_L": ("Axial", "Bottom"), "UNC_R": ("Axial", "Bottom"),
-    "ARC_L": ("Sagittal", "Left"), "ARC_R": ("Sagittal", "Right"),
-    "VOF_L": ("Coronal", "Back"), "VOF_R": ("Coronal", "Back"),
-    "pARC_L": ("Coronal", "Back"), "pARC_R": ("Coronal", "Back")}
-
-
-FORMAL_BUNDLE_NAMES = {
-    "ATR_L": "Left Anterior Thalamic",
-    "ATR_R": "Right Anterior Thalamic",
-    "CST_L": "Left Corticospinal",
-    "CST_R": "Right Corticospinal",
-    "CGC_L": "Left Cingulum Cingulate",
-    "CGC_R": "Right Cingulum Cingulate",
-    "FP": "Forceps Major",
-    "FA": "Forceps Minor",
-    "IFO_L": "Left Inferior Fronto-Occipital",
-    "IFO_R": "Right Inferior Fronto-Occipital",
-    "ILF_L": "Left Inferior Longitudinal",
-    "ILF_R": "Right Inferior Longitudinal",
-    "SLF_L": "Left Superior Longitudinal",
-    "SLF_R": "Right Superior Longitudinal",
-    "UNC_L": "Left Uncinate",
-    "UNC_R": "Right Uncinate",
-    "ARC_L": "Left Arcuate",
-    "ARC_R": "Right Arcuate",
-    "VOF_L": "Left Vertical Occipital",
-    "VOF_R": "Right Vertical Occipital",
-    "pARC_L": "Left Posterior Arcuate",
-    "pARC_R": "Right Posterior Arcuate"
-}
+    "Left Anterior Thalamic": ("Sagittal", "Left"),
+    "Right Anterior Thalamic": ("Sagittal", "Right"),
+    "Left Corticospinal": ("Sagittal", "Left"),
+    "Right Corticospinal": ("Sagittal", "Right"),
+    "Left Cingulum": ("Sagittal", "Left"),
+    "Right Cingulum": ("Sagittal", "Right"),
+    "Forceps Minor": ("Axial", "Top"),
+    "Forceps Major": ("Axial", "Top"),
+    "Left Inferior Fronto-Occipital": ("Sagittal", "Left"),
+    "Right Inferior Fronto-Occipital": ("Sagittal", "Right"),
+    "Left Inferior Longitudinal": ("Sagittal", "Left"),
+    "Right Inferior Longitudinal": ("Sagittal", "Right"),
+    "Left Superior Longitudinal": ("Axial", "Top"),
+    "Right Superior Longitudinal": ("Axial", "Top"),
+    "Left Uncinate": ("Axial", "Bottom"),
+    "Right Uncinate": ("Axial", "Bottom"),
+    "Left Arcuate": ("Sagittal", "Left"),
+    "Right Arcuate": ("Sagittal", "Right"),
+    "Left Vertical Occipital": ("Coronal", "Back"),
+    "Right Vertical Occipital": ("Coronal", "Back"),
+    "Left Posterior Arcuate": ("Coronal", "Back"),
+    "Right Posterior Arcuate": ("Coronal", "Back")}
 
 
 class PanelFigure():
@@ -317,10 +311,10 @@ def gen_color_dict(bundles):
                 custom_color_dict[bundle] = COLOR_DICT[bundle]
             else:
                 other_bundle = list(bundle)
-                if bundle[-2:] == '_L':
-                    other_bundle[-2:] = '_R'
-                elif bundle[-2:] == '_R':
-                    other_bundle[-2:] = '_L'
+                if bundle.startswith("Left "):
+                    other_bundle = "Right" + other_bundle[5:]
+                elif bundle.startswith("Right "):
+                    other_bundle = "Left" + other_bundle[4:]
                 other_bundle = str(other_bundle)
 
                 if other_bundle == bundle:  # lone bundle

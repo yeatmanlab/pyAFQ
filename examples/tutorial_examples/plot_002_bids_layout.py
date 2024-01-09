@@ -216,8 +216,13 @@ print(validator.is_bids(tractography_relative_path))
 # `plot_callosal_tract_profile example <http://yeatmanlab.github.io/pyAFQ/auto_examples/plot_callosal_tract_profile.html>`_.
 
 bundle_info = abd.default18_bd()[
-    "SLF_L", "SLF_R", "ARC_L", "ARC_R",
-    "CST_L", "CST_R", "FP"]
+    "Left Superior Longitudinal",
+    "Right Superior Longitudinal",
+    "Left Arcuate",
+    "Right Arcuate",
+    "Left Corticospinal",
+    "Right Corticospinal",
+    "Forceps Minor"]
 
 ##########################################################################
 # Now, we can define our GroupAFQ object, pointing to the derivatives of the

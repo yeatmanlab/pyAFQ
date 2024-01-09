@@ -57,33 +57,7 @@ study_dir = afd.fetch_hbn_preproc(["NDARAA948VFH"])[1]
 
 or_rois = afd.read_or_templates()
 
-bundles = abd.BundleDict({
-    "L_OR": {
-        "include": [
-            or_rois["left_OR_1"],
-            or_rois["left_OR_2"]],
-        "exclude": [
-            or_rois["left_OP_MNI"],
-            or_rois["left_TP_MNI"],
-            or_rois["left_pos_thal_MNI"]],
-        "start": or_rois['left_thal_MNI'],
-        "end": or_rois['left_V1_MNI'],
-        "cross_midline": False,
-    },
-    "R_OR": {
-        "include": [
-            or_rois["right_OR_1"],
-            or_rois["right_OR_2"]],
-        "exclude": [
-            or_rois["right_OP_MNI"],
-            or_rois["right_TP_MNI"],
-            or_rois["right_pos_thal_MNI"]],
-        "start": or_rois['right_thal_MNI'],
-        "end": or_rois['right_V1_MNI'],
-        "cross_midline": False
-    }
-})
-
+bundles = abd.OR_bd()
 
 #############################################################################
 # Custom bundle definitions such as the OR, and the standard BundleDict can be

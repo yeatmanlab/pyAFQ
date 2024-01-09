@@ -49,12 +49,12 @@ study_dir = afd.fetch_hbn_preproc(["NDARAA948VFH"])[1]
 ar_rois = afd.read_ar_templates()
 
 bundles = abd.BundleDict({
-    "AR_L": {
+    "Left Acoustic": {
         "start": ar_rois["AAL_Thal_L"],
         "end": ar_rois["AAL_TempSup_L"],
         "cross_midline": False,
     },
-    "AR_R": {
+    "Right Acoustic": {
         "start": ar_rois["AAL_Thal_R"],
         "end": ar_rois["AAL_TempSup_R"],
         "cross_midline": False
