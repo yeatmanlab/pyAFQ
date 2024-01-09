@@ -2,6 +2,7 @@ from collections.abc import Iterable
 import numpy as np
 import nibabel as nib
 import logging
+from tqdm import tqdm
 
 import dipy.data as dpd
 from dipy.align import resample
@@ -15,8 +16,9 @@ from dipy.tracking.stopping_criterion import (ThresholdStoppingCriterion,
 
 from nibabel.streamlines.tractogram import LazyTractogram
 
-from AFQ._fixes import (VerboseLocalTracking, VerboseParticleFilteringTracking,
-                        tensor_odf)
+from dipy.tracking.local_tracking import (LocalTracking,
+                                          ParticleFilteringTracking)
+from AFQ._fixes import tensor_odf
 
 
 def get_percentile_threshold(mask, threshold):
@@ -192,7 +194,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
             stopping_criterion = ThresholdStoppingCriterion(stop_mask,
                                                             stop_threshold)
 
-        my_tracker = VerboseLocalTracking
+        my_tracker = LocalTracking
 
     elif tracker == "pft":
         if not isinstance(stop_threshold, str):
@@ -233,7 +235,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
 
         vox_sizes.append(np.mean(params_img.header.get_zooms()[:3]))
 
-        my_tracker = VerboseParticleFilteringTracking
+        my_tracker = ParticleFilteringTracking
         if stop_threshold == "CMC":
             stopping_criterion = CmcStoppingCriterion.from_pve(
                 pve_wm_data,
@@ -247,7 +249,8 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
                 pve_gm_data,
                 pve_csf_data)
 
-    logger.info("Tracking...")
+    logger.info(
+        f"Tracking with {len(seeds)} seeds, 2 directions per seed...")
 
     return _tracking(my_tracker, seeds, dg, stopping_criterion, params_img,
                      step_size=step_size, min_length=min_length,
@@ -264,7 +267,7 @@ def _tracking(tracker, seeds, dg, stopping_criterion, params_img,
     if len(seeds.shape) == 1:
         seeds = seeds[None, ...]
 
-    tracker = tracker(
+    tracker = tqdm(tracker(
         dg,
         stopping_criterion,
         seeds,
@@ -272,7 +275,7 @@ def _tracking(tracker, seeds, dg, stopping_criterion, params_img,
         step_size=step_size,
         min_length=min_length,
         max_length=max_length,
-        random_seed=random_seed)
+        random_seed=random_seed))
 
     if trx:
         return LazyTractogram(lambda: tracker,
