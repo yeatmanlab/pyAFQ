@@ -29,6 +29,7 @@ from fury import actor, window
 from fury.colormap import create_colormap
 
 import AFQ.data.fetch as afd
+from AFQ.viz.utils import PanelFigure
 
 ##############################################################################
 # Get some data from HBN POD2
@@ -418,6 +419,21 @@ scene.add(waypoint2_actor)
 
 window.record(scene, out_path='arc_cst4.png', size=(2400, 2400))
 
+#############################################################################
+# Making a Figure out of many fury panels
+# ---------------------------------------
+# We can also make a figure that contains multiple panels, each of which
+# contains a different visualization. This is useful for communicating the
+# results of an analysis. Here, we will make a figure with four panels, using
+# some of the visualizations we have already created. We will use some
+# convenient methods from pyAFQ.
+
+pf = PanelFigure(3, 2, 6, 9)
+pf.add_img(f'arc_cst1.png', 0, 0)
+pf.add_img(f'arc_cst2.png', 1, 0)
+pf.add_img(f'arc_cst3.png', 0, 1)
+pf.add_img(f'arc_cst4.png', 1, 1)
+pf.format_and_save_figure(f"arc_cst_fig.png")
 
 #############################################################################
 #

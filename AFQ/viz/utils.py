@@ -251,7 +251,7 @@ class PanelFigure():
         if trim_final:
             im1 = Image.open(fname)
             im1 = trim(im1)
-            im1.save(fname)
+            im1.save(fname, dpi=(300, 300))
 
 
 def get_eye(view, direc):
