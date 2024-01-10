@@ -630,7 +630,7 @@ def test_AFQ_pft():
             "stop_mask": stop_mask,
             "stop_threshold": "CMC",
             "tracker": "pft",
-            "max_length": 150,
+            "maxlen": 150,
         })
     sl_file = myafq.export("streamlines")["01"]
     dwi_file = myafq.export("dwi")["01"]
@@ -640,7 +640,7 @@ def test_AFQ_pft():
         bbox_valid_check=False,
         trk_header_check=False).streamlines
     for sl in sls:
-        # double the max_length, due to step size of 0.5
+        # double the maxlen, due to step size of 0.5
         assert len(sl) <= 300
 
 

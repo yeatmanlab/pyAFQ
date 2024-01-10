@@ -34,7 +34,7 @@ def get_percentile_threshold(mask, threshold):
 def track(params_file, directions="prob", max_angle=30., sphere=None,
           seed_mask=None, seed_threshold=0, thresholds_as_percentages=False,
           n_seeds=1, random_seeds=False, rng_seed=None, stop_mask=None,
-          stop_threshold=0, step_size=0.5, min_length=50, max_length=250,
+          stop_threshold=0, step_size=0.5, minlen=50, maxlen=250,
           odf_model="CSD", tracker="local", trx=False):
     """
     Tractography
@@ -97,9 +97,9 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         Default: False
     step_size : float, optional.
         The size of a step (in mm) of tractography. Default: 0.5
-    min_length: int, optional
+    minlen: int, optional
         The miminal length (mm) in a streamline. Default: 20
-    max_length: int, optional
+    maxlen: int, optional
         The miminal length (mm) in a streamline. Default: 250
     odf_model : str, optional
         One of {"DTI", "CSD", "DKI"}. Defaults to use "DTI"
@@ -137,8 +137,8 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
 
     # We need to calculate the size of a voxel, so we can transform
     # from mm to voxel units:
-    min_length = int(min_length / step_size)
-    max_length = int(max_length / step_size)
+    minlen = int(minlen / step_size)
+    maxlen = int(maxlen / step_size)
 
     logger.info("Generating Seeds...")
     if isinstance(n_seeds, int):
@@ -253,13 +253,13 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         f"Tracking with {len(seeds)} seeds, 2 directions per seed...")
 
     return _tracking(my_tracker, seeds, dg, stopping_criterion, params_img,
-                     step_size=step_size, min_length=min_length,
-                     max_length=max_length, random_seed=rng_seed,
+                     step_size=step_size, minlen=minlen,
+                     maxlen=maxlen, random_seed=rng_seed,
                      trx=trx)
 
 
 def _tracking(tracker, seeds, dg, stopping_criterion, params_img,
-              step_size=0.5, min_length=40, max_length=200,
+              step_size=0.5, minlen=40, maxlen=200,
               random_seed=None, trx=False):
     """
     Helper function
@@ -273,8 +273,8 @@ def _tracking(tracker, seeds, dg, stopping_criterion, params_img,
         seeds,
         params_img.affine,
         step_size=step_size,
-        min_length=min_length,
-        max_length=max_length,
+        minlen=minlen,
+        maxlen=maxlen,
         random_seed=random_seed))
 
     if trx:
