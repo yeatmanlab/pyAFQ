@@ -310,7 +310,7 @@ def gen_color_dict(bundles):
             if bundle in COLOR_DICT.keys():
                 custom_color_dict[bundle] = COLOR_DICT[bundle]
             else:
-                other_bundle = list(bundle)
+                other_bundle = bundle
                 if bundle.startswith("Left "):
                     other_bundle = "Right" + other_bundle[5:]
                 elif bundle.startswith("Right "):

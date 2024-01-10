@@ -858,7 +858,7 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         myafq.export("results_dir"),
         'ROIs',
-        'sub-01_ses-01_space-subject_desc-CSTRinclude1_mask.json'))
+        'sub-01_ses-01_space-subject_desc-RightCorticospinalinclude1_mask.json'))  # noqa
 
     seg_sft = aus.SegmentedSFT.fromfile(
         myafq.export("bundles"))
