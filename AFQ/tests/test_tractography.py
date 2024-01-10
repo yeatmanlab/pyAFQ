@@ -36,7 +36,7 @@ def test_csd_local_tracking():
                         sh_order=sh_order, lambda_=1, tau=0.1, mask=None,
                         out_dir=tmpdir.name)
         for directions in ["det", "prob"]:
-            sl = track(
+            sls = track(
                 fname,
                 directions,
                 odf_model="CSD",
@@ -49,13 +49,14 @@ def test_csd_local_tracking():
                 minlen=minlen,
                 tracker="local").streamlines
 
-            npt.assert_(len(sl[0]) >= step_size * minlen)
+            for sl in sls:
+                npt.assert_(len(sl) >= minlen / step_size)
 
 
 def test_dti_local_tracking():
     fdict = fit_dti(fdata, fbval, fbvec)
     for directions in ["det", "prob"]:
-        sl = track(
+        sls = track(
             fdict['params'],
             directions,
             max_angle=30.,
@@ -66,7 +67,8 @@ def test_dti_local_tracking():
             minlen=minlen,
             odf_model="DTI",
             tracker="local").streamlines
-        npt.assert_(len(sl[0]) >= minlen * step_size)
+        for sl in sls:
+            npt.assert_(len(sl) >= minlen / step_size)
 
 
 def test_pft_tracking():
@@ -89,7 +91,7 @@ def test_pft_tracking():
 
         for directions in ["det", "prob"]:
             for stop_threshold in ["ACT", "CMC"]:
-                sl = track(
+                sls = track(
                     fname,
                     directions,
                     max_angle=30.,
@@ -102,7 +104,9 @@ def test_pft_tracking():
                     minlen=minlen,
                     odf_model=odf,
                     tracker="pft").streamlines
-                npt.assert_(len(sl[0]) >= minlen * step_size)
+
+                for sl in sls:
+                    npt.assert_(len(sl) >= minlen / step_size)
 
     # Test error handling:
     with pytest.raises(RuntimeError):

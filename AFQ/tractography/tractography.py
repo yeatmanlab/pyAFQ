@@ -275,6 +275,7 @@ def _tracking(tracker, seeds, dg, stopping_criterion, params_img,
         step_size=step_size,
         minlen=minlen,
         maxlen=maxlen,
+        return_all=False,
         random_seed=random_seed))
 
     if trx:
