@@ -250,10 +250,11 @@ scene.set_camera(position=(238.04, 174.48, 143.04),
 # image into a png file. We use a pretty high resolution here (2400 by 2400) so
 # that we get a nice crisp image. That also means the file is pretty large.
 
-cwd = os.getcwd()
+out_folder = op.join(afd.afq_home, "VizExample")
+os.makedirs(out_folder, exist_ok=True)
 window.record(
     scene,
-    out_path=op.join(cwd, 'arc_cst1.png'),
+    out_path=op.join(out_folder, 'arc_cst1.png'),
     size=(2400, 2400))
 
 
@@ -287,7 +288,7 @@ for slicer in slicers:
 
 window.record(
     scene,
-    out_path=op.join(cwd, 'arc_cst2.png'),
+    out_path=op.join(out_folder, 'arc_cst2.png'),
     size=(2400, 2400))
 
 
@@ -357,7 +358,7 @@ scene.add(core_cst_actor)
 
 window.record(
     scene,
-    out_path=op.join(cwd, 'arc_cst3.png'),
+    out_path=op.join(out_folder, 'arc_cst3.png'),
     size=(2400, 2400))
 
 
@@ -429,7 +430,7 @@ scene.add(waypoint2_actor)
 
 window.record(
     scene,
-    out_path=op.join(cwd, 'arc_cst4.png'),
+    out_path=op.join(out_folder, 'arc_cst4.png'),
     size=(2400, 2400))
 
 #############################################################################
@@ -442,10 +443,10 @@ window.record(
 # convenient methods from pyAFQ.
 
 pf = PanelFigure(3, 2, 6, 9)
-pf.add_img(op.join(cwd, 'arc_cst1.png'), 0, 0)
-pf.add_img(op.join(cwd, 'arc_cst2.png'), 1, 0)
-pf.add_img(op.join(cwd, 'arc_cst3.png'), 0, 1)
-pf.add_img(op.join(cwd, 'arc_cst4.png'), 1, 1)
+pf.add_img(op.join(out_folder, 'arc_cst1.png'), 0, 0)
+pf.add_img(op.join(out_folder, 'arc_cst2.png'), 1, 0)
+pf.add_img(op.join(out_folder, 'arc_cst3.png'), 0, 1)
+pf.add_img(op.join(out_folder, 'arc_cst4.png'), 1, 1)
 pf.format_and_save_figure(f"arc_cst_fig.png")
 
 #############################################################################
