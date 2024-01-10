@@ -497,7 +497,7 @@ def test_API_type_checking():
             preproc_pipeline='vistasoft',
             mapping_definition=IdentityMap(),
             tracking_params={
-                "n_seeds": 1,
+                "n_seeds": 100,
                 "random_seeds": True,
                 "directions": "prob",
                 "odf_model": "CSD"},
@@ -782,7 +782,7 @@ def test_AFQ_data_waypoint():
 
     tracking_params = dict(odf_model="csd",
                            seed_mask=RoiImage(),
-                           n_seeds=100,
+                           n_seeds=200,
                            random_seeds=True,
                            rng_seed=42)
     segmentation_params = dict(filter_by_endpoints=False,
@@ -836,14 +836,14 @@ def test_AFQ_data_waypoint():
 
     seg_sft = aus.SegmentedSFT.fromfile(
         myafq.export("bundles"))
-    npt.assert_(len(seg_sft.get_bundle('SLF_R').streamlines) > 0)
+    npt.assert_(len(seg_sft.get_bundle('CST_L').streamlines) > 0)
 
     # Test bundles exporting:
     myafq.export("indiv_bundles")
     assert op.exists(op.join(
         myafq.export("results_dir"),
         'bundles',
-        'sub-01_ses-01_coordsys-RASMM_trkmethod-probCSD_recogmethod-AFQ_desc-SLFR_tractography.trk'))  # noqa
+        'sub-01_ses-01_coordsys-RASMM_trkmethod-probCSD_recogmethod-AFQ_desc-CSTL_tractography.trk'))  # noqa
 
     tract_profile_fname = myafq.export("profiles")
     tract_profiles = pd.read_csv(tract_profile_fname)
@@ -884,7 +884,7 @@ def test_AFQ_data_waypoint():
     # ROI mask needs to be put in quotes in config
     tracking_params = dict(odf_model="CSD",
                            seed_mask="RoiImage()",
-                           n_seeds=100,
+                           n_seeds=200,
                            random_seeds=True,
                            rng_seed=42)
     bundle_dict_as_str = (
