@@ -497,12 +497,10 @@ def test_API_type_checking():
             preproc_pipeline='vistasoft',
             mapping_definition=IdentityMap(),
             tracking_params={
-                "n_seeds": 100,
+                "n_seeds": 10,
                 "random_seeds": True,
-                "directions": "prob",
-                "odf_model": "CSD"},
-            csd_sh_order=2,  # reduce CSD fit time
-            csd_response=((1, 1, 1), 1),
+                "directions": "det",
+                "odf_model": "DTI"},
             bundle_info=abd.default18_bd()["ARC_L", "ARC_R"])
         myafq.export("bundles")
     del myafq
