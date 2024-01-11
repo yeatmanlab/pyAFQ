@@ -24,7 +24,7 @@ fbvec = op.join(tmpdir.name, 'dti.bvec')
 fdata = op.join(tmpdir.name, 'dti.nii.gz')
 make_tracking_data(fbval, fbvec, fdata)
 
-min_length = 20
+minlen = 20
 step_size = 0.5
 
 
@@ -36,7 +36,7 @@ def test_csd_local_tracking():
                         sh_order=sh_order, lambda_=1, tau=0.1, mask=None,
                         out_dir=tmpdir.name)
         for directions in ["det", "prob"]:
-            sl = track(
+            sls = track(
                 fname,
                 directions,
                 odf_model="CSD",
@@ -46,16 +46,17 @@ def test_csd_local_tracking():
                 n_seeds=seeds,
                 stop_mask=None,
                 step_size=step_size,
-                min_length=min_length,
+                minlen=minlen,
                 tracker="local").streamlines
 
-            npt.assert_(len(sl[0]) >= step_size * min_length)
+            for sl in sls:
+                npt.assert_(len(sl) >= minlen / step_size)
 
 
 def test_dti_local_tracking():
     fdict = fit_dti(fdata, fbval, fbvec)
     for directions in ["det", "prob"]:
-        sl = track(
+        sls = track(
             fdict['params'],
             directions,
             max_angle=30.,
@@ -63,10 +64,11 @@ def test_dti_local_tracking():
             seed_mask=None,
             n_seeds=1,
             step_size=step_size,
-            min_length=min_length,
+            minlen=minlen,
             odf_model="DTI",
             tracker="local").streamlines
-        npt.assert_(len(sl[0]) >= min_length * step_size)
+        for sl in sls:
+            npt.assert_(len(sl) >= minlen / step_size)
 
 
 def test_pft_tracking():
@@ -89,7 +91,7 @@ def test_pft_tracking():
 
         for directions in ["det", "prob"]:
             for stop_threshold in ["ACT", "CMC"]:
-                sl = track(
+                sls = track(
                     fname,
                     directions,
                     max_angle=30.,
@@ -99,10 +101,12 @@ def test_pft_tracking():
                     stop_threshold=stop_threshold,
                     n_seeds=1,
                     step_size=step_size,
-                    min_length=min_length,
+                    minlen=minlen,
                     odf_model=odf,
                     tracker="pft").streamlines
-                npt.assert_(len(sl[0]) >= min_length * step_size)
+
+                for sl in sls:
+                    npt.assert_(len(sl) >= minlen / step_size)
 
     # Test error handling:
     with pytest.raises(RuntimeError):
@@ -116,7 +120,7 @@ def test_pft_tracking():
             stop_threshold=stop_threshold,
             n_seeds=1,
             step_size=step_size,
-            min_length=min_length,
+            minlen=minlen,
             tracker="pft")
 
     with pytest.raises(RuntimeError):
@@ -130,5 +134,5 @@ def test_pft_tracking():
             stop_threshold=None,  # Stop threshold needs to be a string!
             n_seeds=1,
             step_size=step_size,
-            min_length=min_length,
+            minlen=minlen,
             tracker="pft")

@@ -389,8 +389,8 @@ def generate_json(json_folder, overwrite=False,
                 "tckgen":{
                 "algorithm": "iFOD2",
                 "select": 1e6,
-                "max_length": 250,
-                "min_length": 30,
+                "maxlen": 250,
+                "minlen": 30,
                 "power":0.33
                 },
                 "sift2":{}

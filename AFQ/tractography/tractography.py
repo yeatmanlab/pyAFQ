@@ -2,6 +2,7 @@ from collections.abc import Iterable
 import numpy as np
 import nibabel as nib
 import logging
+from tqdm import tqdm
 
 import dipy.data as dpd
 from dipy.align import resample
@@ -15,8 +16,9 @@ from dipy.tracking.stopping_criterion import (ThresholdStoppingCriterion,
 
 from nibabel.streamlines.tractogram import LazyTractogram
 
-from AFQ._fixes import (VerboseLocalTracking, VerboseParticleFilteringTracking,
-                        tensor_odf)
+from dipy.tracking.local_tracking import (LocalTracking,
+                                          ParticleFilteringTracking)
+from AFQ._fixes import tensor_odf
 
 
 def get_percentile_threshold(mask, threshold):
@@ -32,7 +34,7 @@ def get_percentile_threshold(mask, threshold):
 def track(params_file, directions="prob", max_angle=30., sphere=None,
           seed_mask=None, seed_threshold=0, thresholds_as_percentages=False,
           n_seeds=1, random_seeds=False, rng_seed=None, stop_mask=None,
-          stop_threshold=0, step_size=0.5, min_length=50, max_length=250,
+          stop_threshold=0, step_size=0.5, minlen=50, maxlen=250,
           odf_model="CSD", tracker="local", trx=False):
     """
     Tractography
@@ -95,9 +97,9 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         Default: False
     step_size : float, optional.
         The size of a step (in mm) of tractography. Default: 0.5
-    min_length: int, optional
+    minlen: int, optional
         The miminal length (mm) in a streamline. Default: 20
-    max_length: int, optional
+    maxlen: int, optional
         The miminal length (mm) in a streamline. Default: 250
     odf_model : str, optional
         One of {"DTI", "CSD", "DKI"}. Defaults to use "DTI"
@@ -135,8 +137,8 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
 
     # We need to calculate the size of a voxel, so we can transform
     # from mm to voxel units:
-    min_length = int(min_length / step_size)
-    max_length = int(max_length / step_size)
+    minlen = int(minlen / step_size)
+    maxlen = int(maxlen / step_size)
 
     logger.info("Generating Seeds...")
     if isinstance(n_seeds, int):
@@ -192,7 +194,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
             stopping_criterion = ThresholdStoppingCriterion(stop_mask,
                                                             stop_threshold)
 
-        my_tracker = VerboseLocalTracking
+        my_tracker = LocalTracking
 
     elif tracker == "pft":
         if not isinstance(stop_threshold, str):
@@ -233,7 +235,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
 
         vox_sizes.append(np.mean(params_img.header.get_zooms()[:3]))
 
-        my_tracker = VerboseParticleFilteringTracking
+        my_tracker = ParticleFilteringTracking
         if stop_threshold == "CMC":
             stopping_criterion = CmcStoppingCriterion.from_pve(
                 pve_wm_data,
@@ -247,16 +249,17 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
                 pve_gm_data,
                 pve_csf_data)
 
-    logger.info("Tracking...")
+    logger.info(
+        f"Tracking with {len(seeds)} seeds, 2 directions per seed...")
 
     return _tracking(my_tracker, seeds, dg, stopping_criterion, params_img,
-                     step_size=step_size, min_length=min_length,
-                     max_length=max_length, random_seed=rng_seed,
+                     step_size=step_size, minlen=minlen,
+                     maxlen=maxlen, random_seed=rng_seed,
                      trx=trx)
 
 
 def _tracking(tracker, seeds, dg, stopping_criterion, params_img,
-              step_size=0.5, min_length=40, max_length=200,
+              step_size=0.5, minlen=40, maxlen=200,
               random_seed=None, trx=False):
     """
     Helper function
@@ -264,15 +267,16 @@ def _tracking(tracker, seeds, dg, stopping_criterion, params_img,
     if len(seeds.shape) == 1:
         seeds = seeds[None, ...]
 
-    tracker = tracker(
+    tracker = tqdm(tracker(
         dg,
         stopping_criterion,
         seeds,
         params_img.affine,
         step_size=step_size,
-        min_length=min_length,
-        max_length=max_length,
-        random_seed=random_seed)
+        minlen=minlen,
+        maxlen=maxlen,
+        return_all=False,
+        random_seed=random_seed))
 
     if trx:
         return LazyTractogram(lambda: tracker,

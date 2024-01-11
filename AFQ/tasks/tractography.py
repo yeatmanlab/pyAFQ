@@ -47,8 +47,8 @@ def _meta_from_tracking_params(
         Parameters=dict(
             Units="mm",
             StepSize=tracking_params["step_size"],
-            MinimumLength=tracking_params["min_length"],
-            MaximumLength=tracking_params["max_length"],
+            MinimumLength=tracking_params["minlen"],
+            MaximumLength=tracking_params["maxlen"],
             Unidirectional=False),
         Timing=time() - start_time)
     return meta
