@@ -7,7 +7,9 @@ import nibabel as nib
 from dipy.reconst import csdeconv as csd
 from dipy.reconst import mcsd
 from dipy.reconst import shm
+from dipy.core.gradients import gradient_table, unique_bvals_magnitude
 import AFQ.utils.models as ut
+
 
 # Monkey patch fixed spherical harmonics for conda from
 # DIPY dev:
@@ -37,7 +39,14 @@ def _model(gtab, data, response=None, sh_order=None):
 
     my_model = csd.ConstrainedSphericalDeconvModel
     if response is None:
-        response, _ = csd.auto_response_ssst(gtab, data, roi_radii=10,
+        unique_bvals = unique_bvals_magnitude(gtab.bvals)
+        if len(unique_bvals[unique_bvals > 0]) > 1:
+            low_shell_idx = gtab.bvals < unique_bvals[unique_bvals > 0][0]
+            response_gtab = gradient_table(gtab.bvals[low_shell_idx],
+                                           gtab.bvecs[low_shell_idx])
+        else:
+            response_gtab = gtab
+        response, _ = csd.auto_response_ssst(response_gtab, data, roi_radii=10,
                                              fa_thr=0.7)
     # Catch conditions where an auto-response could not be calculated:
     if np.all(np.isnan(response[0])):
