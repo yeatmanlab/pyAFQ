@@ -199,25 +199,27 @@ def as_fit_deriv(tf_name):
     return _as_fit_deriv
 
 
-def as_img(func, is_data_task=True):
+def as_img(is_data_task=True):
     """
     return data, meta as nibabel image, meta with timing
     """
-    if is_data_task:
-        needed_args = ["dwi_affine"]
-    else:
-        needed_args = ["data_imap"]
+    def _as_img(func):
+        if is_data_task:
+            needed_args = ["dwi_affine"]
+        else:
+            needed_args = ["data_imap"]
 
-    @functools.wraps(func)
-    @has_args(func, needed_args)
-    def wrapper_as_img(*args, **kwargs):
-        og_arg_count, affine = extract_added_args(
-            func, needed_args, args)
-        if not is_data_task:
-            affine = affine["dwi_affine"]
-        start_time = time()
-        data, meta = func(*args[:og_arg_count], **kwargs)
-        meta['timing'] = time() - start_time
-        img = nib.Nifti1Image(data.astype(np.float32), affine)
-        return img, meta
-    return wrapper_as_img
+        @functools.wraps(func)
+        @has_args(func, needed_args)
+        def wrapper_as_img(*args, **kwargs):
+            og_arg_count, affine = extract_added_args(
+                func, needed_args, args)
+            if not is_data_task:
+                affine = affine["dwi_affine"]
+            start_time = time()
+            data, meta = func(*args[:og_arg_count], **kwargs)
+            meta['timing'] = time() - start_time
+            img = nib.Nifti1Image(data.astype(np.float32), affine)
+            return img, meta
+        return wrapper_as_img
+    return _as_img
