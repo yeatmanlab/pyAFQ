@@ -62,6 +62,8 @@ def gpu_track(data, gtab, seed_img, stop_img,
     seed_data = seed_img.get_fdata()
     stop_data = stop_img.get_fdata()
 
+    data = np.ascontiguousarray(data, dtype=np.float64)
+
     if len(np.unique(seed_data)) > 2:
         if thresholds_as_percentages:
             seed_threshold = get_percentile_threshold(
@@ -94,8 +96,10 @@ def gpu_track(data, gtab, seed_img, stop_img,
         1.0,
         stop_threshold,
         step_size,
-        data.astype(np.float64), H, R, delta_b, delta_q,
-        b0s_mask.astype(np.int32), stop_data.astype(np.float64),
+        data, H, R, delta_b, delta_q,
+        # Our data is already masked
+        np.zeros(data.shape[-1], dtype=np.int32),
+        stop_data.astype(np.float64),
         sampling_matrix,
         sphere.vertices, sphere.edges.astype(np.int32),
         ngpus=ngpus, rng_seed=0)
