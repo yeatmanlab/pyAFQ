@@ -86,17 +86,19 @@ def get_data_gtab(dwi_path, bval, bvec, min_bval=None,
     gtab = dpg.gradient_table(
         bvals, bvecs,
         b0_threshold=b0_threshold)
+    img = nib.Nifti1Image(data, img.affine)
     return data, gtab, img, img.affine
 
 
 @pimms.calc("b0")
 @as_file('_desc-b0_dwi.nii.gz')
-def b0(dwi, data, gtab, dwi_path):
+def b0(dwi_path, gtab):
     """
     full path to a nifti file containing the mean b0
     """
-    mean_b0 = np.mean(data[..., gtab.b0s_mask], -1)
-    mean_b0_img = nib.Nifti1Image(mean_b0, dwi.affine)
+    data = nib.load(dwi_path)
+    mean_b0 = np.mean(data.get_fdata()[..., gtab.b0s_mask], -1)
+    mean_b0_img = nib.Nifti1Image(mean_b0, data.affine)
     meta = dict(b0_threshold=gtab.b0_threshold,
                 source=dwi_path)
     return mean_b0_img, meta
@@ -104,7 +106,7 @@ def b0(dwi, data, gtab, dwi_path):
 
 @pimms.calc("masked_b0")
 @as_file('_desc-maskedb0_dwi.nii.gz')
-def b0_mask(base_fname, b0, brain_mask):
+def b0_mask(b0, brain_mask):
     """
     full path to a nifti file containing the
     mean b0 after applying the brain mask

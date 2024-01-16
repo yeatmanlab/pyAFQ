@@ -201,8 +201,7 @@ def export_bundle_lengths(bundles):
 
 @pimms.calc("density_maps")
 @as_file('_desc-density_dwi.nii.gz', include_track=True, include_seg=True)
-@as_img(False)
-def export_density_maps(bundles, dwi):
+def export_density_maps(bundles, data_imap):
     """
     full path to 4d nifti file containing streamline counts per voxel
     per bundle, where the 4th dimension encodes the bundle
@@ -210,15 +209,16 @@ def export_density_maps(bundles, dwi):
     seg_sft = aus.SegmentedSFT.fromfile(
         bundles)
     entire_density_map = np.zeros((
-        *nib.load(dwi).shape[:3],
+        *data_imap["data"].shape[:3],
         len(seg_sft.bundle_names)))
     for ii, bundle_name in enumerate(seg_sft.bundle_names):
         bundle_sl = seg_sft.get_bundle(bundle_name)
         bundle_density = auv.density_map(bundle_sl).get_fdata()
         entire_density_map[..., ii] = bundle_density
 
-    return entire_density_map, dict(
-        source=bundles, bundles=list(seg_sft.bundle_names))
+    return nib.Nifti1Image(
+        entire_density_map, data_imap["dwi_affine"]), dict(
+            source=bundles, bundles=list(seg_sft.bundle_names))
 
 
 @pimms.calc("profiles")

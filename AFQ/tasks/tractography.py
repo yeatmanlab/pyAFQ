@@ -56,28 +56,28 @@ def _meta_from_tracking_params(
 
 @pimms.calc("seed")
 @as_file('_desc-seed_mask.nii.gz', include_track=True)
-@as_img(False)
-def export_seed_mask(tracking_params):
+def export_seed_mask(data_imap, tracking_params):
     """
     full path to a nifti file containing the
     tractography seed mask
     """
     seed_mask = tracking_params['seed_mask']
     seed_mask_desc = dict(source=tracking_params['seed_mask'])
-    return seed_mask, seed_mask_desc
+    return nib.Nifti1Image(seed_mask, data_imap["dwi_affine"]),\
+        seed_mask_desc
 
 
 @pimms.calc("stop")
 @as_file('_desc-stop_mask.nii.gz', include_track=True)
-@as_img(False)
-def export_stop_mask(tracking_params):
+def export_stop_mask(data_imap, tracking_params):
     """
     full path to a nifti file containing the
     tractography stop mask
     """
     stop_mask = tracking_params['stop_mask']
     stop_mask_desc = dict(source=tracking_params['stop_mask'])
-    return stop_mask, stop_mask_desc
+    return nib.Nifti1Image(stop_mask, data_imap["dwi_affine"]),\
+        stop_mask_desc
 
 
 @pimms.calc("stop")
