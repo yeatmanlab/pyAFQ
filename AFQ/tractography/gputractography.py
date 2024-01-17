@@ -97,9 +97,7 @@ def gpu_track(data, gtab, seed_img, stop_img,
         stop_threshold,
         step_size,
         data, H, R, delta_b, delta_q,
-        # Our data is already masked
-        np.zeros(data.shape[-1], dtype=np.int32),
-        stop_data.astype(np.float64),
+        b0s_mask.astype(np.int32), stop_data.astype(np.float64),
         sampling_matrix,
         sphere.vertices, sphere.edges.astype(np.int32),
         ngpus=ngpus, rng_seed=0)
