@@ -44,10 +44,11 @@ def _model(gtab, data, response=None, sh_order=None):
             low_shell_idx = gtab.bvals <= unique_bvals[unique_bvals > 0][0]
             response_gtab = gradient_table(gtab.bvals[low_shell_idx],
                                            gtab.bvecs[low_shell_idx])
+            data = data[..., low_shell_idx]
         else:
             response_gtab = gtab
         response, _ = csd.auto_response_ssst(response_gtab,
-                                             data[..., low_shell_idx],
+                                             data,
                                              roi_radii=10,
                                              fa_thr=0.7)
     # Catch conditions where an auto-response could not be calculated:
