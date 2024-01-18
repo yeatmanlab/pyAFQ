@@ -92,10 +92,13 @@ def gpu_track(data, gtab, seed_img, stop_img,
     R = shm.lcr_matrix(H)
 
     gpu_tracker = cuslines.GPUTracker(
+        1,  # CSA-ODF
         radians(max_angle),
         1.0,
         stop_threshold,
         step_size,
+        0.25,  # relative peak threshold
+        radians(45),  # min separation angle
         data, H, R, delta_b, delta_q,
         b0s_mask.astype(np.int32), stop_data.astype(np.float64),
         sampling_matrix,

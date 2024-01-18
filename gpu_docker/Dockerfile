@@ -31,7 +31,7 @@ RUN pip install numpy scipy cython nibabel dipy tqdm fslpy
 # clone pyAFQ GPUStreamlines
 RUN git clone https://github.com/yeatmanlab/pyAFQ.git /opt/pyAFQ
 RUN cd /opt/pyAFQ && git reset --hard ${COMMIT}
-RUN git clone --recursive https://github.com/dipy/GPUStreamlines /opt/GPUStreamlines
+RUN git clone --recursive  -b csaodf_debug_2 https://github.com/dipy/GPUStreamlines /opt/GPUStreamlines
 
 # compile
 RUN cd /opt/GPUStreamlines && mkdir build && cd build \
