@@ -971,4 +971,4 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         results_dir,
         'bundles',
-        'sub-01_ses-01_coordsys-RASMM_trkmethod-probCSD_recogmethod-AFQ_desc--RightSuperiorLongitudinal_tractography.trk'))  # noqa
+        'sub-01_ses-01_coordsys-RASMM_trkmethod-probCSD_recogmethod-AFQ_desc-RightSuperiorLongitudinal_tractography.trk'))  # noqa
