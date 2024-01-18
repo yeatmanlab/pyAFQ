@@ -503,7 +503,7 @@ def test_API_type_checking():
             preproc_pipeline='vistasoft',
             mapping_definition=IdentityMap(),
             tracking_params={
-                "n_seeds": 10,
+                "n_seeds": 5,
                 "random_seeds": True,
                 "directions": "det",
                 "odf_model": "DTI"},
