@@ -5,7 +5,7 @@ from math import radians
 from tqdm import tqdm
 
 from dipy.data import small_sphere
-from dipy.reconst.shm import OpdtModel
+from dipy.reconst.shm import CsaOdfModel
 from dipy.reconst import shm
 from dipy.tracking import utils
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
@@ -74,9 +74,12 @@ def gpu_track(data, gtab, seed_img, stop_img,
         stop_threshold = get_percentile_threshold(
             stop_data, stop_threshold)
 
-    model = OpdtModel(gtab, sh_order=sh_order, min_signal=1)
+    model = CsaOdfModel(
+        gtab, sh_order=sh_order,
+        smooth=0.006, min_signal=1)
     fit_matrix = model._fit_matrix
-    delta_b, delta_q = fit_matrix
+    delta_b = fit_matrix
+    delta_q = fit_matrix
 
     sphere = small_sphere
     theta = sphere.theta
@@ -92,7 +95,7 @@ def gpu_track(data, gtab, seed_img, stop_img,
     R = shm.lcr_matrix(H)
 
     gpu_tracker = cuslines.GPUTracker(
-        1,  # CSA-ODF
+        cuslines.ModelType.CSAODF,
         radians(max_angle),
         1.0,
         stop_threshold,
