@@ -75,6 +75,7 @@ def gpu_track(data, gtab, seed_img, stop_img, odf_model,
             stop_data, stop_threshold)
 
     if odf_model.lower() == "opdt":
+        model_type = cuslines.ModelType.OPDT
         model = OpdtModel(
             gtab,
             sh_order=sh_order,
@@ -83,6 +84,7 @@ def gpu_track(data, gtab, seed_img, stop_img, odf_model,
         fit_matrix = model._fit_matrix
         delta_b, delta_q = fit_matrix
     elif odf_model.lower() == "csa":
+        model_type = cuslines.ModelType.CSAODF
         model = CsaOdfModel(
             gtab, sh_order=sh_order,
             smooth=0.006, min_signal=1)
@@ -122,7 +124,7 @@ def gpu_track(data, gtab, seed_img, stop_img, odf_model,
         sphere.edges, dtype=np.int32)
 
     gpu_tracker = cuslines.GPUTracker(
-        cuslines.ModelType.CSAODF,
+        model_type,
         radians(max_angle),
         1.0,
         stop_threshold,
