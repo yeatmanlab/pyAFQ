@@ -3,6 +3,7 @@ import cuslines
 import numpy as np
 from math import radians
 from tqdm import tqdm
+import logging
 
 from dipy.data import small_sphere
 from dipy.reconst.shm import OpdtModel, CsaOdfModel
@@ -13,6 +14,9 @@ from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from nibabel.streamlines.array_sequence import concatenate
 
 from AFQ.tractography.tractography import get_percentile_threshold
+
+
+logger = logging.getLogger('AFQ')
 
 
 # Modified from https://github.com/dipy/GPUStreamlines/blob/master/run_dipy_gpu.py
@@ -94,7 +98,7 @@ def gpu_track(data, gtab, seed_img, stop_img, odf_model,
     else:
         raise ValueError((
             f"odf_model must be 'opdt' or "
-            "'csa', not {odf_model}"))
+            f"'csa', not {odf_model}"))
 
     sphere = small_sphere
     theta = sphere.theta
@@ -109,19 +113,28 @@ def gpu_track(data, gtab, seed_img, stop_img, odf_model,
     H = shm.hat(B)
     R = shm.lcr_matrix(H)
 
-    data = np.ascontiguousarray(data, dtype=np.float64)
-    H = np.ascontiguousarray(H, dtype=np.float64)
-    R = np.ascontiguousarray(R, dtype=np.float64)
-    delta_b = np.ascontiguousarray(delta_b, dtype=np.float64)
-    delta_q = np.ascontiguousarray(delta_q, dtype=np.float64)
-    b0s_mask = np.ascontiguousarray(b0s_mask, dtype=np.int32)
-    stop_data = np.ascontiguousarray(stop_data, dtype=np.float64)
-    sampling_matrix = np.ascontiguousarray(
-        sampling_matrix, dtype=np.float64)
-    sph_verticies = np.ascontiguousarray(
-        sphere.vertices, dtype=np.float64)
-    sph_edges = np.ascontiguousarray(
-        sphere.edges, dtype=np.int32)
+    sph_edges = sphere.edges
+    sph_verticies = sphere.vertices
+
+    gtargs = {}
+    for var_name in [
+        "data",
+        "H", "R", "delta_b", "delta_q",
+        "b0s_mask", "stop_data", "sampling_matrix",
+            "sph_verticies", "sph_edges"]:
+        var = locals()[var_name]
+
+        if var_name in ["b0s_mask", "sph_edges"]:
+            dtype = np.int32
+        else:
+            dtype = np.float64
+
+        if not np.asarray(var).flags['C_CONTIGUOUS']:
+            logger.warning(f"{var_name} is not C contiguous. Copying...")
+            gtargs[var_name] = np.ascontiguousarray(
+                var, dtype=dtype)
+        else:
+            gtargs[var_name] = var
 
     gpu_tracker = cuslines.GPUTracker(
         model_type,
@@ -131,10 +144,11 @@ def gpu_track(data, gtab, seed_img, stop_img, odf_model,
         step_size,
         0.25,  # relative peak threshold
         radians(45),  # min separation angle
-        data, H, R, delta_b, delta_q,
-        b0s_mask, stop_data,
-        sampling_matrix,
-        sph_verticies, sph_edges,
+        gtargs["data"], gtargs["H"], gtargs["R"],
+        gtargs["delta_b"], gtargs["delta_q"],
+        gtargs["b0s_mask"], gtargs["stop_data"],
+        gtargs["sampling_matrix"],
+        gtargs["sph_verticies"], gtargs["sph_edges"],
         ngpus=ngpus, rng_seed=0)
 
     seed_mask = utils.seeds_from_mask(
