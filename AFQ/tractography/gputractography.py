@@ -134,7 +134,7 @@ def gpu_track(data, gtab, seed_img, stop_img, odf_model,
             gtargs[var_name] = np.ascontiguousarray(
                 var, dtype=dtype)
         else:
-            gtargs[var_name] = var
+            gtargs[var_name] = np.asarray(var, dtype=dtype)
 
     gpu_tracker = cuslines.GPUTracker(
         model_type,
