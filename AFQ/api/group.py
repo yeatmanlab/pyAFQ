@@ -340,8 +340,8 @@ class GroupAFQ(object):
                 this_bundles_file = self.export(
                     "bundles", collapse=False)[sub][ses]
                 this_mapping = self.export("mapping", collapse=False)[sub][ses]
-                this_img = nib.load(self.export(
-                    "dwi", collapse=False)[sub][ses])
+                this_img = self.export(
+                    "dwi", collapse=False)[sub][ses]
                 seg_sft = aus.SegmentedSFT.fromfile(
                     this_bundles_file,
                     this_img)
