@@ -138,6 +138,7 @@ if __name__ == '__main__':
             parse_cli(arg_dict)
     
     if config_file == "download":
+        logger.info("Downloading templates...")
         download_templates()
         exit()
 
