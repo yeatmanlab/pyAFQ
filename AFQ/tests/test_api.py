@@ -432,7 +432,8 @@ def test_AFQ_anisotropic():
 
 def test_API_type_checking():
     _, bids_path, _ = get_temp_hardi()
-    np.random.seed(2022)
+    seed = 2022
+    np.random.seed(seed)
     # Note that the ordering of these "with pytest.raises"
     # statements is important. Later tests will use
     # the sucessful results of previous ones. IE,
@@ -498,6 +499,7 @@ def test_API_type_checking():
             mapping_definition=IdentityMap(),
             tracking_params={
                 "n_seeds": 10,
+                "rng_seed": seed,
                 "random_seeds": True,
                 "directions": "det",
                 "odf_model": "DTI"},
