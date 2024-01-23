@@ -48,5 +48,6 @@ RUN cd /opt/GPUStreamlines/build/cuslines && pip install -e .
 
 # Install pyAFQ
 RUN cd /opt/pyAFQ && pip install -e .
+RUN /opt/pyAFQ/bin/pyAFQ download
 
 ENTRYPOINT ["/opt/pyAFQ/bin/pyAFQ"]

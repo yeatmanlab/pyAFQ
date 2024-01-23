@@ -57,5 +57,7 @@ From: nvidia/cuda:12.0.1-devel-ubuntu20.04
     # Install pyAFQ
     pip install -e /opt/pyAFQ
 
+    /opt/pyAFQ/bin/pyAFQ download
+
 %runscript
     exec /opt/pyAFQ/bin/pyAFQ "$@"
