@@ -21,7 +21,14 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install .[all]
-        conda install -c conda-forge xvfbwrapper
+        conda install -c conda-forge
+    - name: Setup XVFB
+      env:
+        XVFB: 1
+      run: |
+        apt-get install -y xvfb
+        Xvfb :99 -screen 0 1280x1024x24
+        echo 'export DISPLAY=:99' >> $BASH_ENV
     - name: Build docs
       env:
         XVFB: 1

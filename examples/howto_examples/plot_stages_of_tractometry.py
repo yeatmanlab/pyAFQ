@@ -15,25 +15,6 @@ known as pillow).
 
 """
 
-#############################################################################
-#
-# .. note::
-#   A virtual frame buffer is needed if you are running this example on
-#   a machine that is not connected to a display ("headless"). If this is
-#   the case, you can either set an environment variable called `XVFB` to `1`
-#   or you can deindent the following code (and comment out the `if` statement)
-#   to inivialize the virtual frame buffer.
-
-import os
-if os.environ.get("XVFB", False):
-    print("Initializing XVFB")
-    import xvfbwrapper
-    from xvfbwrapper import Xvfb
-
-    vdisplay = Xvfb()
-    vdisplay.start()
-
-
 ##############################################################################
 # Imports
 # -------
@@ -104,24 +85,6 @@ def make_video(frames, out):
         loop=1)
 
 
-#############################################################################
-#
-# .. note::
-#   A virtual frame buffer is needed if you are running this example on
-#   a machine that is not connected to a display ("headless"). If this is
-#   the case, you can either run this example with the environment variable
-#   "XVFB" set to "1" or "True" or you can remove the if statement below,
-#   which will start a virtual frame buffer for you.
-
-if os.environ.get("XVFB", False):
-    print("Initializing XVFB")
-    import xvfbwrapper
-    from xvfbwrapper import Xvfb
-
-    vdisplay = Xvfb()
-    vdisplay.start()
-
-
 tmp = tempfile.mkdtemp()
 n_frames = 72
 
@@ -171,14 +134,14 @@ qsiprep_path = op.join(
     'ses-HBNsiteRU')
 
 dmri_img = nib.load(op.join(
-        qsiprep_path,
-        'dwi',
-        'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi.nii.gz'))
+    qsiprep_path,
+    'dwi',
+    'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi.nii.gz'))
 
 gtab = gradient_table(*[op.join(
-        qsiprep_path,
-        'dwi',
-        f'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi.{ext}') for ext in ['bval', 'bvec']])
+    qsiprep_path,
+    'dwi',
+    f'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi.{ext}') for ext in ['bval', 'bvec']])
 
 
 dmri_data = dmri_img.get_fdata()
@@ -215,11 +178,24 @@ def slice_volume(data, x=None, y=None, z=None):
     return slicer_actors
 
 
-slicers_b0 = slice_volume(dmri_b0, x=dmri_b0.shape[0] // 2, y=dmri_b0.shape[1] // 2, z=dmri_b0.shape[-1] // 3)
-slicers_b1000 = slice_volume(dmri_b1000, x=dmri_b0.shape[0] // 2, y=dmri_b0.shape[1] // 2, z=dmri_b0.shape[-1] // 3)
-slicers_b2000 = slice_volume(dmri_b2000, x=dmri_b0.shape[0] // 2, y=dmri_b0.shape[1] // 2, z=dmri_b0.shape[-1] // 3)
+slicers_b0 = slice_volume(
+    dmri_b0,
+    x=dmri_b0.shape[0] // 2,
+    y=dmri_b0.shape[1] // 2,
+    z=dmri_b0.shape[-1] // 3)
+slicers_b1000 = slice_volume(
+    dmri_b1000,
+    x=dmri_b0.shape[0] // 2,
+    y=dmri_b0.shape[1] // 2,
+    z=dmri_b0.shape[-1] // 3)
+slicers_b2000 = slice_volume(
+    dmri_b2000,
+    x=dmri_b0.shape[0] // 2,
+    y=dmri_b0.shape[1] // 2,
+    z=dmri_b0.shape[-1] // 3)
 
-for bval, slicers in zip([0, 1000, 2000], [slicers_b0, slicers_b1000, slicers_b2000]):
+for bval, slicers in zip([0, 1000, 2000],
+                         [slicers_b0, slicers_b1000, slicers_b2000]):
     scene = window.Scene()
     for slicer in slicers:
         scene.add(slicer)
@@ -232,7 +208,8 @@ for bval, slicers in zip([0, 1000, 2000], [slicers_b0, slicers_b1000, slicers_b2
                   size=(2400, 2400),
                   n_frames=n_frames, path_numbering=True)
 
-    make_video([f'{tmp}/b{bval}{ii:06d}.png' for ii in range(n_frames)], f'b{bval}.gif')
+    make_video(
+        [f'{tmp}/b{bval}{ii:06d}.png' for ii in range(n_frames)], f'b{bval}.gif')
 #############################################################################
 # Visualizing whole-brain tractography
 # ------------------------------------
@@ -299,7 +276,7 @@ window.record(scene, out_path=f'{tmp}/whole_brain', size=(2400, 2400),
               n_frames=n_frames, path_numbering=True)
 
 make_video([f"{tmp}/whole_brain{ii:06d}.png" for ii in range(n_frames)],
-            "whole_brain.gif")
+           "whole_brain.gif")
 
 #############################################################################
 # Whole brain with waypoints
@@ -391,7 +368,7 @@ bundles = [
     "CST_L",
     "ATR_L",
     "ARC_L",
-    ]
+]
 
 color_dict = gen_color_dict(bundles)
 
@@ -511,7 +488,7 @@ for slicer in slicers:
 
 for bundle in bundles:
     sft = load_trk(op.join(clean_bundles_path,
-                            f'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_space-RASMM_model-CSD_desc-prob-afq-{bundle}_tractography.trk'), fa_img)
+                           f'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_space-RASMM_model-CSD_desc-prob-afq-{bundle}_tractography.trk'), fa_img)
 
     sft.to_rasmm()
     bundle_t1w = transform_streamlines(sft.streamlines,
@@ -523,7 +500,8 @@ for bundle in bundles:
 window.record(scene, out_path=f'{tmp}/all_bundles', size=(2400, 2400),
               n_frames=n_frames, path_numbering=True)
 
-make_video([f"{tmp}/all_bundles{ii:06d}.png" for ii in range(n_frames)], "all_bundles.gif")
+make_video(
+    [f"{tmp}/all_bundles{ii:06d}.png" for ii in range(n_frames)], "all_bundles.gif")
 
 
 scene.clear()
@@ -534,12 +512,13 @@ for slicer in slicers:
 tract_profiles = []
 for bundle in bundles:
     sft = load_trk(op.join(clean_bundles_path,
-                            f'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_space-RASMM_model-CSD_desc-prob-afq-{bundle}_tractography.trk'), fa_img)
+                           f'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_space-RASMM_model-CSD_desc-prob-afq-{bundle}_tractography.trk'), fa_img)
     sft.to_rasmm()
     bundle_t1w = transform_streamlines(sft.streamlines,
-                                    np.linalg.inv(t1w_img.affine))
+                                       np.linalg.inv(t1w_img.affine))
 
-    core_bundle = np.median(np.asarray(set_number_of_points(bundle_t1w, 20)), axis=0)
+    core_bundle = np.median(np.asarray(
+        set_number_of_points(bundle_t1w, 20)), axis=0)
     sft.to_vox()
     tract_profiles.append(
         afq_profile(fa, sft.streamlines, affine=np.eye(4),
