@@ -133,7 +133,7 @@ shutil.copy(montage[0], op.split(montage[0])[-1])
 # be navigated, zoomed, rotated, etc.
 
 bundle_html = my_afq.export("indiv_bundles_figures")
-plotly.io.show(bundle_html["NDARAA948VFH"]["L_OR"])
+plotly.io.show(bundle_html["NDARAA948VFH"]["Left Optic Radiation"])
 
 #############################################################################
 # References
