@@ -74,9 +74,9 @@ fa_img = nib.load(op.join(afq_path,
                           'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_model-DKI_FA.nii.gz'))
 fa = fa_img.get_fdata()
 sft_arc = load_trk(op.join(bundle_path,
-                           'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_space-RASMM_model-CSD_desc-prob-afq-LeftArcuate_tractography.trk'), fa_img)
+                           'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_space-RASMM_model-CSD_desc-prob-afq-ARC_L_tractography.trk'), fa_img)
 sft_cst = load_trk(op.join(bundle_path,
-                           'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_space-RASMM_model-CSD_desc-prob-afq-LeftCorticospinal_tractography.trk'), fa_img)
+                           'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_space-RASMM_model-CSD_desc-prob-afq-CST_L_tractography.trk'), fa_img)
 
 #############################################################################
 # Transform into the T1w reference frame
@@ -391,12 +391,12 @@ from dipy.align import resample
 waypoint1 = nib.load(
     op.join(
         afq_path,
-        "ROIs", "sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_desc-ROI-LeftArcuate-1-include.nii.gz"))
+        "ROIs", "sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_desc-ROI-ARC_L-1-include.nii.gz"))
 
 waypoint2 = nib.load(
     op.join(
         afq_path,
-        "ROIs", "sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_desc-ROI-LeftArcuate-2-include.nii.gz"))
+        "ROIs", "sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_desc-ROI-ARC_L-2-include.nii.gz"))
 
 waypoint1_xform = resample(waypoint1, t1w_img)
 waypoint2_xform = resample(waypoint2, t1w_img)

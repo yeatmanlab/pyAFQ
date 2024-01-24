@@ -118,8 +118,10 @@ my_afq.export_all()
 #   properly rendered into the web-page containing this example. It is not
 #   necessary to do this when running this type of analysis.
 
-my_afq.combine_bundle("L_OR")
-montage = my_afq.group_montage("L_OR", (1, 1), "Axial", "left")
+my_afq.combine_bundle("Left Optic Radiation")
+montage = my_afq.group_montage(
+    "Left Optic Radiation",
+    (1, 1), "Axial", "left")
 shutil.copy(montage[0], op.split(montage[0])[-1])
 
 #############################################################################
