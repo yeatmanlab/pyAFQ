@@ -1,6 +1,6 @@
 name: Build and Push pyAFQ CUDA12 Image
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build:
