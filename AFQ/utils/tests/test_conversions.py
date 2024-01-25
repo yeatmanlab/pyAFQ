@@ -19,5 +19,5 @@ def test_matlab_mori_groups():
     fiber_groups = matlab_mori_groups(
         op.join(DATA_PATH, "MoriGroups_Test.mat"),
         afd.read_mni_template())
-    npt.assert_equal(len(fiber_groups.keys()), 20)
-    npt.assert_equal(len(fiber_groups['CST_R'].streamlines), 2)
+    npt.assert_equal(len(fiber_groups.keys()), 18)
+    npt.assert_equal(len(fiber_groups['Right Corticospinal'].streamlines), 2)

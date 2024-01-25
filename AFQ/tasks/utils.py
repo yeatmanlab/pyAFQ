@@ -52,4 +52,4 @@ def get_default_args(func):
 
 
 def str_to_desc(string):
-    return string.replace("-", "").replace("_", "")
+    return string.replace("-", "").replace("_", "").replace(" ", "")

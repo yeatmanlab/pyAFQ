@@ -224,7 +224,7 @@ class Segmentation:
             For example, if you wanted to increase tolerance for the right
             arcuate waypoint ROIs by 3 each, you could make the following
             modification to your bundle_dict:
-            bundle_dict["ARC_R"]["inc_addtol"] = [3, 3]
+            bundle_dict["Right Arcuate"]["inc_addtol"] = [3, 3]
             Additional tolerances can also be negative.
         rng : RandomState or int
             If None, creates RandomState.

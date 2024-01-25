@@ -1,4 +1,4 @@
-from AFQ.viz.utils import COLOR_DICT, FORMAL_BUNDLE_NAMES
+from AFQ.viz.utils import COLOR_DICT
 import numpy as np
 import scipy.stats as stats
 import altair as alt
@@ -79,8 +79,7 @@ def combined_profiles_df_to_altair_df(
         return tp_name.upper().replace("_", " ")
 
     profiles["Hemi"] = profiles["tractID"].apply(lambda x: get_hemi(x[-1]))
-    profiles["Bundle Name"] = profiles["tractID"].replace(
-        FORMAL_BUNDLE_NAMES).apply(get_bname)
+    profiles["Bundle Name"] = profiles["tractID"].apply(get_bname)
     profiles["TP"] = profiles["TP"].apply(formal_tp)
 
     return profiles
@@ -106,8 +105,6 @@ def altair_df_to_chart(profiles, position_domain=(20, 80),
         prof_chart.save("supp_chart_stand.png", dpi=300)
     """
     this_cd = altair_color_dict(profiles.tractID.unique())
-    this_cd = {FORMAL_BUNDLE_NAMES.get(
-        key, key): value for key, value in this_cd.items()}
 
     alt.data_transformers.disable_max_rows()
 

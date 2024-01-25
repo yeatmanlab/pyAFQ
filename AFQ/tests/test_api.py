@@ -241,7 +241,13 @@ def test_AFQ_custom_tract():
     afd.fetch_stanford_hardi_tractography()
 
     bundle_info = abd.default18_bd()[
-        "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"]
+        "Left Superior Longitudinal",
+        "Right Superior Longitudinal",
+        "Left Arcuate",
+        "Right Arcuate",
+        "Left Corticospinal",
+        "Right Corticospinal",
+        "Forceps Minor"]
 
     # move subsampled tractography into bids folder
     os.rename(
@@ -503,7 +509,7 @@ def test_API_type_checking():
                 "random_seeds": True,
                 "directions": "det",
                 "odf_model": "DTI"},
-            bundle_info=abd.default18_bd()["ARC_L", "ARC_R"])
+            bundle_info=abd.default18_bd()["Left Arcuate", "Right Arcuate"])
         myafq.export("bundles")
     del myafq
 
@@ -528,7 +534,9 @@ def test_AFQ_slr():
     afd.read_stanford_hardi_tractography()
 
     _, bids_path, _ = get_temp_hardi()
-    bd = abd.default18_bd()[("CST_L", "CST_R")]
+    bd = abd.default18_bd()[(
+        "Left Corticospinal",
+        "Right Corticospinal")]
 
     myafq = GroupAFQ(
         bids_path=bids_path,
@@ -550,7 +558,8 @@ def test_AFQ_slr():
 
     seg_sft = aus.SegmentedSFT.fromfile(
         myafq.export("bundles")["01"])
-    npt.assert_(len(seg_sft.get_bundle('CST_L').streamlines) > 0)
+    npt.assert_(len(seg_sft.get_bundle(
+        'Left Corticospinal').streamlines) > 0)
 
 
 @pytest.mark.nightly_reco
@@ -608,7 +617,13 @@ def test_AFQ_pft():
     _, bids_path, sub_path = get_temp_hardi()
 
     bundle_names = abd.default18_bd()[
-        "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"]
+        "Left Superior Longitudinal",
+        "Right Superior Longitudinal",
+        "Left Arcuate",
+        "Right Arcuate",
+        "Left Corticospinal",
+        "Right Corticospinal",
+        "Forceps Minor"]
 
     f_pve_csf, f_pve_gm, f_pve_wm = get_fnames('stanford_pve_maps')
     os.rename(f_pve_wm, op.join(sub_path, "sub-01_ses-01_WMprobseg.nii.gz"))
@@ -653,7 +668,13 @@ def test_AFQ_custom_subject_reg():
     _, bids_path, sub_path = get_temp_hardi()
 
     bundle_info = abd.default18_bd()[
-        "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"]
+        "Left Superior Longitudinal",
+        "Right Superior Longitudinal",
+        "Left Arcuate",
+        "Right Arcuate",
+        "Left Corticospinal",
+        "Right Corticospinal",
+        "Forceps Minor"]
 
     b0_file = GroupAFQ(
         bids_path,
@@ -731,7 +752,8 @@ def test_run_using_auto_cli():
     # after the file is written
     arg_dict['BIDS_PARAMS']['bids_path']['default'] = bids_path
     arg_dict['BIDS_PARAMS']['dmriprep']['default'] = 'vistasoft'
-    arg_dict['DATA']['bundle_info']['default'] = abd.default18_bd()[("CST_L")]
+    arg_dict['DATA']['bundle_info']['default'] = abd.default18_bd()[(
+        "Left Corticospinal")]
     arg_dict['TRACTOGRAPHY_PARAMS']['n_seeds']['default'] = 500
     arg_dict['TRACTOGRAPHY_PARAMS']['random_seeds']['default'] = True
 
@@ -761,7 +783,13 @@ def test_AFQ_data_waypoint():
         lv1_folder,
         list(lv1_files.keys())[0])
     bundle_names = [
-        "SLF_L", "SLF_R", "ARC_L", "ARC_R", "CST_L", "CST_R", "FP"]
+        "Left Superior Longitudinal",
+        "Right Superior Longitudinal",
+        "Left Arcuate",
+        "Right Arcuate",
+        "Left Corticospinal",
+        "Right Corticospinal",
+        "Forceps Minor"]
     bundle_info = abd.default18_bd()[bundle_names]
 
     bundle_info.resample_subject_to = nib.load(
@@ -769,7 +797,7 @@ def test_AFQ_data_waypoint():
 
     # Test when we have endpoint ROIs only
     afq_templates = afd.read_templates(as_img=False)
-    bundle_info["SLF_L"] = {
+    bundle_info["Left Superior Longitudinal"] = {
         "start": afq_templates["SLF_L_start"],
         "end": afq_templates["SLF_L_end"],
         "prob_map": afq_templates["SLF_L_prob_map"]
@@ -832,18 +860,19 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         myafq.export("results_dir"),
         'ROIs',
-        'sub-01_ses-01_space-subject_desc-CSTRinclude1_mask.json'))
+        'sub-01_ses-01_space-subject_desc-RightCorticospinalinclude1_mask.json'))  # noqa
 
     seg_sft = aus.SegmentedSFT.fromfile(
         myafq.export("bundles"))
-    npt.assert_(len(seg_sft.get_bundle('CST_L').streamlines) > 0)
+    npt.assert_(len(seg_sft.get_bundle(
+        'Left Corticospinal').streamlines) > 0)
 
     # Test bundles exporting:
     myafq.export("indiv_bundles")
     assert op.exists(op.join(
         myafq.export("results_dir"),
         'bundles',
-        'sub-01_ses-01_coordsys-RASMM_trkmethod-probCSD_recogmethod-AFQ_desc-CSTL_tractography.trk'))  # noqa
+        'sub-01_ses-01_coordsys-RASMM_trkmethod-probCSD_recogmethod-AFQ_desc-LeftCorticospinal_tractography.trk'))  # noqa
 
     tract_profile_fname = myafq.export("profiles")
     tract_profiles = pd.read_csv(tract_profile_fname)
@@ -856,12 +885,12 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         myafq.export("results_dir"),
         "viz_bundles",
-        'sub-01_ses-01_coordsys-RASMM_trkmethod-probCSD_recogmethod-AFQ_desc-SLFLviz_dwi.html'))  # noqa
+        'sub-01_ses-01_coordsys-RASMM_trkmethod-probCSD_recogmethod-AFQ_desc-LeftSuperiorLongitudinalviz_dwi.html'))  # noqa
 
     assert op.exists(op.join(
         myafq.export("results_dir"),
         "viz_bundles",
-        'sub-01_ses-01_coordsys-RASMM_trkmethod-probCSD_recogmethod-AFQ_desc-SLFLviz_dwi.html'))  # noqa
+        'sub-01_ses-01_coordsys-RASMM_trkmethod-probCSD_recogmethod-AFQ_desc-LeftSuperiorLongitudinalviz_dwi.html'))  # noqa
 
     # Before we run the CLI, we'll remove the bundles and ROI folders, to see
     # that the CLI generates them
@@ -889,8 +918,13 @@ def test_AFQ_data_waypoint():
                            rng_seed=42)
     bundle_dict_as_str = (
         'default18_bd()['
-        '"SLF_L", "SLF_R", "ARC_L", '
-        '"ARC_R", "CST_L", "CST_R", "FP"]'
+        '"Left Superior Longitudinal",'
+        '"Right Superior Longitudinal",'
+        '"Left Arcuate",'
+        '"Right Arcuate",'
+        '"Left Corticospinal",'
+        '"Right Corticospinal",'
+        '"Forceps Minor"]'
         '+ BundleDict({"LV1": {"start": '
         f'"{lv1_fname}", '
         '"space": "subject"}})')
@@ -934,9 +968,9 @@ def test_AFQ_data_waypoint():
     assert op.exists(op.join(
         results_dir,
         'ROIs',
-        'sub-01_ses-01_space-subject_desc-SLFRinclude1_mask.json'))
+        'sub-01_ses-01_space-subject_desc-RightSuperiorLongitudinalinclude1_mask.json'))  # noqa
 
     assert op.exists(op.join(
         results_dir,
         'bundles',
-        'sub-01_ses-01_coordsys-RASMM_trkmethod-probCSD_recogmethod-AFQ_desc-SLFR_tractography.trk'))  # noqa
+        'sub-01_ses-01_coordsys-RASMM_trkmethod-probCSD_recogmethod-AFQ_desc-RightSuperiorLongitudinal_tractography.trk'))  # noqa
