@@ -49,12 +49,12 @@ study_dir = afd.fetch_hbn_preproc(["NDARAA948VFH"])[1]
 ar_rois = afd.read_ar_templates()
 
 bundles = abd.BundleDict({
-    "Left Acoustic": {
+    "Left Acoustic Radiation": {
         "start": ar_rois["AAL_Thal_L"],
         "end": ar_rois["AAL_TempSup_L"],
         "cross_midline": False,
     },
-    "Right Acoustic": {
+    "Right Acoustic Radiation": {
         "start": ar_rois["AAL_Thal_R"],
         "end": ar_rois["AAL_TempSup_R"],
         "cross_midline": False
@@ -108,7 +108,7 @@ my_afq.export_all()
 # be navigated, zoomed, rotated, etc.
 
 bundle_html = my_afq.export("indiv_bundles_figures")
-plotly.io.show(bundle_html["NDARAA948VFH"]["Left Acoustic"])
+plotly.io.show(bundle_html["NDARAA948VFH"]["Left Acoustic Radiation"])
 
 #############################################################################
 # References
