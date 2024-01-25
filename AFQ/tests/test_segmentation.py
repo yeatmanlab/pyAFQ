@@ -46,13 +46,13 @@ cst_r_curve_ref = StatefulTractogram([[
     [6.56050014, -23.51795578, -1.27745605]]],
     reg_template, Space.RASMM)
 
-bundles = {'CST_L': {
+bundles = {'Left Corticospinal': {
                     'include': [
                         templates['CST_roi1_L'],
                         templates['CST_roi2_L']],
                     'prob_map': templates['CST_L_prob_map'],
                     'cross_midline': None},
-           'CST_R': {
+           'Right Corticospinal': {
                     'include': [
                         templates['CST_roi1_R'],
                         templates['CST_roi2_R']],
@@ -75,7 +75,7 @@ def test_segment():
     # We asked for 2 fiber groups:
     npt.assert_equal(len(fiber_groups), 2)
     # Here's one of them:
-    CST_R_sl = fiber_groups['CST_R']
+    CST_R_sl = fiber_groups['Right Corticospinal']
     # Let's make sure there are streamlines in there:
     npt.assert_(len(CST_R_sl) > 0)
     # Calculate the tract profile for a volume of all-ones:
@@ -92,12 +92,12 @@ def test_segment():
 def test_segment_no_prob():
     # What if you don't have probability maps?
     bundles_no_prob = {
-        'CST_L': {
+        'Left Corticospinal': {
             'include': [
                 templates['CST_roi1_L'],
                 templates['CST_roi2_L']],
             'cross_midline': False},
-        'CST_R': {
+        'Right Corticospinal': {
             'include': [
                 templates['CST_roi1_R'],
                 templates['CST_roi2_R']],
@@ -114,7 +114,7 @@ def test_segment_no_prob():
 
     # This condition should still hold
     npt.assert_equal(len(fiber_groups), 2)
-    npt.assert_(len(fiber_groups['CST_R']) > 0)
+    npt.assert_(len(fiber_groups['Right Corticospinal']) > 0)
 
 
 def test_segment_return_idx():
@@ -129,8 +129,8 @@ def test_segment_return_idx():
     fiber_groups = segmentation.fiber_groups
 
     npt.assert_equal(len(fiber_groups), 2)
-    npt.assert_(len(fiber_groups['CST_R']['sl']) > 0)
-    npt.assert_(len(fiber_groups['CST_R']['idx']) > 0)
+    npt.assert_(len(fiber_groups['Right Corticospinal']['sl']) > 0)
+    npt.assert_(len(fiber_groups['Right Corticospinal']['idx']) > 0)
 
 
 def test_segment_keep_space():
@@ -201,7 +201,7 @@ def test_segment_clip_edges_api():
                                         hardi_fbvec)
 
     npt.assert_equal(len(fiber_groups), 2)
-    npt.assert_(len(fiber_groups['CST_R']) > 0)
+    npt.assert_(len(fiber_groups['Right Corticospinal']) > 0)
 
 
 def test_segment_reco():
@@ -278,7 +278,7 @@ def test_exclusion_ROI():
         filter_by_endpoints=False
     )
     slf_bundle = {
-        'SLF_L': {
+        'Left Superior Longitudinal': {
             'include': [
                 templates['SLF_roi1_L'],
                 templates['SLF_roi2_L']],
@@ -305,9 +305,10 @@ def test_exclusion_ROI():
         hardi_fbval,
         hardi_fbvec,
     )
-    npt.assert_equal(len(fiber_groups["SLF_L"]), 2)
+    npt.assert_equal(len(fiber_groups["Left Superior Longitudinal"]), 2)
 
-    slf_bundle['SLF_L']['exclude'] = [templates["SLFt_roi2_L"]]
+    slf_bundle['Left Superior Longitudinal']['exclude'] =\
+        [templates["SLFt_roi2_L"]]
 
     fiber_groups = segmentation.segment(
         slf_bundle,
@@ -317,7 +318,7 @@ def test_exclusion_ROI():
         hardi_fbval,
         hardi_fbvec,
     )
-    npt.assert_equal(len(fiber_groups["SLF_L"]), 1)
+    npt.assert_equal(len(fiber_groups["Left Superior Longitudinal"]), 1)
 
 
 def test_segment_orientation():
@@ -349,8 +350,9 @@ def test_segment_sampled_streamlines():
     )
 
     # Already using a subsampled tck
-    # the CST_R has two streamlines and CST_L has none
-    npt.assert_(0 < len(fiber_groups['CST_R']))
+    # the Right Corticospinal has two streamlines and
+    # Left Corticospinal has none
+    npt.assert_(0 < len(fiber_groups['Right Corticospinal']))
 
     # number of streamlines to sample
     nb_streamlines = int(len(tg)*0.8)
@@ -385,4 +387,6 @@ def test_segment_sampled_streamlines():
     # expect the number of resulting streamlines to be more than 0 but less
     # than default; given that random sample and given there are only two
     # streamlines less than equal
-    npt.assert_(0 <= len(sampled_fiber_groups['CST_R']) <= len(fiber_groups['CST_R']))
+    npt.assert_(0 <= len(
+        sampled_fiber_groups['Right Corticospinal']) <= len(
+            fiber_groups['Right Corticospinal']))

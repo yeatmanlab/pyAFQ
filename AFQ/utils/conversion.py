@@ -79,10 +79,15 @@ def matlab_mori_groups(mat_file, img):
     fiber_groups = {}
     for i in range(mat_file["fg"]["name"].shape[1]):
         name = mat_file["fg"]["name"][0][i][0]
+        py_name = None
         if name in BUNDLE_MAT_2_PYTHON.keys():
+            py_name = BUNDLE_MAT_2_PYTHON[name]
+        elif name in BUNDLE_MAT_2_PYTHON.values():
+            py_name = name
+        if py_name is not None:
             bundle_ref = mat_file["fg"]["fibers"][0][i]
             tracker = MatlabFileTracking(bundle_ref)
-            fiber_groups[BUNDLE_MAT_2_PYTHON[name]] =\
+            fiber_groups[py_name] =\
                 StatefulTractogram(tracker, img, Space.RASMM)
 
     return fiber_groups

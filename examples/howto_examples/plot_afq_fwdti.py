@@ -59,7 +59,7 @@ brain_mask_definition = ImageFile(
              'space': 'T1w',
              'scope': 'qsiprep'})
 
-bundle_names = ["ARC_L", "ARC_R"]
+bundle_names = ["Left Arcuate", "Right Arcuate"]
 bundle_dict = abd.default18_bd()[bundle_names]
 
 myafq = GroupAFQ(
@@ -129,7 +129,7 @@ profiles_csv = myafq.export("profiles")['NDARAA948VFH']
 profiles = pd.read_csv(profiles_csv)
 
 fig, ax = plt.subplots(3, 2)
-for ii, bundle in enumerate(["ARC_L", "ARC_R"]):
+for ii, bundle in enumerate(["Left Arcuate", "Right Arcuate"]):
     ax[0, ii].plot(profiles[profiles["tractID"] == bundle]["fwdti_fa"],
                    label="fwDTI")
     ax[0, ii].plot(profiles[profiles["tractID"] == bundle]["dti_fa"],

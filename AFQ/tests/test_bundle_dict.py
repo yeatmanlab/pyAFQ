@@ -22,25 +22,17 @@ def test_BundleDict():
     # test defaults
     afq_bundles = abd.default18_bd()
 
-    assert len(afq_bundles) == len(abd.BUNDLES)
+    assert len(afq_bundles) == 22
 
     # Arcuate Fasciculus
-    afq_bundles = abd.default18_bd()["ARC_L", "ARC_R"]
+    afq_bundles = abd.default18_bd()["Left Arcuate", "Right Arcuate"]
 
     assert len(afq_bundles) == 2
 
     # Forceps Minor and Major
-    afq_bundles = abd.default18_bd()["FA", "FP"]
+    afq_bundles = abd.default18_bd()["Forceps Major", "Forceps Minor"]
 
     assert len(afq_bundles) == 2
-
-    # Cingulum Hippocampus
-    # not included but exists in templates
-    # so this was a wierd test to have
-    # we should find a reliable segmentation of these
-    # afq_bundles = abd.BundleDict(["HCC_L", "HCC_R"])
-
-    # assert len(afq_bundles) == 2
 
     # Test "custom" bundle
     afq_templates = afd.read_templates()
@@ -58,7 +50,9 @@ def test_BundleDict():
     with pytest.raises(
             ValueError,
             match=" is not in this BundleDict"):
-        afq_bundles = abd.default18_bd()["VOQ_L", "VOQ_R"]
+        afq_bundles = abd.default18_bd()[
+            "Left Vertical Occipital Quinticulus",
+            "Right Vertical Occipital Quinticulus"]
 
     afq_bundles = abd.reco_bd(80)["VOF_L", "VOF_R"]
     assert len(afq_bundles) == 2
