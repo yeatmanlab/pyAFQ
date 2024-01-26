@@ -6,6 +6,7 @@ from time import time
 import numpy as np
 from scipy.spatial.distance import cdist
 from scipy.stats import zscore
+from scipy.ndimage import binary_dilation
 
 import dipy.tracking.streamline as dts
 import dipy.tracking.streamlinespeed as dps
@@ -373,6 +374,10 @@ class Segmentation:
         self.logger.info("Preprocessing Streamlines")
         tg = self._read_tg(tg)
 
+        # These are calculated as-needed
+        self._fg_array = None
+        self._crosses = None
+
         # If resampling over-write the sft:
         if self.nb_points:
             self.tg = StatefulTractogram(
@@ -402,30 +407,37 @@ class Segmentation:
 
         return fiber_groups
 
-    def cross_streamlines(self, fgarray, template=None):
+    @property
+    def fgarray(self):
+        """
+        Streamlines resampled to 20 points.
+        """
+        if self._fg_array is None:
+            self.logger.info("Resampling Streamlines...")
+            start_time = time()
+            self._fg_array = np.array(_resample_tg(self.tg, 20))
+            self.logger.info((
+                "Streamlines Resampled "
+                f"(time: {time()-start_time}s)"))
+        return self._fg_array
+
+    @property
+    def crosses(self):
         """
         Classify the streamlines by whether they cross the midline.
         Creates a crosses attribute which is an array of booleans. Each boolean
         corresponds to a streamline, and is whether or not that streamline
         crosses the midline.
-        Parameters
-        ----------
-        fgarray : streamlines resampled to the same length.
-        template : nibabel.Nifti1Image class instance
-            An affine transformation into a template space.
         """
-        if template is None:
-            template_affine = self.img_affine
-        else:
-            template_affine = template.affine
+        if self._crosses is None:
+            # What is the x,y,z coordinate of 0,0,0 in the template space?
+            zero_coord = np.dot(np.linalg.inv(self.img_affine),
+                                np.array([0, 0, 0, 1]))
 
-        # What is the x,y,z coordinate of 0,0,0 in the template space?
-        zero_coord = np.dot(np.linalg.inv(template_affine),
-                            np.array([0, 0, 0, 1]))
-
-        self.crosses = np.logical_and(
-            np.any(fgarray[:, :, 0] > zero_coord[0], axis=1),
-            np.any(fgarray[:, :, 0] < zero_coord[0], axis=1))
+            self._crosses = np.logical_and(
+                np.any(self.fgarray[:, :, 0] > zero_coord[0], axis=1),
+                np.any(self.fgarray[:, :, 0] < zero_coord[0], axis=1))
+        return self._crosses
 
     def _return_empty(self, bundle):
         """
@@ -473,8 +485,6 @@ class Segmentation:
         tg = self._read_tg(tg=tg)
         tg.to_vox()
 
-        fgarray = np.array(_resample_tg(tg, 20))  # for prob map
-        self.cross_streamlines(fgarray)
         n_streamlines = len(tg)
 
         bundle_votes = np.full(
@@ -505,7 +515,7 @@ class Segmentation:
             tol = dts.dist_to_corner(self.img_affine)
         else:
             tol = self.dist_to_waypoint / vox_dim
-        dist_to_atlas = self.dist_to_atlas / vox_dim
+        dist_to_atlas = int(self.dist_to_atlas / vox_dim)
 
         self.logger.info("Assigning Streamlines to Bundles")
         for bundle_idx, bundle_name in enumerate(
@@ -513,13 +523,18 @@ class Segmentation:
             self.logger.info(f"Finding Streamlines for {bundle_name}")
 
             # Warp ROIs
+            self.logger.info(f"Preparing ROIs for {bundle_name}")
+            start_time = time()
             bundle_def = dict(self.bundle_dict.get_b_info(bundle_name))
             bundle_def.update(self.bundle_dict.transform_rois(
                 bundle_name,
                 self.mapping,
                 self.img_affine))
+            self.logger.info(f"Time to prep ROIs: {time()-start_time}s")
 
             if "curvature" in bundle_def:
+                self.logger.info(f"Loading curvature...")
+                start_time = time()
                 if "sft" in bundle_def["curvature"]:
                     ref_sl = bundle_def["curvature"]["sft"]
                 else:
@@ -533,6 +548,9 @@ class Segmentation:
                 moved_ref_curve = sl_curve(
                     moved_ref_sl,
                     len(moved_ref_sl))
+                self.logger.info((
+                    "Time to load curves: "
+                    f"{time()-start_time}s"))
 
             b_sls = _SlsBeingRecognized(
                 tg.streamlines, self.logger,
@@ -545,7 +563,7 @@ class Segmentation:
                 # using entire fgarray here only because it is the first step
                 fiber_probabilities = dts.values_from_volume(
                     bundle_def["prob_map"].get_fdata(),
-                    fgarray, np.eye(4))
+                    self.fgarray, np.eye(4))
                 fiber_probabilities = np.mean(fiber_probabilities, -1)
                 if not self.roi_dist_tie_break:
                     b_sls.bundle_vote = fiber_probabilities
@@ -1351,7 +1369,7 @@ def clean_by_orientation(streamlines, primary_axis, tol=None):
     return cleaned_idx
 
 
-def clean_by_endpoints(streamlines, target, target_idx, tol=None,
+def clean_by_endpoints(streamlines, target, target_idx, tol=0,
                        flip_sls=None, accepted_idxs=None):
     """
     Clean a collection of streamlines based on an endpoint ROI.
@@ -1368,7 +1386,8 @@ def clean_by_endpoints(streamlines, target, target_idx, tol=None,
         Index within each streamline to check if within the target region.
         Typically 0 for startpoint ROIs or -1 for endpoint ROIs.
         If using flip_sls, this becomes (len(sl) - this_idx - 1) % len(sl)
-    tol : float, optional A distance tolerance (in units that the coordinates
+    tol : int, optional
+        A distance tolerance (in units that the coordinates
         of the streamlines are represented in). Default: 0, which means that
         the endpoint is exactly in the coordinate of the target ROI.
     flip_sls : 1d array, optional
@@ -1380,29 +1399,24 @@ def clean_by_endpoints(streamlines, target, target_idx, tol=None,
     -------
     boolean array of streamlines that survive cleaning.
     """
-    if tol is None:
-        tol = 0
-
     if accepted_idxs is None:
         accepted_idxs = np.zeros(len(streamlines), dtype=np.bool8)
-
-    # We square the tolerance, because below we are using the squared Euclidean
-    # distance which is slightly faster:
-    tol = tol ** 2
-
-    idxes = np.array(np.where(target.get_fdata() > 0)).T
 
     if flip_sls is None:
         flip_sls = np.zeros(len(streamlines))
     flip_sls = flip_sls.astype(int)
 
+    roi = target.get_fdata()
+    if tol > 0:
+        roi = binary_dilation(
+            roi,
+            iterations=tol)
+
     for ii, sl in enumerate(streamlines):
         this_idx = target_idx
         if flip_sls[ii]:
             this_idx = (len(sl) - this_idx - 1) % len(sl)
-        dist = np.min(cdist(
-            [sl[this_idx]], idxes, 'sqeuclidean'))
-        if dist <= tol:
-            accepted_idxs[ii] = 1
+        xx, yy, zz = sl[this_idx].astype(int)
+        accepted_idxs[ii] = roi[xx, yy, zz]
 
     return accepted_idxs
