@@ -390,7 +390,7 @@ def test_AFQ_data():
             preproc_pipeline='vistasoft',
             mapping_definition=mapping)
         npt.assert_equal(nib.load(myafq.export("b0")["01"]).shape,
-                         nib.load(myafq.export("dwi")["01"]).shape[:3])
+                         myafq.export("dwi")["01"].shape[:3])
         npt.assert_equal(nib.load(myafq.export("b0")["01"]).shape,
                          nib.load(myafq.export("dti_params")["01"]).shape[:3])
         myafq.export("rois")
