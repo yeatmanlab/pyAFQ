@@ -1369,7 +1369,7 @@ def clean_by_orientation(streamlines, primary_axis, tol=None):
     return cleaned_idx
 
 
-def clean_by_endpoints(streamlines, target, target_idx, tol=None,
+def clean_by_endpoints(streamlines, target, target_idx, tol=0,
                        flip_sls=None, accepted_idxs=None):
     """
     Clean a collection of streamlines based on an endpoint ROI.
@@ -1386,7 +1386,8 @@ def clean_by_endpoints(streamlines, target, target_idx, tol=None,
         Index within each streamline to check if within the target region.
         Typically 0 for startpoint ROIs or -1 for endpoint ROIs.
         If using flip_sls, this becomes (len(sl) - this_idx - 1) % len(sl)
-    tol : float, optional A distance tolerance (in units that the coordinates
+    tol : int, optional
+        A distance tolerance (in units that the coordinates
         of the streamlines are represented in). Default: 0, which means that
         the endpoint is exactly in the coordinate of the target ROI.
     flip_sls : 1d array, optional
@@ -1398,9 +1399,6 @@ def clean_by_endpoints(streamlines, target, target_idx, tol=None,
     -------
     boolean array of streamlines that survive cleaning.
     """
-    if tol is None:
-        tol = 0
-
     if accepted_idxs is None:
         accepted_idxs = np.zeros(len(streamlines), dtype=np.bool8)
 
@@ -1408,14 +1406,17 @@ def clean_by_endpoints(streamlines, target, target_idx, tol=None,
         flip_sls = np.zeros(len(streamlines))
     flip_sls = flip_sls.astype(int)
 
-    dilated_roi = binary_dilation(
-        target.get_fdata(), iterations=tol)
+    roi = target.get_fdata()
+    if tol > 0:
+        roi = binary_dilation(
+            roi,
+            iterations=tol)
 
     for ii, sl in enumerate(streamlines):
         this_idx = target_idx
         if flip_sls[ii]:
             this_idx = (len(sl) - this_idx - 1) % len(sl)
         xx, yy, zz = sl[this_idx].astype(int)
-        accepted_idxs[ii] = dilated_roi[xx, yy, zz]
+        accepted_idxs[ii] = roi[xx, yy, zz]
 
     return accepted_idxs
