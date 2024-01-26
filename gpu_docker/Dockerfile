@@ -1,4 +1,4 @@
-ARG NVIDIAVERSION=11.0.3-devel
+ARG NVIDIAVERSION=12.0.1-devel-ubuntu20.04
 FROM nvidia/cuda:${NVIDIAVERSION}
 
 SHELL ["/bin/bash", "-c"]
@@ -31,7 +31,7 @@ RUN pip install numpy scipy cython nibabel dipy tqdm fslpy
 # clone pyAFQ GPUStreamlines
 RUN git clone https://github.com/yeatmanlab/pyAFQ.git /opt/pyAFQ
 RUN cd /opt/pyAFQ && git reset --hard ${COMMIT}
-RUN git clone --recursive https://github.com/dipy/GPUStreamlines /opt/GPUStreamlines
+RUN git clone --recursive  -b csaodf https://github.com/dipy/GPUStreamlines /opt/GPUStreamlines
 
 # compile
 RUN cd /opt/GPUStreamlines && mkdir build && cd build \
@@ -48,5 +48,6 @@ RUN cd /opt/GPUStreamlines/build/cuslines && pip install -e .
 
 # Install pyAFQ
 RUN cd /opt/pyAFQ && pip install -e .
+RUN /opt/pyAFQ/bin/pyAFQ download
 
 ENTRYPOINT ["/opt/pyAFQ/bin/pyAFQ"]

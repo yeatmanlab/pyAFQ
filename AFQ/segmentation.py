@@ -321,9 +321,9 @@ class Segmentation:
 
         return tg
 
-    def segment(self, bundle_dict, tg, mapping, fdata=None, fbval=None,
-                fbvec=None, reg_prealign=None,
-                reg_template=None, img_affine=None, reset_tg_space=False):
+    def segment(self, bundle_dict, tg, mapping, img,
+                reg_prealign=None,
+                reg_template=None, reset_tg_space=False):
         """
         Segment streamlines into bundles based on either waypoint ROIs
         [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.
@@ -341,17 +341,14 @@ class Segmentation:
             Bundles to segment
         mapping : DiffeomorphicMap, or equivalent interface
             A mapping between DWI space and a template.
-        fdata, fbval, fbvec : str
-            Full path to data, bvals, bvecs
+        img : Nifti1Image
+            Image to use as reference.
         reg_prealign : array, optional.
             The linear transformation to be applied to align input images to
             the reference space before warping under the deformation field.
             Default: None.
         reg_template : str or nib.Nifti1Image, optional.
             Template to use for registration. Default: MNI T2.
-        img_affine : array, optional.
-            The spatial transformation from the measurement to the scanner
-            space.
         reset_tg_space : bool, optional
             Whether to reset the space of the input tractogram after
             segmentation is complete. Default: False.
@@ -371,19 +368,8 @@ class Segmentation:
         bundles using local and global streamline-based registration and
         clustering, Neuroimage, 2017.
         """
-        if img_affine is not None:
-            if (mapping is None
-                or fdata is not None
-                or fbval is not None
-                    or fbvec is not None):
-
-                self.logger.error(
-                    "Provide either the full path to data, bvals, bvecs,"
-                    + "or provide the affine of the image and the mapping")
-
-        self.logger.info("Preparing Segmentation Parameters")
-        self.img_affine = img_affine
-        self.prepare_img(fdata, fbval, fbvec)
+        self.img_affine = img.affine
+        self.img = img
         self.logger.info("Preprocessing Streamlines")
         tg = self._read_tg(tg)
 
@@ -415,24 +401,6 @@ class Segmentation:
             self.tg.to_space(self._tg_orig_space)
 
         return fiber_groups
-
-    def prepare_img(self, fdata, fbval, fbvec):
-        """
-        Prepare image data from DWI data.
-        Parameters
-        ----------
-        fdata, fbval, fbvec : str
-            Full path to data, bvals, bvecs
-        """
-        if self.img_affine is None:
-            self.img, _, _, _ = \
-                ut.prepare_data(fdata, fbval, fbvec,
-                                b0_threshold=self.b0_threshold)
-            self.img_affine = self.img.affine
-
-        self.fdata = fdata
-        self.fbval = fbval
-        self.fbvec = fbvec
 
     def cross_streamlines(self, fgarray, template=None):
         """
@@ -945,9 +913,7 @@ class Segmentation:
                 self.presegment_bundle_dict,
                 self.tg,
                 self.mapping,
-                self.fdata,
-                self.fbval,
-                self.fbvec,
+                self.img,
                 reg_template=self.reg_template,
                 reg_prealign=self.reg_prealign)
             roiseg_fg = roiseg.fiber_groups

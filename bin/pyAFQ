@@ -114,11 +114,33 @@ def parse_cli(arg_dict):
         opts.verbose, opts.dry_run, opts.to_call, opts.generate_json
 
 
+def download_templates():
+    from AFQ.data.fetch import (
+        read_templates,
+        read_pediatric_templates,
+        read_callosum_templates,
+        read_cp_templates,
+        read_or_templates,
+        read_ar_templates)
+
+    read_templates()
+    read_pediatric_templates()
+    read_callosum_templates()
+    read_cp_templates()
+    read_or_templates()
+    read_ar_templates()
+
+
 if __name__ == '__main__':
     arg_dict = afb.func_dict_to_arg_dict(logger=logger)
     config_file, generate_only, overwrite, verbose,\
         dry_run, to_call, generate_json =\
             parse_cli(arg_dict)
+    
+    if config_file == "download":
+        logger.info("Downloading templates...")
+        download_templates()
+        exit()
 
     if generate_only and generate_json:
         raise ValueError("Can only generate .toml or .json; not both")

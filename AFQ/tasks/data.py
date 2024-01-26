@@ -1,5 +1,7 @@
 import nibabel as nib
+import nibabel.orientations as nio
 import numpy as np
+import logging
 
 from dipy.io.gradients import read_bvals_bvecs
 import dipy.core.gradients as dpg
@@ -33,16 +35,20 @@ from AFQ.models.QBallTP import (
     extract_odf, anisotropic_index, anisotropic_power)
 
 
+logger = logging.getLogger('AFQ')
+
+
 DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
 
-@pimms.calc("data", "gtab", "img")
-def get_data_gtab(dwi, bval, bvec, min_bval=None,
+@pimms.calc("data", "gtab", "dwi", "dwi_affine")
+def get_data_gtab(dwi_path, bval, bvec, min_bval=None,
                   max_bval=None, filter_b=True, b0_threshold=50):
     """
     DWI data as an ndarray for selected b values,
     A DIPY GradientTable with all the gradient information,
-    and unaltered DWI data in a Nifti1Image.
+    and DWI data in a Nifti1Image,
+    and the affine transformation of the DWI data.
 
     Parameters
     ----------
@@ -61,9 +67,10 @@ def get_data_gtab(dwi, bval, bvec, min_bval=None,
         The value of b under which
         it is considered to be b0. Default: 50.
     """
-    img = nib.load(dwi)
-    data = img.get_fdata()
+    img = nib.load(dwi_path)
     bvals, bvecs = read_bvals_bvecs(bval, bvec)
+
+    data = img.get_fdata()
     if filter_b and (min_bval is not None):
         valid_b = np.logical_or(
             (bvals >= min_bval), (bvals <= b0_threshold))
@@ -79,25 +86,27 @@ def get_data_gtab(dwi, bval, bvec, min_bval=None,
     gtab = dpg.gradient_table(
         bvals, bvecs,
         b0_threshold=b0_threshold)
-    return data, gtab, img
+    img = nib.Nifti1Image(data, img.affine)
+    return data, gtab, img, img.affine
 
 
 @pimms.calc("b0")
 @as_file('_desc-b0_dwi.nii.gz')
-def b0(dwi, data, gtab, img):
+def b0(dwi_path, gtab):
     """
     full path to a nifti file containing the mean b0
     """
-    mean_b0 = np.mean(data[..., gtab.b0s_mask], -1)
-    mean_b0_img = nib.Nifti1Image(mean_b0, img.affine)
+    data = nib.load(dwi_path)
+    mean_b0 = np.mean(data.get_fdata()[..., gtab.b0s_mask], -1)
+    mean_b0_img = nib.Nifti1Image(mean_b0, data.affine)
     meta = dict(b0_threshold=gtab.b0_threshold,
-                source=dwi)
+                source=dwi_path)
     return mean_b0_img, meta
 
 
 @pimms.calc("masked_b0")
 @as_file('_desc-maskedb0_dwi.nii.gz')
-def b0_mask(base_fname, b0, brain_mask):
+def b0_mask(b0, brain_mask):
     """
     full path to a nifti file containing the
     mean b0 after applying the brain mask
@@ -970,7 +979,7 @@ def get_data_plan(kwargs):
         if kwargs["bids_info"] is not None:
             bm_def.find_path(
                 kwargs["bids_info"]["bids_layout"],
-                kwargs["dwi"],
+                kwargs["dwi_path"],
                 kwargs["bids_info"]["subject"],
                 kwargs["bids_info"]["session"])
         data_tasks["brain_mask_res"] = pimms.calc("brain_mask")(

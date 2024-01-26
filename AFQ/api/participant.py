@@ -98,11 +98,10 @@ class ParticipantAFQ(object):
         self.output_dir = output_dir
 
         self.kwargs = dict(
-            dwi=dwi_data_file,
+            dwi_path=dwi_data_file,
             bval=bval_file,
             bvec=bvec_file,
             results_dir=output_dir,
-            dwi_affine=nib.load(dwi_data_file).affine,
             bids_info=bids_info,
             base_fname=get_base_fname(output_dir, dwi_data_file),
             **kwargs)

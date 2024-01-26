@@ -1,0 +1,63 @@
+Bootstrap: docker
+From: nvidia/cuda:12.0.1-devel-ubuntu20.04
+
+%files
+    PLACEHOLDER_FOR_PACKAGE_PATH /opt/pyAFQ
+
+%environment
+    export DEBIAN_FRONTEND=noninteractive
+    export PATH=/opt/anaconda/bin:${PATH}
+    export LD_LIBRARY_PATH=/opt/anaconda/lib:${LD_LIBRARY_PATH}
+
+%post
+    ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime
+    echo "Etc/UTC" > /etc/timezone
+    apt-get update && apt-get install -y tzdata
+
+    # Remove CUDA/NVIDIA sources
+    rm /etc/apt/sources.list.d/cuda.list
+    rm -f /etc/apt/sources.list.d/nvidia-ml.list
+
+    # System update and basic tools installation
+    apt update && apt install --assume-yes apt-transport-https \
+        ca-certificates gnupg software-properties-common gcc git wget numactl
+
+    # Clone GPUStreamlines
+    git clone --recursive -b csaodf https://github.com/dipy/GPUStreamlines /opt/GPUStreamlines
+
+    # Kitware repository for CMake
+    wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null \
+        | gpg --dearmor - | tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+    apt-add-repository "deb https://apt.kitware.com/ubuntu/ focal main"
+    apt install -y cmake libncurses5-dev libtinfo6
+
+    # Anaconda installation
+    wget -P /tmp https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh
+    bash /tmp/Anaconda3-2022.10-Linux-x86_64.sh -b -p /opt/anaconda
+    rm -rf /tmp/Anaconda3-2022.10-Linux-x86_64.sh
+    cd /opt && eval "$(/opt/anaconda/bin/conda shell.bash hook)"
+
+    # Python prerequisites
+    pip install numpy scipy cython nibabel dipy tqdm fslpy
+
+    # Compilation of GPUStreamlines
+    cd /opt/GPUStreamlines && mkdir build && cd build \
+        && cmake -DCMAKE_INSTALL_PREFIX=/opt/GPUStreamlines/build/ \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_COMPILER=g++ \
+            -DPYTHON_EXECUTABLE=$(which python) \
+            .. \
+        && make && make install
+
+    # Install cuslines as package
+    echo "from setuptools import setup, find_packages" > /opt/GPUStreamlines/build/cuslines/setup.py
+    echo "setup(name='cuslines', version='0.0.1', packages=find_packages())" >> /opt/GPUStreamlines/build/cuslines/setup.py
+    cd /opt/GPUStreamlines/build/cuslines && pip install -e .
+
+    # Install pyAFQ
+    pip install -e /opt/pyAFQ
+
+    /opt/pyAFQ/bin/pyAFQ download
+
+%runscript
+    exec /opt/pyAFQ/bin/pyAFQ "$@"

@@ -3,9 +3,10 @@ import cuslines
 import numpy as np
 from math import radians
 from tqdm import tqdm
+import logging
 
 from dipy.data import small_sphere
-from dipy.reconst.shm import OpdtModel
+from dipy.reconst.shm import OpdtModel, CsaOdfModel
 from dipy.reconst import shm
 from dipy.tracking import utils
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
@@ -15,8 +16,11 @@ from nibabel.streamlines.array_sequence import concatenate
 from AFQ.tractography.tractography import get_percentile_threshold
 
 
+logger = logging.getLogger('AFQ')
+
+
 # Modified from https://github.com/dipy/GPUStreamlines/blob/master/run_dipy_gpu.py
-def gpu_track(data, gtab, seed_img, stop_img,
+def gpu_track(data, gtab, seed_img, stop_img, odf_model,
               seed_threshold, stop_threshold, thresholds_as_percentages,
               max_angle, step_size, sampling_density, ngpus):
     """
@@ -34,6 +38,8 @@ def gpu_track(data, gtab, seed_img, stop_img,
     stop_img : Nifti1Image
         A float or binary mask that determines a stopping criterion
         (e.g. FA).
+    odf_model : str, optional
+        One of {"OPDT", "CSA"}
     seed_threshold : float
         The value of the seed_img above which tracking is seeded.
     stop_threshold : float
@@ -72,9 +78,27 @@ def gpu_track(data, gtab, seed_img, stop_img,
         stop_threshold = get_percentile_threshold(
             stop_data, stop_threshold)
 
-    model = OpdtModel(gtab, sh_order=sh_order, min_signal=1)
-    fit_matrix = model._fit_matrix
-    delta_b, delta_q = fit_matrix
+    if odf_model.lower() == "opdt":
+        model_type = cuslines.ModelType.OPDT
+        model = OpdtModel(
+            gtab,
+            sh_order=sh_order,
+            smooth=0.006,
+            min_signal=1)
+        fit_matrix = model._fit_matrix
+        delta_b, delta_q = fit_matrix
+    elif odf_model.lower() == "csa":
+        model_type = cuslines.ModelType.CSAODF
+        model = CsaOdfModel(
+            gtab, sh_order=sh_order,
+            smooth=0.006, min_signal=1)
+        fit_matrix = model._fit_matrix
+        delta_b = fit_matrix
+        delta_q = fit_matrix
+    else:
+        raise ValueError((
+            f"odf_model must be 'opdt' or "
+            f"'csa', not {odf_model}"))
 
     sphere = small_sphere
     theta = sphere.theta
@@ -89,15 +113,42 @@ def gpu_track(data, gtab, seed_img, stop_img,
     H = shm.hat(B)
     R = shm.lcr_matrix(H)
 
+    sph_edges = sphere.edges
+    sph_verticies = sphere.vertices
+
+    gtargs = {}
+    for var_name in [
+        "data",
+        "H", "R", "delta_b", "delta_q",
+        "b0s_mask", "stop_data", "sampling_matrix",
+            "sph_verticies", "sph_edges"]:
+        var = locals()[var_name]
+
+        if var_name in ["b0s_mask", "sph_edges"]:
+            dtype = np.int32
+        else:
+            dtype = np.float64
+
+        if not np.asarray(var).flags['C_CONTIGUOUS']:
+            logger.warning(f"{var_name} is not C contiguous. Copying...")
+            gtargs[var_name] = np.ascontiguousarray(
+                var, dtype=dtype)
+        else:
+            gtargs[var_name] = np.asarray(var, dtype=dtype)
+
     gpu_tracker = cuslines.GPUTracker(
+        model_type,
         radians(max_angle),
         1.0,
         stop_threshold,
         step_size,
-        data.astype(np.float64), H, R, delta_b, delta_q,
-        b0s_mask.astype(np.int32), stop_data.astype(np.float64),
-        sampling_matrix,
-        sphere.vertices, sphere.edges.astype(np.int32),
+        0.25,  # relative peak threshold
+        radians(45),  # min separation angle
+        gtargs["data"], gtargs["H"], gtargs["R"],
+        gtargs["delta_b"], gtargs["delta_q"],
+        gtargs["b0s_mask"], gtargs["stop_data"],
+        gtargs["sampling_matrix"],
+        gtargs["sph_verticies"], gtargs["sph_edges"],
         ngpus=ngpus, rng_seed=0)
 
     seed_mask = utils.seeds_from_mask(

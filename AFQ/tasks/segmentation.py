@@ -35,7 +35,7 @@ logger = logging.getLogger('AFQ')
 
 @pimms.calc("bundles")
 @as_file('_tractography', include_track=True, include_seg=True)
-def segment(dwi, data_imap, mapping_imap,
+def segment(data_imap, mapping_imap,
             tractography_imap, segmentation_params):
     """
     full path to a trk/trx file containing containing
@@ -50,15 +50,14 @@ def segment(dwi, data_imap, mapping_imap,
     bundle_dict = data_imap["bundle_dict"]
     reg_template = data_imap["reg_template"]
     streamlines = tractography_imap["streamlines"]
-    img = nib.load(dwi)
     if streamlines.endswith(".trk") or streamlines.endswith(".tck"):
         tg = load_tractogram(
-            streamlines, img, Space.VOX,
+            streamlines, data_imap["dwi"], Space.VOX,
             bbox_valid_check=False)
         is_trx = False
     elif streamlines.endswith(".trx"):
         is_trx = True
-        trx = load_trx(streamlines, img)
+        trx = load_trx(streamlines, data_imap["dwi"])
         trx.streamlines._data = trx.streamlines._data.astype(np.float32)
         tg = trx.to_sft()
 
@@ -72,9 +71,7 @@ def segment(dwi, data_imap, mapping_imap,
         bundle_dict,
         tg,
         mapping_imap["mapping"],
-        dwi,
-        data_imap["bval"],
-        data_imap["bvec"],
+        data_imap["dwi"],
         reg_template=reg_template)
 
     seg_sft = aus.SegmentedSFT(bundles, Space.VOX)
@@ -204,8 +201,7 @@ def export_bundle_lengths(bundles):
 
 @pimms.calc("density_maps")
 @as_file('_desc-density_dwi.nii.gz', include_track=True, include_seg=True)
-@as_img
-def export_density_maps(bundles, dwi):
+def export_density_maps(bundles, data_imap):
     """
     full path to 4d nifti file containing streamline counts per voxel
     per bundle, where the 4th dimension encodes the bundle
@@ -213,21 +209,22 @@ def export_density_maps(bundles, dwi):
     seg_sft = aus.SegmentedSFT.fromfile(
         bundles)
     entire_density_map = np.zeros((
-        *nib.load(dwi).shape[:3],
+        *data_imap["data"].shape[:3],
         len(seg_sft.bundle_names)))
     for ii, bundle_name in enumerate(seg_sft.bundle_names):
         bundle_sl = seg_sft.get_bundle(bundle_name)
         bundle_density = auv.density_map(bundle_sl).get_fdata()
         entire_density_map[..., ii] = bundle_density
 
-    return entire_density_map, dict(
-        source=bundles, bundles=list(seg_sft.bundle_names))
+    return nib.Nifti1Image(
+        entire_density_map, data_imap["dwi_affine"]), dict(
+            source=bundles, bundles=list(seg_sft.bundle_names))
 
 
 @pimms.calc("profiles")
 @as_file('_desc-profiles_dwi.csv', include_track=True, include_seg=True)
 def tract_profiles(bundles,
-                   scalar_dict, dwi_affine,
+                   scalar_dict, data_imap,
                    profile_weights="gauss",
                    n_points_profile=100):
     """
@@ -298,7 +295,7 @@ def tract_profiles(bundles,
                             values_from_volume(
                                 scalar_data,
                                 fgarray,
-                                dwi_affine))
+                                data_imap["dwi_affine"]))
                         weights = np.zeros(values.shape)
                         for ii, jj in enumerate(
                             np.argsort(values, axis=0)[
@@ -311,7 +308,7 @@ def tract_profiles(bundles,
             this_profile[ii] = afq_profile(
                 scalar_data,
                 this_sl,
-                dwi_affine,
+                data_imap["dwi_affine"],
                 weights=this_prof_weights,
                 n_points=n_points_profile)
             profiles[ii].extend(list(this_profile[ii]))

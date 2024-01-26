@@ -56,28 +56,28 @@ def _meta_from_tracking_params(
 
 @pimms.calc("seed")
 @as_file('_desc-seed_mask.nii.gz', include_track=True)
-@as_img
-def export_seed_mask(tracking_params):
+def export_seed_mask(data_imap, tracking_params):
     """
     full path to a nifti file containing the
     tractography seed mask
     """
     seed_mask = tracking_params['seed_mask']
     seed_mask_desc = dict(source=tracking_params['seed_mask'])
-    return seed_mask, seed_mask_desc
+    return nib.Nifti1Image(seed_mask, data_imap["dwi_affine"]),\
+        seed_mask_desc
 
 
 @pimms.calc("stop")
 @as_file('_desc-stop_mask.nii.gz', include_track=True)
-@as_img
-def export_stop_mask(tracking_params):
+def export_stop_mask(data_imap, tracking_params):
     """
     full path to a nifti file containing the
     tractography stop mask
     """
     stop_mask = tracking_params['stop_mask']
     stop_mask_desc = dict(source=tracking_params['stop_mask'])
-    return stop_mask, stop_mask_desc
+    return nib.Nifti1Image(stop_mask, data_imap["dwi_affine"]),\
+        stop_mask_desc
 
 
 @pimms.calc("stop")
@@ -224,6 +224,7 @@ def gpu_tractography(data_imap, tracking_params, seed, stop,
     sft = gpu_track(
         data_imap["data"], data_imap["gtab"],
         nib.load(seed), nib.load(stop),
+        tracking_params["odf_model"],
         tracking_params["seed_threshold"],
         tracking_params["stop_threshold"],
         tracking_params["thresholds_as_percentages"],
@@ -299,20 +300,19 @@ def get_tractography_plan(kwargs):
 
     stop_mask = kwargs["tracking_params"]['stop_mask']
     seed_mask = kwargs["tracking_params"]['seed_mask']
-    dwi = kwargs["dwi"]
     bids_info = kwargs["bids_info"]
 
     if bids_info is not None:
         if isinstance(stop_mask, Definition):
             stop_mask.find_path(
                 bids_info["bids_layout"],
-                dwi,
+                kwargs["dwi_path"],
                 bids_info["subject"],
                 bids_info["session"])
         if isinstance(seed_mask, Definition):
             seed_mask.find_path(
                 bids_info["bids_layout"],
-                dwi,
+                kwargs["dwi_path"],
                 bids_info["subject"],
                 bids_info["session"])
 
