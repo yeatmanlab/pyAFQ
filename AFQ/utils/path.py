@@ -1,6 +1,10 @@
 import os.path as op
 import os
 import json
+import logging
+
+
+logger = logging.getLogger('AFQ')
 
 
 def write_json(fname, data):
@@ -61,6 +65,10 @@ def apply_cmd_to_afq_derivs(
         raise ValueError((
             "dependent_on must be one of "
             "None, 'track', 'recog', 'prof'."))
+
+    if not op.exists(derivs_dir):
+        logger.warning(f"Nothing to {cmd} in {derivs_dir}")
+        return
 
     for filename in os.listdir(derivs_dir):
         full_path = os.path.join(derivs_dir, filename)
