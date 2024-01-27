@@ -10,7 +10,7 @@ from AFQ.tasks.utils import with_name
 from AFQ.definitions.utils import Definition
 import AFQ.tractography.tractography as aft
 from AFQ.tasks.utils import get_default_args
-from AFQ.definitions.image import ScalarImage
+from AFQ.definitions.image import ScalarImage, HMRFImage
 
 try:
     from trx.trx_file_memmap import TrxFile
@@ -290,9 +290,7 @@ def get_tractography_plan(kwargs):
     kwargs["tracking_params"]["odf_model"] =\
         kwargs["tracking_params"]["odf_model"].upper()
     if kwargs["tracking_params"]["seed_mask"] is None:
-        kwargs["tracking_params"]["seed_mask"] = ScalarImage(
-            kwargs["best_scalar"])
-        kwargs["tracking_params"]["seed_threshold"] = 0.2
+        kwargs["tracking_params"]["seed_mask"] = HMRFImage()
     if kwargs["tracking_params"]["stop_mask"] is None:
         kwargs["tracking_params"]["stop_mask"] = ScalarImage(
             kwargs["best_scalar"])

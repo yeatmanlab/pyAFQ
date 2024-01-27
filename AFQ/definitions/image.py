@@ -4,16 +4,17 @@ import logging
 import nibabel as nib
 
 from dipy.segment.mask import median_otsu
+from dipy.segment.tissue import TissueClassifierHMRF
 from dipy.align import resample
 
-import AFQ.utils.volume as auv
 from AFQ.definitions.utils import Definition, find_file, name_from_path
 
 from skimage.morphology import convex_hull_image, binary_opening
-from scipy.linalg import blas
+from scipy.ndimage import binary_dilation
 
 __all__ = [
-    "ImageFile", "FullImage", "RoiImage", "B0Image", "LabelledImageFile",
+    "ImageFile", "FullImage", "RoiImage", "HMRFImage", "B0Image",
+    "B0ThreshImage", "LabelledImageFile",
     "ThresholdedImageFile", "ScalarImage", "ThresholdedScalarImage",
     "TemplateImage", "GQImage"]
 
@@ -391,6 +392,117 @@ class GQImage(ImageDefinition):
                 data_imap["gq_aso"])
 
 
+class HMRFImage(ImageDefinition):
+    """
+    Use the Hidden Markov Random Field segmentation to generate
+    a segmentation on white matter, gray matter, and CSF,
+    from the CSD-derived anisotropic power map. Then,
+    use this to make a mask of the WM-GM interface.
+
+    Parameters
+    ----------
+    niter : int, optional
+        Number of iterations to run the HMRF segmentation.
+        Default: 5
+    beta : float, optional
+        Smoothness factor for the HMRF segmentation.
+        Default: 0.5
+    tp : string, optional
+        Tissue property derived from diffusion data
+        which looks similar to T1. Both
+        "csd_pmap" and "gq_pmap" have been tested.
+        Default: "csd_pmap"
+
+    Examples
+    --------
+    seed_def = HMRFImage()
+    api.GroupAFQ(tracking_params={
+        "seed_image": seed_def})
+    """
+
+    def __init__(self, beta=0.5, niter=5, tp="csd_pmap"):
+        self.beta = beta
+        self.niter = niter
+        self.tp = tp
+
+    def find_path(self, bids_layout, from_path, subject, session):
+        pass
+
+    def get_name(self):
+        return "hmrf"
+
+    def get_image_getter(self, task_name):
+        if task_name == "data":
+            raise ValueError("HMRFImage cannot be used in this context")
+
+        def image_getter_helper(data_imap):
+            brain_mask_img = nib.load(data_imap["brain_mask"])
+            hmrf = TissueClassifierHMRF()
+            pmap_img = nib.load(data_imap[self.tp])
+            pmap = pmap_img.get_fdata()
+            pmap = brain_mask_img.get_fdata() * pmap
+            logger.info("Generating WM-GM interface mask")
+            pmap[pmap != 0] = pmap[pmap != 0] - pmap[pmap != 0].min()
+            _, _, PVE = hmrf.classify(
+                pmap, 3, self.beta, max_iter=self.niter)
+            wmgmi = np.logical_and(
+                PVE[..., 1] > 0.1,
+                binary_dilation(PVE[..., 2] > 0.1))
+            return nib.Nifti1Image(
+                wmgmi.astype(np.float32),
+                pmap_img.affine), dict(
+                    source=data_imap[self.tp],
+                    beta=self.beta,
+                    niter=self.niter)
+        return image_getter_helper
+
+
+class B0ThreshImage(ImageDefinition):
+    """
+    Define an image using thresholding and convex hull on the
+    b0 data. Note that, for now, this will remove the skull but
+    keep the eyes.
+
+    Parameters
+    ----------
+    b0_noise_thresh: int, optional
+        B0 noise threshold for making brain mask from B0.
+        Default: 1000
+
+    Examples
+    --------
+    brain_image_definition = B0ThreshImage()
+    api.GroupAFQ(brain_image_definition=brain_image_definition)
+    """
+
+    def __init__(self, b0_noise_thresh=1000):
+        self.b0_noise_thresh = b0_noise_thresh
+
+    def find_path(self, bids_layout, from_path, subject, session):
+        pass
+
+    def get_name(self):
+        return "b0"
+
+    def get_image_getter(self, task_name):
+        def image_getter_helper(b0):
+            b0_img = nib.load(b0)
+            b0_dat = b0_img.get_fdata()
+            b0_dat = b0_dat[b0_dat > 1000].flatten()
+            attempt_at_mask = convex_hull_image(
+                binary_opening(
+                    b0_img.get_fdata() > np.percentile(b0_dat, 10)))
+            return nib.Nifti1Image(
+                attempt_at_mask.astype(np.float32),
+                b0_img.affine), dict(
+                    source=b0,
+                    b0_noise_thresh=self.b0_noise_thresh)
+        if task_name == "data":
+            return image_getter_helper
+        else:
+            return lambda data_imap: image_getter_helper(data_imap["b0"])
+
+
 class B0Image(ImageDefinition):
     """
     Define an image using b0 and dipy's median_otsu.
@@ -414,7 +526,7 @@ class B0Image(ImageDefinition):
         pass
 
     def get_name(self):
-        return "b0"
+        return "otsu"
 
     def get_image_getter(self, task_name):
         def image_getter_helper(b0):
