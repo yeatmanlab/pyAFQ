@@ -773,6 +773,17 @@ def dki_mk(dki_tf):
     return dki_tf.mk()
 
 
+@pimms.calc("dki_kfa")
+@as_file('_odfmodel-DKI_desc-KFA_dwi.nii.gz')
+@as_fit_deriv('DKI')
+def dki_kfa(dki_tf):
+    """
+    full path to a nifti file containing
+    the DKI mean kurtosis file
+    """
+    return dki_tf.kfa()
+
+
 @pimms.calc("dki_ga")
 @as_file(suffix='_odfmodel-DKI_desc-GA_dwi.nii.gz')
 @as_fit_deriv('DKI')
@@ -955,12 +966,13 @@ def get_data_plan(kwargs):
         gq, gq_pmap, gq_ai, opdt_params, opdt_pmap, opdt_ai,
         csa_params, csa_pmap, csa_ai,
         fwdti_fa, fwdti_md, fwdti_fwf,
-        dki_md, dki_awf, dki_mk, dti_ga, dti_rd, dti_ad, dki_ga, dki_rd,
+        dki_md, dki_awf, dki_mk, dki_kfa, dti_ga, dti_rd, dti_ad,
+        dki_ga, dki_rd,
         dki_ad, dki_rk, dki_ak, dti_params, dki_params, fwdti_params,
         csd_params, get_bundle_dict])
 
     if "scalars" not in kwargs:
-        kwargs["scalars"] = ["dti_fa", "dti_md"]
+        kwargs["scalars"] = ["dki_fa", "dki_md", "dki_kfa", "dki_mk"]
     else:
         scalars = []
         for scalar in kwargs["scalars"]:
