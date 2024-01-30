@@ -107,7 +107,8 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None, cbs=None,
     else:
         color_constant = color
         line_color = np.zeros((plotting_shape, 3))
-    customdata = np.zeros(plotting_shape)
+    customdata_tp = np.zeros(plotting_shape)
+    customdata_nodes = np.zeros(plotting_shape)
 
     for sl_index, plotting_offset in enumerate(sls._offsets):
         sl_length = sls._lengths[sl_index]
@@ -137,11 +138,13 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None, cbs=None,
 
             line_color[total_offset:total_offset + sl_length, :] = \
                 np.outer(brightness, color_constant)
-            customdata[total_offset:total_offset + sl_length] = brightness
+            customdata_tp[total_offset:total_offset + sl_length] = brightness
         else:
             line_color[total_offset:total_offset + sl_length, :] = \
                 color_constant
-            customdata[total_offset:total_offset + sl_length] = 1
+            customdata_tp[total_offset:total_offset + sl_length] = 1
+        customdata_nodes[total_offset:total_offset + sl_length] =\
+            np.arange(sl_length)
 
         if line_color.shape[1] > 3:
             line_color[total_offset:total_offset + sl_length, 3] = \
@@ -149,7 +152,6 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None, cbs=None,
 
         if len(sls._offsets) > 1:
             line_color[total_offset + sl_length, :] = 0
-            customdata[total_offset + sl_length] = 0
 
     if flip_axes[0]:
         x_pts = dimensions[0] - x_pts
@@ -157,6 +159,10 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None, cbs=None,
         y_pts = dimensions[1] - y_pts
     if flip_axes[2]:
         z_pts = dimensions[2] - z_pts
+    hovertext = [
+        f'TP: {i1}<br>Node ID: {i2}'
+        for i1, i2 in zip(
+            customdata_tp, customdata_nodes)]
     figure.add_trace(
         go.Scatter3d(
             x=x_pts,
@@ -172,7 +178,7 @@ def _draw_streamlines(figure, sls, dimensions, color, name, cbv=None, cbs=None,
                 width=8,
                 color=line_color,
             ),
-            hovertext=customdata,
+            hovertext=hovertext,
             hoverinfo='all',
             opacity=opacity
         ),
