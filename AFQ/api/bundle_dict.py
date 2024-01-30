@@ -808,7 +808,7 @@ class BundleDict(MutableMapping):
                     " are co-located, and AFQ"
                     " assigns each streamline to only one bundle."
                     " Only Callosum Occipital will be used."))
-                self.bundle_names.remove("FP")
+                self.bundle_names.remove("Forceps Major")
             if "Forceps Minor" in self.bundle_names\
                     and "Callosum Orbital" in self.bundle_names:
                 self.logger.warning((
