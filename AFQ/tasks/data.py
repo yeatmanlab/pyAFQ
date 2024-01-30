@@ -1,5 +1,4 @@
 import nibabel as nib
-import nibabel.orientations as nio
 import numpy as np
 import logging
 
@@ -781,7 +780,7 @@ def dki_kfa(dki_tf):
     full path to a nifti file containing
     the DKI mean kurtosis file
     """
-    return dki_tf.kfa()
+    return dki_tf.kfa
 
 
 @pimms.calc("dki_ga")
@@ -972,7 +971,14 @@ def get_data_plan(kwargs):
         csd_params, get_bundle_dict])
 
     if "scalars" not in kwargs:
-        kwargs["scalars"] = ["dki_fa", "dki_md", "dki_kfa", "dki_mk"]
+        bvals, _ = read_bvals_bvecs(kwargs["bval"], kwargs["bvec"])
+        if len(dpg.unique_bvals_magnitude(bvals)) > 2:
+            kwargs["scalars"] = [
+                "dki_fa", "dki_md",
+                "dki_kfa", "dki_mk"]
+        else:
+            kwargs["scalars"] = [
+                "dti_fa", "dti_md"]
     else:
         scalars = []
         for scalar in kwargs["scalars"]:
