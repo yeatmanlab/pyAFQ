@@ -89,13 +89,20 @@ def segment(data_imap, mapping_imap,
     else:
         tgram, meta = seg_sft.get_sft_and_sidecar()
 
-    segmentation_params_out = {
-        arg_name: value if isinstance(value, (int, float, bool, str)) or (
-            value is None) else str(value)
-        for arg_name, value in segmentation_params.items()}
+    seg_params_out = {}
+    for arg_name, value in segmentation_params.items():
+        if isinstance(value, (int, float, bool, str)):
+            seg_params_out[arg_name] = value
+        elif isinstance(value, (list, tuple)):
+            seg_params_out[arg_name] = [str(v) for v in value]
+        elif isinstance(value, dict):
+            for k, v in value.items():
+                seg_params_out[k] = str(v)
+        else:
+            seg_params_out[arg_name] = str(value)
 
     meta["source"] = streamlines
-    meta["Recognition Parameters"] = segmentation_params_out
+    meta["Recognition Parameters"] = seg_params_out
     meta["Timing"] = time() - start_time
     return tgram, meta
 
