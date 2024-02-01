@@ -139,7 +139,8 @@ class Segmentation:
                  presegment_kwargs={},
                  filter_by_endpoints=True,
                  dist_to_atlas=4,
-                 save_intermediates=None):
+                 save_intermediates=None,
+                 cleaning_params={}):
         """
         Segment streamlines into bundles.
 
@@ -260,6 +261,11 @@ class Segmentation:
         save_intermediates : str, optional
             The full path to a folder into which intermediate products
             are saved. Default: None, means no saving of intermediates.
+        cleaning_params : dict, optional
+            Cleaning params to pass to seg.clean_bundle. This will
+            override the default parameters of that method. However, this
+            can be overriden by setting the cleaning parameters in the
+            bundle_dict. Default: {}.
 
         References
         ----------
@@ -297,6 +303,7 @@ class Segmentation:
         self.filter_by_endpoints = filter_by_endpoints
         self.dist_to_atlas = dist_to_atlas
         self.parallel_segmentation = parallel_segmentation
+        self.cleaning_params = cleaning_params
 
         if (save_intermediates is not None) and \
                 (not op.exists(save_intermediates)):
@@ -774,6 +781,9 @@ class Segmentation:
             if b_sls:
                 accept_idx = b_sls.initiate_selection("Mahalanobis")
                 clean_params = bundle_def.get("mahal", {})
+                clean_params = {
+                    **self.cleaning_params,
+                    **clean_params}
                 clean_params["return_idx"] = True
                 cut = self.clip_edges or ("bundlesection" in bundle_def)
                 _, cleaned_idx = clean_bundle(
