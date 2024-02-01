@@ -778,7 +778,14 @@ def dki_mk(dki_tf):
 def dki_kfa(dki_tf):
     """
     full path to a nifti file containing
-    the DKI mean kurtosis file
+    the DKI kurtosis FA file
+
+    References
+    ----------
+    .. [Hansen2019] Hansen B. An Introduction to Kurtosis Fractional
+    Anisotropy. AJNR Am J Neuroradiol. 2019 Oct;40(10):1638-1641.
+    doi: 10.3174/ajnr.A6235. Epub 2019 Sep 26. PMID: 31558496;
+    PMCID: PMC7028548.
     """
     return dki_tf.kfa
 
