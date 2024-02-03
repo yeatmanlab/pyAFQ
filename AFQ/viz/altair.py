@@ -88,7 +88,9 @@ def combined_profiles_df_to_altair_df(
 def altair_df_to_chart(profiles, position_domain=(20, 80),
                        column_count=1, font_size=20,
                        line_size=10, row_label_angle=90,
+                       bundle_list=None,
                        legend_line_size=5,
+                       alt_x_kwargs={}, alt_y_kwargs={},
                        **kwargs):
     """
     Given a dataframe formatted for Altair, probably from
@@ -118,11 +120,14 @@ def altair_df_to_chart(profiles, position_domain=(20, 80),
         "DKI MD": " (µm²/ms)",
         "DKI MK": ""}
 
+    if bundle_list is None:
+        bundle_list = profiles["Bundle Name"].unique()
+
     row_charts = []
-    for jj, b_name in enumerate(profiles["Bundle Name"].unique()):
+    for jj, b_name in enumerate(bundle_list):
         row_dataframe = profiles[profiles["Bundle Name"] == b_name]
         charts = []
-        for ii, tp in enumerate(profiles.TP.unique()):
+        for ii, tp in enumerate(sorted(profiles.TP.unique())):
             this_dataframe = row_dataframe[row_dataframe.TP == tp]
             if jj == 0:
                 title_name = tp + tp_units[tp]
@@ -138,13 +143,13 @@ def altair_df_to_chart(profiles, position_domain=(20, 80),
             else:
                 x_axis_title = ""
                 useXlab = False
-            y_kwargs = dict(
-                scale=alt.Scale(zero=False),
-                # axis=alt.Axis(title=""),
-                title=y_axis_title
-            )
-            x_kwargs = dict(
-                axis=alt.Axis(title=x_axis_title, labels=useXlab))
+            y_kwargs = {
+                "scale": alt.Scale(zero=False),
+                "title": y_axis_title,
+                **alt_y_kwargs}
+            x_kwargs = {
+                "axis": alt.Axis(title=x_axis_title, labels=useXlab),
+                **alt_x_kwargs}
             prof_chart = alt.Chart(
                 this_dataframe, title=title_name).mark_line(
                     size=line_size).encode(
