@@ -6,11 +6,9 @@ import nibabel as nib
 from dipy.segment.mask import median_otsu
 from dipy.align import resample
 
-import AFQ.utils.volume as auv
 from AFQ.definitions.utils import Definition, find_file, name_from_path
 
 from skimage.morphology import convex_hull_image, binary_opening
-from scipy.linalg import blas
 
 __all__ = [
     "ImageFile", "FullImage", "RoiImage", "B0Image", "LabelledImageFile",
@@ -128,16 +126,20 @@ class ImageFile(ImageDefinition):
             self.filters = filters
             self.fnames = {}
 
-    def find_path(self, bids_layout, from_path, subject, session):
+    def find_path(self, bids_layout, from_path,
+                  subject, session, required=True):
         if self._from_path:
             return
-        if session not in self.fnames:
-            self.fnames[session] = {}
 
         nearest_image = find_file(
             bids_layout, from_path, self.filters, self.suffix, session,
-            subject)
+            subject, required=required)
 
+        if nearest_image is None:
+            return False
+
+        if session not in self.fnames:
+            self.fnames[session] = {}
         self.fnames[session][subject] = nearest_image
 
     def get_path_data_affine(self, bids_info):
@@ -194,9 +196,6 @@ class FullImage(ImageDefinition):
     """
 
     def __init__(self):
-        pass
-
-    def find_path(self, bids_layout, from_path, subject, session):
         pass
 
     def get_name(self):
@@ -268,9 +267,6 @@ class RoiImage(ImageDefinition):
             raise ValueError((
                 "One of use_waypoints, use_presegment, "
                 "use_endpoints, must be True"))
-
-    def find_path(self, bids_layout, from_path, subject, session):
-        pass
 
     def get_name(self):
         return "roi"
@@ -364,9 +360,6 @@ class GQImage(ImageDefinition):
     def __init__(self):
         pass
 
-    def find_path(self, bids_layout, from_path, subject, session):
-        pass
-
     def get_name(self):
         return "GQ"
 
@@ -409,9 +402,6 @@ class B0Image(ImageDefinition):
 
     def __init__(self, median_otsu_kwargs={}):
         self.median_otsu_kwargs = median_otsu_kwargs
-
-    def find_path(self, bids_layout, from_path, subject, session):
-        pass
 
     def get_name(self):
         return "b0"
@@ -616,9 +606,6 @@ class ScalarImage(ImageDefinition):
     def __init__(self, scalar):
         self.scalar = scalar
 
-    def find_path(self, bids_layout, from_path, subject, session):
-        pass
-
     def get_name(self):
         return self.scalar
 
@@ -705,9 +692,15 @@ class PFTImage(ImageDefinition):
     def __init__(self, WM_probseg, GM_probseg, CSF_probseg):
         self.probsegs = (WM_probseg, GM_probseg, CSF_probseg)
 
-    def find_path(self, bids_layout, from_path, subject, session):
+    def find_path(self, bids_layout, from_path,
+                  subject, session, required=True):
+        if required == False:
+            raise ValueError(
+                "PFTImage cannot be used in this context")
         for probseg in self.probsegs:
-            probseg.find_path(bids_layout, from_path, subject, session)
+            probseg.find_path(
+                bids_layout, from_path, subject, session,
+                required=required)
 
     def get_name(self):
         return "pft"
@@ -738,9 +731,6 @@ class TemplateImage(ImageDefinition):
 
     def __init__(self, path):
         self.path = path
-
-    def find_path(self, bids_layout, from_path, subject, session):
-        pass
 
     def get_name(self):
         return name_from_path(self.path)

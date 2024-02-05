@@ -105,7 +105,8 @@ class FnirtMap(Definition):
             self.space_filters = space_filters
             self.fnames = {}
 
-    def find_path(self, bids_layout, from_path, subject, session):
+    def find_path(self, bids_layout, from_path,
+                  subject, session, required=True):
         if self._from_path:
             return
         if session not in self.fnames:
@@ -113,11 +114,11 @@ class FnirtMap(Definition):
 
         nearest_warp = find_file(
             bids_layout, from_path, self.warp_filters, self.warp_suffix,
-            session, subject)
+            session, subject, required=required)
 
         nearest_space = find_file(
             bids_layout, from_path, self.space_filters, self.space_suffix,
-            session, subject)
+            session, subject, required=required)
 
         self.fnames[session][subject] = (nearest_warp, nearest_space)
 
@@ -179,9 +180,6 @@ class IdentityMap(Definition):
     """
 
     def __init__(self):
-        pass
-
-    def find_path(self, bids_layout, from_path, subject, session):
         pass
 
     def get_for_subses(self, base_fname, dwi, bids_info, reg_subject,
@@ -314,9 +312,6 @@ class SynMap(GeneratedMapMixin, Definition):
         self.syn_kwargs = syn_kwargs
         self.extension = ".nii.gz"
 
-    def find_path(self, bids_layout, from_path, subject, session):
-        pass
-
     def gen_mapping(self, base_fname, reg_subject, reg_template,
                     subject_sls, template_sls,
                     reg_prealign):
@@ -362,9 +357,6 @@ class SlrMap(GeneratedMapMixin, Definition):
         self.use_prealign = False
         self.extension = ".npy"
 
-    def find_path(self, bids_layout, from_path, subject, session):
-        pass
-
     def gen_mapping(self, base_fname, reg_template, reg_subject,
                     subject_sls, template_sls, reg_prealign):
         return reg.slr_registration(
@@ -401,9 +393,6 @@ class AffMap(GeneratedMapMixin, Definition):
         self.use_prealign = False
         self.affine_kwargs = affine_kwargs
         self.extension = ".npy"
-
-    def find_path(self, bids_layout, from_path, subject, session):
-        pass
 
     def gen_mapping(self, base_fname, reg_subject, reg_template,
                     subject_sls, template_sls,

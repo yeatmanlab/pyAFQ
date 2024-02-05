@@ -214,21 +214,21 @@ def get_mapping_plan(kwargs, use_sls=False):
                     None,
                     kwargs["dwi_path"],
                     None,
-                    None
-                )
+                    None)
             else:
-                scalar.find_path(
+                scalar_found = scalar.find_path(
                     bids_info["bids_layout"],
                     kwargs["dwi_path"],
                     bids_info["subject"],
-                    bids_info["session"]
-                )
-            mapping_tasks[f"{scalar.get_name()}_res"] =\
-                pimms.calc(f"{scalar.get_name()}")(
-                    as_file((
-                        f'_desc-{str_to_desc(scalar.get_name())}'
-                        '_dwi.nii.gz'))(
-                            scalar.get_image_getter("mapping")))
+                    bids_info["session"],
+                    required=False)
+            if scalar_found != False:
+                mapping_tasks[f"{scalar.get_name()}_res"] =\
+                    pimms.calc(f"{scalar.get_name()}")(
+                        as_file((
+                            f'_desc-{str_to_desc(scalar.get_name())}'
+                            '_dwi.nii.gz'))(
+                                scalar.get_image_getter("mapping")))
 
     if use_sls:
         mapping_tasks["mapping_res"] = sls_mapping

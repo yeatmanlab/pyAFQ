@@ -1,6 +1,11 @@
 import os.path as op
+import logging
 
 from AFQ.utils.path import drop_extension
+
+
+logger = logging.getLogger('AFQ')
+
 
 __all__ = ["Definition", "find_file", "name_from_path"]
 
@@ -20,8 +25,9 @@ class Definition(object):
     def __init__(self):
         raise NotImplementedError("Please implement an __init__ method")
 
-    def find_path(self, bids_layout, from_path, subject, session):
-        raise NotImplementedError("Please implement a find_path method")
+    def find_path(self, bids_layout, from_path,
+                  subject, session, required=True):
+        pass
 
     def str_for_toml(self):
         """
@@ -72,7 +78,7 @@ def name_from_path(path):
 
 
 def find_file(bids_layout, path, filters, suffix, session, subject,
-              extension=".nii.gz"):
+              extension=".nii.gz", required=True):
     """
     Helper function
     Generic calls to get_nearest to find a file
@@ -92,8 +98,9 @@ def find_file(bids_layout, path, filters, suffix, session, subject,
         strict=False,
     )
 
+    # If that fails, loosen session restriction
+    # in order to find scans that are not session specific
     if nearest is None:
-        # If that fails, loosen session restriction
         nearest = bids_layout.get_nearest(
             path,
             **filters,
@@ -102,28 +109,51 @@ def find_file(bids_layout, path, filters, suffix, session, subject,
             strict=False,
         )
 
-    if nearest is None:
-        # If nothing is found still, raise an error
-        raise ValueError((
-            "No file found with these parameters:\n"
-            f"suffix: {suffix},\n"
-            f"session (searched with and without): {session},\n"
-            f"subject: {subject},\n"
-            f"filters: {filters},\n"
-            f"near path: {path},\n"))
-
     path_subject = bids_layout.parse_file_entities(path).get(
         "subject", None
     )
     file_subject = bids_layout.parse_file_entities(nearest).get(
         "subject", None
     )
+    path_session = bids_layout.parse_file_entities(path).get(
+        "session", None
+    )
+    file_session = bids_layout.parse_file_entities(nearest).get(
+        "session", None
+    )
+    err_msg = None
+
+    # Nothing is found
+    if nearest is None:
+        err_msg = (
+            "No file found with these parameters:\n"
+            f"suffix: {suffix},\n"
+            f"session (searched with and without): {session},\n"
+            f"subject: {subject},\n"
+            f"filters: {filters},\n"
+            f"near path: {path},\n")
+
+    # found file is wrong subject
     if path_subject != file_subject:
-        raise ValueError(
+        err_msg = (
             f"Expected subject IDs to match for the retrieved image file "
             f"and the supplied `from_path` file. Got sub-{file_subject} "
             f"from image file {nearest} and sub-{path_subject} "
-            f"from `from_path` file {path}."
-        )
+            f"from `from_path` file {path}.")
 
-    return nearest
+    # found file is wrong session
+    if (file_session is not None) and (path_session != file_session):
+        err_msg = (
+            f"Expected session IDs to match for the retrieved image file "
+            f"and the supplied `from_path` file. Got ses-{file_session} "
+            f"from image file {nearest} and ses-{path_session} "
+            f"from `from_path` file {path}.")
+
+    if err_msg is not None:
+        if required:
+            raise ValueError(err_msg)
+        else:
+            logger.warning(err_msg)
+            return None
+    else:
+        return nearest
