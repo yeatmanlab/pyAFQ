@@ -77,15 +77,12 @@ def name_from_path(path):
     return file_name
 
 
-def _ff_helper(required, nearest, err_msg):
-    if err_msg is not None:
-        if required:
-            raise ValueError(err_msg)
-        else:
-            logger.warning(err_msg)
-            return None
+def _ff_helper(required, err_msg):
+    if required:
+        raise ValueError(err_msg)
     else:
-        return nearest
+        logger.warning(err_msg)
+        return None
 
 
 def find_file(bids_layout, path, filters, suffix, session, subject,
@@ -122,7 +119,7 @@ def find_file(bids_layout, path, filters, suffix, session, subject,
 
     # Nothing is found
     if nearest is None:
-        return _ff_helper(required, nearest, (
+        return _ff_helper(required, (
             "No file found with these parameters:\n"
             f"suffix: {suffix},\n"
             f"session (searched with and without): {session},\n"
@@ -145,7 +142,7 @@ def find_file(bids_layout, path, filters, suffix, session, subject,
 
     # found file is wrong subject
     if path_subject != file_subject:
-        return _ff_helper(required, nearest, (
+        return _ff_helper(required, (
             f"Expected subject IDs to match for the retrieved image file "
             f"and the supplied `from_path` file. Got sub-{file_subject} "
             f"from image file {nearest} and sub-{path_subject} "
@@ -153,8 +150,10 @@ def find_file(bids_layout, path, filters, suffix, session, subject,
 
     # found file is wrong session
     if (file_session is not None) and (path_session != file_session):
-        return _ff_helper(required, nearest, (
+        return _ff_helper(required, (
             f"Expected session IDs to match for the retrieved image file "
             f"and the supplied `from_path` file. Got ses-{file_session} "
             f"from image file {nearest} and ses-{path_session} "
             f"from `from_path` file {path}."))
+
+    return nearest

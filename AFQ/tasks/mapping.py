@@ -224,7 +224,6 @@ def get_mapping_plan(kwargs, use_sls=False):
                     bids_info["session"],
                     required=False)
             if scalar_found != False:
-                print(f"Found {scalar.get_name()}")
                 mapping_tasks[f"{scalar.get_name()}_res"] =\
                     pimms.calc(f"{scalar.get_name()}")(
                         as_file((
