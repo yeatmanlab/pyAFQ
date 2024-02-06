@@ -77,6 +77,17 @@ def name_from_path(path):
     return file_name
 
 
+def _ff_helper(required, nearest, err_msg):
+    if err_msg is not None:
+        if required:
+            raise ValueError(err_msg)
+        else:
+            logger.warning(err_msg)
+            return None
+    else:
+        return nearest
+
+
 def find_file(bids_layout, path, filters, suffix, session, subject,
               extension=".nii.gz", required=True):
     """
@@ -109,6 +120,16 @@ def find_file(bids_layout, path, filters, suffix, session, subject,
             strict=False,
         )
 
+    # Nothing is found
+    if nearest is None:
+        return _ff_helper(required, nearest, (
+            "No file found with these parameters:\n"
+            f"suffix: {suffix},\n"
+            f"session (searched with and without): {session},\n"
+            f"subject: {subject},\n"
+            f"filters: {filters},\n"
+            f"near path: {path},\n"))
+
     path_subject = bids_layout.parse_file_entities(path).get(
         "subject", None
     )
@@ -121,39 +142,19 @@ def find_file(bids_layout, path, filters, suffix, session, subject,
     file_session = bids_layout.parse_file_entities(nearest).get(
         "session", None
     )
-    err_msg = None
-
-    # Nothing is found
-    if nearest is None:
-        err_msg = (
-            "No file found with these parameters:\n"
-            f"suffix: {suffix},\n"
-            f"session (searched with and without): {session},\n"
-            f"subject: {subject},\n"
-            f"filters: {filters},\n"
-            f"near path: {path},\n")
 
     # found file is wrong subject
     if path_subject != file_subject:
-        err_msg = (
+        return _ff_helper(required, nearest, (
             f"Expected subject IDs to match for the retrieved image file "
             f"and the supplied `from_path` file. Got sub-{file_subject} "
             f"from image file {nearest} and sub-{path_subject} "
-            f"from `from_path` file {path}.")
+            f"from `from_path` file {path}."))
 
     # found file is wrong session
     if (file_session is not None) and (path_session != file_session):
-        err_msg = (
+        return _ff_helper(required, nearest, (
             f"Expected session IDs to match for the retrieved image file "
             f"and the supplied `from_path` file. Got ses-{file_session} "
             f"from image file {nearest} and ses-{path_session} "
-            f"from `from_path` file {path}.")
-
-    if err_msg is not None:
-        if required:
-            raise ValueError(err_msg)
-        else:
-            logger.warning(err_msg)
-            return None
-    else:
-        return nearest
+            f"from `from_path` file {path}."))

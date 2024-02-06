@@ -215,6 +215,7 @@ def get_mapping_plan(kwargs, use_sls=False):
                     kwargs["dwi_path"],
                     None,
                     None)
+                scalar_found = True
             else:
                 scalar_found = scalar.find_path(
                     bids_info["bids_layout"],
