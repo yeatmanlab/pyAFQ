@@ -312,6 +312,7 @@ def test_AFQ_fury():
     myafq.export("all_bundles_figure")
 
 
+@pytest.mark.nightly_pft
 def test_AFQ_trx():
     tmpdir = tempfile.TemporaryDirectory()
     bids_path = op.join(tmpdir.name, "stanford_hardi")
@@ -320,6 +321,8 @@ def test_AFQ_trx():
     myafq = GroupAFQ(
         bids_path=bids_path,
         preproc_pipeline='vistasoft',
+        # should throw warning but not error
+        scalars=["dti_fa", "dti_md", ImageFile(suffix="DNE")],
         tracking_params={"trx": True})
     myafq.export("all_bundles_figure")
 
