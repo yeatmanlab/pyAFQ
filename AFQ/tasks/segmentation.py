@@ -356,7 +356,7 @@ def get_scalar_dict(data_imap, mapping_imap, scalars=["dti_fa", "dti_md"]):
         if isinstance(scalar, str):
             sc = scalar.lower()
             scalar_dict[sc] = data_imap[f"{sc}"]
-        else:
+        elif f"{scalar.get_name()}" in mapping_imap:
             scalar_dict[scalar.get_name()] = mapping_imap[
                 f"{scalar.get_name()}"]
     return {"scalar_dict": scalar_dict}
