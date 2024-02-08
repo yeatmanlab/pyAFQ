@@ -9,6 +9,40 @@ import nibabel as nib
 from AFQ.data.utils import BUNDLE_MAT_2_PYTHON
 
 
+# This dictionary is used to convert the names of the bundles
+# from old pyAFQ bundle names to the new pyAFQ bundle names.
+old_acronyms_to_formal = {
+    "ATR_L": "Left Anterior Thalamic",
+    "ATR_R": "Right Anterior Thalamic",
+    "CST_L": "Left Corticospinal",
+    "CST_R": "Right Corticospinal",
+    "CGC_L": "Left Cingulum Cingulate",
+    "CGC_R": "Right Cingulum Cingulate",
+    "IFO_L": "Left Inferior Fronto-Occipital",
+    "IFO_R": "Right Inferior Fronto-Occipital",
+    "ILF_L": "Left Inferior Longitudinal",
+    "ILF_R": "Right Inferior Longitudinal",
+    "SLF_L": "Left Superior Longitudinal",
+    "SLF_R": "Right Superior Longitudinal",
+    "UNC_L": "Left Uncinate",
+    "UNC_R": "Right Uncinate",
+    "ARC_L": "Left Arcuate",
+    "ARC_R": "Right Arcuate",
+    "VOF_L": "Left Vertical Occipital",
+    "VOF_R": "Right Vertical Occipital",
+    "pARC_L": "Left Posterior Arcuate",
+    "pARC_R": "Right Posterior Arcuate",
+    "Orbital": "Callosum Orbital",
+    "AntFrontal": "Callosum Anterior Frontal",
+    "SupFrontal": "Callosum Superior Frontal",
+    "Motor": "Callosum Motor",
+    "SupParietal": "Callosum Superior Parietal",
+    "PostParietal": "Callosum Posterior Parietal",
+    "Occipital": "Callosum Occipital",
+    "Temporal": "Callosum Temporal"
+}
+
+
 class MatlabFileTracking():
     """
     Helper class.
