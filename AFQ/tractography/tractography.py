@@ -8,7 +8,6 @@ import dipy.data as dpd
 from dipy.align import resample
 from dipy.direction import (DeterministicMaximumDirectionGetter,
                             ProbabilisticDirectionGetter)
-import dipy.tracking.utils as dtu
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.tracking.stopping_criterion import (ThresholdStoppingCriterion,
                                               CmcStoppingCriterion,
@@ -19,16 +18,7 @@ from nibabel.streamlines.tractogram import LazyTractogram
 from dipy.tracking.local_tracking import (LocalTracking,
                                           ParticleFilteringTracking)
 from AFQ._fixes import tensor_odf
-
-
-def get_percentile_threshold(mask, threshold):
-    zero_mask = mask == 0
-    mask[zero_mask] = np.nan
-    new_threshold = np.nanpercentile(
-        mask,
-        100 - threshold)
-    mask[zero_mask] = 0
-    return new_threshold
+from AFQ.tractography.utils import gen_seeds, get_percentile_threshold
 
 
 def track(params_file, directions="prob", max_angle=30., sphere=None,
@@ -131,7 +121,6 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         params_img = params_file
 
     model_params = params_img.get_fdata()
-    affine = params_img.affine
     odf_model = odf_model.upper()
     directions = directions.lower()
 
@@ -140,27 +129,11 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
     minlen = int(minlen / step_size)
     maxlen = int(maxlen / step_size)
 
-    logger.info("Generating Seeds...")
-    if isinstance(n_seeds, int):
-        if seed_mask is None:
-            seed_mask = np.ones(params_img.shape[:3])
-        elif len(np.unique(seed_mask)) > 2:
-            if thresholds_as_percentages:
-                seed_threshold = get_percentile_threshold(
-                    seed_mask, seed_threshold)
-            seed_mask = seed_mask > seed_threshold
-        if random_seeds:
-            seeds = dtu.random_seeds_from_mask(seed_mask, seeds_count=n_seeds,
-                                               seed_count_per_voxel=False,
-                                               affine=affine,
-                                               random_seed=rng_seed)
-        else:
-            seeds = dtu.seeds_from_mask(seed_mask,
-                                        density=n_seeds,
-                                        affine=affine)
-    else:
-        # If user provided an array, we'll use n_seeds as the seeds:
-        seeds = n_seeds
+    seeds = gen_seeds(
+        seed_mask, seed_threshold,
+        n_seeds, thresholds_as_percentages,
+        random_seeds, rng_seed, params_img)
+
     if sphere is None:
         sphere = dpd.default_sphere
 
