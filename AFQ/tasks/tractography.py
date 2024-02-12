@@ -230,6 +230,8 @@ def gpu_tractography(data_imap, tracking_params, seed, stop,
         tracking_params["thresholds_as_percentages"],
         tracking_params["max_angle"], tracking_params["step_size"],
         tracking_params["n_seeds"],
+        tracking_params["random_seeds"],
+        tracking_params["rng_seed"],
         tractography_ngpus)
 
     return sft, _meta_from_tracking_params(

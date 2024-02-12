@@ -8,12 +8,11 @@ import logging
 from dipy.data import small_sphere
 from dipy.reconst.shm import OpdtModel, CsaOdfModel
 from dipy.reconst import shm
-from dipy.tracking import utils
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 from nibabel.streamlines.array_sequence import concatenate
 
-from AFQ.tractography.tractography import get_percentile_threshold
+from AFQ.tractography.utils import gen_seeds, get_percentile_threshold
 
 
 logger = logging.getLogger('AFQ')
@@ -22,7 +21,7 @@ logger = logging.getLogger('AFQ')
 # Modified from https://github.com/dipy/GPUStreamlines/blob/master/run_dipy_gpu.py
 def gpu_track(data, gtab, seed_img, stop_img, odf_model,
               seed_threshold, stop_threshold, thresholds_as_percentages,
-              max_angle, step_size, sampling_density, ngpus):
+              max_angle, step_size, n_seeds, random_seeds, rng_seed, ngpus):
     """
     Perform GPU tractography on DWI data.
 
@@ -54,10 +53,18 @@ def gpu_track(data, gtab, seed_img, stop_img, odf_model,
         The maximum turning angle in each step.
     step_size : float
         The size of a step (in mm) of tractography.
-    sampling_density : int
-        The seeding density; how many seeds in each voxel on
-        each dimension (for example, 2 => [2, 2, 2]).
-    ngpus : int
+    n_seeds : int
+        The seeding density: if this is an int, it is is how many seeds in each
+        voxel on each dimension (for example, 2 => [2, 2, 2]). If this is a 2D
+        array, these are the coordinates of the seeds. Unless random_seeds is
+        set to True, in which case this is the total number of random seeds
+        to generate within the mask. Default: 1
+    random_seeds : bool
+        If True, n_seeds is total number of random seeds to generate.
+        If False, n_seeds encodes the density of seeds to generate.
+    rng_seed : int
+        random seed used to generate random seeds if random_seeds is
+        set to True. Default: None    ngpus : int
         Number of GPUs to use.
     Returns
     -------
@@ -67,12 +74,6 @@ def gpu_track(data, gtab, seed_img, stop_img, odf_model,
 
     seed_data = seed_img.get_fdata()
     stop_data = stop_img.get_fdata()
-
-    if len(np.unique(seed_data)) > 2:
-        if thresholds_as_percentages:
-            seed_threshold = get_percentile_threshold(
-                seed_data, seed_threshold)
-        seed_data = seed_data > seed_threshold
 
     if thresholds_as_percentages:
         stop_threshold = get_percentile_threshold(
@@ -151,19 +152,21 @@ def gpu_track(data, gtab, seed_img, stop_img, odf_model,
         gtargs["sph_verticies"], gtargs["sph_edges"],
         ngpus=ngpus, rng_seed=0)
 
-    seed_mask = utils.seeds_from_mask(
-        seed_data, density=sampling_density, affine=np.eye(4))
+    seeds = gen_seeds(
+        seed_data, seed_threshold,
+        n_seeds, thresholds_as_percentages,
+        random_seeds, rng_seed, seed_img)
 
     global_chunk_sz = chunk_size * ngpus
-    nchunks = (seed_mask.shape[0] + global_chunk_sz - 1) // global_chunk_sz
+    nchunks = (seeds.shape[0] + global_chunk_sz - 1) // global_chunk_sz
 
     streamlines_ls = [None] * nchunks
-    with tqdm(total=seed_mask.shape[0]) as pbar:
+    with tqdm(total=seeds.shape[0]) as pbar:
         for idx in range(int(nchunks)):
             streamlines_ls[idx] = gpu_tracker.generate_streamlines(
-                seed_mask[idx * global_chunk_sz:(idx + 1) * global_chunk_sz])
+                seeds[idx * global_chunk_sz:(idx + 1) * global_chunk_sz])
             pbar.update(
-                seed_mask[idx * global_chunk_sz:(idx + 1) * global_chunk_sz].shape[0])
+                seeds[idx * global_chunk_sz:(idx + 1) * global_chunk_sz].shape[0])
 
     sft = StatefulTractogram(
         concatenate(streamlines_ls, 0),
