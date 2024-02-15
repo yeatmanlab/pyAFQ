@@ -21,12 +21,10 @@ def reset_progressbars(gallery_conf, fname):
     """
 
     # disable tqdm
-    import AFQ.data.s3bids as afs
     import AFQ._fixes as fixes
     import AFQ.segmentation as seg
     import AFQ.viz.utils as utils
 
-    afs.tqdm = _no_tqdm
     fixes.tqdm = _no_tqdm
     seg.tqdm = _no_tqdm
     utils.tqdm = _no_tqdm

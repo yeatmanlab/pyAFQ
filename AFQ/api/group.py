@@ -6,7 +6,6 @@ from AFQ.definitions.mapping import SynMap
 warnings.simplefilter(action='ignore', category=FutureWarning)  # noqa
 
 import logging
-import AFQ.data.s3bids as afs
 from AFQ.api.participant import ParticipantAFQ
 from AFQ.api.utils import (
     check_attribute, AFQclass_doc,
@@ -957,7 +956,7 @@ def download_and_combine_afq_profiles(bucket,
         deriv_name = True
 
     with nib.tmpdirs.InTemporaryDirectory() as t_dir:
-        remote_study = afs.S3BIDSStudy(
+        remote_study = S3BIDSStudy(
             "get_profiles",
             bucket,
             study_s3_prefix,
