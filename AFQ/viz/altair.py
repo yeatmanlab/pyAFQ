@@ -118,7 +118,9 @@ def altair_df_to_chart(profiles, position_domain=(20, 80),
         "DKI AWF": "",
         "DKI FA": "",
         "DKI MD": " (µm²/ms)",
-        "DKI MK": ""}
+        "DKI MK": "",
+        "DTI FA": "",
+        "DTI MD": " (µm²/ms)"}
 
     if bundle_list is None:
         bundle_list = profiles["Bundle Name"].unique()
