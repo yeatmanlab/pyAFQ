@@ -230,44 +230,28 @@ def default18_bd():
                                    'space': 'template',
                                    'start': templates['pARC_L_start'],
                                    'primary_axis': 2,
-                                   'primary_axis_percentage': 40,
-                                   'mahal': {
-                                       "distance_threshold": 3,
-                                       "length_threshold": 5,
-                                       "clean_rounds": 10}},
+                                   'primary_axis_percentage': 40},
         'Right Posterior Arcuate': {'cross_midline': False,
                                     'include': [templates['SLFt_roi2_R']],
                                     'exclude': [templates['SLF_roi1_R']],
                                     'space': 'template',
                                     'start': templates['pARC_R_start'],
                                     'primary_axis': 2,
-                                    'primary_axis_percentage': 40,
-                                    'mahal': {
-                                        "distance_threshold": 3,
-                                        "length_threshold": 5,
-                                        "clean_rounds": 10}},
+                                    'primary_axis_percentage': 40},
         'Left Vertical Occipital': {'cross_midline': False,
                                     'space': 'template',
                                     'start': templates['VOF_L_start'],
                                     'end': templates['VOF_L_end'],
                                     'inc_addtol': [4, 0],
                                     'primary_axis': 2,
-                                    'primary_axis_percentage': 40,
-                                    'mahal': {
-                                        "distance_threshold": 3,
-                                        "length_threshold": 5,
-                                        "clean_rounds": 10}},
+                                    'primary_axis_percentage': 40},
         'Right Vertical Occipital': {'cross_midline': False,
                                      'space': 'template',
                                      'start': templates['VOF_R_start'],
                                      'end': templates['VOF_R_end'],
                                      'inc_addtol': [4, 0],
                                      'primary_axis': 2,
-                                     'primary_axis_percentage': 40,
-                                     'mahal': {
-                                         "distance_threshold": 3,
-                                         "length_threshold": 5,
-                                         "clean_rounds": 10}}})
+                                     'primary_axis_percentage': 40}})
 
 
 def baby_bd():
