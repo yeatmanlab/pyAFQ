@@ -33,6 +33,11 @@ from AFQ.models.fwdti import _fit as fwdti_fit_model
 from AFQ.models.QBallTP import (
     extract_odf, anisotropic_index, anisotropic_power)
 
+try:
+    import AFQ.data.fastsurfer_integration as afi
+    has_fastsurfer = True
+except ModuleNotFoundError:
+    has_fastsurfer = False
 
 logger = logging.getLogger('AFQ')
 
@@ -954,6 +959,15 @@ def get_bundle_dict(segmentation_params,
             bids_info["subject"],
             bids_info["session"])
     return bundle_dict, reg_template
+
+
+@pimms.calc("hypvinn")
+def hypvinn(t1, device):
+    """
+    full path to a nifti file containing
+    the hypothalamus segmentation
+    """
+    labelled_data, labels = afi.run_hypvinn(t1, device=device)
 
 
 def get_data_plan(kwargs):

@@ -18,6 +18,7 @@ import numpy as np
 import pandas as pd
 import logging
 import time
+import requests
 from tqdm import tqdm
 
 import warnings
@@ -53,7 +54,8 @@ __all__ = ["fetch_callosum_templates", "read_callosum_templates",
            "fetch_stanford_hardi_tractography",
            "read_stanford_hardi_tractography",
            "organize_stanford_data",
-           "fetch_stanford_hardi_lv1"]
+           "fetch_stanford_hardi_lv1",
+           "download_hypvinn"]
 
 
 # Set a user-writeable file-system location to put files:
@@ -1831,3 +1833,34 @@ def fetch_hbn_afq(subjects, path=None):
                            "GeneratedBy": [{'Name': 'afq'}]})
 
     return data_files, op.join(my_path, "HBN")
+
+
+def download_hypvinn():
+    HYPVINN_URL = "https://b2share.fz-juelich.de/api/files/7133b542-733b-4cc6-a284-5c333ff25f78"  # noqa
+    HYPVINN_CFG_URL = "https://raw.githubusercontent.com/santiestrada32/FastSurfer/dev/HypVINN/config/"  # noqa
+    planes = ["axial", "coronal", "sagittal"]
+
+    os.makedirs(op.join(afq_home, "fs_checkpoints"), exist_ok=True)
+    ckpt_paths = {}
+    for plane in planes:
+        ckpt_paths[plane] = op.join(
+            afq_home,
+            f"fs_checkpoints/HypVINN_{plane}_v1.0.0.pkl")
+        if not op.exists(ckpt_paths[plane]):
+            response = requests.get(
+                f"{HYPVINN_URL}/HypVINN_{plane}_v1.0.0.pkl",
+                verify=True)
+            with open(ckpt_paths[plane], "wb") as f:
+                f.write(response.content)
+    cfg_paths = {}
+    for plane in planes:
+        cfg_paths[plane] = op.join(
+            afq_home,
+            f"fs_checkpoints/HypVINN_{plane}_v1.0.0.yaml")
+        if not op.exists(cfg_paths[plane]):
+            response = requests.get(
+                f"{HYPVINN_CFG_URL}/HypVINN_{plane}_v1.0.0.yaml",
+                verify=True)
+            with open(cfg_paths[plane], "wb") as f:
+                f.write(response.content)
+    return ckpt_paths, cfg_paths
