@@ -629,14 +629,17 @@ def test_AFQ_pft():
         "Forceps Minor"]
 
     f_pve_csf, f_pve_gm, f_pve_wm = get_fnames('stanford_pve_maps')
-    os.rename(f_pve_wm, op.join(sub_path, "sub-01_ses-01_WMprobseg.nii.gz"))
-    os.rename(f_pve_gm, op.join(sub_path, "sub-01_ses-01_GMprobseg.nii.gz"))
-    os.rename(f_pve_csf, op.join(sub_path, "sub-01_ses-01_CSFprobseg.nii.gz"))
+    os.rename(f_pve_wm, op.join(sub_path,
+                                "sub-01_ses-01_label-WM_probseg.nii.gz"))
+    os.rename(f_pve_gm, op.join(sub_path,
+                                "sub-01_ses-01_label-GM_probseg.nii.gz"))
+    os.rename(f_pve_csf, op.join(sub_path,
+                                 "sub-01_ses-01_label-CSF_probseg.nii.gz"))
 
     stop_mask = PFTImage(
-        ImageFile(suffix="WMprobseg"),
-        ImageFile(suffix="GMprobseg"),
-        ImageFile(suffix="CSFprobseg"))
+        ImageFile(suffix="probseg", filters={"label": "WM"}),
+        ImageFile(suffix="probseg", filters={"label": "GM"}),
+        ImageFile(suffix="probseg", filters={"label": "CSF"}))
     t_output_dir = tempfile.TemporaryDirectory()
 
     myafq = GroupAFQ(
