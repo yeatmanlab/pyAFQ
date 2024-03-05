@@ -11,7 +11,8 @@ import pimms
 from dipy.align import resample
 
 from AFQ.tasks.utils import (
-    get_fname, with_name, str_to_desc, as_file, get_default_args)
+    get_fname, with_name, str_to_desc, get_default_args)
+from AFQ.tasks.decorators import as_file
 import AFQ.utils.volume as auv
 from AFQ.viz.utils import Viz
 import AFQ.utils.streamlines as aus

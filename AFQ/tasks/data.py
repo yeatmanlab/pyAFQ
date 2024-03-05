@@ -13,6 +13,7 @@ import dipy.reconst.fwdti as dpy_fwdti
 from dipy.reconst.gqi import GeneralizedQSamplingModel
 from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
+from dipy.align import resample
 
 from AFQ.tasks.decorators import as_file, as_img, as_fit_deriv
 from AFQ.tasks.utils import get_fname, with_name, str_to_desc
@@ -963,8 +964,7 @@ def get_bundle_dict(segmentation_params,
 
 @pimms.calc("hypvinn_seg")
 @as_file(suffix='_desc-hypvinnseg_mask.nii.gz')
-@as_img
-def hypvinn(t1=None, device="cpu"):
+def hypvinn(dwi, t1, device="cpu"):
     """
     full path to a nifti file containing
     the hypothalamus segmentation
@@ -973,15 +973,17 @@ def hypvinn(t1=None, device="cpu"):
     t1 : instance from `AFQ.definitions.image`
         The T1 image to be used for the segmentation.
         Required if hypvinn is to be run.
-        Default: None
     device : str, optional
         The device to use for the neural network segmentation.
         Default: "cpu"
     """
-    if t1 is None:
-        raise ValueError("t1 must be provided to run hypvinn")
     labelled_data, labels = afi.run_hypvinn(t1, device=device)
-    return labelled_data, {**labels, "t1": t1}
+    labelled_img = resample(
+        labelled_data,
+        dwi.get_fdata(),
+        nib.load(t1).affine,
+        dwi.affine)
+    return labelled_img, {**labels, "t1": t1}
 
 
 def get_data_plan(kwargs):
@@ -1039,5 +1041,21 @@ def get_data_plan(kwargs):
             as_file((
                 f'_desc-{str_to_desc(bm_def.get_name())}'
                 '_dwi.nii.gz'))(bm_def.get_image_getter("data")))
+
+    t1_def = kwargs.get("t1", None)
+    if t1_def is not None:
+        if not isinstance(t1_def, Definition):
+            raise TypeError(
+                "t1 must be a Definition")
+        t1_def.find_path(
+            kwargs["bids_info"]["bids_layout"],
+            kwargs["dwi_path"],
+            kwargs["bids_info"]["subject"],
+            kwargs["bids_info"]["session"])
+        del kwargs["t1"]
+        data_tasks["t1_res"] = pimms.calc("t1")(
+            as_file((
+                f'_desc-{str_to_desc(t1_def.get_name())}'
+                '_T1w.nii.gz'))(t1_def.get_image_getter("data")))
 
     return pimms.plan(**data_tasks)

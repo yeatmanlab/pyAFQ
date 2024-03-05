@@ -52,6 +52,7 @@ def skeleton_from_roi(roi, affine, orientation_axis, jump_threshold=3):
         Default: 3.
     """
     # First, skeletonize the ROI
+    print(np.sum(roi))
     skeleton = skeletonize_3d(roi)
     skel_pts = np.asarray(np.where(skeleton)).T
 
