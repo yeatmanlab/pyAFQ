@@ -980,7 +980,7 @@ def hypvinn(dwi, t1, device="cpu"):
     labelled_data, labels = afi.run_hypvinn(t1, device=device)
     labelled_img = resample(
         labelled_data,
-        dwi.get_fdata(),
+        dwi.get_fdata()[..., 0],
         nib.load(t1).affine,
         dwi.affine)
     return labelled_img, {**labels, "t1": t1}

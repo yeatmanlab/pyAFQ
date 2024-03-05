@@ -255,6 +255,19 @@ def viz_bundles(base_fname,
         inline=False,
         figure=figure)
 
+    if "nn_bundle_dict" in data_imap and\
+            data_imap["nn_bundle_dict"] is not None:
+        hypvinn_seg = nib.load(data_imap["hypvinn_seg"])
+        for bundle_name, bundle_info in data_imap["nn_bundle_dict"].items():
+            roi = hypvinn_seg.get_fdata() == bundle_info["label"]
+            figure = viz_backend.visualize_roi(
+                roi,
+                name=bundle_name,
+                flip_axes=flip_axes,
+                inline=False,
+                interact=False,
+                figure=figure)
+
     fname = None
     if "no_gif" not in viz_backend.backend:
         fname = get_fname(
