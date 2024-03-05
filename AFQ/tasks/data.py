@@ -34,7 +34,7 @@ from AFQ.models.QBallTP import (
     extract_odf, anisotropic_index, anisotropic_power)
 
 try:
-    import AFQ.data.fastsurfer_integration as afi
+    import AFQ.nn.fastsurfer_integration as afi
     has_fastsurfer = True
 except ModuleNotFoundError:
     has_fastsurfer = False
@@ -961,13 +961,27 @@ def get_bundle_dict(segmentation_params,
     return bundle_dict, reg_template
 
 
-@pimms.calc("hypvinn")
-def hypvinn(t1, device):
+@pimms.calc("hypvinn_seg")
+@as_file(suffix='_desc-hypvinnseg_mask.nii.gz')
+@as_img
+def hypvinn(t1=None, device="cpu"):
     """
     full path to a nifti file containing
     the hypothalamus segmentation
+    Parameters
+    ----------
+    t1 : instance from `AFQ.definitions.image`
+        The T1 image to be used for the segmentation.
+        Required if hypvinn is to be run.
+        Default: None
+    device : str, optional
+        The device to use for the neural network segmentation.
+        Default: "cpu"
     """
+    if t1 is None:
+        raise ValueError("t1 must be provided to run hypvinn")
     labelled_data, labels = afi.run_hypvinn(t1, device=device)
+    return labelled_data, {**labels, "t1": t1}
 
 
 def get_data_plan(kwargs):
@@ -989,7 +1003,7 @@ def get_data_plan(kwargs):
         dki_md, dki_awf, dki_mk, dki_kfa, dti_ga, dti_rd, dti_ad,
         dki_ga, dki_rd,
         dki_ad, dki_rk, dki_ak, dti_params, dki_params, fwdti_params,
-        csd_params, get_bundle_dict])
+        csd_params, get_bundle_dict, hypvinn])
 
     if "scalars" not in kwargs:
         bvals, _ = read_bvals_bvecs(kwargs["bval"], kwargs["bvec"])

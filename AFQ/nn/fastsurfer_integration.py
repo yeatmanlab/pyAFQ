@@ -1,13 +1,22 @@
+import sys
 import tempfile
 import os.path as op
 import argparse
 import logging
-
 from AFQ.data.fetch import download_hypvinn
-from HypVINN.run_prediction import (
-    get_prediction, load_volumes, set_up_cfgs)
-from HypVINN.inference import Inference
-from HypVINN.config.hypvinn_global_var.py import HYPVINN_CLASS_NAMES
+
+current_script_dir = op.dirname(op.abspath(__file__))
+fastsurfer_path = op.join(current_script_dir, "FastSurfer")
+if fastsurfer_path not in sys.path:
+    sys.path.append(fastsurfer_path)
+
+try:
+    from HypVINN.run_prediction import (
+        get_prediction, load_volumes, set_up_cfgs)
+    from HypVINN.inference import Inference
+    from HypVINN.config.hypvinn_global_var import HYPVINN_CLASS_NAMES
+except TypeError:
+    raise ValueError("FastSurfer requires python 3.10 or higher")
 
 
 logger = logging.getLogger('AFQ')

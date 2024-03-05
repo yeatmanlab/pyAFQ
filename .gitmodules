@@ -1,0 +1,3 @@
+[submodule "AFQ/nn/FastSurfer"]
+	path = AFQ/nn/FastSurfer
+	url = https://github.com/santiestrada32/FastSurfer.git

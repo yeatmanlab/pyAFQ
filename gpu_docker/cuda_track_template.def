@@ -8,7 +8,6 @@ From: nvidia/cuda:12.0.1-devel-ubuntu20.04
     export DEBIAN_FRONTEND=noninteractive
     export PATH=/opt/anaconda/bin:${PATH}
     export LD_LIBRARY_PATH=/opt/anaconda/lib:${LD_LIBRARY_PATH}
-    export PYTHONPATH="${PYTHONPATH}:FastSurfer"
 
 %post
     ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime
@@ -37,10 +36,6 @@ From: nvidia/cuda:12.0.1-devel-ubuntu20.04
     bash /tmp/Anaconda3-2022.10-Linux-x86_64.sh -b -p /opt/anaconda
     rm -rf /tmp/Anaconda3-2022.10-Linux-x86_64.sh
     cd /opt && eval "$(/opt/anaconda/bin/conda shell.bash hook)"
-
-    # Install Fastsurfer (TODO: in the future, use primary fork)
-    git clone https://github.com/santiestrada32/FastSurfer/
-    conda env update --file FastSurfer/env/fastsurfer.yml
 
     # Python prerequisites
     pip install numpy scipy cython nibabel dipy tqdm fslpy
