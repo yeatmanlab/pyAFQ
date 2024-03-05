@@ -612,7 +612,7 @@ def test_AFQ_reco80():
     npt.assert_(len(seg_sft.get_bundle('CCMid').streamlines) > 0)
 
 
-# @pytest.mark.nightly_pft
+@pytest.mark.nightly_pft
 def test_AFQ_pft():
     """
     Test pft interface for AFQ
