@@ -24,6 +24,7 @@ from AFQ._fixes import gwi_odf
 
 from AFQ.definitions.utils import Definition
 from AFQ.definitions.image import B0Image
+from AFQ.definitions.utils import find_file
 
 from AFQ.models.dti import noise_from_b0
 from AFQ.models.csd import _fit as csd_fit_model
@@ -964,25 +965,45 @@ def get_bundle_dict(segmentation_params,
 
 @pimms.calc("hypvinn_seg")
 @as_file(suffix='_desc-hypvinnseg_mask.nii.gz')
-def hypvinn(dwi, t1, device="cpu"):
+def hypvinn(dwi_path, bids_info, t1=None, device="cpu"):
     """
     full path to a nifti file containing
     the hypothalamus segmentation
     Parameters
     ----------
-    t1 : instance from `AFQ.definitions.image`
+    t1 : str or dictionary
         The T1 image to be used for the segmentation.
+        If string, the full path to the T1 image.
+        If dictionary, the dictionary should contain BIDS
+        filters to find the T1 image.
         Required if hypvinn is to be run.
     device : str, optional
         The device to use for the neural network segmentation.
         Default: "cpu"
     """
-    labelled_data, labels = afi.run_hypvinn(t1, device=device)
-    labelled_img = resample(
-        labelled_data,
-        dwi.get_fdata()[..., 0],
-        nib.load(t1).affine,
-        dwi.affine)
+    if t1 is None:
+        raise ValueError(
+            "t1 must be provided to run hypvinn")
+    if isinstance(t1, dict):
+        t1 = find_file(
+            bids_info["bids_layout"],
+            dwi_path,
+            t1,
+            t1.get("suffix", "T1w"),
+            bids_info["session"],
+            bids_info["subject"],
+            required=True)
+    if not isinstance(t1, str):
+        raise TypeError(
+            "t1 must be a dict or string")
+
+    labelled_data, labels, affine = afi.run_hypvinn(t1, device=device)
+    labelled_img = nib.Nifti1Image(labelled_data.astype(np.int32), affine)
+    # labelled_img = resample(
+    #     labelled_data,
+    #     dwi.get_fdata()[..., 0],
+    #     nib.load(t1).affine,
+    #     dwi.affine)
     return labelled_img, {**labels, "t1": t1}
 
 
@@ -1041,21 +1062,5 @@ def get_data_plan(kwargs):
             as_file((
                 f'_desc-{str_to_desc(bm_def.get_name())}'
                 '_dwi.nii.gz'))(bm_def.get_image_getter("data")))
-
-    t1_def = kwargs.get("t1", None)
-    if t1_def is not None:
-        if not isinstance(t1_def, Definition):
-            raise TypeError(
-                "t1 must be a Definition")
-        t1_def.find_path(
-            kwargs["bids_info"]["bids_layout"],
-            kwargs["dwi_path"],
-            kwargs["bids_info"]["subject"],
-            kwargs["bids_info"]["session"])
-        del kwargs["t1"]
-        data_tasks["t1_res"] = pimms.calc("t1")(
-            as_file((
-                f'_desc-{str_to_desc(t1_def.get_name())}'
-                '_T1w.nii.gz'))(t1_def.get_image_getter("data")))
 
     return pimms.plan(**data_tasks)

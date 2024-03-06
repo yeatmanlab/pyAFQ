@@ -1,6 +1,7 @@
-from skimage.morphology import skeletonize_3d
+from skimage.morphology import skeletonize_3d, binary_dilation
 import numpy as np
 import nibabel as nib
+from dipy.align import resample
 
 
 def _find_longest_true_series_indices(input_list):
@@ -19,18 +20,30 @@ def _find_longest_true_series_indices(input_list):
             if current_length > max_length:
                 max_length = current_length
                 max_start_index = start_index
-                max_end_index = i - 1
+                max_end_index = i
             current_length = 0
 
     if current_length > max_length:
         max_length = current_length
         max_start_index = start_index
-        max_end_index = len(input_list) - 1
+        max_end_index = len(input_list)
 
-    if max_length > 0:
-        return max_start_index, max_end_index
-    else:
-        return 0, -1
+    return max_start_index, max_end_index + 1
+
+
+def roi_from_segmentation(seg, label, dwi):
+    """
+    Resample a region of interest (ROI) from a
+    segmentation to the space of a diffusion-weighted
+    image (DWI).
+    """
+    roi = seg.get_fdata() == label
+    resampled_roi = resample(
+        binary_dilation(roi),
+        dwi.get_fdata()[..., 0],
+        seg.affine,
+        dwi.affine).get_fdata() > 0
+    return resampled_roi
 
 
 def skeleton_from_roi(roi, affine, orientation_axis, jump_threshold=3):
@@ -52,9 +65,13 @@ def skeleton_from_roi(roi, affine, orientation_axis, jump_threshold=3):
         Default: 3.
     """
     # First, skeletonize the ROI
-    print(np.sum(roi))
     skeleton = skeletonize_3d(roi)
+    if np.sum(skeleton) == 0:
+        skeleton = roi
     skel_pts = np.asarray(np.where(skeleton)).T
+
+    if len(skel_pts) == 0:
+        return skel_pts
 
     # Then, remove any jumps in the skeleton
     # that are less than the jump_threshold
@@ -116,7 +133,7 @@ def profile_roi(
     tract_profile = np.full(pts_len, -np.inf)
     for nodeid in range(pts_len):
         min_idx = max(0, nodeid - 1)
-        max_idx = min(pts_len, nodeid + 1)
+        max_idx = min(pts_len - 1, nodeid + 1)
         n_vec = skel_pts[min_idx] - skel_pts[max_idx]
         n_vec = n_vec / np.linalg.norm(n_vec)
         c_pt = skel_pts[nodeid]

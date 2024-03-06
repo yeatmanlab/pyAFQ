@@ -81,7 +81,8 @@ bundles = abd.OR_bd()
 # the results of fastsurfer's segmentations to define the optic tract
 # and nerve.
 # Here, label encodes the segmentation label for the bundle produced by
-# the nework. Look at FastSurfer's documentation for more information.
+# the nework. Look at FastSurfer's documentation for more information:
+# https://github.com/santiestrada32/FastSurfer/blob/6c373a275e3b090ed8e0dc6ff39178816e967a44/HypVINN/config/hypvinn_global_var.py#L16  # noqa
 # The network is the name of the network used to segment the bundle.
 # For now, only "hypvinn" is supported.
 # The orient is the orientation of the bundle. "P" means that the bundle
@@ -133,13 +134,10 @@ brain_mask_definition = ImageFile(
     filters={'desc': 'brain',
              'scope': 'qsiprep'})
 
-# Note that it is important to set resample to False
-# when defining the t1 Image for use with FastSurfer
-t1 = ImageFile(
+t1 = dict(
     suffix="T1w",
-    filters={'desc': 'preproc',
-             'scope': 'qsiprep'},
-    resample=False)
+    desc='preproc',
+    scope='qsiprep')
 
 my_afq = GroupAFQ(
     bids_path=study_dir,
@@ -224,12 +222,12 @@ plotly.io.show(bundle_html["NDARAA948VFH"])
 #     FastSurfer - A fast and accurate deep learning based neuroimaging
 #     pipeline, NeuroImage 219 (2020), 117012.
 #     https://doi.org/10.1016/j.neuroimage.2020.117012
-# 
+#
 # .. [7] Henschel L*, Kuegler D*, Reuter M. (*co-first). FastSurferVINN:
 #     Building Resolution-Independence into Deep Learning Segmentation Methods
 #     - A Solution for HighRes Brain MRI. NeuroImage 251 (2022), 118933.
 #     http://dx.doi.org/10.1016/j.neuroimage.2022.118933
-# 
+#
 # .. [8] Faber J*, Kuegler D*, Bahrami E*, et al. (*co-first). CerebNet:
 #     A fast and reliable deep-learning pipeline for detailed cerebellum
 #     sub-segmentation. NeuroImage 264 (2022), 119703.

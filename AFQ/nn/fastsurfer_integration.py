@@ -52,7 +52,7 @@ def run_hypvinn(t1, device="cpu"):
     cfg_cor = set_up_cfgs(args.cfg_cor, args)
     view_ops["coronal"] = {"cfg": cfg_cor, "ckpt": args.ckpt_cor}
 
-    modalities, _, _, orig_zoom, orig_size = load_volumes(
+    modalities, affine, _, orig_zoom, orig_size = load_volumes(
         mode=args.mode, t1_path=args.t1, t2_path=args.t2)
 
     model = Inference(cfg=cfg_cor, args=args)
@@ -62,4 +62,4 @@ def run_hypvinn(t1, device="cpu"):
         view_opts=view_ops, out_scale=None, mode=args.mode,
         logger=logger)
 
-    return pred_classes, HYPVINN_CLASS_NAMES
+    return pred_classes, HYPVINN_CLASS_NAMES, affine

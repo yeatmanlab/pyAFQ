@@ -8,8 +8,6 @@ import pandas as pd
 
 import pimms
 
-from dipy.align import resample
-
 from AFQ.tasks.utils import (
     get_fname, with_name, str_to_desc, get_default_args)
 from AFQ.tasks.decorators import as_file
@@ -23,6 +21,8 @@ from plotly.subplots import make_subplots
 
 from dipy.stats.analysis import afq_profile, gaussian_weights
 from dipy.tracking.streamline import set_number_of_points, values_from_volume
+from dipy.align import resample
+
 
 logger = logging.getLogger('AFQ')
 
@@ -151,18 +151,25 @@ def tract_profiles(segmentation_imap,
         hypvinn_seg = nib.load(data_imap["hypvinn_seg"])
         meta["seg_source"] = data_imap["hypvinn_seg"]
         for bundle_name, bundle_info in nn_bundle_dict.items():
-            roi = hypvinn_seg.get_fdata() == bundle_info["label"]
+            roi = anp.roi_from_segmentation(
+                hypvinn_seg,
+                bundle_info["label"],
+                data_imap["dwi"])
             skel_pts = anp.skeleton_from_roi(
                 roi,
-                hypvinn_seg.affine,
+                data_imap["dwi"].affine,
                 bundle_info["orientation_axis"])
-            for ii, sc_data in enumerate(scalar_data.values()):
-                if isinstance(sc_data, str):
-                    sc_data = nib.load(sc_data)
-                profiles[ii].extend(list(anp.profile_roi(
-                    roi, skel_pts, sc_data)))
-            bundle_names.extend([bundle_name] * len(nodes))
-            node_numbers.extend(nodes)
+            if len(skel_pts) == 0:
+                logger.warning(f"{bundle_name} not found")
+            else:
+                for ii, sc_data in enumerate(scalar_dict.values()):
+                    if isinstance(sc_data, str):
+                        sc_data = nib.load(sc_data)
+                    sc_data = sc_data.get_fdata()
+                    profiles[ii].extend(list(anp.profile_roi(
+                        roi, skel_pts, sc_data)))
+                bundle_names.extend([bundle_name] * len(nodes))
+                node_numbers.extend(nodes)
 
     profile_dict = dict()
     profile_dict["tractID"] = bundle_names
@@ -259,7 +266,10 @@ def viz_bundles(base_fname,
             data_imap["nn_bundle_dict"] is not None:
         hypvinn_seg = nib.load(data_imap["hypvinn_seg"])
         for bundle_name, bundle_info in data_imap["nn_bundle_dict"].items():
-            roi = hypvinn_seg.get_fdata() == bundle_info["label"]
+            roi = anp.roi_from_segmentation(
+                hypvinn_seg,
+                bundle_info["label"],
+                data_imap["dwi"])
             figure = viz_backend.visualize_roi(
                 roi,
                 name=bundle_name,
