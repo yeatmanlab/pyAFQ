@@ -981,6 +981,10 @@ def hypvinn(dwi_path, bids_info, t1=None, device="cpu"):
         The device to use for the neural network segmentation.
         Default: "cpu"
     """
+    if not has_fastsurfer:
+        raise ImportError(
+            "fastsurfer is required to run hypvinn."
+            "Install it with pyAFQ[fastsurfer]")
     if t1 is None:
         raise ValueError(
             "t1 must be provided to run hypvinn")
