@@ -31,7 +31,7 @@ import s3fs
 from time import time
 import nibabel as nib
 from PIL import Image
-from s3bids import S3BIDSStudy
+from s3bids.utils import S3BIDSStudy
 
 from bids.layout import BIDSLayout, BIDSLayoutIndexer
 try:

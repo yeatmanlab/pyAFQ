@@ -44,7 +44,7 @@ def afq_process_subject(subject):
     import s3fs
     # all imports must be at the top of the function
     # cloudknot installs the appropriate packages from pip
-    from s3bids import S3BIDSStudy
+    from s3bids.utils import S3BIDSStudy
     from AFQ.api.group import GroupAFQ
     import AFQ.definitions.image as afm
 
