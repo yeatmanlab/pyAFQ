@@ -7,7 +7,7 @@ import importlib.util
 from AFQ.data.fetch import download_hypvinn
 
 package_dir = op.dirname(importlib.util.find_spec("AFQ").origin)
-fastsurfer_path = op.join(package_dir, "FastSurfer")
+fastsurfer_path = op.join(package_dir, "nn", "FastSurfer")
 if fastsurfer_path not in sys.path:
     sys.path.append(fastsurfer_path)
 

@@ -1,7 +1,7 @@
 from setuptools import setup
 from setuptools.command.install import install
 import string
-import os
+import subprocess
 import os.path as op
 import glob
 from setuptools_scm import get_version
@@ -29,7 +29,8 @@ class InstallpyAFQandFastSurfer(install):
 
     def run(self):
         # Ensure submodules are updated and initialized
-        os.system('git submodule update --init --recursive')
+        subprocess.run(['git', 'submodule', 'update',
+                       '--init', '--recursive'], check=True)
         # Call the original install command
         install.run(self)
 
