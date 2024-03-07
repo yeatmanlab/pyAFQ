@@ -122,7 +122,8 @@ def download_templates():
         read_cp_templates,
         read_or_templates,
         read_ar_templates,
-        download_hypvinn)
+        download_hypvinn,
+        read_mni_template)
 
     read_templates()
     read_pediatric_templates()
@@ -131,6 +132,8 @@ def download_templates():
     read_or_templates()
     read_ar_templates()
     download_hypvinn()
+    read_mni_template(weight="T1w")
+    read_mni_template(weight="T2w")
 
 
 if __name__ == '__main__':

@@ -1,5 +1,7 @@
 from setuptools import setup
+from setuptools.command.install import install
 import string
+import os
 import os.path as op
 import glob
 from setuptools_scm import get_version
@@ -22,11 +24,22 @@ def local_version(version):
         return ""
 
 
+class InstallpyAFQandFastSurfer(install):
+    """Customized setuptools install command which updates git submodules."""
+
+    def run(self):
+        # Ensure submodules are updated and initialized
+        os.system('git submodule update --init --recursive')
+        # Call the original install command
+        install.run(self)
+
+
 opts = dict(
     use_scm_version={"root": ".", "relative_to": __file__,
                      "write_to": op.join("AFQ", "version.py"),
                      "local_scheme": local_version},
-    scripts=[op.join('bin', op.split(f)[-1]) for f in glob.glob('bin/*')])
+    scripts=[op.join('bin', op.split(f)[-1]) for f in glob.glob('bin/*')],
+    cmdclass={'install': InstallpyAFQandFastSurfer},)
 
 
 if __name__ == '__main__':

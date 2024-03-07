@@ -3,10 +3,11 @@ import tempfile
 import os.path as op
 import argparse
 import logging
+import importlib.util
 from AFQ.data.fetch import download_hypvinn
 
-current_script_dir = op.dirname(op.abspath(__file__))
-fastsurfer_path = op.join(current_script_dir, "FastSurfer")
+package_dir = op.dirname(importlib.util.find_spec("AFQ").origin)
+fastsurfer_path = op.join(package_dir, "FastSurfer")
 if fastsurfer_path not in sys.path:
     sys.path.append(fastsurfer_path)
 
