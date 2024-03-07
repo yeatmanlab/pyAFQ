@@ -27,7 +27,7 @@ from dipy.align import resample
 logger = logging.getLogger('AFQ')
 
 
-def _viz_prepare_vol(vol, xform, mapping, scalar_dict):
+def _viz_prepare_vol(vol, scalar_dict):
     if vol in scalar_dict.keys():
         vol = scalar_dict[vol]
         if isinstance(vol, str):
@@ -35,8 +35,6 @@ def _viz_prepare_vol(vol, xform, mapping, scalar_dict):
         vol = vol.get_fdata()
     if isinstance(vol, str):
         vol = nib.load(vol).get_fdata()
-    if xform:
-        vol = mapping.transform_inverse(vol)
     vol[np.isnan(vol)] = 0
     return vol
 
@@ -186,7 +184,6 @@ def tract_profiles(segmentation_imap,
 def viz_bundles(base_fname,
                 viz_backend,
                 data_imap,
-                mapping_imap,
                 segmentation_imap,
                 tracking_params,
                 segmentation_params,
@@ -223,14 +220,13 @@ def viz_bundles(base_fname,
     path to the file.
     Otherwise, returns the figure.
     """
-    mapping = mapping_imap["mapping"]
     scalar_dict = segmentation_imap["scalar_dict"]
     volume = data_imap["masked_b0"]
     shade_by_volume = data_imap[best_scalar]
     start_time = time()
-    volume = _viz_prepare_vol(volume, False, mapping, scalar_dict)
+    volume = _viz_prepare_vol(volume, scalar_dict)
     shade_by_volume = _viz_prepare_vol(
-        shade_by_volume, False, mapping, scalar_dict)
+        shade_by_volume, scalar_dict)
 
     flip_axes = [False, False, False]
     for i in range(3):
@@ -351,9 +347,9 @@ def viz_indivBundle(base_fname,
 
     start_time = time()
     volume = _viz_prepare_vol(
-        volume, False, mapping, scalar_dict)
+        volume, scalar_dict)
     shade_by_volume = _viz_prepare_vol(
-        shade_by_volume, False, mapping, scalar_dict)
+        shade_by_volume, scalar_dict)
 
     flip_axes = [False, False, False]
     for i in range(3):
