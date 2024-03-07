@@ -251,16 +251,17 @@ def viz_bundles(base_fname,
         inline=False,
         figure=figure)
 
-    figure = viz_backend.visualize_bundles(
-        segmentation_imap["bundles"],
-        shade_by_volume=shade_by_volume,
-        sbv_lims=sbv_lims_bundles,
-        include_profiles=(pd.read_csv(profiles), best_scalar),
-        n_points=n_points_bundles,
-        flip_axes=flip_axes,
-        interact=False,
-        inline=False,
-        figure=figure)
+    if len(data_imap["bundle_dict"]) > 0:
+        figure = viz_backend.visualize_bundles(
+            segmentation_imap["bundles"],
+            shade_by_volume=shade_by_volume,
+            sbv_lims=sbv_lims_bundles,
+            include_profiles=(pd.read_csv(profiles), best_scalar),
+            n_points=n_points_bundles,
+            flip_axes=flip_axes,
+            interact=False,
+            inline=False,
+            figure=figure)
 
     if "nn_bundle_dict" in data_imap and\
             data_imap["nn_bundle_dict"] is not None:
