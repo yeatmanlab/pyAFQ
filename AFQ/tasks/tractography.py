@@ -63,7 +63,7 @@ def export_seed_mask(data_imap, tracking_params):
     """
     seed_mask = tracking_params['seed_mask']
     seed_mask_desc = dict(source=tracking_params['seed_mask'])
-    return nib.Nifti1Image(seed_mask, data_imap["dwi_affine"]),\
+    return nib.Nifti1Image(seed_mask, data_imap["dwi_affine"]), \
         seed_mask_desc
 
 
@@ -76,7 +76,7 @@ def export_stop_mask(data_imap, tracking_params):
     """
     stop_mask = tracking_params['stop_mask']
     stop_mask_desc = dict(source=tracking_params['stop_mask'])
-    return nib.Nifti1Image(stop_mask, data_imap["dwi_affine"]),\
+    return nib.Nifti1Image(stop_mask, data_imap["dwi_affine"]), \
         stop_mask_desc
 
 
@@ -208,7 +208,7 @@ def custom_tractography(bids_info, import_tract=None):
 @pimms.calc("streamlines")
 @as_file('_tractography', include_track=True)
 def gpu_tractography(data_imap, tracking_params, seed, stop,
-                     tractography_ngpus=0):
+                     tractography_ngpus=0, chunk_size=100000):
     """
     full path to the complete, unsegmented tractography file
 
@@ -219,6 +219,9 @@ def gpu_tractography(data_imap, tracking_params, seed, stop,
         this algorithm is used for tractography,
         https://github.com/dipy/GPUStreamlines
         Default: 0
+    chunk_size : int, optional
+        Chunk size for GPU tracking.
+        Default: 100000
     """
     start_time = time()
     sft = gpu_track(
@@ -232,7 +235,8 @@ def gpu_tractography(data_imap, tracking_params, seed, stop,
         tracking_params["n_seeds"],
         tracking_params["random_seeds"],
         tracking_params["rng_seed"],
-        tractography_ngpus)
+        tractography_ngpus,
+        chunk_size)
 
     return sft, _meta_from_tracking_params(
         tracking_params, start_time,
