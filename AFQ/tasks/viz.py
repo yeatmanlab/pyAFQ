@@ -8,20 +8,26 @@ import pandas as pd
 
 import pimms
 
-from dipy.align import resample
-
-from AFQ.tasks.utils import get_fname, with_name, str_to_desc
+from AFQ.tasks.utils import (
+    get_fname, with_name, str_to_desc, get_default_args)
+from AFQ.tasks.decorators import as_file
 import AFQ.utils.volume as auv
 from AFQ.viz.utils import Viz
 import AFQ.utils.streamlines as aus
 from AFQ.utils.path import write_json
+import AFQ.nn.profile_roi as anp
 
 from plotly.subplots import make_subplots
+
+from dipy.stats.analysis import afq_profile, gaussian_weights
+from dipy.tracking.streamline import set_number_of_points, values_from_volume
+from dipy.align import resample
+
 
 logger = logging.getLogger('AFQ')
 
 
-def _viz_prepare_vol(vol, xform, mapping, scalar_dict):
+def _viz_prepare_vol(vol, scalar_dict):
     if vol in scalar_dict.keys():
         vol = scalar_dict[vol]
         if isinstance(vol, str):
@@ -29,20 +35,159 @@ def _viz_prepare_vol(vol, xform, mapping, scalar_dict):
         vol = vol.get_fdata()
     if isinstance(vol, str):
         vol = nib.load(vol).get_fdata()
-    if xform:
-        vol = mapping.transform_inverse(vol)
     vol[np.isnan(vol)] = 0
     return vol
+
+
+@pimms.calc("profiles")
+@as_file('_desc-profiles_dwi.csv', include_track=True, include_seg=True)
+def tract_profiles(segmentation_imap,
+                   data_imap,
+                   nn_bundle_dict=None,
+                   profile_weights="gauss",
+                   n_points_profile=100):
+    """
+    full path to a CSV file containing tract profiles
+
+    Parameters
+    ----------
+    nn_bundle_dict : dict, optional
+        Dictionary specify how to use ROIs from HypVINN
+        segmentation. If None, no HypVINN segmentation
+        will be performed.
+        Default: None
+    profile_weights : str, 1D array, 2D array callable, optional
+        How to weight each streamline (1D) or each node (2D)
+        when calculating the tract-profiles. If callable, this is a
+        function that calculates weights. If None, no weighting will
+        be applied. If "gauss", gaussian weights will be used.
+        If "median", the median of values at each node will be used
+        instead of a mean or weighted mean.
+        Default: "gauss"
+    n_points_profile : int, optional
+        Number of points to resample each streamline to before
+        calculating the tract-profiles.
+        Default: 100
+    """
+    if not (profile_weights is None
+            or isinstance(profile_weights, str)
+            or callable(profile_weights)
+            or hasattr(profile_weights, "__len__")):
+        raise TypeError(
+            "profile_weights must be string, None, callable, or"
+            + "a 1D or 2D array")
+    if isinstance(profile_weights, str):
+        profile_weights = profile_weights.lower()
+    if isinstance(profile_weights, str) and\
+            profile_weights != "gauss" and profile_weights != "median":
+        raise TypeError(
+            "if profile_weights is a string,"
+            + " it must be 'gauss' or 'median'")
+
+    scalar_dict = segmentation_imap["scalar_dict"]
+    bundle_names = []
+    node_numbers = []
+    profiles = np.empty((len(scalar_dict), 0)).tolist()
+    this_profile = np.zeros((len(scalar_dict), n_points_profile))
+    reference = nib.load(scalar_dict[list(scalar_dict.keys())[0]])
+    nodes = list(np.arange(n_points_profile))
+    meta = dict(parameters=get_default_args(afq_profile))
+
+    if len(data_imap["bundle_dict"]) > 0:
+        seg_sft = aus.SegmentedSFT.fromfile(
+            segmentation_imap["bundles"],
+            reference=reference)
+        seg_sft.sft.to_rasmm()
+        meta["bundles_source"] = segmentation_imap["bundles"]
+        for bundle_name in seg_sft.bundle_names:
+            this_sl = seg_sft.get_bundle(bundle_name).streamlines
+            if len(this_sl) == 0:
+                continue
+            if profile_weights == "gauss":
+                # calculate only once per bundle
+                bundle_profile_weights = gaussian_weights(
+                    this_sl,
+                    n_points=n_points_profile)
+            for ii, (scalar, scalar_file) in enumerate(scalar_dict.items()):
+                if isinstance(scalar_file, str):
+                    scalar_file = nib.load(scalar_file)
+                scalar_data = scalar_file.get_fdata()
+                if isinstance(profile_weights, str):
+                    if profile_weights == "gauss":
+                        this_prof_weights = bundle_profile_weights
+                    elif profile_weights == "median":
+                        # weights bundle to only return the mean
+                        def _median_weight(bundle):
+                            fgarray = set_number_of_points(
+                                bundle, n_points_profile)
+                            values = np.array(
+                                values_from_volume(
+                                    scalar_data,
+                                    fgarray,
+                                    data_imap["dwi_affine"]))
+                            weights = np.zeros(values.shape)
+                            for ii, jj in enumerate(
+                                np.argsort(values, axis=0)[
+                                    len(values) // 2, :]):
+                                weights[jj, ii] = 1
+                            return weights
+                        this_prof_weights = _median_weight
+                else:
+                    this_prof_weights = profile_weights
+                this_profile[ii] = afq_profile(
+                    scalar_data,
+                    this_sl,
+                    data_imap["dwi_affine"],
+                    weights=this_prof_weights,
+                    n_points=n_points_profile)
+                profiles[ii].extend(list(this_profile[ii]))
+
+            bundle_names.extend([bundle_name] * len(nodes))
+            node_numbers.extend(nodes)
+
+    if nn_bundle_dict is not None:
+        hypvinn_seg = nib.load(data_imap["hypvinn_seg"])
+        meta["seg_source"] = data_imap["hypvinn_seg"]
+        for bundle_name, bundle_info in nn_bundle_dict.items():
+            roi = anp.roi_from_segmentation(
+                hypvinn_seg,
+                bundle_info["label"],
+                data_imap["dwi"])
+            skel_pts = anp.skeleton_from_roi(
+                roi,
+                data_imap["dwi"].affine,
+                bundle_info["orientation_axis"])
+            if len(skel_pts) == 0:
+                logger.warning(f"{bundle_name} not found")
+            else:
+                for ii, sc_data in enumerate(scalar_dict.values()):
+                    if isinstance(sc_data, str):
+                        sc_data = nib.load(sc_data)
+                    sc_data = sc_data.get_fdata()
+                    profiles[ii].extend(list(anp.profile_roi(
+                        roi, skel_pts, sc_data)))
+                bundle_names.extend([bundle_name] * len(nodes))
+                node_numbers.extend(nodes)
+
+    profile_dict = dict()
+    profile_dict["tractID"] = bundle_names
+    profile_dict["nodeID"] = node_numbers
+    for ii, scalar in enumerate(scalar_dict.keys()):
+        profile_dict[scalar] = profiles[ii]
+
+    profile_dframe = pd.DataFrame(profile_dict)
+
+    return profile_dframe, meta
 
 
 @pimms.calc("all_bundles_figure")
 def viz_bundles(base_fname,
                 viz_backend,
                 data_imap,
-                mapping_imap,
                 segmentation_imap,
                 tracking_params,
                 segmentation_params,
+                profiles,
                 best_scalar,
                 sbv_lims_bundles=[None, None],
                 volume_opacity_bundles=0.3,
@@ -75,15 +220,13 @@ def viz_bundles(base_fname,
     path to the file.
     Otherwise, returns the figure.
     """
-    mapping = mapping_imap["mapping"]
     scalar_dict = segmentation_imap["scalar_dict"]
-    profiles_file = segmentation_imap["profiles"]
     volume = data_imap["masked_b0"]
     shade_by_volume = data_imap[best_scalar]
     start_time = time()
-    volume = _viz_prepare_vol(volume, False, mapping, scalar_dict)
+    volume = _viz_prepare_vol(volume, scalar_dict)
     shade_by_volume = _viz_prepare_vol(
-        shade_by_volume, False, mapping, scalar_dict)
+        shade_by_volume, scalar_dict)
 
     flip_axes = [False, False, False]
     for i in range(3):
@@ -104,16 +247,33 @@ def viz_bundles(base_fname,
         inline=False,
         figure=figure)
 
-    figure = viz_backend.visualize_bundles(
-        segmentation_imap["bundles"],
-        shade_by_volume=shade_by_volume,
-        sbv_lims=sbv_lims_bundles,
-        include_profiles=(pd.read_csv(profiles_file), best_scalar),
-        n_points=n_points_bundles,
-        flip_axes=flip_axes,
-        interact=False,
-        inline=False,
-        figure=figure)
+    if len(data_imap["bundle_dict"]) > 0:
+        figure = viz_backend.visualize_bundles(
+            segmentation_imap["bundles"],
+            shade_by_volume=shade_by_volume,
+            sbv_lims=sbv_lims_bundles,
+            include_profiles=(pd.read_csv(profiles), best_scalar),
+            n_points=n_points_bundles,
+            flip_axes=flip_axes,
+            interact=False,
+            inline=False,
+            figure=figure)
+
+    if "nn_bundle_dict" in data_imap and\
+            data_imap["nn_bundle_dict"] is not None:
+        hypvinn_seg = nib.load(data_imap["hypvinn_seg"])
+        for bundle_name, bundle_info in data_imap["nn_bundle_dict"].items():
+            roi = anp.roi_from_segmentation(
+                hypvinn_seg,
+                bundle_info["label"],
+                data_imap["dwi"])
+            figure = viz_backend.visualize_roi(
+                roi,
+                name=bundle_name,
+                flip_axes=flip_axes,
+                inline=False,
+                interact=False,
+                figure=figure)
 
     fname = None
     if "no_gif" not in viz_backend.backend:
@@ -151,6 +311,7 @@ def viz_indivBundle(base_fname,
                     segmentation_imap,
                     tracking_params,
                     segmentation_params,
+                    profiles,
                     best_scalar,
                     sbv_lims_indiv=[None, None],
                     volume_opacity_indiv=0.3,
@@ -182,13 +343,13 @@ def viz_indivBundle(base_fname,
     scalar_dict = segmentation_imap["scalar_dict"]
     volume = data_imap["masked_b0"]
     shade_by_volume = data_imap[best_scalar]
-    profiles = pd.read_csv(segmentation_imap["profiles"])
+    profiles = pd.read_csv(profiles)
 
     start_time = time()
     volume = _viz_prepare_vol(
-        volume, False, mapping, scalar_dict)
+        volume, scalar_dict)
     shade_by_volume = _viz_prepare_vol(
-        shade_by_volume, False, mapping, scalar_dict)
+        shade_by_volume, scalar_dict)
 
     flip_axes = [False, False, False]
     for i in range(3):
@@ -355,7 +516,7 @@ def viz_indivBundle(base_fname,
 
 
 @pimms.calc("tract_profile_plots")
-def plot_tract_profiles(base_fname, scalars, tracking_params,
+def plot_tract_profiles(base_fname, profiles, scalars, tracking_params,
                         segmentation_params, segmentation_imap):
     """
     list of full paths to png files,
@@ -380,7 +541,7 @@ def plot_tract_profiles(base_fname, scalars, tracking_params,
         os.makedirs(op.abspath(tract_profiles_folder), exist_ok=True)
 
         visualize_tract_profiles(
-            segmentation_imap["profiles"],
+            profiles,
             scalar=this_scalar,
             file_name=fname,
             n_boot=100)
@@ -426,5 +587,6 @@ def init_viz_backend(viz_backend_spec="plotly_no_gif",
 
 def get_viz_plan(kwargs):
     viz_tasks = with_name([
-        plot_tract_profiles, viz_bundles, viz_indivBundle, init_viz_backend])
+        plot_tract_profiles, viz_bundles, viz_indivBundle, init_viz_backend,
+        tract_profiles])
     return pimms.plan(**viz_tasks)

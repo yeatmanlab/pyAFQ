@@ -101,6 +101,9 @@ class ImageFile(ImageDefinition):
         Additional filters to pass to bids_layout.get() to identify
         the file.
         Default: {}
+    resample : bool, optional
+        Whether to resample the image to the DWI data.
+        Default: True
 
     Examples
     --------
@@ -111,7 +114,7 @@ class ImageFile(ImageDefinition):
                                 "seed_threshold": 0.1})
     """
 
-    def __init__(self, path=None, suffix=None, filters={}):
+    def __init__(self, path=None, suffix=None, filters={}, resample=True):
         if path is None and suffix is None:
             raise ValueError((
                 "One of `path` or `suffix` must set to "
@@ -125,6 +128,8 @@ class ImageFile(ImageDefinition):
             self.suffix = suffix
             self.filters = filters
             self.fnames = {}
+
+        self.resample = resample
 
     def find_path(self, bids_layout, from_path,
                   subject, session, required=True):
@@ -169,14 +174,17 @@ class ImageFile(ImageDefinition):
                 image_data_orig, image_file)
 
             # Resample to DWI data:
-            image_data = _resample_image(
-                image_data,
-                dwi.get_fdata(),
-                image_affine,
-                dwi.affine)
+            if self.resample:
+                image_data = _resample_image(
+                    image_data,
+                    dwi.get_fdata(),
+                    image_affine,
+                    dwi.affine)
+                image_affine = dwi.affine
+
             return nib.Nifti1Image(
                 image_data.astype(np.float32),
-                dwi.affine), meta
+                image_affine), meta
         if task_name == "data":
             def image_getter(dwi, bids_info):
                 return _image_getter_helper(dwi, bids_info)

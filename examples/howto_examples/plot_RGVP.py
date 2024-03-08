@@ -1,13 +1,19 @@
 """
-===========================================================
-How to add new bundles into pyAFQ(Optic Radiations Example)
-===========================================================
+===============================================================
+How to find the retinogeniculate visual pathway (RGVP) in pyAFQ
+===============================================================
 
 pyAFQ is designed to be customizable and extensible. This example shows how you
 can customize it to define a new bundle based on a definition of waypoint and
 endpoint ROIs of your design.
 
-In this case, we add the optic radiations, based on work by Caffara et al. [1]_,
+In addition, this example showcases pyAFQ's integration with FastSurfer
+(https://github.com/Deep-MI/FastSurfer/) [6]_, [7]_, [8]_,
+a deep learning-based tool for segmenting brain MRI data. FastSurfer is used to
+identify the optic tract and nerve, while the traditional tractography and AFQ
+approach is used to identify the optic radiations.
+
+In this case, the optic radiations are based on work by Caffara et al. [1]_,
 [2]_. The optic radiations (OR) are the primary projection of visual information
 from the lateral geniculate nucleus of the thalamus to the primary visual
 cortex. Studying the optic radiations with dMRI provides a linkage between white
@@ -68,6 +74,43 @@ bundles = abd.OR_bd()
 #
 # In this case, we will skip this and generate just the OR.
 
+#############################################################################
+# Define custom `nn_bundle_dict`
+# ------------------------------
+# The `nn_bundle_dict` object holds information about how to use
+# the results of fastsurfer's segmentations to define the optic tract
+# and nerve.
+# Here, label encodes the segmentation label for the bundle produced by
+# the nework. Look at FastSurfer's documentation for more information:
+# https://github.com/santiestrada32/FastSurfer/blob/6c373a275e3b090ed8e0dc6ff39178816e967a44/HypVINN/config/hypvinn_global_var.py#L16  # noqa
+# The network is the name of the network used to segment the bundle.
+# For now, only "hypvinn" is supported.
+# The orient is the orientation of the bundle. "P" means that the bundle
+# is oriented from anterior to posterior. It can also be "L" or "I".
+
+nn_bundle_dict = {
+    "Left Optic Nerve": {
+        "label": 2,
+        "network": "hypvinn",
+        "orientation_axis": "P",
+    },
+    "Right Optic Nerve": {
+        "label": 1,
+        "network": "hypvinn",
+        "orientation_axis": "P",
+    },
+    "Left Optic Tract": {
+        "label": 5,
+        "network": "hypvinn",
+        "orientation_axis": "P",
+    },
+    "Right Optic Tract": {
+        "label": 4,
+        "network": "hypvinn",
+        "orientation_axis": "P",
+    },
+}
+
 
 #############################################################################
 # Define GroupAFQ object
@@ -89,14 +132,21 @@ bundles = abd.OR_bd()
 brain_mask_definition = ImageFile(
     suffix="mask",
     filters={'desc': 'brain',
-             'space': 'T1w',
              'scope': 'qsiprep'})
+
+t1 = dict(
+    suffix="T1w",
+    desc='preproc',
+    scope='qsiprep')
 
 my_afq = GroupAFQ(
     bids_path=study_dir,
     preproc_pipeline="qsiprep",
+    participant_labels=["NDARAA948VFH"],
     output_dir=op.join(study_dir, "derivatives", "afq_or"),
     brain_mask_definition=brain_mask_definition,
+    nn_bundle_dict=nn_bundle_dict,
+    t1=t1,
     tracking_params={"n_seeds": 4,
                      "directions": "prob",
                      "odf_model": "CSD",
@@ -136,6 +186,14 @@ bundle_html = my_afq.export("indiv_bundles_figures")
 plotly.io.show(bundle_html["NDARAA948VFH"]["Left Optic Radiation"])
 
 #############################################################################
+# Full Interactive bundle visualization
+# -------------------------------------
+# Finally, one can also visualize all of the bundles at once
+
+bundle_html = my_afq.export("all_bundles_figures")
+plotly.io.show(bundle_html["NDARAA948VFH"])
+
+#############################################################################
 # References
 # ----------
 # .. [1] Caffarra S, Joo SJ, Bloom D, Kruper J, Rokem A, Yeatman JD. Development
@@ -159,3 +217,18 @@ plotly.io.show(bundle_html["NDARAA948VFH"]["Left Optic Radiation"])
 # .. [5] Cieslak M, Cook PA, He X, et al. QSIPrep: an integrative platform for
 #     preprocessing and reconstructing diffusion MRI data. Nat Methods.
 #     2021;18(7):775-778.
+#
+# .. [6] Henschel L, Conjeti S, Estrada S, Diers K, Fischl B, Reuter M,
+#     FastSurfer - A fast and accurate deep learning based neuroimaging
+#     pipeline, NeuroImage 219 (2020), 117012.
+#     https://doi.org/10.1016/j.neuroimage.2020.117012
+#
+# .. [7] Henschel L*, Kuegler D*, Reuter M. (*co-first). FastSurferVINN:
+#     Building Resolution-Independence into Deep Learning Segmentation Methods
+#     - A Solution for HighRes Brain MRI. NeuroImage 251 (2022), 118933.
+#     http://dx.doi.org/10.1016/j.neuroimage.2022.118933
+#
+# .. [8] Faber J*, Kuegler D*, Bahrami E*, et al. (*co-first). CerebNet:
+#     A fast and reliable deep-learning pipeline for detailed cerebellum
+#     sub-segmentation. NeuroImage 264 (2022), 119703.
+#     https://doi.org/10.1016/j.neuroimage.2022.119703

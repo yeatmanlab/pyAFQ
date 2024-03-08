@@ -8,12 +8,12 @@ import logging
 
 import pimms
 
-from AFQ.tasks.decorators import as_file, as_img
-from AFQ.tasks.utils import get_fname, with_name, str_to_desc
+from AFQ.tasks.decorators import as_file
+from AFQ.tasks.utils import (
+    get_fname, with_name, str_to_desc, get_default_args)
 import AFQ.segmentation as seg
 from AFQ.utils.path import drop_extension, write_json
 import AFQ.utils.streamlines as aus
-from AFQ.tasks.utils import get_default_args
 import AFQ.utils.volume as auv
 
 try:
@@ -25,9 +25,7 @@ except ModuleNotFoundError:
     has_trx = False
 
 from dipy.io.streamline import load_tractogram, save_tractogram
-from dipy.io.stateful_tractogram import Space, StatefulTractogram
-from dipy.stats.analysis import afq_profile, gaussian_weights
-from dipy.tracking.streamline import set_number_of_points, values_from_volume
+from dipy.io.stateful_tractogram import Space
 
 
 logger = logging.getLogger('AFQ')
@@ -228,114 +226,6 @@ def export_density_maps(bundles, data_imap):
             source=bundles, bundles=list(seg_sft.bundle_names))
 
 
-@pimms.calc("profiles")
-@as_file('_desc-profiles_dwi.csv', include_track=True, include_seg=True)
-def tract_profiles(bundles,
-                   scalar_dict, data_imap,
-                   profile_weights="gauss",
-                   n_points_profile=100):
-    """
-    full path to a CSV file containing tract profiles
-
-    Parameters
-    ----------
-    profile_weights : str, 1D array, 2D array callable, optional
-        How to weight each streamline (1D) or each node (2D)
-        when calculating the tract-profiles. If callable, this is a
-        function that calculates weights. If None, no weighting will
-        be applied. If "gauss", gaussian weights will be used.
-        If "median", the median of values at each node will be used
-        instead of a mean or weighted mean.
-        Default: "gauss"
-    n_points_profile : int, optional
-        Number of points to resample each streamline to before
-        calculating the tract-profiles.
-        Default: 100
-    """
-    if not (profile_weights is None
-            or isinstance(profile_weights, str)
-            or callable(profile_weights)
-            or hasattr(profile_weights, "__len__")):
-        raise TypeError(
-            "profile_weights must be string, None, callable, or"
-            + "a 1D or 2D array")
-    if isinstance(profile_weights, str):
-        profile_weights = profile_weights.lower()
-    if isinstance(profile_weights, str) and\
-            profile_weights != "gauss" and profile_weights != "median":
-        raise TypeError(
-            "if profile_weights is a string,"
-            + " it must be 'gauss' or 'median'")
-
-    bundle_names = []
-    node_numbers = []
-    profiles = np.empty((len(scalar_dict), 0)).tolist()
-    this_profile = np.zeros((len(scalar_dict), n_points_profile))
-    reference = nib.load(scalar_dict[list(scalar_dict.keys())[0]])
-    seg_sft = aus.SegmentedSFT.fromfile(
-        bundles,
-        reference=reference)
-
-    seg_sft.sft.to_rasmm()
-    for bundle_name in seg_sft.bundle_names:
-        this_sl = seg_sft.get_bundle(bundle_name).streamlines
-        if len(this_sl) == 0:
-            continue
-        if profile_weights == "gauss":
-            # calculate only once per bundle
-            bundle_profile_weights = gaussian_weights(
-                this_sl,
-                n_points=n_points_profile)
-        for ii, (scalar, scalar_file) in enumerate(scalar_dict.items()):
-            if isinstance(scalar_file, str):
-                scalar_file = nib.load(scalar_file)
-            scalar_data = scalar_file.get_fdata()
-            if isinstance(profile_weights, str):
-                if profile_weights == "gauss":
-                    this_prof_weights = bundle_profile_weights
-                elif profile_weights == "median":
-                    # weights bundle to only return the mean
-                    def _median_weight(bundle):
-                        fgarray = set_number_of_points(
-                            bundle, n_points_profile)
-                        values = np.array(
-                            values_from_volume(
-                                scalar_data,
-                                fgarray,
-                                data_imap["dwi_affine"]))
-                        weights = np.zeros(values.shape)
-                        for ii, jj in enumerate(
-                            np.argsort(values, axis=0)[
-                                len(values) // 2, :]):
-                            weights[jj, ii] = 1
-                        return weights
-                    this_prof_weights = _median_weight
-            else:
-                this_prof_weights = profile_weights
-            this_profile[ii] = afq_profile(
-                scalar_data,
-                this_sl,
-                data_imap["dwi_affine"],
-                weights=this_prof_weights,
-                n_points=n_points_profile)
-            profiles[ii].extend(list(this_profile[ii]))
-        nodes = list(np.arange(this_profile[0].shape[0]))
-        bundle_names.extend([bundle_name] * len(nodes))
-        node_numbers.extend(nodes)
-
-    profile_dict = dict()
-    profile_dict["tractID"] = bundle_names
-    profile_dict["nodeID"] = node_numbers
-    for ii, scalar in enumerate(scalar_dict.keys()):
-        profile_dict[scalar] = profiles[ii]
-
-    profile_dframe = pd.DataFrame(profile_dict)
-    meta = dict(source=bundles,
-                parameters=get_default_args(afq_profile))
-
-    return profile_dframe, meta
-
-
 @pimms.calc("scalar_dict")
 def get_scalar_dict(data_imap, mapping_imap, scalars=["dti_fa", "dti_md"]):
     """
@@ -373,8 +263,7 @@ def get_segmentation_plan(kwargs):
         export_bundle_lengths,
         export_bundles,
         export_density_maps,
-        segment,
-        tract_profiles])
+        segment])
 
     default_seg_params = get_default_args(seg.Segmentation.__init__)
     if "segmentation_params" in kwargs:

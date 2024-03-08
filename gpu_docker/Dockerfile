@@ -18,12 +18,17 @@ RUN apt-add-repository "deb https://apt.kitware.com/ubuntu/ focal main"
 RUN apt install -y cmake libncurses5-dev libtinfo6
 
 # Anaconda
-RUN wget -P /tmp https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh
-RUN bash /tmp/Anaconda3-2022.10-Linux-x86_64.sh -b -p /opt/anaconda
-RUN rm -rf /tmp/Anaconda3-2022.10-Linux-x86_64.sh
+RUN wget -P /tmp https://repo.anaconda.com/archive/Anaconda3-2024.02-1-Linux-x86_64.sh
+RUN bash /tmp/Anaconda3-2024.02-1-Linux-x86_64.sh -b -p /opt/anaconda
+RUN rm -rf /tmp/Anaconda3-2024.02-1-Linux-x86_64.sh
 RUN cd /opt && eval "$(/opt/anaconda/bin/conda shell.bash hook)"
 ENV PATH /opt/anaconda/bin:${PATH}
 ENV LD_LIBRARY_PATH /opt/anaconda/lib:${LD_LIBRARY_PATH}
+
+# Install Fastsurfer
+RUN conda install -y -c anaconda git
+RUN git clone https://github.com/santiestrada32/FastSurfer.git /opt/FastSurfer
+ENV PYTHONPATH="${PYTHONPATH}:/opt/FastSurfer"
 
 # python prereqs
 RUN pip install numpy scipy cython nibabel dipy tqdm fslpy

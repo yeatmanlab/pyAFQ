@@ -13,6 +13,7 @@ import dipy.reconst.fwdti as dpy_fwdti
 from dipy.reconst.gqi import GeneralizedQSamplingModel
 from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
+from dipy.align import resample
 
 from AFQ.tasks.decorators import as_file, as_img, as_fit_deriv
 from AFQ.tasks.utils import get_fname, with_name, str_to_desc
@@ -23,6 +24,7 @@ from AFQ._fixes import gwi_odf
 
 from AFQ.definitions.utils import Definition
 from AFQ.definitions.image import B0Image
+from AFQ.definitions.utils import find_file
 
 from AFQ.models.dti import noise_from_b0
 from AFQ.models.csd import _fit as csd_fit_model
@@ -33,6 +35,11 @@ from AFQ.models.fwdti import _fit as fwdti_fit_model
 from AFQ.models.QBallTP import (
     extract_odf, anisotropic_index, anisotropic_power)
 
+try:
+    import AFQ.nn.fastsurfer_integration as afi
+    has_fastsurfer = True
+except ModuleNotFoundError:
+    has_fastsurfer = False
 
 logger = logging.getLogger('AFQ')
 
@@ -956,6 +963,54 @@ def get_bundle_dict(segmentation_params,
     return bundle_dict, reg_template
 
 
+@pimms.calc("hypvinn_seg")
+@as_file(suffix='_desc-hypvinnseg_mask.nii.gz')
+def hypvinn(dwi_path, bids_info, t1=None, device="cpu"):
+    """
+    full path to a nifti file containing
+    the hypothalamus segmentation
+    Parameters
+    ----------
+    t1 : str or dictionary
+        The T1 image to be used for the segmentation.
+        If string, the full path to the T1 image.
+        If dictionary, the dictionary should contain BIDS
+        filters to find the T1 image.
+        Required if hypvinn is to be run.
+    device : str, optional
+        The device to use for the neural network segmentation.
+        Default: "cpu"
+    """
+    if not has_fastsurfer:
+        raise ImportError(
+            "fastsurfer is required to run hypvinn."
+            "Install it with pyAFQ[fastsurfer]")
+    if t1 is None:
+        raise ValueError(
+            "t1 must be provided to run hypvinn")
+    if isinstance(t1, dict):
+        t1 = find_file(
+            bids_info["bids_layout"],
+            dwi_path,
+            t1,
+            t1.get("suffix", "T1w"),
+            bids_info["session"],
+            bids_info["subject"],
+            required=True)
+    if not isinstance(t1, str):
+        raise TypeError(
+            "t1 must be a dict or string")
+
+    labelled_data, labels, affine = afi.run_hypvinn(t1, device=device)
+    labelled_img = nib.Nifti1Image(labelled_data.astype(np.int32), affine)
+    # labelled_img = resample(
+    #     labelled_data,
+    #     dwi.get_fdata()[..., 0],
+    #     nib.load(t1).affine,
+    #     dwi.affine)
+    return labelled_img, {**labels, "t1": t1}
+
+
 def get_data_plan(kwargs):
     if "scalars" in kwargs and not (
         isinstance(kwargs["scalars"], list) and isinstance(
@@ -975,7 +1030,7 @@ def get_data_plan(kwargs):
         dki_md, dki_awf, dki_mk, dki_kfa, dti_ga, dti_rd, dti_ad,
         dki_ga, dki_rd,
         dki_ad, dki_rk, dki_ak, dti_params, dki_params, fwdti_params,
-        csd_params, get_bundle_dict])
+        csd_params, get_bundle_dict, hypvinn])
 
     if "scalars" not in kwargs:
         bvals, _ = read_bvals_bvecs(kwargs["bval"], kwargs["bvec"])
