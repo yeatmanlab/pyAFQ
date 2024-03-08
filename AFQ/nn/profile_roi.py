@@ -10,7 +10,6 @@ def _find_longest_true_series_indices(input_list):
     start_index = 0
     max_start_index = -1
     max_end_index = -1
-
     for i, value in enumerate(input_list):
         if value:
             if current_length == 0:
@@ -22,13 +21,11 @@ def _find_longest_true_series_indices(input_list):
                 max_start_index = start_index
                 max_end_index = i
             current_length = 0
-
     if current_length > max_length:
         max_length = current_length
         max_start_index = start_index
         max_end_index = len(input_list)
-
-    return max_start_index, max_end_index + 1
+    return max_start_index, max_end_index
 
 
 def roi_from_segmentation(seg, label, dwi):
