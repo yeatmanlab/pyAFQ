@@ -35,12 +35,12 @@ def gen_seeds(seed_mask, seed_threshold,
         if random_seeds:
             seeds = dtu.random_seeds_from_mask(seed_mask, seeds_count=n_seeds,
                                                seed_count_per_voxel=False,
-                                               affine=img.affine,
+                                               affine=np.eye(4),
                                                random_seed=rng_seed)
         else:
             seeds = dtu.seeds_from_mask(seed_mask,
                                         density=n_seeds,
-                                        affine=img.affine)
+                                        affine=np.eye(4))
     else:
         # If user provided an array, we'll use n_seeds as the seeds:
         seeds = n_seeds
