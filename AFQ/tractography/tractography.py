@@ -132,7 +132,7 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
     seeds = gen_seeds(
         seed_mask, seed_threshold,
         n_seeds, thresholds_as_percentages,
-        random_seeds, rng_seed, params_img)
+        random_seeds, rng_seed, params_img.affine)
 
     if sphere is None:
         sphere = dpd.default_sphere

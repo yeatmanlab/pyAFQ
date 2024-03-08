@@ -157,7 +157,7 @@ def gpu_track(data, gtab, seed_img, stop_img, odf_model,
     seeds = gen_seeds(
         seed_data, seed_threshold,
         n_seeds, thresholds_as_percentages,
-        random_seeds, rng_seed, seed_img)
+        random_seeds, rng_seed, np.eye(4))
 
     global_chunk_sz = chunk_size * ngpus
     nchunks = (seeds.shape[0] + global_chunk_sz - 1) // global_chunk_sz
