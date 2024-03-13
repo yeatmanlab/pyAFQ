@@ -89,19 +89,9 @@ tmp = tempfile.mkdtemp()
 n_frames = 72
 
 ###############################################################################
-# Get some data from HBN POD2
+# Get data from HBN POD2
 # ----------------------------
-# The Healthy Brain Network Preprocessed Open Diffusion Derivatives (HBN POD2)
-# is a collection of resources based on the Healthy Brain Network dataset
-# [1, 2]_. HBN POD2 includes data derivatives - including pyAFQ derivatives -
-# from more than 2,000 subjects. The data and the derivatives can be browsed at
-# https://fcp-indi.s3.amazonaws.com/index.html#data/Projects/HBN/BIDS_curated/
-#
-# Here, we will visualize the results from one subject, together with their
-# anatomy and using several variations. We start by downloading their
-# pyAFQ-processed data using fetcher functions that download both the
-# preprocessed data, as well as the pyAFQ-processed data (Note that this
-# will take up about 1.75 GB of disk space):
+# We get the same data that is used in the visualization tutorials.
 
 afd.fetch_hbn_preproc(["NDARAA948VFH"])
 study_path = afd.fetch_hbn_afq(["NDARAA948VFH"])[1]
@@ -122,7 +112,8 @@ study_path = afd.fetch_hbn_afq(["NDARAA948VFH"])[1]
 # y, or z dimension. We then call this function three times, once for each of
 # the b0, b1000, and b2000 volumes, and add the resulting slicer actors to a
 # scene. We set the camera on the scene to a view that we like, and then we
-# record the scene into a png file. We do this for each of the three volumes.
+# record the scene into png files and subsequently gif animations. We do this
+# for each of the three volumes.
 
 deriv_path = op.join(
     study_path, "derivatives")
@@ -216,6 +207,8 @@ for bval, slicers in zip([0, 1000, 2000],
 # One of the first steps of the pyAFQ pipeline is to generate whole-brain
 # tractography. We will visualize the results of this step. We start by reading
 # in the FA image, which is used as a reference for the tractography. We then
+# load the whole brain tractography, and transform the coordinates of the
+# streamlines into the coordinate frame of the T1-weighted data.
 
 afq_path = op.join(
     deriv_path,
@@ -231,17 +224,6 @@ sft_whole_brain = load_trk(op.join(afq_path,
                                    'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_space-RASMM_model-CSD_desc-prob-afq_tractography.trk'), fa_img)
 
 
-#############################################################################
-# Transform into the T1w reference frame
-# --------------------------------------
-# Next, we would like to visualize the whole-brain tractography in the context
-# of the T1w measurement. We read in this data and transform the bundle
-# coordinates, first into the RASMM common coordinate frame and then
-# subsequently into the coordinate frame of the T1-weighted data (if you find
-# this confusing, you can brush up on this topic in the
-# `nibabel documentation <https://nipy.org/nibabel/coordinate_systems.html>`_).
-
-
 t1w_img = nib.load(op.join(deriv_path,
                            'qsiprep/sub-NDARAA948VFH/anat/sub-NDARAA948VFH_desc-preproc_T1w.nii.gz'))
 t1w = t1w_img.get_fdata()
@@ -249,6 +231,12 @@ sft_whole_brain.to_rasmm()
 whole_brain_t1w = transform_streamlines(
     sft_whole_brain.streamlines,
     np.linalg.inv(t1w_img.affine))
+
+#############################################################################
+# Visualize the streamlines
+# -------------------------
+# The streamlines are visualized in the context of the T1-weighted data.
+#
 
 
 def lines_as_tubes(sl, line_width, **kwargs):
@@ -281,7 +269,9 @@ make_video([f"{tmp}/whole_brain{ii:06d}.png" for ii in range(n_frames)],
 #############################################################################
 # Whole brain with waypoints
 # --------------------------------------
-#
+# We can also generate a gif video with the whole brain tractography and the
+# waypoints that are used to define the bundles. We will use the same scene as
+# before, but we will add the waypoints as contours to the scene.
 
 scene.clear()
 whole_brain_actor = lines_as_tubes(whole_brain_t1w, 2)
@@ -331,12 +321,10 @@ bundle_path = op.join(afq_path,
 
 
 #############################################################################
-# Show the bundle
-# ---------------
-# The bundle coordinates from pyAFQ are always saved in the reference frame of
-# the diffusion data from which they are generated, so we need an image file
-# with the dMRI coordinates as a reference for loading the data (we could also
-# use `"same"` here).
+# Visualize the arcuate bundle
+# ----------------------------
+# Now visualize only the arcuate bundle that is selected with these waypoints.
+#
 
 fa_img = nib.load(op.join(afq_path,
                           'sub-NDARAA948VFH_ses-HBNsiteRU_acq-64dir_space-T1w_desc-preproc_dwi_model-DKI_FA.nii.gz'))
@@ -389,7 +377,9 @@ make_video([f"{tmp}/arc1{ii:06d}.png" for ii in range(n_frames)], "arc1.gif")
 
 #############################################################################
 # Clean bundle
-# ---------------
+# ------------
+# The next step in processing would be to clean the bundle by removing
+# streamlines that are outliers. We will visualize the cleaned bundle.
 
 scene.clear()
 
@@ -427,7 +417,11 @@ make_video([f"{tmp}/arc3{ii:06d}.png" for ii in range(n_frames)], "arc3.gif")
 
 #############################################################################
 # Show the values of tissue properties along the bundle
-# ---------------
+# ------------------------------------------------------
+# We can also visualize the values of tissue properties along the bundle. Here
+# we will visualize the fractional anisotropy (FA) along the arcuate bundle.
+# This is done by using a colormap to color the streamlines according to the
+# values of the tissue property, with `fury.colormap.create_colormap`.
 
 lut_args = dict(scale_range=(0, 1),
                 hue_range=(1, 0),
@@ -451,6 +445,9 @@ make_video([f"{tmp}/arc4{ii:06d}.png" for ii in range(n_frames)], "arc4.gif")
 #############################################################################
 # Core of the bundle and tract profile
 # -------------------------------------
+# Finally, we can visualize the core of the bundle and the tract profile. The
+# core of the bundle is the median of the streamlines, and the tract profile is
+# the values of the tissue property along the core of the bundle.
 
 core_arc = np.median(np.asarray(set_number_of_points(arc_t1w, 20)), axis=0)
 
@@ -480,6 +477,11 @@ window.record(scene, out_path=f'{tmp}/arc5', size=(2400, 2400),
               n_frames=n_frames, path_numbering=True)
 
 make_video([f"{tmp}/arc5{ii:06d}.png" for ii in range(n_frames)], "arc5.gif")
+
+#############################################################################
+# Core of all bundles and their tract profiles
+# --------------------------------------------
+# Same as before, but for all bundles.
 
 scene.clear()
 
@@ -543,6 +545,12 @@ make_video([f"{tmp}/all_tract_profiles{ii:06d}.png" for ii in range(n_frames)],
 
 #############################################################################
 # Tract profiles as a table
+# -------------------------
+# Finally, we can visualize the tract profiles as a table. This is done by
+# plotting the tract profiles for each bundle as a line plot, with the x-axis
+# representing the position along the bundle, and the y-axis representing the
+# value of the tissue property. We will use the `matplotlib` library to create
+# this plot.
 
 import matplotlib.pyplot as plt
 fig, ax = plt.subplots()
