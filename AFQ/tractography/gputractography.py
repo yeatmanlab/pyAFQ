@@ -21,7 +21,8 @@ logger = logging.getLogger('AFQ')
 # Modified from https://github.com/dipy/GPUStreamlines/blob/master/run_dipy_gpu.py
 def gpu_track(data, gtab, seed_img, stop_img, odf_model,
               seed_threshold, stop_threshold, thresholds_as_percentages,
-              max_angle, step_size, n_seeds, random_seeds, rng_seed, ngpus):
+              max_angle, step_size, n_seeds, random_seeds, rng_seed, ngpus,
+              chunk_size):
     """
     Perform GPU tractography on DWI data.
 
@@ -66,10 +67,11 @@ def gpu_track(data, gtab, seed_img, stop_img, odf_model,
         random seed used to generate random seeds if random_seeds is
         set to True. Default: None    ngpus : int
         Number of GPUs to use.
+    chunk_size : int
+        Chunk size for GPU tracking.
     Returns
     -------
     """
-    chunk_size = 100000
     sh_order = 6
 
     seed_data = seed_img.get_fdata()
@@ -155,7 +157,7 @@ def gpu_track(data, gtab, seed_img, stop_img, odf_model,
     seeds = gen_seeds(
         seed_data, seed_threshold,
         n_seeds, thresholds_as_percentages,
-        random_seeds, rng_seed, seed_img)
+        random_seeds, rng_seed, np.eye(4))
 
     global_chunk_sz = chunk_size * ngpus
     nchunks = (seeds.shape[0] + global_chunk_sz - 1) // global_chunk_sz

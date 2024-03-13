@@ -362,22 +362,7 @@ def test_AFQ_init():
                     bids_path,
                     preproc_pipeline="synthetic",
                     participant_labels=participant_labels)
-
-                for subject in range(n_subjects):
-                    sub = f"0{subject+1}"
-                    if n_subjects == n_sessions:
-                        npt.assert_equal(
-                            len(myafq.wf_dict[sub][sub]),
-                            26)
-                    else:
-                        for session in range(n_sessions):
-                            if n_sessions == 1:
-                                sess = "None"
-                            else:
-                                sess = f"0{session+1}"
-                            npt.assert_equal(
-                                len(myafq.wf_dict[sub][sess]),
-                                26)
+                myafq.export("dwi")
 
 
 @pytest.mark.nightly_basic

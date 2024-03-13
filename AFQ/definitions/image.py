@@ -736,7 +736,7 @@ class TemplateImage(ImageDefinition):
         return name_from_path(self.path)
 
     def get_image_getter(self, task_name):
-        def _image_getter_helper(mapping, reg_template):
+        def _image_getter_helper(mapping, reg_template, reg_subject):
             img = nib.load(self.path)
             img_data = resample(
                 img.get_fdata(),
@@ -748,18 +748,20 @@ class TemplateImage(ImageDefinition):
                 img_data, interpolation='nearest')
             return nib.Nifti1Image(
                 scalar_data.astype(np.float32),
-                reg_template.affine), dict(source=self.path)
+                reg_subject.affine), dict(source=self.path)
 
         if task_name == "data":
             raise ValueError((
                 "TemplateImage cannot be used in this context, as they"
                 "require later derivatives to be calculated"))
         elif task_name == "mapping":
-            def image_getter(mapping, data_imap):
+            def image_getter(mapping, reg_subject, data_imap):
                 return _image_getter_helper(
-                    mapping, data_imap["reg_template"])
+                    mapping, data_imap["reg_template"],
+                    reg_subject)
         else:
             def image_getter(mapping_imap, data_imap):
                 return _image_getter_helper(
-                    mapping_imap["mapping"], data_imap["reg_template"])
+                    mapping_imap["mapping"], data_imap["reg_template"],
+                    mapping_imap["reg_subject"])
         return image_getter
