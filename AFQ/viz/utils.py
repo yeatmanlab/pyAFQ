@@ -42,6 +42,11 @@ tableau_20 = [
     (0.8588235294117647, 0.8588235294117647, 0.5529411764705883),
     (0.09019607843137255, 0.7450980392156863, 0.8117647058823529),
     (0.6196078431372549, 0.8549019607843137, 0.8980392156862745)]
+tableau_extension = [
+    (0.95, 0.85, 0.25),  # Warm, Soft Yellow
+    (0.98, 0.92, 0.5),
+    (0.4, 0.5, 0.6),  # Cool, Muted Blue
+    (0.6, 0.7, 0.9)]
 large_font = 28
 medium_font = 24
 small_font = 20
@@ -56,9 +61,9 @@ COLOR_DICT = OrderedDict({
     "Right Cingulum Cingulate": tableau_20[5], "CCMid": tableau_20[5],
     "Forceps Minor": tableau_20[8], "CC_ForcepsMinor": tableau_20[8],
     "Forceps Major": tableau_20[9], "CC_ForcepsMajor": tableau_20[9],
-    "Left Inferior Fronto-Occipital": tableau_20[10],
+    "Left Inferior Fronto-occipital": tableau_20[10],
     "IFOF_L": tableau_20[10],
-    "Right Inferior Fronto-Occipital": tableau_20[11],
+    "Right Inferior Fronto-occipital": tableau_20[11],
     "IFOF_R": tableau_20[11],
     "Left Inferior Longitudinal": tableau_20[12], "F_L": tableau_20[12],
     "Right Inferior Longitudinal": tableau_20[13], "F_R": tableau_20[13],
@@ -68,6 +73,10 @@ COLOR_DICT = OrderedDict({
     "Right Uncinate": tableau_20[17], "UF_R": tableau_20[17],
     "Left Arcuate": tableau_20[18], "AF_L": tableau_20[18],
     "Right Arcuate": tableau_20[19], "AF_R": tableau_20[19],
+    "Left Posterior Arcuate": tableau_20[6],
+    "Right Posterior Arcuate": tableau_20[7],
+    "Left Vertical Occipital": tableau_extension[0],
+    "Right Vertical Occipital": tableau_extension[1],
     "median": tableau_20[6],
     # Paul Tol's palette for callosal bundles
     "Callosum Orbital": (0.2, 0.13, 0.53),
@@ -88,8 +97,8 @@ POSITIONS = OrderedDict({
     "MCP": (3, 1), "CCMid": (3, 3),
     "Forceps Minor": (4, 2), "Forceps Major": (0, 2),
     "CC_ForcepsMinor": (4, 2), "CC_ForcepsMajor": (0, 2),
-    "Left Inferior Fronto-Occipital": (4, 1),
-    "Right Inferior Fronto-Occipital": (4, 3),
+    "Left Inferior Fronto-occipital": (4, 1),
+    "Right Inferior Fronto-occipital": (4, 3),
     "IFOF_L": (4, 1), "IFOF_R": (4, 3),
     "Left Inferior Longitudinal": (3, 0),
     "Right Inferior Longitudinal": (3, 4),
@@ -121,8 +130,8 @@ BEST_BUNDLE_ORIENTATIONS = {
     "Right Cingulum Cingulate": ("Sagittal", "Right"),
     "Forceps Minor": ("Axial", "Top"),
     "Forceps Major": ("Axial", "Top"),
-    "Left Inferior Fronto-Occipital": ("Sagittal", "Left"),
-    "Right Inferior Fronto-Occipital": ("Sagittal", "Right"),
+    "Left Inferior Fronto-occipital": ("Sagittal", "Left"),
+    "Right Inferior Fronto-occipital": ("Sagittal", "Right"),
     "Left Inferior Longitudinal": ("Sagittal", "Left"),
     "Right Inferior Longitudinal": ("Sagittal", "Right"),
     "Left Superior Longitudinal": ("Axial", "Top"),
