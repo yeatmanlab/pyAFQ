@@ -22,14 +22,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install .[all]
         sudo apt-get install -y xvfb
-    - name: Run XVFB
-      run: Xvfb :99 -screen 0 1280x1024x24
-      background: true
     - name: Build docs
       env:
         XVFB: 1
+        DISPLAY: :99
       run: |
-        echo 'export DISPLAY=:99' >> $BASH_ENV
+        Xvfb :99 -screen 0 1280x1024x24 &
         cd docs
         make html
     - name: Upload docs
