@@ -482,6 +482,15 @@ class Segmentation:
         else:
             self.fiber_groups[b_name] = sl
 
+    def _add_bundle_to_meta(self, bundle_name, bundle_info):
+        bundle_info = bundle_info.copy()
+        # remove keys that can never be serialized
+        for key in [
+                'include', 'exclude', 'prob_map',
+                'start', 'end', 'curvature']:
+            bundle_info.pop(key, None)
+        self.meta[bundle_name] = bundle_info
+
     def segment_afq(self, tg=None):
         """
         Assign streamlines to bundles using the waypoint ROI approach
@@ -509,6 +518,7 @@ class Segmentation:
             dtype=np.uint32)
 
         self.fiber_groups = {}
+        self.meta = {}
 
         # We need to calculate the size of a voxel, so we can transform
         # from mm to voxel units:
@@ -862,10 +872,12 @@ class Segmentation:
                         sb_include_cuts, in_place=False)
                     self._add_bundle_to_fiber_group(
                         sb_name, bundlesection_select_sl, select_idx, to_flip)
+                    self._add_bundle_to_meta(sb_name, bundle_def)
             else:
                 self._add_bundle_to_fiber_group(
                     bundle, select_sl, select_idx, to_flip)
-        return self.fiber_groups
+                self._add_bundle_to_meta(bundle, bundle_def)
+        return self.fiber_groups, self.meta
 
     def move_streamlines(self, tg, to="template"):
         """Streamline-based registration of a whole-brain tractogram to
@@ -1052,7 +1064,7 @@ class Segmentation:
                                                           self.img,
                                                           Space.RASMM)
         self.fiber_groups = fiber_groups
-        return fiber_groups
+        return fiber_groups, {}
 
 
 def sl_curve(sl, n_points):

@@ -185,10 +185,11 @@ def test_segment_clip_edges_api():
     # Test with the clip_edges kwarg set to True:
     segmentation = seg.Segmentation(clip_edges=True)
 
-    fiber_groups = segmentation.segment(bundles,
-                                        tg,
-                                        mapping,
-                                        nib.load(hardi_fdata))
+    fiber_groups, _ = segmentation.segment(
+        bundles,
+        tg,
+        mapping,
+        nib.load(hardi_fdata))
 
     npt.assert_equal(len(fiber_groups), 2)
     npt.assert_(len(fiber_groups['Right Corticospinal']) > 0)
@@ -208,9 +209,9 @@ def test_segment_reco():
                                     greater_than=10,
                                     rm_small_clusters=1,
                                     rng=np.random.RandomState(seed=8))
-    fiber_groups = segmentation.segment(bundles_reco, tg,
-                                        mapping,
-                                        nib.load(hardi_fdata))
+    fiber_groups, _ = segmentation.segment(
+        bundles_reco, tg, mapping,
+        nib.load(hardi_fdata))
 
     # This condition should still hold
     npt.assert_equal(len(fiber_groups), 2)
@@ -285,7 +286,7 @@ def test_exclusion_ROI():
                     [30, 41, 62], [20, 44, 34]]
             ]).astype(float),
         hardi_img, Space.VOX)
-    fiber_groups = segmentation.segment(
+    fiber_groups, _ = segmentation.segment(
         slf_bundle,
         slf_tg,
         mapping,
@@ -296,7 +297,7 @@ def test_exclusion_ROI():
     slf_bundle['Left Superior Longitudinal']['exclude'] =\
         [templates["SLFt_roi2_L"]]
 
-    fiber_groups = segmentation.segment(
+    fiber_groups, _ = segmentation.segment(
         slf_bundle,
         slf_tg,
         mapping,
@@ -324,7 +325,7 @@ def test_segment_sampled_streamlines():
 
     # default segmentation
     segmentation = seg.Segmentation()
-    fiber_groups = segmentation.segment(
+    fiber_groups, _ = segmentation.segment(
         bundles,
         tg,
         mapping,
@@ -343,7 +344,7 @@ def test_segment_sampled_streamlines():
         nb_streamlines=nb_streamlines
     )
 
-    sampled_fiber_groups = sampled_segmentation.segment(
+    sampled_fiber_groups, _ = sampled_segmentation.segment(
         bundles,
         tg,
         mapping,
