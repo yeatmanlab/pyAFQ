@@ -1,3 +1,36 @@
+1.3 (March 25, 2024)
+====================
+All bundles are now ordered according to LPI+ and 
+are output as full names instead of abbreviations.
+Only the lowest shell is now used in the calculation of
+the CSD response function. Corrects typos in babyAFQ and
+GPU tracking, pARC/VOF cleaning parameters updated,
+along with other minor improvements.
+  * Adds an example to plot stages of tractometry. (#1073)
+  * [FIX] fix bundle colors (#1116)
+  * Fix gpu tracking (#1115)
+  * Move s3 BIDS to separate repo (#1109)
+  * [DOC] try to reproduce and fix nightly test (#1113)
+  * [FIX] Set parc/vof cleaning params to default (#1111)
+  * [DOC] make altair example (#1108)
+  * [ENH] allow random seeds in gpu tracking (#1105)
+  * [FIX] force upgraded joblib (#1104)
+  * [ENH/FIX] Smarter file finding (#1103)
+  * Upgrade python versions supported, and drop 3.8.  (#1102)
+  *  (#1101)
+  * [ENH] add anisotropic kurtosis, make dki default? (#1097)
+  * [ENH] Make the cleaning easier to interact with (#1100)
+  * [ENH] Order all bundles according to LPI+ (#1099)
+  * [FIX] update this nightly test (#1095)
+  * [ENH] Some segmentation speed-ups (#1094)
+  * Use only the lowest shell in calculation of the CSD response function. (#1089)
+  * [FIX] Fix GPU Tractography (#1091)
+  * [ENH] Begin removing confusing abbreviations (#1086)
+  * [ENH] simplify verbose tracking (#1087)
+  * [FIX] correct typo in baby bundle dict OR (#1088)
+  * [ENH] more little tweaks to the AFQ viz utils panelfigure class (#1084)
+  *  (#1085)
+
 1.2 (January 04, 2024)
 ======================
 Incorporates TRX, a new tractography file format, makes
