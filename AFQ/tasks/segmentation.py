@@ -67,7 +67,7 @@ def segment(data_imap, mapping_imap,
 
     start_time = time()
     segmentation = seg.Segmentation(**segmentation_params)
-    bundles = segmentation.segment(
+    bundles, bundle_meta = segmentation.segment(
         bundle_dict,
         tg,
         mapping_imap["mapping"],
@@ -103,6 +103,7 @@ def segment(data_imap, mapping_imap,
 
     meta["source"] = streamlines
     meta["Recognition Parameters"] = seg_params_out
+    meta["Bundle Parameters"] = bundle_meta
     meta["Timing"] = time() - start_time
     return tgram, meta
 
@@ -150,7 +151,9 @@ def export_bundles(base_fname, results_dir,
                         bbox_valid_check=False)
             else:
                 logger.info(f"No bundle to save for {bundle}")
-            meta = dict(source=bundles)
+            meta = dict(
+                source=bundles,
+                params=seg_sft.get_bundle_param_info(bundle))
             meta_fname = drop_extension(fname) + '.json'
             write_json(meta_fname, meta)
     return bundles_dir
