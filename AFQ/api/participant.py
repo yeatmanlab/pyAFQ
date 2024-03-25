@@ -34,7 +34,7 @@ class ParticipantAFQ(object):
                  dwi_data_file,
                  bval_file, bvec_file,
                  output_dir,
-                 bids_info=None,
+                 _bids_info=None,
                  **kwargs):
         """
         Initialize a ParticipantAFQ object from a BIDS dataset.
@@ -49,8 +49,9 @@ class ParticipantAFQ(object):
             Path to bvec file.
         output_dir : str
             Path to output directory.
-        bids_info : dict or None, optional
-            This is used by GroupAFQ to provide information about
+        _bids_info : dict or None, optional
+            This should be left as None in most cases. It
+            is used by GroupAFQ to provide information about
             the BIDS layout to each participant.
         kwargs : additional optional parameters
             You can set additional parameters for any step
@@ -102,7 +103,7 @@ class ParticipantAFQ(object):
             bval=bval_file,
             bvec=bvec_file,
             results_dir=output_dir,
-            bids_info=bids_info,
+            bids_info=_bids_info,
             base_fname=get_base_fname(output_dir, dwi_data_file),
             **kwargs)
         self.make_workflow()
