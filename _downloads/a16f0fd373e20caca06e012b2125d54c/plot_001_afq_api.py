@@ -18,6 +18,7 @@ import pandas as pd
 
 from AFQ.api.group import GroupAFQ
 import AFQ.data.fetch as afd
+import AFQ.viz.altair as ava
 
 ##########################################################################
 # Example data
@@ -60,7 +61,7 @@ afd.organize_stanford_data(clear_previous_afq="track")
 
 tracking_params = dict(n_seeds=25000,
                        random_seeds=True,
-                       rng_seed=42,
+                       rng_seed=2022,
                        trx=True)
 
 ##########################################################################
@@ -186,7 +187,7 @@ plotly.io.show(bundle_html["01"][0])
 ##########################################################################
 # We can also visualize the tract profiles in all of the bundles. These
 # plots show both FA (left) and MD (right) layed out anatomically.
-# To make this plots, it is required that you install with
+# To make this plot, it is required that you install with
 # `pip install pyAFQ[plot]` so that you have the necessary dependencies.
 #
 
@@ -195,6 +196,20 @@ fig_files = myafq.export("tract_profile_plots")["01"]
 ##########################################################################
 # .. figure:: {{ fig_files[0] }}
 #
+
+
+##########################################################################
+# We can even use altair to visualize the tract profiles in all
+# of the bundles. We provide a more customizable interface for visualizing
+# the tract profiles using altair.
+# Again, to make this plot, it is required that you install with
+# `pip install pyAFQ[plot]` so that you have the necessary dependencies.
+#
+profiles_df = myafq.combine_profiles()
+altair_df = ava.combined_profiles_df_to_altair_df(profiles_df)
+altair_chart = ava.altair_df_to_chart(altair_df)
+altair_chart.display()
+
 
 ##########################################################################
 # We can check the number of streamlines per bundle, to make sure

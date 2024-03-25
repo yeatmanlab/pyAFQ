@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.tractography &#8212; AFQ 1.2 documentation</title>
+    <title>AFQ.tasks.tractography &#8212; AFQ 1.3 documentation</title>
   
   
   
@@ -18,12 +18,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
@@ -39,9 +39,9 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509" />
-  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=bd9e20870c6007c4c509"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -65,7 +65,6 @@
   <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -105,10 +104,8 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
-
-  <header>
   
-    <div class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
   <label class="sidebar-toggle primary-toggle" for="__primary">
     <span class="fa-solid fa-bars"></span>
@@ -132,8 +129,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -253,15 +250,10 @@ document.write(`
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
-      <span class="fa-solid fa-outdent"></span>
-    </label>
-  
 </div>
 
-    </div>
+    </header>
   
-  </header>
 
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
@@ -483,8 +475,8 @@ document.write(`
         <span class="n">Parameters</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
             <span class="n">Units</span><span class="o">=</span><span class="s2">&quot;mm&quot;</span><span class="p">,</span>
             <span class="n">StepSize</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;step_size&quot;</span><span class="p">],</span>
-            <span class="n">MinimumLength</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;min_length&quot;</span><span class="p">],</span>
-            <span class="n">MaximumLength</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;max_length&quot;</span><span class="p">],</span>
+            <span class="n">MinimumLength</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;minlen&quot;</span><span class="p">],</span>
+            <span class="n">MaximumLength</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;maxlen&quot;</span><span class="p">],</span>
             <span class="n">Unidirectional</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
         <span class="n">Timing</span><span class="o">=</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">meta</span></div>
@@ -492,28 +484,28 @@ document.write(`
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;seed&quot;</span><span class="p">)</span>
 <span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_desc-seed_mask.nii.gz&#39;</span><span class="p">,</span> <span class="n">include_track</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="nd">@as_img</span>
-<div class="viewcode-block" id="export_seed_mask"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/tractography/index.html#AFQ.tasks.tractography.export_seed_mask">[docs]</a><span class="k">def</span> <span class="nf">export_seed_mask</span><span class="p">(</span><span class="n">tracking_params</span><span class="p">):</span>
+<div class="viewcode-block" id="export_seed_mask"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/tractography/index.html#AFQ.tasks.tractography.export_seed_mask">[docs]</a><span class="k">def</span> <span class="nf">export_seed_mask</span><span class="p">(</span><span class="n">data_imap</span><span class="p">,</span> <span class="n">tracking_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    full path to a nifti file containing the</span>
 <span class="sd">    tractography seed mask</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">seed_mask</span> <span class="o">=</span> <span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;seed_mask&#39;</span><span class="p">]</span>
     <span class="n">seed_mask_desc</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;seed_mask&#39;</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">seed_mask</span><span class="p">,</span> <span class="n">seed_mask_desc</span></div>
+    <span class="k">return</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">seed_mask</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;dwi_affine&quot;</span><span class="p">]),</span> \
+        <span class="n">seed_mask_desc</span></div>
 
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;stop&quot;</span><span class="p">)</span>
 <span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_desc-stop_mask.nii.gz&#39;</span><span class="p">,</span> <span class="n">include_track</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="nd">@as_img</span>
-<div class="viewcode-block" id="export_stop_mask"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/tractography/index.html#AFQ.tasks.tractography.export_stop_mask">[docs]</a><span class="k">def</span> <span class="nf">export_stop_mask</span><span class="p">(</span><span class="n">tracking_params</span><span class="p">):</span>
+<div class="viewcode-block" id="export_stop_mask"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/tractography/index.html#AFQ.tasks.tractography.export_stop_mask">[docs]</a><span class="k">def</span> <span class="nf">export_stop_mask</span><span class="p">(</span><span class="n">data_imap</span><span class="p">,</span> <span class="n">tracking_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    full path to a nifti file containing the</span>
 <span class="sd">    tractography stop mask</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">stop_mask</span> <span class="o">=</span> <span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;stop_mask&#39;</span><span class="p">]</span>
     <span class="n">stop_mask_desc</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">[</span><span class="s1">&#39;stop_mask&#39;</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">stop_mask</span><span class="p">,</span> <span class="n">stop_mask_desc</span></div>
+    <span class="k">return</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">stop_mask</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;dwi_affine&quot;</span><span class="p">]),</span> \
+        <span class="n">stop_mask_desc</span></div>
 
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;stop&quot;</span><span class="p">)</span>
@@ -644,7 +636,7 @@ document.write(`
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;streamlines&quot;</span><span class="p">)</span>
 <span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_tractography&#39;</span><span class="p">,</span> <span class="n">include_track</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <div class="viewcode-block" id="gpu_tractography"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/tractography/index.html#AFQ.tasks.tractography.gpu_tractography">[docs]</a><span class="k">def</span> <span class="nf">gpu_tractography</span><span class="p">(</span><span class="n">data_imap</span><span class="p">,</span> <span class="n">tracking_params</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span>
-                     <span class="n">tractography_ngpus</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+                     <span class="n">tractography_ngpus</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">100000</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    full path to the complete, unsegmented tractography file</span>
 
@@ -655,17 +647,24 @@ document.write(`
 <span class="sd">        this algorithm is used for tractography,</span>
 <span class="sd">        https://github.com/dipy/GPUStreamlines</span>
 <span class="sd">        Default: 0</span>
+<span class="sd">    chunk_size : int, optional</span>
+<span class="sd">        Chunk size for GPU tracking.</span>
+<span class="sd">        Default: 100000</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
     <span class="n">sft</span> <span class="o">=</span> <span class="n">gpu_track</span><span class="p">(</span>
         <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">],</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;gtab&quot;</span><span class="p">],</span>
         <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">seed</span><span class="p">),</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">stop</span><span class="p">),</span>
+        <span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;odf_model&quot;</span><span class="p">],</span>
         <span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;seed_threshold&quot;</span><span class="p">],</span>
         <span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;stop_threshold&quot;</span><span class="p">],</span>
         <span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;thresholds_as_percentages&quot;</span><span class="p">],</span>
         <span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;max_angle&quot;</span><span class="p">],</span> <span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;step_size&quot;</span><span class="p">],</span>
         <span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;n_seeds&quot;</span><span class="p">],</span>
-        <span class="n">tractography_ngpus</span><span class="p">)</span>
+        <span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;random_seeds&quot;</span><span class="p">],</span>
+        <span class="n">tracking_params</span><span class="p">[</span><span class="s2">&quot;rng_seed&quot;</span><span class="p">],</span>
+        <span class="n">tractography_ngpus</span><span class="p">,</span>
+        <span class="n">chunk_size</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">sft</span><span class="p">,</span> <span class="n">_meta_from_tracking_params</span><span class="p">(</span>
         <span class="n">tracking_params</span><span class="p">,</span> <span class="n">start_time</span><span class="p">,</span>
@@ -735,20 +734,19 @@ document.write(`
 
     <span class="n">stop_mask</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;tracking_params&quot;</span><span class="p">][</span><span class="s1">&#39;stop_mask&#39;</span><span class="p">]</span>
     <span class="n">seed_mask</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;tracking_params&quot;</span><span class="p">][</span><span class="s1">&#39;seed_mask&#39;</span><span class="p">]</span>
-    <span class="n">dwi</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dwi&quot;</span><span class="p">]</span>
     <span class="n">bids_info</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bids_info&quot;</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="n">bids_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stop_mask</span><span class="p">,</span> <span class="n">Definition</span><span class="p">):</span>
             <span class="n">stop_mask</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
                 <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;bids_layout&quot;</span><span class="p">],</span>
-                <span class="n">dwi</span><span class="p">,</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dwi_path&quot;</span><span class="p">],</span>
                 <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">],</span>
                 <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;session&quot;</span><span class="p">])</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seed_mask</span><span class="p">,</span> <span class="n">Definition</span><span class="p">):</span>
             <span class="n">seed_mask</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
                 <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;bids_layout&quot;</span><span class="p">],</span>
-                <span class="n">dwi</span><span class="p">,</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dwi_path&quot;</span><span class="p">],</span>
                 <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">],</span>
                 <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;session&quot;</span><span class="p">])</span>
 
@@ -801,8 +799,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509"></script>
+  <script src="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
 
   <footer class="bd-footer">
@@ -836,7 +834,7 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
 </p></div>
       
     </div>

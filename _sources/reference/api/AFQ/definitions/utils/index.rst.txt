@@ -58,8 +58,7 @@ Functions
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: find_path(bids_layout, from_path, subject, session)
-      :abstractmethod:
+   .. py:method:: find_path(bids_layout, from_path, subject, session, required=True)
 
 
    .. py:method:: str_for_toml()
@@ -92,7 +91,7 @@ Functions
 .. py:function:: name_from_path(path)
 
 
-.. py:function:: find_file(bids_layout, path, filters, suffix, session, subject, extension='.nii.gz')
+.. py:function:: find_file(bids_layout, path, filters, suffix, session, subject, extension='.nii.gz', required=True)
 
    
    Helper function

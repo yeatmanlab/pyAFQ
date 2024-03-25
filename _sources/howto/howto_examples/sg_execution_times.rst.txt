@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**91:08.228** total execution time for 12 files **from howto/howto_examples**:
+**147:38.991** total execution time for 13 files **from howto/howto_examples**:
 
 .. container::
 
@@ -32,21 +32,24 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_howto_howto_examples_plot_accoustic_radiations.py` (``plot_accoustic_radiations.py``)
-     - 29:07.364
-     - 5770.4
+   * - :ref:`sphx_glr_howto_howto_examples_plot_acoustic_radiations.py` (``plot_acoustic_radiations.py``)
+     - 34:15.924
+     - 4191.2
    * - :ref:`sphx_glr_howto_howto_examples_plot_afq_fwdti.py` (``plot_afq_fwdti.py``)
-     - 22:02.005
-     - 4964.5
+     - 30:47.120
+     - 3825.1
    * - :ref:`sphx_glr_howto_howto_examples_plot_optic_radiations.py` (``plot_optic_radiations.py``)
-     - 15:50.721
-     - 5253.2
-   * - :ref:`sphx_glr_howto_howto_examples_plot_recobundles.py` (``plot_recobundles.py``)
-     - 13:14.843
-     - 2693.1
+     - 26:41.967
+     - 3774.4
+   * - :ref:`sphx_glr_howto_howto_examples_plot_stages_of_tractometry.py` (``plot_stages_of_tractometry.py``)
+     - 25:25.653
+     - 4684.2
    * - :ref:`sphx_glr_howto_howto_examples_plot_afq_callosal.py` (``plot_afq_callosal.py``)
-     - 10:53.294
-     - 2363.6
+     - 15:31.445
+     - 2263.3
+   * - :ref:`sphx_glr_howto_howto_examples_plot_recobundles.py` (``plot_recobundles.py``)
+     - 14:56.881
+     - 2213.5
    * - :ref:`sphx_glr_howto_howto_examples_add_custom_bundle.py` (``add_custom_bundle.py``)
      - 00:00.000
      - 0.0

@@ -51,6 +51,7 @@ Functions
    AFQ.tasks.data.dki_md
    AFQ.tasks.data.dki_awf
    AFQ.tasks.data.dki_mk
+   AFQ.tasks.data.dki_kfa
    AFQ.tasks.data.dki_ga
    AFQ.tasks.data.dki_rd
    AFQ.tasks.data.dki_ad
@@ -67,20 +68,26 @@ Attributes
 
 .. autoapisummary::
 
+   AFQ.tasks.data.logger
    AFQ.tasks.data.DIPY_GH
 
+
+.. py:data:: logger
+
+   
 
 .. py:data:: DIPY_GH
    :value: 'https://github.com/dipy/dipy/blob/master/dipy/'
 
    
 
-.. py:function:: get_data_gtab(dwi, bval, bvec, min_bval=None, max_bval=None, filter_b=True, b0_threshold=50)
+.. py:function:: get_data_gtab(dwi_path, bval, bvec, min_bval=None, max_bval=None, filter_b=True, b0_threshold=50)
 
    
    DWI data as an ndarray for selected b values,
    A DIPY GradientTable with all the gradient information,
-   and unaltered DWI data in a Nifti1Image.
+   and DWI data in a Nifti1Image,
+   and the affine transformation of the DWI data.
 
 
    :Parameters:
@@ -119,7 +126,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: b0(dwi, data, gtab, img)
+.. py:function:: b0(dwi_path, gtab)
 
    
    full path to a nifti file containing the mean b0
@@ -142,7 +149,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: b0_mask(base_fname, b0, brain_mask)
+.. py:function:: b0_mask(b0, brain_mask)
 
    
    full path to a nifti file containing the
@@ -1109,6 +1116,40 @@ Attributes
 
 
 
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dki_kfa(dki_tf)
+
+   
+   full path to a nifti file containing
+   the DKI kurtosis FA file
+
+
+
+
+
+
+
+
+
+
+
+
+   .. rubric:: References
+
+   .. [R146e7c91c7e8-Hansen2019] Hansen B. An Introduction to Kurtosis Fractional
+   Anisotropy. AJNR Am J Neuroradiol. 2019 Oct;40(10):1638-1641.
+   doi: 10.3174/ajnr.A6235. Epub 2019 Sep 26. PMID: 31558496;
+   PMCID: PMC7028548.
+
+   .. only:: latex
+
+      [R146e7c91c7e8-Hansen2019]_
 
 
 

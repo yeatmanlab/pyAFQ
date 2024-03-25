@@ -26,13 +26,62 @@ Functions
 
 
 
-.. py:class:: Segmentation(nb_points=False, nb_streamlines=False, seg_algo='AFQ', clip_edges=False, parallel_segmentation={'engine': 'serial'}, progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=1.25, reduction_thr=25, refine=False, pruning_thr=12, b0_threshold=50, prob_threshold=0, roi_dist_tie_break=False, dist_to_waypoint=None, rng=None, return_idx=False, presegment_bundle_dict=None, presegment_kwargs={}, filter_by_endpoints=True, dist_to_atlas=4, save_intermediates=None)
+.. py:class:: Segmentation(nb_points=False, nb_streamlines=False, seg_algo='AFQ', clip_edges=False, parallel_segmentation={'engine': 'serial'}, progressive=True, greater_than=50, rm_small_clusters=50, model_clust_thr=1.25, reduction_thr=25, refine=False, pruning_thr=12, b0_threshold=50, prob_threshold=0, roi_dist_tie_break=False, dist_to_waypoint=None, rng=None, return_idx=False, presegment_bundle_dict=None, presegment_kwargs={}, filter_by_endpoints=True, dist_to_atlas=4, save_intermediates=None, cleaning_params={})
 
+
+   .. py:property:: fgarray
+
+      
+      Streamlines resampled to 20 points.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:property:: crosses
+
+      
+      Classify the streamlines by whether they cross the midline.
+      Creates a crosses attribute which is an array of booleans. Each boolean
+      corresponds to a streamline, and is whether or not that streamline
+      crosses the midline.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
 
    .. py:method:: _read_tg(tg=None)
 
 
-   .. py:method:: segment(bundle_dict, tg, mapping, fdata=None, fbval=None, fbvec=None, reg_prealign=None, reg_template=None, img_affine=None, reset_tg_space=False)
+   .. py:method:: segment(bundle_dict, tg, mapping, img, reg_prealign=None, reg_template=None, reset_tg_space=False)
 
       
       Segment streamlines into bundles based on either waypoint ROIs
@@ -51,17 +100,14 @@ Functions
           Bundles to segment
       mapping : DiffeomorphicMap, or equivalent interface
           A mapping between DWI space and a template.
-      fdata, fbval, fbvec : str
-          Full path to data, bvals, bvecs
+      img : Nifti1Image
+          Image to use as reference.
       reg_prealign : array, optional.
           The linear transformation to be applied to align input images to
           the reference space before warping under the deformation field.
           Default: None.
       reg_template : str or nib.Nifti1Image, optional.
           Template to use for registration. Default: MNI T2.
-      img_affine : array, optional.
-          The spatial transformation from the measurement to the scanner
-          space.
       reset_tg_space : bool, optional
           Whether to reset the space of the input tractogram after
           segmentation is complete. Default: False.
@@ -94,64 +140,6 @@ Functions
       .. only:: latex
 
          [R03e71c6d7dc6-Yeatman2012]_, [R03e71c6d7dc6-Garyfallidis17]_
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: prepare_img(fdata, fbval, fbvec)
-
-      
-      Prepare image data from DWI data.
-      Parameters
-      ----------
-      fdata, fbval, fbvec : str
-          Full path to data, bvals, bvecs
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
-
-   .. py:method:: cross_streamlines(fgarray, template=None)
-
-      
-      Classify the streamlines by whether they cross the midline.
-      Creates a crosses attribute which is an array of booleans. Each boolean
-      corresponds to a streamline, and is whether or not that streamline
-      crosses the midline.
-      Parameters
-      ----------
-      fgarray : streamlines resampled to the same length.
-      template : nibabel.Nifti1Image class instance
-          An affine transformation into a template space.
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -365,7 +353,7 @@ Functions
    ..
        !! processed by numpydoc !!
 
-.. py:function:: clean_by_endpoints(streamlines, target, target_idx, tol=None, flip_sls=None, accepted_idxs=None)
+.. py:function:: clean_by_endpoints(streamlines, target, target_idx, tol=0, flip_sls=None, accepted_idxs=None)
 
    
    Clean a collection of streamlines based on an endpoint ROI.
@@ -382,7 +370,8 @@ Functions
        Index within each streamline to check if within the target region.
        Typically 0 for startpoint ROIs or -1 for endpoint ROIs.
        If using flip_sls, this becomes (len(sl) - this_idx - 1) % len(sl)
-   tol : float, optional A distance tolerance (in units that the coordinates
+   tol : int, optional
+       A distance tolerance (in units that the coordinates
        of the streamlines are represented in). Default: 0, which means that
        the endpoint is exactly in the coordinate of the target ROI.
    flip_sls : 1d array, optional

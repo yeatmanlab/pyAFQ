@@ -58,8 +58,9 @@ segmentation_params = {"clip_edges": True}
 # -------------------------
 #
 # We specify bundle_info as the callosal bundles only
-# (`abd.CALLOSUM_BUNDLES`). If we want to segment both the callosum
-# and the other bundles, we would pass `abd.CALLOSUM_BUNDLES + abd.BUNDLES`
+# (`abd.callosal_bd`). If we want to segment both the callosum
+# and the other bundles, we would pass
+# `abd.callosal_bd() + abd.default18_bd()`
 # instead. This would tell the GroupAFQ object to use bundles from both
 # the standard and callosal templates.
 

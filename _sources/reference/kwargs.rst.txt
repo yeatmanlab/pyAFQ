@@ -190,6 +190,10 @@ tractography_ngpus: int, optional
 	https://github.com/dipy/GPUStreamlines
 	Default: 0
 
+chunk_size: int, optional
+	Chunk size for GPU tracking.
+	Default: 100000
+
 
 ==========================================================
 VIZ

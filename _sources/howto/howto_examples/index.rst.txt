@@ -109,14 +109,14 @@ about the variety of pyAFQ functionality that is available.
 
 .. only:: html
 
-  .. image:: /howto/howto_examples/images/thumb/sphx_glr_plot_accoustic_radiations_thumb.png
+  .. image:: /howto/howto_examples/images/thumb/sphx_glr_plot_acoustic_radiations_thumb.png
     :alt:
 
-  :ref:`sphx_glr_howto_howto_examples_plot_accoustic_radiations.py`
+  :ref:`sphx_glr_howto_howto_examples_plot_acoustic_radiations.py`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">How to add new bundles into pyAFQ(Accoustic Radiations Example)</div>
+      <div class="sphx-glr-thumbnail-title">How to add new bundles into pyAFQ (Acoustic Radiations Example)</div>
     </div>
 
 
@@ -190,6 +190,23 @@ about the variety of pyAFQ functionality that is available.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Two-dimensional figures of anatomical data are somewhat limited, because of the complex three-d...">
+
+.. only:: html
+
+  .. image:: /howto/howto_examples/images/thumb/sphx_glr_plot_stages_of_tractometry_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_howto_howto_examples_plot_stages_of_tractometry.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Making videos the different stages of tractometry</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="An example using the AFQ API to find bundles as defined by endpoint ROIs from freesurfer. This ...">
 
 .. only:: html
@@ -235,11 +252,12 @@ about the variety of pyAFQ functionality that is available.
    /howto/howto_examples/cerebellar_peduncles
    /howto/howto_examples/cloudknot_example
    /howto/howto_examples/cloudknot_hcp_example
-   /howto/howto_examples/plot_accoustic_radiations
+   /howto/howto_examples/plot_acoustic_radiations
    /howto/howto_examples/plot_afq_callosal
    /howto/howto_examples/plot_afq_fwdti
    /howto/howto_examples/plot_optic_radiations
    /howto/howto_examples/plot_recobundles
+   /howto/howto_examples/plot_stages_of_tractometry
    /howto/howto_examples/use_subject_space_rois_from_freesurfer
    /howto/howto_examples/vof_example
 

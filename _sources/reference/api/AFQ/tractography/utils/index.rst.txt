@@ -1,0 +1,59 @@
+:py:mod:`AFQ.tractography.utils`
+================================
+
+.. py:module:: AFQ.tractography.utils
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.tractography.utils.get_percentile_threshold
+   AFQ.tractography.utils.gen_seeds
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   AFQ.tractography.utils.logger
+
+
+.. py:data:: logger
+
+   
+
+.. py:function:: get_percentile_threshold(mask, threshold)
+
+
+.. py:function:: gen_seeds(seed_mask, seed_threshold, n_seeds, thresholds_as_percentages, random_seeds, rng_seed, affine)
+
+   
+   Generate seeds for tracking. For parameters, see
+   :func:`AFQ.tractography.tractography.track`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

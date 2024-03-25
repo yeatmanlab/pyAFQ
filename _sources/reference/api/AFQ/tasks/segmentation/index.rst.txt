@@ -42,7 +42,7 @@ Attributes
 
    
 
-.. py:function:: segment(dwi, data_imap, mapping_imap, tractography_imap, segmentation_params)
+.. py:function:: segment(data_imap, mapping_imap, tractography_imap, segmentation_params)
 
    
    full path to a trk/trx file containing containing
@@ -141,7 +141,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: export_density_maps(bundles, dwi)
+.. py:function:: export_density_maps(bundles, data_imap)
 
    
    full path to 4d nifti file containing streamline counts per voxel
@@ -165,7 +165,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: tract_profiles(bundles, scalar_dict, dwi_affine, profile_weights='gauss', n_points_profile=100)
+.. py:function:: tract_profiles(bundles, scalar_dict, data_imap, profile_weights='gauss', n_points_profile=100)
 
    
    full path to a CSV file containing tract profiles

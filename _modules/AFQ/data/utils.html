@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.data.utils &#8212; AFQ 1.2 documentation</title>
+    <title>AFQ.data.utils &#8212; AFQ 1.3 documentation</title>
   
   
   
@@ -18,12 +18,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
@@ -39,9 +39,9 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509" />
-  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=bd9e20870c6007c4c509"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -65,7 +65,6 @@
   <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -105,10 +104,8 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
-
-  <header>
   
-    <div class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
   <label class="sidebar-toggle primary-toggle" for="__primary">
     <span class="fa-solid fa-bars"></span>
@@ -132,8 +129,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -253,15 +250,10 @@ document.write(`
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
-      <span class="fa-solid fa-outdent"></span>
-    </label>
-  
 </div>
 
-    </div>
+    </header>
   
-  </header>
 
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
@@ -436,37 +428,46 @@ document.write(`
   <h1>Source code for AFQ.data.utils</h1><div class="highlight"><pre>
 <div class="viewcode-block" id="BUNDLE_RECO_2_AFQ"><a class="viewcode-back" href="../../../reference/api/AFQ/data/utils/index.html#AFQ.data.utils.BUNDLE_RECO_2_AFQ">[docs]</a><span></span><span class="n">BUNDLE_RECO_2_AFQ</span> <span class="o">=</span> \
     <span class="p">{</span>
-        <span class="s2">&quot;AF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;ARC_L&quot;</span><span class="p">,</span> <span class="s2">&quot;AF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;ARC_R&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;UF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;UNC_L&quot;</span><span class="p">,</span> <span class="s2">&quot;UF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;UNC_R&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;IFOF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;IFO_L&quot;</span><span class="p">,</span> <span class="s2">&quot;IFOF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;IFO_R&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;CST_L&quot;</span><span class="p">:</span> <span class="s2">&quot;CST_L&quot;</span><span class="p">,</span> <span class="s2">&quot;CST_R&quot;</span><span class="p">:</span> <span class="s2">&quot;CST_R&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ILF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;ILF_L&quot;</span><span class="p">,</span> <span class="s2">&quot;ILF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;ILF_R&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;SLF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;SLF_L&quot;</span><span class="p">,</span> <span class="s2">&quot;SLF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;SLF_R&quot;</span>
+        <span class="s2">&quot;AF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;Left Arcuate&quot;</span><span class="p">,</span> <span class="s2">&quot;AF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;Right Arcuate&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;UF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;Left Uncinate&quot;</span><span class="p">,</span> <span class="s2">&quot;UF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;Right Uncinate&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;IFOF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;Left Inferior Fronto-occipital&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;IFOF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;Right Inferior Fronto-occipital&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;CST_L&quot;</span><span class="p">:</span> <span class="s2">&quot;Left Corticospinal&quot;</span><span class="p">,</span> <span class="s2">&quot;CST_R&quot;</span><span class="p">:</span> <span class="s2">&quot;Right Corticospinal&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ILF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;Left Inferior Longitudinal&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ILF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;Right Inferior Longitudinal&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;SLF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;Left Superior Longitudinal&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;SLF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;Right Superior Longitudinal&quot;</span>
     <span class="p">}</span></div>
 
-<div class="viewcode-block" id="BUNDLE_MAT_2_PYTHON"><a class="viewcode-back" href="../../../reference/api/AFQ/data/utils/index.html#AFQ.data.utils.BUNDLE_MAT_2_PYTHON">[docs]</a><span class="n">BUNDLE_MAT_2_PYTHON</span> <span class="o">=</span> \
-    <span class="p">{</span><span class="s1">&#39;Right Corticospinal&#39;</span><span class="p">:</span> <span class="s1">&#39;CST_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left Corticospinal&#39;</span><span class="p">:</span> <span class="s1">&#39;CST_L&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;RightCorticospinal&#39;</span><span class="p">:</span> <span class="s1">&#39;CST_R&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftCorticospinal&#39;</span><span class="p">:</span> <span class="s1">&#39;CST_L&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;Right Uncinate&#39;</span><span class="p">:</span> <span class="s1">&#39;UNC_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left Uncinate&#39;</span><span class="p">:</span> <span class="s1">&#39;UNC_L&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;RightUncinate&#39;</span><span class="p">:</span> <span class="s1">&#39;UNC_R&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftUncinate&#39;</span><span class="p">:</span> <span class="s1">&#39;UNC_L&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;Left IFOF&#39;</span><span class="p">:</span> <span class="s1">&#39;IFO_L&#39;</span><span class="p">,</span> <span class="s1">&#39;Right IFOF&#39;</span><span class="p">:</span> <span class="s1">&#39;IFO_R&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;LeftIFOF&#39;</span><span class="p">:</span> <span class="s1">&#39;IFO_L&#39;</span><span class="p">,</span> <span class="s1">&#39;RightIFOF&#39;</span><span class="p">:</span> <span class="s1">&#39;IFO_R&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;Right Arcuate&#39;</span><span class="p">:</span> <span class="s1">&#39;ARC_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left Arcuate&#39;</span><span class="p">:</span> <span class="s1">&#39;ARC_L&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;RightArcuate&#39;</span><span class="p">:</span> <span class="s1">&#39;ARC_R&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftArcuate&#39;</span><span class="p">:</span> <span class="s1">&#39;ARC_L&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;Right Thalamic Radiation&#39;</span><span class="p">:</span> <span class="s1">&#39;ATR_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left Thalamic Radiation&#39;</span><span class="p">:</span> <span class="s1">&#39;ATR_L&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;RightThalamicRadiation&#39;</span><span class="p">:</span> <span class="s1">&#39;ATR_R&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftThalamicRadiation&#39;</span><span class="p">:</span> <span class="s1">&#39;ATR_L&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;Right Cingulum Cingulate&#39;</span><span class="p">:</span> <span class="s1">&#39;CGC_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left Cingulum Cingulate&#39;</span><span class="p">:</span> <span class="s1">&#39;CGC_L&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;RightCingulumCingulate&#39;</span><span class="p">:</span> <span class="s1">&#39;CGC_R&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftCingulumCingulate&#39;</span><span class="p">:</span> <span class="s1">&#39;CGC_L&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;Right Cingulum Hippocampus&#39;</span><span class="p">:</span> <span class="s1">&#39;HCC_R&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;Left Cingulum Hippocampus&#39;</span><span class="p">:</span> <span class="s1">&#39;HCC_L&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;RightCingulumHippocampus&#39;</span><span class="p">:</span> <span class="s1">&#39;HCC_R&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;LeftCingulumHippocampus&#39;</span><span class="p">:</span> <span class="s1">&#39;HCC_L&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;Callosum Forceps Major&#39;</span><span class="p">:</span> <span class="s1">&#39;FP&#39;</span><span class="p">,</span> <span class="s1">&#39;Callosum Forceps Minor&#39;</span><span class="p">:</span> <span class="s1">&#39;FA&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;CallosumForcepsMajor&#39;</span><span class="p">:</span> <span class="s1">&#39;FP&#39;</span><span class="p">,</span> <span class="s1">&#39;CallosumForcepsMinor&#39;</span><span class="p">:</span> <span class="s1">&#39;FA&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;Right ILF&#39;</span><span class="p">:</span> <span class="s1">&#39;ILF_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left ILF&#39;</span><span class="p">:</span> <span class="s1">&#39;ILF_L&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;RightILF&#39;</span><span class="p">:</span> <span class="s1">&#39;ILF_R&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftILF&#39;</span><span class="p">:</span> <span class="s1">&#39;ILF_L&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;Right SLF&#39;</span><span class="p">:</span> <span class="s1">&#39;SLF_R&#39;</span><span class="p">,</span> <span class="s1">&#39;Left SLF&#39;</span><span class="p">:</span> <span class="s1">&#39;SLF_L&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;RightSLF&#39;</span><span class="p">:</span> <span class="s1">&#39;SLF_R&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftSLF&#39;</span><span class="p">:</span> <span class="s1">&#39;SLF_L&#39;</span><span class="p">}</span></div>
+<div class="viewcode-block" id="BUNDLE_MAT_2_PYTHON"><a class="viewcode-back" href="../../../reference/api/AFQ/data/utils/index.html#AFQ.data.utils.BUNDLE_MAT_2_PYTHON">[docs]</a><span class="n">BUNDLE_MAT_2_PYTHON</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;RightCorticospinal&#39;</span><span class="p">:</span> <span class="s1">&#39;Right Corticospinal&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;LeftCorticospinal&#39;</span><span class="p">:</span> <span class="s1">&#39;Left Corticospinal&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;RightUncinate&#39;</span><span class="p">:</span> <span class="s1">&#39;Right Uncinate&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftUncinate&#39;</span><span class="p">:</span> <span class="s1">&#39;Left Uncinate&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Left IFOF&#39;</span><span class="p">:</span> <span class="s1">&#39;Left Inferior Fronto-occipital&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Right IFOF&#39;</span><span class="p">:</span> <span class="s1">&#39;Right Inferior Fronto-occipital&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;LeftIFOF&#39;</span><span class="p">:</span> <span class="s1">&#39;Left Inferior Fronto-occipital&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;RightIFOF&#39;</span><span class="p">:</span> <span class="s1">&#39;Right Inferior Fronto-occipital&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;RightArcuate&#39;</span><span class="p">:</span> <span class="s1">&#39;Right Arcuate&#39;</span><span class="p">,</span> <span class="s1">&#39;LeftArcuate&#39;</span><span class="p">:</span> <span class="s1">&#39;Left Arcuate&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Right Thalamic Radiation&#39;</span><span class="p">:</span> <span class="s1">&#39;Right Anterior Thalamic&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Left Thalamic Radiation&#39;</span><span class="p">:</span> <span class="s1">&#39;Left Anterior Thalamic&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;RightThalamicRadiation&#39;</span><span class="p">:</span> <span class="s1">&#39;Right Anterior Thalamic&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;LeftThalamicRadiation&#39;</span><span class="p">:</span> <span class="s1">&#39;Left Anterior Thalamic&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Right Cingulum Cingulate&#39;</span><span class="p">:</span> <span class="s1">&#39;Right Cingulum Cingulate&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Left Cingulum Cingulate&#39;</span><span class="p">:</span> <span class="s1">&#39;Left Cingulum Cingulate&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;RightCingulumCingulate&#39;</span><span class="p">:</span> <span class="s1">&#39;Right Cingulum Cingulate&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;LeftCingulumCingulate&#39;</span><span class="p">:</span> <span class="s1">&#39;Left Cingulum Cingulate&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Callosum Forceps Major&#39;</span><span class="p">:</span> <span class="s1">&#39;Forceps Major&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Callosum Forceps Minor&#39;</span><span class="p">:</span> <span class="s1">&#39;Forceps Minor&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;CallosumForcepsMajor&#39;</span><span class="p">:</span> <span class="s1">&#39;Forceps Major&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;CallosumForcepsMinor&#39;</span><span class="p">:</span> <span class="s1">&#39;Forceps Minor&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Right ILF&#39;</span><span class="p">:</span> <span class="s1">&#39;Right Inferior Longitudinal&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Left ILF&#39;</span><span class="p">:</span> <span class="s1">&#39;Left Inferior Longitudinal&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;RightILF&#39;</span><span class="p">:</span> <span class="s1">&#39;Right Inferior Longitudinal&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;LeftILF&#39;</span><span class="p">:</span> <span class="s1">&#39;Left Inferior Longitudinal&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Right SLF&#39;</span><span class="p">:</span> <span class="s1">&#39;Right Superior Longitudinal&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Left SLF&#39;</span><span class="p">:</span> <span class="s1">&#39;Left Superior Longitudinal&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;RightSLF&#39;</span><span class="p">:</span> <span class="s1">&#39;Right Superior Longitudinal&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;LeftSLF&#39;</span><span class="p">:</span> <span class="s1">&#39;Left Superior Longitudinal&#39;</span><span class="p">}</span></div>
 </pre></div>
 
                 </article>
@@ -498,8 +499,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509"></script>
+  <script src="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
 
   <footer class="bd-footer">
@@ -533,7 +534,7 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
 </p></div>
       
     </div>

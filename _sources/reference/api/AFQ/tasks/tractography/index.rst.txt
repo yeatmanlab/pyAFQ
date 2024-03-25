@@ -51,7 +51,7 @@ Attributes
 .. py:function:: _meta_from_tracking_params(tracking_params, start_time, n_streamlines, seed, stop)
 
 
-.. py:function:: export_seed_mask(tracking_params)
+.. py:function:: export_seed_mask(data_imap, tracking_params)
 
    
    full path to a nifti file containing the
@@ -75,7 +75,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: export_stop_mask(tracking_params)
+.. py:function:: export_stop_mask(data_imap, tracking_params)
 
    
    full path to a nifti file containing the
@@ -186,7 +186,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: gpu_tractography(data_imap, tracking_params, seed, stop, tractography_ngpus=0)
+.. py:function:: gpu_tractography(data_imap, tracking_params, seed, stop, tractography_ngpus=0, chunk_size=100000)
 
    
    full path to the complete, unsegmented tractography file
@@ -199,6 +199,10 @@ Attributes
            this algorithm is used for tractography,
            https://github.com/dipy/GPUStreamlines
            Default: 0
+
+       **chunk_size** : int, optional
+           Chunk size for GPU tracking.
+           Default: 100000
 
 
 

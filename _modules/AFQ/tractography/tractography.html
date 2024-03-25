@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tractography.tractography &#8212; AFQ 1.2 documentation</title>
+    <title>AFQ.tractography.tractography &#8212; AFQ 1.3 documentation</title>
   
   
   
@@ -18,12 +18,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
@@ -39,9 +39,9 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509" />
-  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=bd9e20870c6007c4c509"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -65,7 +65,6 @@
   <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -105,10 +104,8 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
-
-  <header>
   
-    <div class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
   <label class="sidebar-toggle primary-toggle" for="__primary">
     <span class="fa-solid fa-bars"></span>
@@ -132,8 +129,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -253,15 +250,10 @@ document.write(`
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
-      <span class="fa-solid fa-outdent"></span>
-    </label>
-  
 </div>
 
-    </div>
+    </header>
   
-  </header>
 
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
@@ -438,12 +430,12 @@ document.write(`
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
 <span class="kn">import</span> <span class="nn">dipy.data</span> <span class="k">as</span> <span class="nn">dpd</span>
 <span class="kn">from</span> <span class="nn">dipy.align</span> <span class="kn">import</span> <span class="n">resample</span>
 <span class="kn">from</span> <span class="nn">dipy.direction</span> <span class="kn">import</span> <span class="p">(</span><span class="n">DeterministicMaximumDirectionGetter</span><span class="p">,</span>
                             <span class="n">ProbabilisticDirectionGetter</span><span class="p">)</span>
-<span class="kn">import</span> <span class="nn">dipy.tracking.utils</span> <span class="k">as</span> <span class="nn">dtu</span>
 <span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">StatefulTractogram</span><span class="p">,</span> <span class="n">Space</span>
 <span class="kn">from</span> <span class="nn">dipy.tracking.stopping_criterion</span> <span class="kn">import</span> <span class="p">(</span><span class="n">ThresholdStoppingCriterion</span><span class="p">,</span>
                                               <span class="n">CmcStoppingCriterion</span><span class="p">,</span>
@@ -451,24 +443,16 @@ document.write(`
 
 <span class="kn">from</span> <span class="nn">nibabel.streamlines.tractogram</span> <span class="kn">import</span> <span class="n">LazyTractogram</span>
 
-<span class="kn">from</span> <span class="nn">AFQ._fixes</span> <span class="kn">import</span> <span class="p">(</span><span class="n">VerboseLocalTracking</span><span class="p">,</span> <span class="n">VerboseParticleFilteringTracking</span><span class="p">,</span>
-                        <span class="n">tensor_odf</span><span class="p">)</span>
-
-
-<div class="viewcode-block" id="get_percentile_threshold"><a class="viewcode-back" href="../../../reference/api/AFQ/tractography/tractography/index.html#AFQ.tractography.tractography.get_percentile_threshold">[docs]</a><span class="k">def</span> <span class="nf">get_percentile_threshold</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
-    <span class="n">zero_mask</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span>
-    <span class="n">mask</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-    <span class="n">new_threshold</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span>
-        <span class="n">mask</span><span class="p">,</span>
-        <span class="mi">100</span> <span class="o">-</span> <span class="n">threshold</span><span class="p">)</span>
-    <span class="n">mask</span><span class="p">[</span><span class="n">zero_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">return</span> <span class="n">new_threshold</span></div>
+<span class="kn">from</span> <span class="nn">dipy.tracking.local_tracking</span> <span class="kn">import</span> <span class="p">(</span><span class="n">LocalTracking</span><span class="p">,</span>
+                                          <span class="n">ParticleFilteringTracking</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">AFQ._fixes</span> <span class="kn">import</span> <span class="n">tensor_odf</span>
+<span class="kn">from</span> <span class="nn">AFQ.tractography.utils</span> <span class="kn">import</span> <span class="n">gen_seeds</span><span class="p">,</span> <span class="n">get_percentile_threshold</span>
 
 
 <div class="viewcode-block" id="track"><a class="viewcode-back" href="../../../reference/api/AFQ/tractography/tractography/index.html#AFQ.tractography.tractography.track">[docs]</a><span class="k">def</span> <span class="nf">track</span><span class="p">(</span><span class="n">params_file</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="s2">&quot;prob&quot;</span><span class="p">,</span> <span class="n">max_angle</span><span class="o">=</span><span class="mf">30.</span><span class="p">,</span> <span class="n">sphere</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
           <span class="n">seed_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">seed_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">thresholds_as_percentages</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
           <span class="n">n_seeds</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_seeds</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rng_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-          <span class="n">stop_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span>
+          <span class="n">stop_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">minlen</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">maxlen</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span>
           <span class="n">odf_model</span><span class="o">=</span><span class="s2">&quot;CSD&quot;</span><span class="p">,</span> <span class="n">tracker</span><span class="o">=</span><span class="s2">&quot;local&quot;</span><span class="p">,</span> <span class="n">trx</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Tractography</span>
@@ -531,9 +515,9 @@ document.write(`
 <span class="sd">        Default: False</span>
 <span class="sd">    step_size : float, optional.</span>
 <span class="sd">        The size of a step (in mm) of tractography. Default: 0.5</span>
-<span class="sd">    min_length: int, optional</span>
+<span class="sd">    minlen: int, optional</span>
 <span class="sd">        The miminal length (mm) in a streamline. Default: 20</span>
-<span class="sd">    max_length: int, optional</span>
+<span class="sd">    maxlen: int, optional</span>
 <span class="sd">        The miminal length (mm) in a streamline. Default: 250</span>
 <span class="sd">    odf_model : str, optional</span>
 <span class="sd">        One of {&quot;DTI&quot;, &quot;CSD&quot;, &quot;DKI&quot;}. Defaults to use &quot;DTI&quot;</span>
@@ -565,36 +549,19 @@ document.write(`
         <span class="n">params_img</span> <span class="o">=</span> <span class="n">params_file</span>
 
     <span class="n">model_params</span> <span class="o">=</span> <span class="n">params_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
-    <span class="n">affine</span> <span class="o">=</span> <span class="n">params_img</span><span class="o">.</span><span class="n">affine</span>
     <span class="n">odf_model</span> <span class="o">=</span> <span class="n">odf_model</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
     <span class="n">directions</span> <span class="o">=</span> <span class="n">directions</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
     <span class="c1"># We need to calculate the size of a voxel, so we can transform</span>
     <span class="c1"># from mm to voxel units:</span>
-    <span class="n">min_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">min_length</span> <span class="o">/</span> <span class="n">step_size</span><span class="p">)</span>
-    <span class="n">max_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_length</span> <span class="o">/</span> <span class="n">step_size</span><span class="p">)</span>
+    <span class="n">minlen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">minlen</span> <span class="o">/</span> <span class="n">step_size</span><span class="p">)</span>
+    <span class="n">maxlen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">maxlen</span> <span class="o">/</span> <span class="n">step_size</span><span class="p">)</span>
 
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Generating Seeds...&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n_seeds</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">seed_mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">seed_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">params_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">seed_mask</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">thresholds_as_percentages</span><span class="p">:</span>
-                <span class="n">seed_threshold</span> <span class="o">=</span> <span class="n">get_percentile_threshold</span><span class="p">(</span>
-                    <span class="n">seed_mask</span><span class="p">,</span> <span class="n">seed_threshold</span><span class="p">)</span>
-            <span class="n">seed_mask</span> <span class="o">=</span> <span class="n">seed_mask</span> <span class="o">&gt;</span> <span class="n">seed_threshold</span>
-        <span class="k">if</span> <span class="n">random_seeds</span><span class="p">:</span>
-            <span class="n">seeds</span> <span class="o">=</span> <span class="n">dtu</span><span class="o">.</span><span class="n">random_seeds_from_mask</span><span class="p">(</span><span class="n">seed_mask</span><span class="p">,</span> <span class="n">seeds_count</span><span class="o">=</span><span class="n">n_seeds</span><span class="p">,</span>
-                                               <span class="n">seed_count_per_voxel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                               <span class="n">affine</span><span class="o">=</span><span class="n">affine</span><span class="p">,</span>
-                                               <span class="n">random_seed</span><span class="o">=</span><span class="n">rng_seed</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">seeds</span> <span class="o">=</span> <span class="n">dtu</span><span class="o">.</span><span class="n">seeds_from_mask</span><span class="p">(</span><span class="n">seed_mask</span><span class="p">,</span>
-                                        <span class="n">density</span><span class="o">=</span><span class="n">n_seeds</span><span class="p">,</span>
-                                        <span class="n">affine</span><span class="o">=</span><span class="n">affine</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># If user provided an array, we&#39;ll use n_seeds as the seeds:</span>
-        <span class="n">seeds</span> <span class="o">=</span> <span class="n">n_seeds</span>
+    <span class="n">seeds</span> <span class="o">=</span> <span class="n">gen_seeds</span><span class="p">(</span>
+        <span class="n">seed_mask</span><span class="p">,</span> <span class="n">seed_threshold</span><span class="p">,</span>
+        <span class="n">n_seeds</span><span class="p">,</span> <span class="n">thresholds_as_percentages</span><span class="p">,</span>
+        <span class="n">random_seeds</span><span class="p">,</span> <span class="n">rng_seed</span><span class="p">,</span> <span class="n">params_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">sphere</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">sphere</span> <span class="o">=</span> <span class="n">dpd</span><span class="o">.</span><span class="n">default_sphere</span>
 
@@ -628,7 +595,7 @@ document.write(`
             <span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">ThresholdStoppingCriterion</span><span class="p">(</span><span class="n">stop_mask</span><span class="p">,</span>
                                                             <span class="n">stop_threshold</span><span class="p">)</span>
 
-        <span class="n">my_tracker</span> <span class="o">=</span> <span class="n">VerboseLocalTracking</span>
+        <span class="n">my_tracker</span> <span class="o">=</span> <span class="n">LocalTracking</span>
 
     <span class="k">elif</span> <span class="n">tracker</span> <span class="o">==</span> <span class="s2">&quot;pft&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stop_threshold</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -669,7 +636,7 @@ document.write(`
 
         <span class="n">vox_sizes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">params_img</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">get_zooms</span><span class="p">()[:</span><span class="mi">3</span><span class="p">]))</span>
 
-        <span class="n">my_tracker</span> <span class="o">=</span> <span class="n">VerboseParticleFilteringTracking</span>
+        <span class="n">my_tracker</span> <span class="o">=</span> <span class="n">ParticleFilteringTracking</span>
         <span class="k">if</span> <span class="n">stop_threshold</span> <span class="o">==</span> <span class="s2">&quot;CMC&quot;</span><span class="p">:</span>
             <span class="n">stopping_criterion</span> <span class="o">=</span> <span class="n">CmcStoppingCriterion</span><span class="o">.</span><span class="n">from_pve</span><span class="p">(</span>
                 <span class="n">pve_wm_data</span><span class="p">,</span>
@@ -683,16 +650,17 @@ document.write(`
                 <span class="n">pve_gm_data</span><span class="p">,</span>
                 <span class="n">pve_csf_data</span><span class="p">)</span>
 
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Tracking...&quot;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Tracking with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">seeds</span><span class="p">)</span><span class="si">}</span><span class="s2"> seeds, 2 directions per seed...&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_tracking</span><span class="p">(</span><span class="n">my_tracker</span><span class="p">,</span> <span class="n">seeds</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">,</span> <span class="n">params_img</span><span class="p">,</span>
-                     <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="n">min_length</span><span class="p">,</span>
-                     <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="n">rng_seed</span><span class="p">,</span>
+                     <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span> <span class="n">minlen</span><span class="o">=</span><span class="n">minlen</span><span class="p">,</span>
+                     <span class="n">maxlen</span><span class="o">=</span><span class="n">maxlen</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="n">rng_seed</span><span class="p">,</span>
                      <span class="n">trx</span><span class="o">=</span><span class="n">trx</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="_tracking"><a class="viewcode-back" href="../../../reference/api/AFQ/tractography/tractography/index.html#AFQ.tractography.tractography._tracking">[docs]</a><span class="k">def</span> <span class="nf">_tracking</span><span class="p">(</span><span class="n">tracker</span><span class="p">,</span> <span class="n">seeds</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">stopping_criterion</span><span class="p">,</span> <span class="n">params_img</span><span class="p">,</span>
-              <span class="n">step_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+              <span class="n">step_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">minlen</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">maxlen</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
               <span class="n">random_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">trx</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function</span>
@@ -700,15 +668,16 @@ document.write(`
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">seeds</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">seeds</span> <span class="o">=</span> <span class="n">seeds</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
 
-    <span class="n">tracker</span> <span class="o">=</span> <span class="n">tracker</span><span class="p">(</span>
+    <span class="n">tracker</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">tracker</span><span class="p">(</span>
         <span class="n">dg</span><span class="p">,</span>
         <span class="n">stopping_criterion</span><span class="p">,</span>
         <span class="n">seeds</span><span class="p">,</span>
         <span class="n">params_img</span><span class="o">.</span><span class="n">affine</span><span class="p">,</span>
         <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span>
-        <span class="n">min_length</span><span class="o">=</span><span class="n">min_length</span><span class="p">,</span>
-        <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span>
-        <span class="n">random_seed</span><span class="o">=</span><span class="n">random_seed</span><span class="p">)</span>
+        <span class="n">minlen</span><span class="o">=</span><span class="n">minlen</span><span class="p">,</span>
+        <span class="n">maxlen</span><span class="o">=</span><span class="n">maxlen</span><span class="p">,</span>
+        <span class="n">return_all</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">random_seed</span><span class="o">=</span><span class="n">random_seed</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">trx</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">LazyTractogram</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">tracker</span><span class="p">,</span>
@@ -746,8 +715,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509"></script>
+  <script src="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
 
   <footer class="bd-footer">
@@ -781,7 +750,7 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
 </p></div>
       
     </div>

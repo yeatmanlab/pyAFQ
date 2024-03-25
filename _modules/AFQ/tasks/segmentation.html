@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.segmentation &#8212; AFQ 1.2 documentation</title>
+    <title>AFQ.tasks.segmentation &#8212; AFQ 1.3 documentation</title>
   
   
   
@@ -18,12 +18,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
@@ -39,9 +39,9 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509" />
-  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=bd9e20870c6007c4c509"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -65,7 +65,6 @@
   <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -105,10 +104,8 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
-
-  <header>
   
-    <div class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
   <label class="sidebar-toggle primary-toggle" for="__primary">
     <span class="fa-solid fa-bars"></span>
@@ -132,8 +129,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -253,15 +250,10 @@ document.write(`
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
-      <span class="fa-solid fa-outdent"></span>
-    </label>
-  
 </div>
 
-    </div>
+    </header>
   
-  </header>
 
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
@@ -471,7 +463,7 @@ document.write(`
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;bundles&quot;</span><span class="p">)</span>
 <span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_tractography&#39;</span><span class="p">,</span> <span class="n">include_track</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">include_seg</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<div class="viewcode-block" id="segment"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/segmentation/index.html#AFQ.tasks.segmentation.segment">[docs]</a><span class="k">def</span> <span class="nf">segment</span><span class="p">(</span><span class="n">dwi</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">,</span> <span class="n">mapping_imap</span><span class="p">,</span>
+<div class="viewcode-block" id="segment"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/segmentation/index.html#AFQ.tasks.segmentation.segment">[docs]</a><span class="k">def</span> <span class="nf">segment</span><span class="p">(</span><span class="n">data_imap</span><span class="p">,</span> <span class="n">mapping_imap</span><span class="p">,</span>
             <span class="n">tractography_imap</span><span class="p">,</span> <span class="n">segmentation_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    full path to a trk/trx file containing containing</span>
@@ -486,15 +478,14 @@ document.write(`
     <span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;bundle_dict&quot;</span><span class="p">]</span>
     <span class="n">reg_template</span> <span class="o">=</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;reg_template&quot;</span><span class="p">]</span>
     <span class="n">streamlines</span> <span class="o">=</span> <span class="n">tractography_imap</span><span class="p">[</span><span class="s2">&quot;streamlines&quot;</span><span class="p">]</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dwi</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">streamlines</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.trk&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">streamlines</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.tck&quot;</span><span class="p">):</span>
         <span class="n">tg</span> <span class="o">=</span> <span class="n">load_tractogram</span><span class="p">(</span>
-            <span class="n">streamlines</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">,</span>
+            <span class="n">streamlines</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;dwi&quot;</span><span class="p">],</span> <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">,</span>
             <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">is_trx</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">elif</span> <span class="n">streamlines</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.trx&quot;</span><span class="p">):</span>
         <span class="n">is_trx</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">trx</span> <span class="o">=</span> <span class="n">load_trx</span><span class="p">(</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">img</span><span class="p">)</span>
+        <span class="n">trx</span> <span class="o">=</span> <span class="n">load_trx</span><span class="p">(</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;dwi&quot;</span><span class="p">])</span>
         <span class="n">trx</span><span class="o">.</span><span class="n">streamlines</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">trx</span><span class="o">.</span><span class="n">streamlines</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
         <span class="n">tg</span> <span class="o">=</span> <span class="n">trx</span><span class="o">.</span><span class="n">to_sft</span><span class="p">()</span>
 
@@ -508,9 +499,7 @@ document.write(`
         <span class="n">bundle_dict</span><span class="p">,</span>
         <span class="n">tg</span><span class="p">,</span>
         <span class="n">mapping_imap</span><span class="p">[</span><span class="s2">&quot;mapping&quot;</span><span class="p">],</span>
-        <span class="n">dwi</span><span class="p">,</span>
-        <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;bval&quot;</span><span class="p">],</span>
-        <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;bvec&quot;</span><span class="p">],</span>
+        <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;dwi&quot;</span><span class="p">],</span>
         <span class="n">reg_template</span><span class="o">=</span><span class="n">reg_template</span><span class="p">)</span>
 
     <span class="n">seg_sft</span> <span class="o">=</span> <span class="n">aus</span><span class="o">.</span><span class="n">SegmentedSFT</span><span class="p">(</span><span class="n">bundles</span><span class="p">,</span> <span class="n">Space</span><span class="o">.</span><span class="n">VOX</span><span class="p">)</span>
@@ -528,13 +517,20 @@ document.write(`
     <span class="k">else</span><span class="p">:</span>
         <span class="n">tgram</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">seg_sft</span><span class="o">.</span><span class="n">get_sft_and_sidecar</span><span class="p">()</span>
 
-    <span class="n">segmentation_params_out</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">arg_name</span><span class="p">:</span> <span class="n">value</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span>
-            <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">segmentation_params</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">seg_params_out</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">segmentation_params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
+            <span class="n">seg_params_out</span><span class="p">[</span><span class="n">arg_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">seg_params_out</span><span class="p">[</span><span class="n">arg_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">seg_params_out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">seg_params_out</span><span class="p">[</span><span class="n">arg_name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
     <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">streamlines</span>
-    <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;Recognition Parameters&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">segmentation_params_out</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;Recognition Parameters&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">seg_params_out</span>
     <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;Timing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
     <span class="k">return</span> <span class="n">tgram</span><span class="p">,</span> <span class="n">meta</span></div>
 
@@ -640,8 +636,7 @@ document.write(`
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;density_maps&quot;</span><span class="p">)</span>
 <span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_desc-density_dwi.nii.gz&#39;</span><span class="p">,</span> <span class="n">include_track</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">include_seg</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="nd">@as_img</span>
-<div class="viewcode-block" id="export_density_maps"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/segmentation/index.html#AFQ.tasks.segmentation.export_density_maps">[docs]</a><span class="k">def</span> <span class="nf">export_density_maps</span><span class="p">(</span><span class="n">bundles</span><span class="p">,</span> <span class="n">dwi</span><span class="p">):</span>
+<div class="viewcode-block" id="export_density_maps"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/segmentation/index.html#AFQ.tasks.segmentation.export_density_maps">[docs]</a><span class="k">def</span> <span class="nf">export_density_maps</span><span class="p">(</span><span class="n">bundles</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    full path to 4d nifti file containing streamline counts per voxel</span>
 <span class="sd">    per bundle, where the 4th dimension encodes the bundle</span>
@@ -649,21 +644,22 @@ document.write(`
     <span class="n">seg_sft</span> <span class="o">=</span> <span class="n">aus</span><span class="o">.</span><span class="n">SegmentedSFT</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span>
         <span class="n">bundles</span><span class="p">)</span>
     <span class="n">entire_density_map</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span>
-        <span class="o">*</span><span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dwi</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span>
+        <span class="o">*</span><span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span>
         <span class="nb">len</span><span class="p">(</span><span class="n">seg_sft</span><span class="o">.</span><span class="n">bundle_names</span><span class="p">)))</span>
     <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">bundle_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">seg_sft</span><span class="o">.</span><span class="n">bundle_names</span><span class="p">):</span>
         <span class="n">bundle_sl</span> <span class="o">=</span> <span class="n">seg_sft</span><span class="o">.</span><span class="n">get_bundle</span><span class="p">(</span><span class="n">bundle_name</span><span class="p">)</span>
         <span class="n">bundle_density</span> <span class="o">=</span> <span class="n">auv</span><span class="o">.</span><span class="n">density_map</span><span class="p">(</span><span class="n">bundle_sl</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
         <span class="n">entire_density_map</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="n">bundle_density</span>
 
-    <span class="k">return</span> <span class="n">entire_density_map</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span>
-        <span class="n">source</span><span class="o">=</span><span class="n">bundles</span><span class="p">,</span> <span class="n">bundles</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">seg_sft</span><span class="o">.</span><span class="n">bundle_names</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span>
+        <span class="n">entire_density_map</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;dwi_affine&quot;</span><span class="p">]),</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">bundles</span><span class="p">,</span> <span class="n">bundles</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">seg_sft</span><span class="o">.</span><span class="n">bundle_names</span><span class="p">))</span></div>
 
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;profiles&quot;</span><span class="p">)</span>
 <span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_desc-profiles_dwi.csv&#39;</span><span class="p">,</span> <span class="n">include_track</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">include_seg</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <div class="viewcode-block" id="tract_profiles"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/segmentation/index.html#AFQ.tasks.segmentation.tract_profiles">[docs]</a><span class="k">def</span> <span class="nf">tract_profiles</span><span class="p">(</span><span class="n">bundles</span><span class="p">,</span>
-                   <span class="n">scalar_dict</span><span class="p">,</span> <span class="n">dwi_affine</span><span class="p">,</span>
+                   <span class="n">scalar_dict</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">,</span>
                    <span class="n">profile_weights</span><span class="o">=</span><span class="s2">&quot;gauss&quot;</span><span class="p">,</span>
                    <span class="n">n_points_profile</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -734,7 +730,7 @@ document.write(`
                             <span class="n">values_from_volume</span><span class="p">(</span>
                                 <span class="n">scalar_data</span><span class="p">,</span>
                                 <span class="n">fgarray</span><span class="p">,</span>
-                                <span class="n">dwi_affine</span><span class="p">))</span>
+                                <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;dwi_affine&quot;</span><span class="p">]))</span>
                         <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
                         <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">jj</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
                             <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span>
@@ -747,7 +743,7 @@ document.write(`
             <span class="n">this_profile</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="n">afq_profile</span><span class="p">(</span>
                 <span class="n">scalar_data</span><span class="p">,</span>
                 <span class="n">this_sl</span><span class="p">,</span>
-                <span class="n">dwi_affine</span><span class="p">,</span>
+                <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;dwi_affine&quot;</span><span class="p">],</span>
                 <span class="n">weights</span><span class="o">=</span><span class="n">this_prof_weights</span><span class="p">,</span>
                 <span class="n">n_points</span><span class="o">=</span><span class="n">n_points_profile</span><span class="p">)</span>
             <span class="n">profiles</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">this_profile</span><span class="p">[</span><span class="n">ii</span><span class="p">]))</span>
@@ -788,7 +784,7 @@ document.write(`
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">sc</span> <span class="o">=</span> <span class="n">scalar</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
             <span class="n">scalar_dict</span><span class="p">[</span><span class="n">sc</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_imap</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">scalar</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">mapping_imap</span><span class="p">:</span>
             <span class="n">scalar_dict</span><span class="p">[</span><span class="n">scalar</span><span class="o">.</span><span class="n">get_name</span><span class="p">()]</span> <span class="o">=</span> <span class="n">mapping_imap</span><span class="p">[</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">scalar</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
     <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;scalar_dict&quot;</span><span class="p">:</span> <span class="n">scalar_dict</span><span class="p">}</span></div>
@@ -846,8 +842,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509"></script>
+  <script src="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
 
   <footer class="bd-footer">
@@ -881,7 +877,7 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
 </p></div>
       
     </div>

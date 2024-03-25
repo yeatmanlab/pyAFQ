@@ -28,7 +28,7 @@ some bundles. This example shows how to track and recognize only certain
 bundles that you are interested in, though note that ARC, pARC and VOF are all
 also part of the set of bundles that are segmented per default.
 
-.. GENERATED FROM PYTHON SOURCE LINES 13-47
+.. GENERATED FROM PYTHON SOURCE LINES 13-50
 
 .. code-block:: Python
 
@@ -43,7 +43,10 @@ also part of the set of bundles that are segmented per default.
 
     afd.organize_stanford_data(clear_previous_afq="track")
 
-    bundle_names = ["ARC_L", "ARC_R", "pARC_L", "pARC_R", "VOF_L", "VOF_R"]
+    bundle_names = [
+        "Left Arcuate", "Right Arcuate",
+        "Left Posterior Arcuate", "Right Posterior Arcuate",
+        "Left Vertical Occipital", "Right Vertical Occipital"]
     bundle_dict = abd.default18_bd()[bundle_names]
 
 

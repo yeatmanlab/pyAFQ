@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Automated Fiber Quantification in Python (pyAFQ) &#8212; AFQ 1.2 documentation</title>
+    <title>Automated Fiber Quantification in Python (pyAFQ) &#8212; AFQ 1.3 documentation</title>
   
   
   
@@ -18,12 +18,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
@@ -39,9 +39,9 @@
     <link rel="stylesheet" type="text/css" href="_static/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509" />
-  <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=bd9e20870c6007c4c509"></script>
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
@@ -66,7 +66,6 @@
   <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -106,10 +105,8 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
-
-  <header>
   
-    <div class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
   <label class="sidebar-toggle primary-toggle" for="__primary">
     <span class="fa-solid fa-bars"></span>
@@ -133,8 +130,8 @@
       
     
     
-    <img src="_static/logo.png" class="logo__image only-light" alt="AFQ 1.2 documentation - Home"/>
-    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="AFQ 1.2 documentation - Home"/>`);</script>
+    <img src="_static/logo.png" class="logo__image only-light" alt="AFQ 1.3 documentation - Home"/>
+    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -260,9 +257,8 @@ document.write(`
   
 </div>
 
-    </div>
+    </header>
   
-  </header>
 
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
@@ -483,7 +479,7 @@ of how methods work and the parameters used for each method.</p>
 and by a grant from the
 <a class="reference external" href="https://www.moore.org/">Gordon &amp; Betty Moore Foundation</a>,  and from the
 <a class="reference external" href="http://www.sloan.org/">Alfred P. Sloan Foundation</a> to the
-<a class="reference external" href="http://escience.washington.edu/">University of Washington eScience Institute</a>, by grant <cite>R01EB027585 &lt;https://reporter.nih.gov/search/jnnzzQ8Rj0CLD3R3l92GPg/project-details/10735068&gt;_</cite> to Eleftherios Garyfallidis (PI) and Ariel Rokem, grant <a class="reference external" href="https://reporter.nih.gov/search/j2JXd89oR0i4cCnIDo7fFA/project-details/10669103">R01HD095861</a> to Jason Yeatman, <a class="reference external" href="https://reporter.nih.gov/search/j2JXd89oR0i4cCnIDo7fFA/project-details/9735358">R21HD092771</a>  to Jason Yeatman and Pat Kuhl, by NSF grants <a class="reference external" href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1551330">1551330</a> to Jason Yeatman and <cite>1934292 &lt;https://www.nsf.gov/awardsearch/showAward?AWD_ID=1934292&gt;_</cite> to Magda Balazinska (PI) and Ariel Rokem (co-PI). John Kruper’s work on pyAFQ has been supported through the NSF Graduate Research Fellowship program (DGE-2140004).</p>
+<a class="reference external" href="http://escience.washington.edu/">University of Washington eScience Institute</a>, by grant <a class="reference external" href="https://reporter.nih.gov/search/jnnzzQ8Rj0CLD3R3l92GPg/project-details/10735068">R01EB027585</a> to Eleftherios Garyfallidis (PI) and Ariel Rokem, grant <a class="reference external" href="https://reporter.nih.gov/search/j2JXd89oR0i4cCnIDo7fFA/project-details/10669103">R01HD095861</a> to Jason Yeatman, <a class="reference external" href="https://reporter.nih.gov/search/j2JXd89oR0i4cCnIDo7fFA/project-details/9735358">R21HD092771</a>  to Jason Yeatman and Pat Kuhl, by NSF grants <a class="reference external" href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1551330">1551330</a> to Jason Yeatman and <a class="reference external" href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1934292">1934292</a> to Magda Balazinska (PI) and Ariel Rokem (co-PI). John Kruper’s work on pyAFQ has been supported through the NSF Graduate Research Fellowship program (DGE-2140004).</p>
 <div class="align-center figure">
 <a class="reference external image-reference" href="http://escience.washington.edu"><img alt="_images/eScience_Logo_HR.png" src="_images/eScience_Logo_HR.png" /></a>
 </div>
@@ -572,8 +568,8 @@ and by a grant from the
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509"></script>
+  <script src="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
 
   <footer class="bd-footer">
@@ -607,7 +603,7 @@ and by a grant from the
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
 </p></div>
       
     </div>

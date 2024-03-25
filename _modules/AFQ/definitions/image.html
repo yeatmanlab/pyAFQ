@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.definitions.image &#8212; AFQ 1.2 documentation</title>
+    <title>AFQ.definitions.image &#8212; AFQ 1.3 documentation</title>
   
   
   
@@ -18,12 +18,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
@@ -39,9 +39,9 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509" />
-  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=bd9e20870c6007c4c509"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -65,7 +65,6 @@
   <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -105,10 +104,8 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
-
-  <header>
   
-    <div class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
   <label class="sidebar-toggle primary-toggle" for="__primary">
     <span class="fa-solid fa-bars"></span>
@@ -132,8 +129,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -253,15 +250,10 @@ document.write(`
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
-      <span class="fa-solid fa-outdent"></span>
-    </label>
-  
 </div>
 
-    </div>
+    </header>
   
-  </header>
 
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
@@ -442,11 +434,9 @@ document.write(`
 <span class="kn">from</span> <span class="nn">dipy.segment.mask</span> <span class="kn">import</span> <span class="n">median_otsu</span>
 <span class="kn">from</span> <span class="nn">dipy.align</span> <span class="kn">import</span> <span class="n">resample</span>
 
-<span class="kn">import</span> <span class="nn">AFQ.utils.volume</span> <span class="k">as</span> <span class="nn">auv</span>
 <span class="kn">from</span> <span class="nn">AFQ.definitions.utils</span> <span class="kn">import</span> <span class="n">Definition</span><span class="p">,</span> <span class="n">find_file</span><span class="p">,</span> <span class="n">name_from_path</span>
 
 <span class="kn">from</span> <span class="nn">skimage.morphology</span> <span class="kn">import</span> <span class="n">convex_hull_image</span><span class="p">,</span> <span class="n">binary_opening</span>
-<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="kn">import</span> <span class="n">blas</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;ImageFile&quot;</span><span class="p">,</span> <span class="s2">&quot;FullImage&quot;</span><span class="p">,</span> <span class="s2">&quot;RoiImage&quot;</span><span class="p">,</span> <span class="s2">&quot;B0Image&quot;</span><span class="p">,</span> <span class="s2">&quot;LabelledImageFile&quot;</span><span class="p">,</span>
@@ -564,16 +554,20 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">filters</span> <span class="o">=</span> <span class="n">filters</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span> <span class="o">=</span> <span class="p">{}</span>
 
-<div class="viewcode-block" id="ImageFile.find_path"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.ImageFile.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+<div class="viewcode-block" id="ImageFile.find_path"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.ImageFile.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span>
+                  <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_from_path</span><span class="p">:</span>
             <span class="k">return</span>
-        <span class="k">if</span> <span class="n">session</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span><span class="n">session</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="n">nearest_image</span> <span class="o">=</span> <span class="n">find_file</span><span class="p">(</span>
             <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span>
-            <span class="n">subject</span><span class="p">)</span>
+            <span class="n">subject</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">nearest_image</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">session</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span><span class="n">session</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span><span class="n">session</span><span class="p">][</span><span class="n">subject</span><span class="p">]</span> <span class="o">=</span> <span class="n">nearest_image</span></div>
 
 <div class="viewcode-block" id="ImageFile.get_path_data_affine"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.ImageFile.get_path_data_affine">[docs]</a>    <span class="k">def</span> <span class="nf">get_path_data_affine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">):</span>
@@ -593,7 +587,7 @@ document.write(`
         <span class="k">return</span> <span class="n">name_from_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_from_path</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span></div>
 
 <div class="viewcode-block" id="ImageFile.get_image_getter"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.ImageFile.get_image_getter">[docs]</a>    <span class="k">def</span> <span class="nf">get_image_getter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_name</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">image_getter</span><span class="p">(</span><span class="n">dwi</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">_image_getter_helper</span><span class="p">(</span><span class="n">dwi</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">):</span>
             <span class="c1"># Load data</span>
             <span class="n">image_file</span><span class="p">,</span> <span class="n">image_data_orig</span><span class="p">,</span> <span class="n">image_affine</span> <span class="o">=</span> \
                 <span class="bp">self</span><span class="o">.</span><span class="n">get_path_data_affine</span><span class="p">(</span><span class="n">bids_info</span><span class="p">)</span>
@@ -603,15 +597,20 @@ document.write(`
                 <span class="n">image_data_orig</span><span class="p">,</span> <span class="n">image_file</span><span class="p">)</span>
 
             <span class="c1"># Resample to DWI data:</span>
-            <span class="n">dwi_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dwi</span><span class="p">)</span>
             <span class="n">image_data</span> <span class="o">=</span> <span class="n">_resample_image</span><span class="p">(</span>
                 <span class="n">image_data</span><span class="p">,</span>
-                <span class="n">dwi_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
+                <span class="n">dwi</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
                 <span class="n">image_affine</span><span class="p">,</span>
-                <span class="n">dwi_img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+                <span class="n">dwi</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span>
                 <span class="n">image_data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
-                <span class="n">dwi_img</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span> <span class="n">meta</span>
+                <span class="n">dwi</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span> <span class="n">meta</span>
+        <span class="k">if</span> <span class="n">task_name</span> <span class="o">==</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span>
+            <span class="k">def</span> <span class="nf">image_getter</span><span class="p">(</span><span class="n">dwi</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">_image_getter_helper</span><span class="p">(</span><span class="n">dwi</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">def</span> <span class="nf">image_getter</span><span class="p">(</span><span class="n">data_imap</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">_image_getter_helper</span><span class="p">(</span><span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;dwi&quot;</span><span class="p">],</span> <span class="n">bids_info</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">image_getter</span></div></div>
 
 
@@ -627,18 +626,20 @@ document.write(`
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-<div class="viewcode-block" id="FullImage.find_path"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.FullImage.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
-        <span class="k">pass</span></div>
-
 <div class="viewcode-block" id="FullImage.get_name"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.FullImage.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;entire_volume&quot;</span></div>
 
 <div class="viewcode-block" id="FullImage.get_image_getter"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.FullImage.get_image_getter">[docs]</a>    <span class="k">def</span> <span class="nf">get_image_getter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_name</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">image_getter</span><span class="p">(</span><span class="n">dwi</span><span class="p">):</span>
-            <span class="n">dwi_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dwi</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">_image_getter_helper</span><span class="p">(</span><span class="n">dwi</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">dwi_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
-                <span class="n">dwi_img</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s2">&quot;Entire Volume&quot;</span><span class="p">)</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">dwi</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+                <span class="n">dwi</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s2">&quot;Entire Volume&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">task_name</span> <span class="o">==</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span>
+            <span class="k">def</span> <span class="nf">image_getter</span><span class="p">(</span><span class="n">dwi</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">_image_getter_helper</span><span class="p">(</span><span class="n">dwi</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">def</span> <span class="nf">image_getter</span><span class="p">(</span><span class="n">data_imap</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">_image_getter_helper</span><span class="p">(</span><span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;dwi&quot;</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">image_getter</span></div></div>
 
 
@@ -695,14 +696,11 @@ document.write(`
                 <span class="s2">&quot;One of use_waypoints, use_presegment, &quot;</span>
                 <span class="s2">&quot;use_endpoints, must be True&quot;</span><span class="p">))</span>
 
-<div class="viewcode-block" id="RoiImage.find_path"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.RoiImage.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
-        <span class="k">pass</span></div>
-
 <div class="viewcode-block" id="RoiImage.get_name"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.RoiImage.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;roi&quot;</span></div>
 
 <div class="viewcode-block" id="RoiImage.get_image_getter"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.RoiImage.get_image_getter">[docs]</a>    <span class="k">def</span> <span class="nf">get_image_getter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_name</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">_image_getter_helper</span><span class="p">(</span><span class="n">dwi_affine</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span>
+        <span class="k">def</span> <span class="nf">_image_getter_helper</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span>
                                  <span class="n">data_imap</span><span class="p">,</span> <span class="n">segmentation_params</span><span class="p">):</span>
             <span class="n">image_data</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;bundle_dict&quot;</span><span class="p">]</span>
@@ -716,7 +714,7 @@ document.write(`
                 <span class="n">bundle_entry</span> <span class="o">=</span> <span class="n">bundle_dict</span><span class="o">.</span><span class="n">transform_rois</span><span class="p">(</span>
                     <span class="n">bundle_name</span><span class="p">,</span>
                     <span class="n">mapping</span><span class="p">,</span>
-                    <span class="n">dwi_affine</span><span class="p">)</span>
+                    <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;dwi_affine&quot;</span><span class="p">])</span>
                 <span class="n">rois</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_endpoints</span><span class="p">:</span>
                     <span class="n">rois</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
@@ -752,7 +750,7 @@ document.write(`
                     <span class="sa">f</span><span class="s2">&quot;an ROI Image: </span><span class="si">{</span><span class="n">bundle_dict</span><span class="o">.</span><span class="n">_dict</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span>
                 <span class="n">image_data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
-                <span class="n">dwi_affine</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s2">&quot;ROIs&quot;</span><span class="p">)</span>
+                <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;dwi_affine&quot;</span><span class="p">]),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s2">&quot;ROIs&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">task_name</span> <span class="o">==</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
@@ -760,17 +758,17 @@ document.write(`
                 <span class="s2">&quot;require later derivatives to be calculated&quot;</span><span class="p">))</span>
         <span class="k">elif</span> <span class="n">task_name</span> <span class="o">==</span> <span class="s2">&quot;mapping&quot;</span><span class="p">:</span>
             <span class="k">def</span> <span class="nf">image_getter</span><span class="p">(</span>
-                    <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span>
+                    <span class="n">mapping</span><span class="p">,</span>
                     <span class="n">data_imap</span><span class="p">,</span> <span class="n">segmentation_params</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">_image_getter_helper</span><span class="p">(</span>
-                    <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span>
+                    <span class="n">mapping</span><span class="p">,</span>
                     <span class="n">data_imap</span><span class="p">,</span> <span class="n">segmentation_params</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">def</span> <span class="nf">image_getter</span><span class="p">(</span>
-                    <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">mapping_imap</span><span class="p">,</span>
+                    <span class="n">mapping_imap</span><span class="p">,</span>
                     <span class="n">data_imap</span><span class="p">,</span> <span class="n">segmentation_params</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">_image_getter_helper</span><span class="p">(</span>
-                    <span class="n">dwi_affine</span><span class="p">,</span> <span class="n">mapping_imap</span><span class="p">[</span><span class="s2">&quot;mapping&quot;</span><span class="p">],</span>
+                    <span class="n">mapping_imap</span><span class="p">[</span><span class="s2">&quot;mapping&quot;</span><span class="p">],</span>
                     <span class="n">data_imap</span><span class="p">,</span> <span class="n">segmentation_params</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">image_getter</span></div></div>
 
@@ -789,9 +787,6 @@ document.write(`
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
-
-<div class="viewcode-block" id="GQImage.find_path"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.GQImage.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
-        <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="GQImage.get_name"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.GQImage.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;GQ&quot;</span></div>
@@ -835,9 +830,6 @@ document.write(`
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">median_otsu_kwargs</span><span class="o">=</span><span class="p">{}):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">median_otsu_kwargs</span> <span class="o">=</span> <span class="n">median_otsu_kwargs</span>
-
-<div class="viewcode-block" id="B0Image.find_path"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.B0Image.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
-        <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="B0Image.get_name"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.B0Image.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;b0&quot;</span></div>
@@ -1042,9 +1034,6 @@ document.write(`
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span> <span class="o">=</span> <span class="n">scalar</span>
 
-<div class="viewcode-block" id="ScalarImage.find_path"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.ScalarImage.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
-        <span class="k">pass</span></div>
-
 <div class="viewcode-block" id="ScalarImage.get_name"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.ScalarImage.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar</span></div>
 
@@ -1131,9 +1120,15 @@ document.write(`
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">WM_probseg</span><span class="p">,</span> <span class="n">GM_probseg</span><span class="p">,</span> <span class="n">CSF_probseg</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">probsegs</span> <span class="o">=</span> <span class="p">(</span><span class="n">WM_probseg</span><span class="p">,</span> <span class="n">GM_probseg</span><span class="p">,</span> <span class="n">CSF_probseg</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span>
+                  <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">required</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;PFTImage cannot be used in this context&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">probseg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">probsegs</span><span class="p">:</span>
-            <span class="n">probseg</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span><span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">)</span>
+            <span class="n">probseg</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
+                <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span>
+                <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;pft&quot;</span>
@@ -1165,14 +1160,11 @@ document.write(`
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
 
-<div class="viewcode-block" id="TemplateImage.find_path"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.TemplateImage.find_path">[docs]</a>    <span class="k">def</span> <span class="nf">find_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_layout</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
-        <span class="k">pass</span></div>
-
 <div class="viewcode-block" id="TemplateImage.get_name"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.TemplateImage.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">name_from_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TemplateImage.get_image_getter"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.TemplateImage.get_image_getter">[docs]</a>    <span class="k">def</span> <span class="nf">get_image_getter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_name</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">_image_getter_helper</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">_image_getter_helper</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">):</span>
             <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
             <span class="n">img_data</span> <span class="o">=</span> <span class="n">resample</span><span class="p">(</span>
                 <span class="n">img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
@@ -1184,20 +1176,22 @@ document.write(`
                 <span class="n">img_data</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span>
                 <span class="n">scalar_data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
-                <span class="n">reg_template</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+                <span class="n">reg_subject</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">task_name</span> <span class="o">==</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
                 <span class="s2">&quot;TemplateImage cannot be used in this context, as they&quot;</span>
                 <span class="s2">&quot;require later derivatives to be calculated&quot;</span><span class="p">))</span>
         <span class="k">elif</span> <span class="n">task_name</span> <span class="o">==</span> <span class="s2">&quot;mapping&quot;</span><span class="p">:</span>
-            <span class="k">def</span> <span class="nf">image_getter</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">image_getter</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">_image_getter_helper</span><span class="p">(</span>
-                    <span class="n">mapping</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;reg_template&quot;</span><span class="p">])</span>
+                    <span class="n">mapping</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;reg_template&quot;</span><span class="p">],</span>
+                    <span class="n">reg_subject</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">def</span> <span class="nf">image_getter</span><span class="p">(</span><span class="n">mapping_imap</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">_image_getter_helper</span><span class="p">(</span>
-                    <span class="n">mapping_imap</span><span class="p">[</span><span class="s2">&quot;mapping&quot;</span><span class="p">],</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;reg_template&quot;</span><span class="p">])</span>
+                    <span class="n">mapping_imap</span><span class="p">[</span><span class="s2">&quot;mapping&quot;</span><span class="p">],</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;reg_template&quot;</span><span class="p">],</span>
+                    <span class="n">mapping_imap</span><span class="p">[</span><span class="s2">&quot;reg_subject&quot;</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">image_getter</span></div></div>
 </pre></div>
 
@@ -1230,8 +1224,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509"></script>
+  <script src="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
 
   <footer class="bd-footer">
@@ -1265,7 +1259,7 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
 </p></div>
       
     </div>

@@ -132,10 +132,10 @@ See an example configuration file below::
     step_size = 0.5
     
     # The miminal length (mm) in a streamline. Default: 20
-    min_length = 50
+    minlen = 50
     
     # The miminal length (mm) in a streamline. Default: 250
-    max_length = 250
+    maxlen = 250
     
     # One of {"DTI", "CSD", "DKI"}. Defaults to use "DTI"
     odf_model = "CSD"
@@ -246,7 +246,7 @@ See an example configuration file below::
     # For example, if you wanted to increase tolerance for the right
     # arcuate waypoint ROIs by 3 each, you could make the following
     # modification to your bundle_dict:
-    # bundle_dict["ARC_R"]["inc_addtol"] = [3, 3]
+    # bundle_dict["Right Arcuate"]["inc_addtol"] = [3, 3]
     # Additional tolerances can also be negative.
     dist_to_waypoint = ""
     
@@ -289,6 +289,12 @@ See an example configuration file below::
     # The full path to a folder into which intermediate products
     # are saved. Default: None, means no saving of intermediates.
     save_intermediates = ""
+    
+    # Cleaning params to pass to seg.clean_bundle. This will
+    # override the default parameters of that method. However, this
+    # can be overriden by setting the cleaning parameters in the
+    # bundle_dict. Default: {}.
+    cleaning_params = "{}"
     
     [CLEANING_PARAMS]
     
@@ -476,6 +482,10 @@ See an example configuration file below::
     # https://github.com/dipy/GPUStreamlines
     # Default: 0
     tractography_ngpus = 0
+    
+    # Chunk size for GPU tracking.
+    # Default: 100000
+    chunk_size = 100000
     
     [VIZ]
     

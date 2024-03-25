@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.viz.utils &#8212; AFQ 1.2 documentation</title>
+    <title>AFQ.viz.utils &#8212; AFQ 1.3 documentation</title>
   
   
   
@@ -18,12 +18,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
@@ -39,9 +39,9 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509" />
-  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=bd9e20870c6007c4c509"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -65,7 +65,6 @@
   <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -105,10 +104,8 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
-
-  <header>
   
-    <div class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
   <label class="sidebar-toggle primary-toggle" for="__primary">
     <span class="fa-solid fa-bars"></span>
@@ -132,8 +129,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -253,15 +250,10 @@ document.write(`
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
-      <span class="fa-solid fa-outdent"></span>
-    </label>
-  
 </div>
 
-    </div>
+    </header>
   
-  </header>
 
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
@@ -478,54 +470,73 @@ document.write(`
     <span class="p">(</span><span class="mf">0.8588235294117647</span><span class="p">,</span> <span class="mf">0.8588235294117647</span><span class="p">,</span> <span class="mf">0.5529411764705883</span><span class="p">),</span>
     <span class="p">(</span><span class="mf">0.09019607843137255</span><span class="p">,</span> <span class="mf">0.7450980392156863</span><span class="p">,</span> <span class="mf">0.8117647058823529</span><span class="p">),</span>
     <span class="p">(</span><span class="mf">0.6196078431372549</span><span class="p">,</span> <span class="mf">0.8549019607843137</span><span class="p">,</span> <span class="mf">0.8980392156862745</span><span class="p">)]</span>
+<span class="n">tableau_extension</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">),</span>  <span class="c1"># Warm, Soft Yellow</span>
+    <span class="p">(</span><span class="mf">0.98</span><span class="p">,</span> <span class="mf">0.92</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">),</span>  <span class="c1"># Cool, Muted Blue</span>
+    <span class="p">(</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">)]</span>
 <span class="n">large_font</span> <span class="o">=</span> <span class="mi">28</span>
 <span class="n">medium_font</span> <span class="o">=</span> <span class="mi">24</span>
 <span class="n">small_font</span> <span class="o">=</span> <span class="mi">20</span>
 <span class="n">marker_size</span> <span class="o">=</span> <span class="mi">200</span>
 
 <span class="n">COLOR_DICT</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">({</span>
-    <span class="s2">&quot;ATR_L&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;C_L&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-    <span class="s2">&quot;ATR_R&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;C_R&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-    <span class="s2">&quot;CST_L&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
-    <span class="s2">&quot;CST_R&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
-    <span class="s2">&quot;CGC_L&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="s2">&quot;MCP&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
-    <span class="s2">&quot;CGC_R&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="s2">&quot;CCMid&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span>
-    <span class="s2">&quot;HCC_L&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span>
-    <span class="s2">&quot;HCC_R&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span>
-    <span class="s2">&quot;FP&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="s2">&quot;CC_ForcepsMinor&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span>
-    <span class="s2">&quot;FA&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span> <span class="s2">&quot;CC_ForcepsMajor&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span>
-    <span class="s2">&quot;IFO_L&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span> <span class="s2">&quot;IFOF_L&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span>
-    <span class="s2">&quot;IFO_R&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span> <span class="s2">&quot;IFOF_R&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span>
-    <span class="s2">&quot;ILF_L&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">12</span><span class="p">],</span> <span class="s2">&quot;F_L&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">12</span><span class="p">],</span>
-    <span class="s2">&quot;ILF_R&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">13</span><span class="p">],</span> <span class="s2">&quot;F_R&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">13</span><span class="p">],</span>
-    <span class="s2">&quot;SLF_L&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">14</span><span class="p">],</span>
-    <span class="s2">&quot;SLF_R&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">15</span><span class="p">],</span>
-    <span class="s2">&quot;UNC_L&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">16</span><span class="p">],</span> <span class="s2">&quot;UF_L&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">16</span><span class="p">],</span>
-    <span class="s2">&quot;UNC_R&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">17</span><span class="p">],</span> <span class="s2">&quot;UF_R&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">17</span><span class="p">],</span>
-    <span class="s2">&quot;ARC_L&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">18</span><span class="p">],</span> <span class="s2">&quot;AF_L&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">18</span><span class="p">],</span>
-    <span class="s2">&quot;ARC_R&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">19</span><span class="p">],</span> <span class="s2">&quot;AF_R&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">19</span><span class="p">],</span>
+    <span class="s2">&quot;Left Anterior Thalamic&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;C_L&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="s2">&quot;Right Anterior Thalamic&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;C_R&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+    <span class="s2">&quot;Left Corticospinal&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+    <span class="s2">&quot;Right Corticospinal&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+    <span class="s2">&quot;Left Cingulum Cingulate&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="s2">&quot;MCP&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+    <span class="s2">&quot;Right Cingulum Cingulate&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="s2">&quot;CCMid&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span>
+    <span class="s2">&quot;Forceps Minor&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="s2">&quot;CC_ForcepsMinor&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span>
+    <span class="s2">&quot;Forceps Major&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span> <span class="s2">&quot;CC_ForcepsMajor&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span>
+    <span class="s2">&quot;Left Inferior Fronto-occipital&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span>
+    <span class="s2">&quot;IFOF_L&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span>
+    <span class="s2">&quot;Right Inferior Fronto-occipital&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span>
+    <span class="s2">&quot;IFOF_R&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span>
+    <span class="s2">&quot;Left Inferior Longitudinal&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">12</span><span class="p">],</span> <span class="s2">&quot;F_L&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">12</span><span class="p">],</span>
+    <span class="s2">&quot;Right Inferior Longitudinal&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">13</span><span class="p">],</span> <span class="s2">&quot;F_R&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">13</span><span class="p">],</span>
+    <span class="s2">&quot;Left Superior Longitudinal&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">14</span><span class="p">],</span>
+    <span class="s2">&quot;Right Superior Longitudinal&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">15</span><span class="p">],</span>
+    <span class="s2">&quot;Left Uncinate&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">16</span><span class="p">],</span> <span class="s2">&quot;UF_L&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">16</span><span class="p">],</span>
+    <span class="s2">&quot;Right Uncinate&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">17</span><span class="p">],</span> <span class="s2">&quot;UF_R&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">17</span><span class="p">],</span>
+    <span class="s2">&quot;Left Arcuate&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">18</span><span class="p">],</span> <span class="s2">&quot;AF_L&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">18</span><span class="p">],</span>
+    <span class="s2">&quot;Right Arcuate&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">19</span><span class="p">],</span> <span class="s2">&quot;AF_R&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">19</span><span class="p">],</span>
+    <span class="s2">&quot;Left Posterior Arcuate&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span>
+    <span class="s2">&quot;Right Posterior Arcuate&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span>
+    <span class="s2">&quot;Left Vertical Occipital&quot;</span><span class="p">:</span> <span class="n">tableau_extension</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="s2">&quot;Right Vertical Occipital&quot;</span><span class="p">:</span> <span class="n">tableau_extension</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
     <span class="s2">&quot;median&quot;</span><span class="p">:</span> <span class="n">tableau_20</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span>
-    <span class="s2">&quot;Orbital&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.13</span><span class="p">,</span> <span class="mf">0.53</span><span class="p">),</span>  <span class="c1"># Paul Tol&#39;s palette for callosal bundles</span>
-    <span class="s2">&quot;AntFrontal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.07</span><span class="p">,</span> <span class="mf">0.47</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">),</span>
-    <span class="s2">&quot;SupFrontal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.27</span><span class="p">,</span> <span class="mf">0.67</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">),</span>
-    <span class="s2">&quot;Motor&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.53</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.93</span><span class="p">),</span>
-    <span class="s2">&quot;SupParietal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.87</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.47</span><span class="p">),</span>
-    <span class="s2">&quot;PostParietal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.47</span><span class="p">),</span>
-    <span class="s2">&quot;Occipital&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.67</span><span class="p">,</span> <span class="mf">0.27</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">),</span>
-    <span class="s2">&quot;Temporal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.53</span><span class="p">,</span> <span class="mf">0.13</span><span class="p">,</span> <span class="mf">0.33</span><span class="p">)})</span>
+    <span class="c1"># Paul Tol&#39;s palette for callosal bundles</span>
+    <span class="s2">&quot;Callosum Orbital&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.13</span><span class="p">,</span> <span class="mf">0.53</span><span class="p">),</span>
+    <span class="s2">&quot;Callosum Anterior Frontal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.07</span><span class="p">,</span> <span class="mf">0.47</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">),</span>
+    <span class="s2">&quot;Callosum Superior Frontal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.27</span><span class="p">,</span> <span class="mf">0.67</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">),</span>
+    <span class="s2">&quot;Callosum Motor&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.53</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.93</span><span class="p">),</span>
+    <span class="s2">&quot;Callosum Superior Parietal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.87</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.47</span><span class="p">),</span>
+    <span class="s2">&quot;Callosum Posterior Parietal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.47</span><span class="p">),</span>
+    <span class="s2">&quot;Callosum Occipital&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.67</span><span class="p">,</span> <span class="mf">0.27</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">),</span>
+    <span class="s2">&quot;Callosum Temporal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.53</span><span class="p">,</span> <span class="mf">0.13</span><span class="p">,</span> <span class="mf">0.33</span><span class="p">)})</span>
 
 <span class="n">POSITIONS</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">({</span>
-    <span class="s2">&quot;ATR_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;ATR_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="s2">&quot;C_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;C_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-    <span class="s2">&quot;CST_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;CST_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
-    <span class="s2">&quot;CGC_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;CGC_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="s2">&quot;MCP&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;CCMid&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
-    <span class="s2">&quot;FP&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="s2">&quot;FA&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="s2">&quot;Left Anterior Thalamic&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;Right Anterior Thalamic&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="s2">&quot;C_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;C_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="s2">&quot;Left Corticospinal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;Right Corticospinal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+    <span class="s2">&quot;Left Cingulum Cingulate&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="s2">&quot;Right Cingulum Cingulate&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+    <span class="s2">&quot;MCP&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;CCMid&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+    <span class="s2">&quot;Forceps Minor&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="s2">&quot;Forceps Major&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
     <span class="s2">&quot;CC_ForcepsMinor&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="s2">&quot;CC_ForcepsMajor&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-    <span class="s2">&quot;IFO_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;IFO_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="s2">&quot;IFOF_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;IFOF_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
-    <span class="s2">&quot;HCC_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;HCC_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-    <span class="s2">&quot;ILF_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;ILF_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="s2">&quot;F_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;F_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-    <span class="s2">&quot;SLF_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;SLF_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
-    <span class="s2">&quot;ARC_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;ARC_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="s2">&quot;AF_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;AF_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-    <span class="s2">&quot;UNC_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;UNC_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="s2">&quot;UF_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;UF_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)})</span>
+    <span class="s2">&quot;Left Inferior Fronto-occipital&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="s2">&quot;Right Inferior Fronto-occipital&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+    <span class="s2">&quot;IFOF_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;IFOF_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+    <span class="s2">&quot;Left Inferior Longitudinal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="s2">&quot;Right Inferior Longitudinal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="s2">&quot;F_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;F_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="s2">&quot;Left Superior Longitudinal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="s2">&quot;Right Superior Longitudinal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+    <span class="s2">&quot;Left Arcuate&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;Right Arcuate&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="s2">&quot;AF_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s2">&quot;AF_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="s2">&quot;Left Uncinate&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;Right Uncinate&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+    <span class="s2">&quot;UF_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;UF_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)})</span>
 
 <span class="n">CSV_MAT_2_PYTHON</span> <span class="o">=</span> \
     <span class="p">{</span><span class="s1">&#39;fa&#39;</span><span class="p">:</span> <span class="s1">&#39;dti_fa&#39;</span><span class="p">,</span> <span class="s1">&#39;md&#39;</span><span class="p">:</span> <span class="s1">&#39;dti_md&#39;</span><span class="p">}</span>
@@ -539,43 +550,28 @@ document.write(`
 <span class="n">RECO_FLIP</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;IFO_L&quot;</span><span class="p">,</span> <span class="s2">&quot;IFO_R&quot;</span><span class="p">,</span> <span class="s2">&quot;UNC_L&quot;</span><span class="p">,</span> <span class="s2">&quot;ILF_L&quot;</span><span class="p">,</span> <span class="s2">&quot;ILF_R&quot;</span><span class="p">]</span>
 
 <span class="n">BEST_BUNDLE_ORIENTATIONS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;ATR_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Left&quot;</span><span class="p">),</span> <span class="s2">&quot;ATR_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Right&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;CST_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Left&quot;</span><span class="p">),</span> <span class="s2">&quot;CST_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Right&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;CGC_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Left&quot;</span><span class="p">),</span> <span class="s2">&quot;CGC_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Right&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;FP&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Axial&quot;</span><span class="p">,</span> <span class="s2">&quot;Top&quot;</span><span class="p">),</span> <span class="s2">&quot;FA&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Axial&quot;</span><span class="p">,</span> <span class="s2">&quot;Top&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;IFO_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Left&quot;</span><span class="p">),</span> <span class="s2">&quot;IFO_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Right&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;ILF_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Left&quot;</span><span class="p">),</span> <span class="s2">&quot;ILF_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Right&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;SLF_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Axial&quot;</span><span class="p">,</span> <span class="s2">&quot;Top&quot;</span><span class="p">),</span> <span class="s2">&quot;SLF_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Axial&quot;</span><span class="p">,</span> <span class="s2">&quot;Top&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;UNC_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Axial&quot;</span><span class="p">,</span> <span class="s2">&quot;Bottom&quot;</span><span class="p">),</span> <span class="s2">&quot;UNC_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Axial&quot;</span><span class="p">,</span> <span class="s2">&quot;Bottom&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;ARC_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Left&quot;</span><span class="p">),</span> <span class="s2">&quot;ARC_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Right&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;VOF_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Coronal&quot;</span><span class="p">,</span> <span class="s2">&quot;Back&quot;</span><span class="p">),</span> <span class="s2">&quot;VOF_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Coronal&quot;</span><span class="p">,</span> <span class="s2">&quot;Back&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;pARC_L&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Coronal&quot;</span><span class="p">,</span> <span class="s2">&quot;Back&quot;</span><span class="p">),</span> <span class="s2">&quot;pARC_R&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Coronal&quot;</span><span class="p">,</span> <span class="s2">&quot;Back&quot;</span><span class="p">)}</span>
-
-
-<span class="n">FORMAL_BUNDLE_NAMES</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;ATR_L&quot;</span><span class="p">:</span> <span class="s2">&quot;Left Anterior Thalamic&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;ATR_R&quot;</span><span class="p">:</span> <span class="s2">&quot;Right Anterior Thalamic&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;CST_L&quot;</span><span class="p">:</span> <span class="s2">&quot;Left Corticospinal&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;CST_R&quot;</span><span class="p">:</span> <span class="s2">&quot;Right Corticospinal&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;CGC_L&quot;</span><span class="p">:</span> <span class="s2">&quot;Left Cingulum Cingulate&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;CGC_R&quot;</span><span class="p">:</span> <span class="s2">&quot;Right Cingulum Cingulate&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;FP&quot;</span><span class="p">:</span> <span class="s2">&quot;Forceps Major&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;FA&quot;</span><span class="p">:</span> <span class="s2">&quot;Forceps Minor&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;IFO_L&quot;</span><span class="p">:</span> <span class="s2">&quot;Left Inferior Fronto-Occipital&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;IFO_R&quot;</span><span class="p">:</span> <span class="s2">&quot;Right Inferior Fronto-Occipital&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;ILF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;Left Inferior Longitudinal&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;ILF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;Right Inferior Longitudinal&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;SLF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;Left Superior Longitudinal&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;SLF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;Right Superior Longitudinal&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;UNC_L&quot;</span><span class="p">:</span> <span class="s2">&quot;Left Uncinate&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;UNC_R&quot;</span><span class="p">:</span> <span class="s2">&quot;Right Uncinate&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;ARC_L&quot;</span><span class="p">:</span> <span class="s2">&quot;Left Arcuate&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;ARC_R&quot;</span><span class="p">:</span> <span class="s2">&quot;Right Arcuate&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;VOF_L&quot;</span><span class="p">:</span> <span class="s2">&quot;Left Vertical Occipital&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;VOF_R&quot;</span><span class="p">:</span> <span class="s2">&quot;Right Vertical Occipital&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;pARC_L&quot;</span><span class="p">:</span> <span class="s2">&quot;Left Posterior Arcuate&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;pARC_R&quot;</span><span class="p">:</span> <span class="s2">&quot;Right Posterior Arcuate&quot;</span>
-<span class="p">}</span>
+    <span class="s2">&quot;Left Anterior Thalamic&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Left&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Right Anterior Thalamic&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Right&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Left Corticospinal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Left&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Right Corticospinal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Right&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Left Cingulum Cingulate&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Left&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Right Cingulum Cingulate&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Right&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Forceps Minor&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Axial&quot;</span><span class="p">,</span> <span class="s2">&quot;Top&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Forceps Major&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Axial&quot;</span><span class="p">,</span> <span class="s2">&quot;Top&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Left Inferior Fronto-occipital&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Left&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Right Inferior Fronto-occipital&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Right&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Left Inferior Longitudinal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Left&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Right Inferior Longitudinal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Right&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Left Superior Longitudinal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Axial&quot;</span><span class="p">,</span> <span class="s2">&quot;Top&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Right Superior Longitudinal&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Axial&quot;</span><span class="p">,</span> <span class="s2">&quot;Top&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Left Uncinate&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Axial&quot;</span><span class="p">,</span> <span class="s2">&quot;Bottom&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Right Uncinate&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Axial&quot;</span><span class="p">,</span> <span class="s2">&quot;Bottom&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Left Arcuate&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Left&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Right Arcuate&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Sagittal&quot;</span><span class="p">,</span> <span class="s2">&quot;Right&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Left Vertical Occipital&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Coronal&quot;</span><span class="p">,</span> <span class="s2">&quot;Back&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Right Vertical Occipital&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Coronal&quot;</span><span class="p">,</span> <span class="s2">&quot;Back&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Left Posterior Arcuate&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Coronal&quot;</span><span class="p">,</span> <span class="s2">&quot;Back&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;Right Posterior Arcuate&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Coronal&quot;</span><span class="p">,</span> <span class="s2">&quot;Back&quot;</span><span class="p">)}</span>
 
 
 <span class="k">class</span> <span class="nc">PanelFigure</span><span class="p">():</span>
@@ -584,7 +580,8 @@ document.write(`
 <span class="sd">    into subplots using matplotlib</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_rows</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_rows</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span>
+                 <span class="n">panel_label_kwargs</span><span class="o">=</span><span class="p">{}):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize PanelFigure.</span>
 
@@ -598,14 +595,27 @@ document.write(`
 <span class="sd">            Width of figure in inches</span>
 <span class="sd">        height : int</span>
 <span class="sd">            Height of figure in inches</span>
+<span class="sd">        panel_label_kwargs : dict</span>
+<span class="sd">            Additional arguments for matplotlib&#39;s text method,</span>
+<span class="sd">            which is used to add panel labels to each subplot</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">GridSpec</span><span class="p">(</span><span class="n">num_rows</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">,</span> <span class="n">hspace</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">subplot_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel_label_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">fontfamily</span><span class="o">=</span><span class="s2">&quot;Helvetica-Bold&quot;</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="s2">&quot;xx-large&quot;</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+            <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">,</span>
+            <span class="n">verticalalignment</span><span class="o">=</span><span class="s2">&quot;top&quot;</span><span class="p">,</span>
+            <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+                <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+                <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel_label_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">panel_label_kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">add_img</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">x_coord</span><span class="p">,</span> <span class="n">y_coord</span><span class="p">,</span> <span class="n">reduct_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                 <span class="n">subplot_label_pos</span><span class="o">=</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="n">legend</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">legend_kwargs</span><span class="o">=</span><span class="p">{},</span>
-                <span class="n">add_panel_label</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">panel_label_font_size</span><span class="o">=</span><span class="s2">&quot;medium&quot;</span><span class="p">):</span>
+                <span class="n">add_panel_label</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add image from fname into figure as a panel.</span>
 
@@ -632,9 +642,6 @@ document.write(`
 <span class="sd">        add_panel_label : bool</span>
 <span class="sd">            Whether or not to add a panel label to the subplot</span>
 <span class="sd">            Default: True</span>
-<span class="sd">        panel_label_font_size : str</span>
-<span class="sd">            Font size of panel label</span>
-<span class="sd">            Default: &quot;medium&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="n">y_coord</span><span class="p">,</span> <span class="n">x_coord</span><span class="p">])</span>
         <span class="n">im1</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
@@ -652,11 +659,9 @@ document.write(`
                 <span class="mi">10</span> <span class="o">/</span> <span class="mi">72</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span> <span class="o">/</span> <span class="mi">72</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">dpi_scale_trans</span><span class="p">)</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
                 <span class="n">subplot_label_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">subplot_label_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">chr</span><span class="p">(</span><span class="mi">65</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">subplot_count</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">chr</span><span class="p">(</span><span class="mi">65</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">subplot_count</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span> <span class="o">+</span> <span class="n">trans</span><span class="p">,</span>
-                <span class="n">fontsize</span><span class="o">=</span><span class="n">panel_label_font_size</span><span class="p">,</span> <span class="n">verticalalignment</span><span class="o">=</span><span class="s2">&quot;top&quot;</span><span class="p">,</span>
-                <span class="n">fontfamily</span><span class="o">=</span><span class="s1">&#39;serif&#39;</span><span class="p">,</span>
-                <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;0.7&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">3.0</span><span class="p">))</span>
+                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">panel_label_kwargs</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">im1</span><span class="p">),</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">subplot_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subplot_count</span> <span class="o">+</span> <span class="mi">1</span>
@@ -678,7 +683,7 @@ document.write(`
         <span class="k">if</span> <span class="n">trim_final</span><span class="p">:</span>
             <span class="n">im1</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
             <span class="n">im1</span> <span class="o">=</span> <span class="n">trim</span><span class="p">(</span><span class="n">im1</span><span class="p">)</span>
-            <span class="n">im1</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+            <span class="n">im1</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">))</span>
 
 
 <span class="k">def</span> <span class="nf">get_eye</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="n">direc</span><span class="p">):</span>
@@ -743,11 +748,11 @@ document.write(`
             <span class="k">if</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="n">COLOR_DICT</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="n">custom_color_dict</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span> <span class="o">=</span> <span class="n">COLOR_DICT</span><span class="p">[</span><span class="n">bundle</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">other_bundle</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">bundle</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">bundle</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;_L&#39;</span><span class="p">:</span>
-                    <span class="n">other_bundle</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="o">=</span> <span class="s1">&#39;_R&#39;</span>
-                <span class="k">elif</span> <span class="n">bundle</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;_R&#39;</span><span class="p">:</span>
-                    <span class="n">other_bundle</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="o">=</span> <span class="s1">&#39;_L&#39;</span>
+                <span class="n">other_bundle</span> <span class="o">=</span> <span class="n">bundle</span>
+                <span class="k">if</span> <span class="n">bundle</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Left &quot;</span><span class="p">):</span>
+                    <span class="n">other_bundle</span> <span class="o">=</span> <span class="s2">&quot;Right&quot;</span> <span class="o">+</span> <span class="n">other_bundle</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span>
+                <span class="k">elif</span> <span class="n">bundle</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Right &quot;</span><span class="p">):</span>
+                    <span class="n">other_bundle</span> <span class="o">=</span> <span class="s2">&quot;Left&quot;</span> <span class="o">+</span> <span class="n">other_bundle</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span>
                 <span class="n">other_bundle</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">other_bundle</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">other_bundle</span> <span class="o">==</span> <span class="n">bundle</span><span class="p">:</span>  <span class="c1"># lone bundle</span>
@@ -1086,8 +1091,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509"></script>
+  <script src="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
 
   <footer class="bd-footer">
@@ -1121,7 +1126,7 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
 </p></div>
       
     </div>

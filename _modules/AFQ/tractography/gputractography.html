@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tractography.gputractography &#8212; AFQ 1.2 documentation</title>
+    <title>AFQ.tractography.gputractography &#8212; AFQ 1.3 documentation</title>
   
   
   
@@ -18,12 +18,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
@@ -39,9 +39,9 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509" />
-  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=bd9e20870c6007c4c509"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -65,7 +65,6 @@
   <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -105,10 +104,8 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
-
-  <header>
   
-    <div class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
   <label class="sidebar-toggle primary-toggle" for="__primary">
     <span class="fa-solid fa-bars"></span>
@@ -132,8 +129,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -253,15 +250,10 @@ document.write(`
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
-      <span class="fa-solid fa-outdent"></span>
-    </label>
-  
 </div>
 
-    </div>
+    </header>
   
-  </header>
 
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
@@ -439,22 +431,26 @@ document.write(`
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">radians</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">from</span> <span class="nn">dipy.data</span> <span class="kn">import</span> <span class="n">small_sphere</span>
-<span class="kn">from</span> <span class="nn">dipy.reconst.shm</span> <span class="kn">import</span> <span class="n">OpdtModel</span>
+<span class="kn">from</span> <span class="nn">dipy.reconst.shm</span> <span class="kn">import</span> <span class="n">OpdtModel</span><span class="p">,</span> <span class="n">CsaOdfModel</span>
 <span class="kn">from</span> <span class="nn">dipy.reconst</span> <span class="kn">import</span> <span class="n">shm</span>
-<span class="kn">from</span> <span class="nn">dipy.tracking</span> <span class="kn">import</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">dipy.io.stateful_tractogram</span> <span class="kn">import</span> <span class="n">StatefulTractogram</span><span class="p">,</span> <span class="n">Space</span>
 
 <span class="kn">from</span> <span class="nn">nibabel.streamlines.array_sequence</span> <span class="kn">import</span> <span class="n">concatenate</span>
 
-<span class="kn">from</span> <span class="nn">AFQ.tractography.tractography</span> <span class="kn">import</span> <span class="n">get_percentile_threshold</span>
+<span class="kn">from</span> <span class="nn">AFQ.tractography.utils</span> <span class="kn">import</span> <span class="n">gen_seeds</span><span class="p">,</span> <span class="n">get_percentile_threshold</span>
+
+
+<div class="viewcode-block" id="logger"><a class="viewcode-back" href="../../../reference/api/AFQ/tractography/gputractography/index.html#AFQ.tractography.gputractography.logger">[docs]</a><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ&#39;</span><span class="p">)</span></div>
 
 
 <span class="c1"># Modified from https://github.com/dipy/GPUStreamlines/blob/master/run_dipy_gpu.py</span>
-<div class="viewcode-block" id="gpu_track"><a class="viewcode-back" href="../../../reference/api/AFQ/tractography/gputractography/index.html#AFQ.tractography.gputractography.gpu_track">[docs]</a><span class="k">def</span> <span class="nf">gpu_track</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">seed_img</span><span class="p">,</span> <span class="n">stop_img</span><span class="p">,</span>
+<div class="viewcode-block" id="gpu_track"><a class="viewcode-back" href="../../../reference/api/AFQ/tractography/gputractography/index.html#AFQ.tractography.gputractography.gpu_track">[docs]</a><span class="k">def</span> <span class="nf">gpu_track</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">seed_img</span><span class="p">,</span> <span class="n">stop_img</span><span class="p">,</span> <span class="n">odf_model</span><span class="p">,</span>
               <span class="n">seed_threshold</span><span class="p">,</span> <span class="n">stop_threshold</span><span class="p">,</span> <span class="n">thresholds_as_percentages</span><span class="p">,</span>
-              <span class="n">max_angle</span><span class="p">,</span> <span class="n">step_size</span><span class="p">,</span> <span class="n">sampling_density</span><span class="p">,</span> <span class="n">ngpus</span><span class="p">):</span>
+              <span class="n">max_angle</span><span class="p">,</span> <span class="n">step_size</span><span class="p">,</span> <span class="n">n_seeds</span><span class="p">,</span> <span class="n">random_seeds</span><span class="p">,</span> <span class="n">rng_seed</span><span class="p">,</span> <span class="n">ngpus</span><span class="p">,</span>
+              <span class="n">chunk_size</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Perform GPU tractography on DWI data.</span>
 
@@ -470,6 +466,8 @@ document.write(`
 <span class="sd">    stop_img : Nifti1Image</span>
 <span class="sd">        A float or binary mask that determines a stopping criterion</span>
 <span class="sd">        (e.g. FA).</span>
+<span class="sd">    odf_model : str, optional</span>
+<span class="sd">        One of {&quot;OPDT&quot;, &quot;CSA&quot;}</span>
 <span class="sd">    seed_threshold : float</span>
 <span class="sd">        The value of the seed_img above which tracking is seeded.</span>
 <span class="sd">    stop_threshold : float</span>
@@ -484,33 +482,54 @@ document.write(`
 <span class="sd">        The maximum turning angle in each step.</span>
 <span class="sd">    step_size : float</span>
 <span class="sd">        The size of a step (in mm) of tractography.</span>
-<span class="sd">    sampling_density : int</span>
-<span class="sd">        The seeding density; how many seeds in each voxel on</span>
-<span class="sd">        each dimension (for example, 2 =&gt; [2, 2, 2]).</span>
-<span class="sd">    ngpus : int</span>
+<span class="sd">    n_seeds : int</span>
+<span class="sd">        The seeding density: if this is an int, it is is how many seeds in each</span>
+<span class="sd">        voxel on each dimension (for example, 2 =&gt; [2, 2, 2]). If this is a 2D</span>
+<span class="sd">        array, these are the coordinates of the seeds. Unless random_seeds is</span>
+<span class="sd">        set to True, in which case this is the total number of random seeds</span>
+<span class="sd">        to generate within the mask. Default: 1</span>
+<span class="sd">    random_seeds : bool</span>
+<span class="sd">        If True, n_seeds is total number of random seeds to generate.</span>
+<span class="sd">        If False, n_seeds encodes the density of seeds to generate.</span>
+<span class="sd">    rng_seed : int</span>
+<span class="sd">        random seed used to generate random seeds if random_seeds is</span>
+<span class="sd">        set to True. Default: None    ngpus : int</span>
 <span class="sd">        Number of GPUs to use.</span>
+<span class="sd">    chunk_size : int</span>
+<span class="sd">        Chunk size for GPU tracking.</span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">chunk_size</span> <span class="o">=</span> <span class="mi">100000</span>
     <span class="n">sh_order</span> <span class="o">=</span> <span class="mi">6</span>
 
     <span class="n">seed_data</span> <span class="o">=</span> <span class="n">seed_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
     <span class="n">stop_data</span> <span class="o">=</span> <span class="n">stop_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">seed_data</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">thresholds_as_percentages</span><span class="p">:</span>
-            <span class="n">seed_threshold</span> <span class="o">=</span> <span class="n">get_percentile_threshold</span><span class="p">(</span>
-                <span class="n">seed_data</span><span class="p">,</span> <span class="n">seed_threshold</span><span class="p">)</span>
-        <span class="n">seed_data</span> <span class="o">=</span> <span class="n">seed_data</span> <span class="o">&gt;</span> <span class="n">seed_threshold</span>
-
     <span class="k">if</span> <span class="n">thresholds_as_percentages</span><span class="p">:</span>
         <span class="n">stop_threshold</span> <span class="o">=</span> <span class="n">get_percentile_threshold</span><span class="p">(</span>
             <span class="n">stop_data</span><span class="p">,</span> <span class="n">stop_threshold</span><span class="p">)</span>
 
-    <span class="n">model</span> <span class="o">=</span> <span class="n">OpdtModel</span><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="n">sh_order</span><span class="p">,</span> <span class="n">min_signal</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">fit_matrix</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">_fit_matrix</span>
-    <span class="n">delta_b</span><span class="p">,</span> <span class="n">delta_q</span> <span class="o">=</span> <span class="n">fit_matrix</span>
+    <span class="k">if</span> <span class="n">odf_model</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;opdt&quot;</span><span class="p">:</span>
+        <span class="n">model_type</span> <span class="o">=</span> <span class="n">cuslines</span><span class="o">.</span><span class="n">ModelType</span><span class="o">.</span><span class="n">OPDT</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">OpdtModel</span><span class="p">(</span>
+            <span class="n">gtab</span><span class="p">,</span>
+            <span class="n">sh_order</span><span class="o">=</span><span class="n">sh_order</span><span class="p">,</span>
+            <span class="n">smooth</span><span class="o">=</span><span class="mf">0.006</span><span class="p">,</span>
+            <span class="n">min_signal</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">fit_matrix</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">_fit_matrix</span>
+        <span class="n">delta_b</span><span class="p">,</span> <span class="n">delta_q</span> <span class="o">=</span> <span class="n">fit_matrix</span>
+    <span class="k">elif</span> <span class="n">odf_model</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;csa&quot;</span><span class="p">:</span>
+        <span class="n">model_type</span> <span class="o">=</span> <span class="n">cuslines</span><span class="o">.</span><span class="n">ModelType</span><span class="o">.</span><span class="n">CSAODF</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">CsaOdfModel</span><span class="p">(</span>
+            <span class="n">gtab</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="n">sh_order</span><span class="p">,</span>
+            <span class="n">smooth</span><span class="o">=</span><span class="mf">0.006</span><span class="p">,</span> <span class="n">min_signal</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">fit_matrix</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">_fit_matrix</span>
+        <span class="n">delta_b</span> <span class="o">=</span> <span class="n">fit_matrix</span>
+        <span class="n">delta_q</span> <span class="o">=</span> <span class="n">fit_matrix</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+            <span class="sa">f</span><span class="s2">&quot;odf_model must be &#39;opdt&#39; or &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;&#39;csa&#39;, not </span><span class="si">{</span><span class="n">odf_model</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
 
     <span class="n">sphere</span> <span class="o">=</span> <span class="n">small_sphere</span>
     <span class="n">theta</span> <span class="o">=</span> <span class="n">sphere</span><span class="o">.</span><span class="n">theta</span>
@@ -525,30 +544,59 @@ document.write(`
     <span class="n">H</span> <span class="o">=</span> <span class="n">shm</span><span class="o">.</span><span class="n">hat</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
     <span class="n">R</span> <span class="o">=</span> <span class="n">shm</span><span class="o">.</span><span class="n">lcr_matrix</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
 
+    <span class="n">sph_edges</span> <span class="o">=</span> <span class="n">sphere</span><span class="o">.</span><span class="n">edges</span>
+    <span class="n">sph_verticies</span> <span class="o">=</span> <span class="n">sphere</span><span class="o">.</span><span class="n">vertices</span>
+
+    <span class="n">gtargs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="s2">&quot;data&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;delta_b&quot;</span><span class="p">,</span> <span class="s2">&quot;delta_q&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;b0s_mask&quot;</span><span class="p">,</span> <span class="s2">&quot;stop_data&quot;</span><span class="p">,</span> <span class="s2">&quot;sampling_matrix&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;sph_verticies&quot;</span><span class="p">,</span> <span class="s2">&quot;sph_edges&quot;</span><span class="p">]:</span>
+        <span class="n">var</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()[</span><span class="n">var_name</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;b0s_mask&quot;</span><span class="p">,</span> <span class="s2">&quot;sph_edges&quot;</span><span class="p">]:</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">var</span><span class="p">)</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s1">&#39;C_CONTIGUOUS&#39;</span><span class="p">]:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var_name</span><span class="si">}</span><span class="s2"> is not C contiguous. Copying...&quot;</span><span class="p">)</span>
+            <span class="n">gtargs</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span>
+                <span class="n">var</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">gtargs</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+
     <span class="n">gpu_tracker</span> <span class="o">=</span> <span class="n">cuslines</span><span class="o">.</span><span class="n">GPUTracker</span><span class="p">(</span>
+        <span class="n">model_type</span><span class="p">,</span>
         <span class="n">radians</span><span class="p">(</span><span class="n">max_angle</span><span class="p">),</span>
         <span class="mf">1.0</span><span class="p">,</span>
         <span class="n">stop_threshold</span><span class="p">,</span>
         <span class="n">step_size</span><span class="p">,</span>
-        <span class="n">data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span> <span class="n">H</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">delta_b</span><span class="p">,</span> <span class="n">delta_q</span><span class="p">,</span>
-        <span class="n">b0s_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span> <span class="n">stop_data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
-        <span class="n">sampling_matrix</span><span class="p">,</span>
-        <span class="n">sphere</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="n">sphere</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
+        <span class="mf">0.25</span><span class="p">,</span>  <span class="c1"># relative peak threshold</span>
+        <span class="n">radians</span><span class="p">(</span><span class="mi">45</span><span class="p">),</span>  <span class="c1"># min separation angle</span>
+        <span class="n">gtargs</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">],</span> <span class="n">gtargs</span><span class="p">[</span><span class="s2">&quot;H&quot;</span><span class="p">],</span> <span class="n">gtargs</span><span class="p">[</span><span class="s2">&quot;R&quot;</span><span class="p">],</span>
+        <span class="n">gtargs</span><span class="p">[</span><span class="s2">&quot;delta_b&quot;</span><span class="p">],</span> <span class="n">gtargs</span><span class="p">[</span><span class="s2">&quot;delta_q&quot;</span><span class="p">],</span>
+        <span class="n">gtargs</span><span class="p">[</span><span class="s2">&quot;b0s_mask&quot;</span><span class="p">],</span> <span class="n">gtargs</span><span class="p">[</span><span class="s2">&quot;stop_data&quot;</span><span class="p">],</span>
+        <span class="n">gtargs</span><span class="p">[</span><span class="s2">&quot;sampling_matrix&quot;</span><span class="p">],</span>
+        <span class="n">gtargs</span><span class="p">[</span><span class="s2">&quot;sph_verticies&quot;</span><span class="p">],</span> <span class="n">gtargs</span><span class="p">[</span><span class="s2">&quot;sph_edges&quot;</span><span class="p">],</span>
         <span class="n">ngpus</span><span class="o">=</span><span class="n">ngpus</span><span class="p">,</span> <span class="n">rng_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="n">seed_mask</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">seeds_from_mask</span><span class="p">(</span>
-        <span class="n">seed_data</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="n">sampling_density</span><span class="p">,</span> <span class="n">affine</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+    <span class="n">seeds</span> <span class="o">=</span> <span class="n">gen_seeds</span><span class="p">(</span>
+        <span class="n">seed_data</span><span class="p">,</span> <span class="n">seed_threshold</span><span class="p">,</span>
+        <span class="n">n_seeds</span><span class="p">,</span> <span class="n">thresholds_as_percentages</span><span class="p">,</span>
+        <span class="n">random_seeds</span><span class="p">,</span> <span class="n">rng_seed</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
 
     <span class="n">global_chunk_sz</span> <span class="o">=</span> <span class="n">chunk_size</span> <span class="o">*</span> <span class="n">ngpus</span>
-    <span class="n">nchunks</span> <span class="o">=</span> <span class="p">(</span><span class="n">seed_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">global_chunk_sz</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">global_chunk_sz</span>
+    <span class="n">nchunks</span> <span class="o">=</span> <span class="p">(</span><span class="n">seeds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">global_chunk_sz</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">global_chunk_sz</span>
 
     <span class="n">streamlines_ls</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">nchunks</span>
-    <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">seed_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">seeds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">nchunks</span><span class="p">)):</span>
             <span class="n">streamlines_ls</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">gpu_tracker</span><span class="o">.</span><span class="n">generate_streamlines</span><span class="p">(</span>
-                <span class="n">seed_mask</span><span class="p">[</span><span class="n">idx</span> <span class="o">*</span> <span class="n">global_chunk_sz</span><span class="p">:(</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">global_chunk_sz</span><span class="p">])</span>
+                <span class="n">seeds</span><span class="p">[</span><span class="n">idx</span> <span class="o">*</span> <span class="n">global_chunk_sz</span><span class="p">:(</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">global_chunk_sz</span><span class="p">])</span>
             <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                <span class="n">seed_mask</span><span class="p">[</span><span class="n">idx</span> <span class="o">*</span> <span class="n">global_chunk_sz</span><span class="p">:(</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">global_chunk_sz</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">seeds</span><span class="p">[</span><span class="n">idx</span> <span class="o">*</span> <span class="n">global_chunk_sz</span><span class="p">:(</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">global_chunk_sz</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
     <span class="n">sft</span> <span class="o">=</span> <span class="n">StatefulTractogram</span><span class="p">(</span>
         <span class="n">concatenate</span><span class="p">(</span><span class="n">streamlines_ls</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
@@ -586,8 +634,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509"></script>
+  <script src="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
 
   <footer class="bd-footer">
@@ -621,7 +669,7 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
 </p></div>
       
     </div>

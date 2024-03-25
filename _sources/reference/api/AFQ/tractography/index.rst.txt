@@ -12,5 +12,6 @@ Submodules
 
    gputractography/index.rst
    tractography/index.rst
+   utils/index.rst
 
 

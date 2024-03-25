@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.data &#8212; AFQ 1.2 documentation</title>
+    <title>AFQ.tasks.data &#8212; AFQ 1.3 documentation</title>
   
   
   
@@ -18,12 +18,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
@@ -39,9 +39,9 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509" />
-  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=bd9e20870c6007c4c509"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -65,7 +65,6 @@
   <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -105,10 +104,8 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
-
-  <header>
   
-    <div class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
   <label class="sidebar-toggle primary-toggle" for="__primary">
     <span class="fa-solid fa-bars"></span>
@@ -132,8 +129,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.2 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.2 documentation - Home"/>`);</script>
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -253,15 +250,10 @@ document.write(`
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
-      <span class="fa-solid fa-outdent"></span>
-    </label>
-  
 </div>
 
-    </div>
+    </header>
   
-  </header>
 
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
@@ -436,6 +428,7 @@ document.write(`
   <h1>Source code for AFQ.tasks.data</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">from</span> <span class="nn">dipy.io.gradients</span> <span class="kn">import</span> <span class="n">read_bvals_bvecs</span>
 <span class="kn">import</span> <span class="nn">dipy.core.gradients</span> <span class="k">as</span> <span class="nn">dpg</span>
@@ -469,16 +462,20 @@ document.write(`
     <span class="n">extract_odf</span><span class="p">,</span> <span class="n">anisotropic_index</span><span class="p">,</span> <span class="n">anisotropic_power</span><span class="p">)</span>
 
 
+<div class="viewcode-block" id="logger"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/data/index.html#AFQ.tasks.data.logger">[docs]</a><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;AFQ&#39;</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="DIPY_GH"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/data/index.html#AFQ.tasks.data.DIPY_GH">[docs]</a><span class="n">DIPY_GH</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/dipy/dipy/blob/master/dipy/&quot;</span></div>
 
 
-<span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;gtab&quot;</span><span class="p">,</span> <span class="s2">&quot;img&quot;</span><span class="p">)</span>
-<div class="viewcode-block" id="get_data_gtab"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/data/index.html#AFQ.tasks.data.get_data_gtab">[docs]</a><span class="k">def</span> <span class="nf">get_data_gtab</span><span class="p">(</span><span class="n">dwi</span><span class="p">,</span> <span class="n">bval</span><span class="p">,</span> <span class="n">bvec</span><span class="p">,</span> <span class="n">min_bval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;gtab&quot;</span><span class="p">,</span> <span class="s2">&quot;dwi&quot;</span><span class="p">,</span> <span class="s2">&quot;dwi_affine&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="get_data_gtab"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/data/index.html#AFQ.tasks.data.get_data_gtab">[docs]</a><span class="k">def</span> <span class="nf">get_data_gtab</span><span class="p">(</span><span class="n">dwi_path</span><span class="p">,</span> <span class="n">bval</span><span class="p">,</span> <span class="n">bvec</span><span class="p">,</span> <span class="n">min_bval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                   <span class="n">max_bval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filter_b</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">b0_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    DWI data as an ndarray for selected b values,</span>
 <span class="sd">    A DIPY GradientTable with all the gradient information,</span>
-<span class="sd">    and unaltered DWI data in a Nifti1Image.</span>
+<span class="sd">    and DWI data in a Nifti1Image,</span>
+<span class="sd">    and the affine transformation of the DWI data.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -497,9 +494,10 @@ document.write(`
 <span class="sd">        The value of b under which</span>
 <span class="sd">        it is considered to be b0. Default: 50.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dwi</span><span class="p">)</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dwi_path</span><span class="p">)</span>
     <span class="n">bvals</span><span class="p">,</span> <span class="n">bvecs</span> <span class="o">=</span> <span class="n">read_bvals_bvecs</span><span class="p">(</span><span class="n">bval</span><span class="p">,</span> <span class="n">bvec</span><span class="p">)</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">filter_b</span> <span class="ow">and</span> <span class="p">(</span><span class="n">min_bval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
         <span class="n">valid_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span>
             <span class="p">(</span><span class="n">bvals</span> <span class="o">&gt;=</span> <span class="n">min_bval</span><span class="p">),</span> <span class="p">(</span><span class="n">bvals</span> <span class="o">&lt;=</span> <span class="n">b0_threshold</span><span class="p">))</span>
@@ -515,25 +513,27 @@ document.write(`
     <span class="n">gtab</span> <span class="o">=</span> <span class="n">dpg</span><span class="o">.</span><span class="n">gradient_table</span><span class="p">(</span>
         <span class="n">bvals</span><span class="p">,</span> <span class="n">bvecs</span><span class="p">,</span>
         <span class="n">b0_threshold</span><span class="o">=</span><span class="n">b0_threshold</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">img</span></div>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span></div>
 
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;b0&quot;</span><span class="p">)</span>
 <span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_desc-b0_dwi.nii.gz&#39;</span><span class="p">)</span>
-<div class="viewcode-block" id="b0"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/data/index.html#AFQ.tasks.data.b0">[docs]</a><span class="k">def</span> <span class="nf">b0</span><span class="p">(</span><span class="n">dwi</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">img</span><span class="p">):</span>
+<div class="viewcode-block" id="b0"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/data/index.html#AFQ.tasks.data.b0">[docs]</a><span class="k">def</span> <span class="nf">b0</span><span class="p">(</span><span class="n">dwi_path</span><span class="p">,</span> <span class="n">gtab</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    full path to a nifti file containing the mean b0</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">mean_b0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">gtab</span><span class="o">.</span><span class="n">b0s_mask</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">mean_b0_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">mean_b0</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">dwi_path</span><span class="p">)</span>
+    <span class="n">mean_b0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()[</span><span class="o">...</span><span class="p">,</span> <span class="n">gtab</span><span class="o">.</span><span class="n">b0s_mask</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">mean_b0_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">mean_b0</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">affine</span><span class="p">)</span>
     <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">b0_threshold</span><span class="o">=</span><span class="n">gtab</span><span class="o">.</span><span class="n">b0_threshold</span><span class="p">,</span>
-                <span class="n">source</span><span class="o">=</span><span class="n">dwi</span><span class="p">)</span>
+                <span class="n">source</span><span class="o">=</span><span class="n">dwi_path</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">mean_b0_img</span><span class="p">,</span> <span class="n">meta</span></div>
 
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;masked_b0&quot;</span><span class="p">)</span>
 <span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_desc-maskedb0_dwi.nii.gz&#39;</span><span class="p">)</span>
-<div class="viewcode-block" id="b0_mask"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/data/index.html#AFQ.tasks.data.b0_mask">[docs]</a><span class="k">def</span> <span class="nf">b0_mask</span><span class="p">(</span><span class="n">base_fname</span><span class="p">,</span> <span class="n">b0</span><span class="p">,</span> <span class="n">brain_mask</span><span class="p">):</span>
+<div class="viewcode-block" id="b0_mask"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/data/index.html#AFQ.tasks.data.b0_mask">[docs]</a><span class="k">def</span> <span class="nf">b0_mask</span><span class="p">(</span><span class="n">b0</span><span class="p">,</span> <span class="n">brain_mask</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    full path to a nifti file containing the</span>
 <span class="sd">    mean b0 after applying the brain mask</span>
@@ -1200,6 +1200,24 @@ document.write(`
     <span class="k">return</span> <span class="n">dki_tf</span><span class="o">.</span><span class="n">mk</span><span class="p">()</span></div>
 
 
+<span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;dki_kfa&quot;</span><span class="p">)</span>
+<span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_odfmodel-DKI_desc-KFA_dwi.nii.gz&#39;</span><span class="p">)</span>
+<span class="nd">@as_fit_deriv</span><span class="p">(</span><span class="s1">&#39;DKI&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="dki_kfa"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/data/index.html#AFQ.tasks.data.dki_kfa">[docs]</a><span class="k">def</span> <span class="nf">dki_kfa</span><span class="p">(</span><span class="n">dki_tf</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    the DKI kurtosis FA file</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [Hansen2019] Hansen B. An Introduction to Kurtosis Fractional</span>
+<span class="sd">    Anisotropy. AJNR Am J Neuroradiol. 2019 Oct;40(10):1638-1641.</span>
+<span class="sd">    doi: 10.3174/ajnr.A6235. Epub 2019 Sep 26. PMID: 31558496;</span>
+<span class="sd">    PMCID: PMC7028548.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">dki_tf</span><span class="o">.</span><span class="n">kfa</span></div>
+
+
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;dki_ga&quot;</span><span class="p">)</span>
 <span class="nd">@as_file</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;_odfmodel-DKI_desc-GA_dwi.nii.gz&#39;</span><span class="p">)</span>
 <span class="nd">@as_fit_deriv</span><span class="p">(</span><span class="s1">&#39;DKI&#39;</span><span class="p">)</span>
@@ -1382,12 +1400,20 @@ document.write(`
         <span class="n">gq</span><span class="p">,</span> <span class="n">gq_pmap</span><span class="p">,</span> <span class="n">gq_ai</span><span class="p">,</span> <span class="n">opdt_params</span><span class="p">,</span> <span class="n">opdt_pmap</span><span class="p">,</span> <span class="n">opdt_ai</span><span class="p">,</span>
         <span class="n">csa_params</span><span class="p">,</span> <span class="n">csa_pmap</span><span class="p">,</span> <span class="n">csa_ai</span><span class="p">,</span>
         <span class="n">fwdti_fa</span><span class="p">,</span> <span class="n">fwdti_md</span><span class="p">,</span> <span class="n">fwdti_fwf</span><span class="p">,</span>
-        <span class="n">dki_md</span><span class="p">,</span> <span class="n">dki_awf</span><span class="p">,</span> <span class="n">dki_mk</span><span class="p">,</span> <span class="n">dti_ga</span><span class="p">,</span> <span class="n">dti_rd</span><span class="p">,</span> <span class="n">dti_ad</span><span class="p">,</span> <span class="n">dki_ga</span><span class="p">,</span> <span class="n">dki_rd</span><span class="p">,</span>
+        <span class="n">dki_md</span><span class="p">,</span> <span class="n">dki_awf</span><span class="p">,</span> <span class="n">dki_mk</span><span class="p">,</span> <span class="n">dki_kfa</span><span class="p">,</span> <span class="n">dti_ga</span><span class="p">,</span> <span class="n">dti_rd</span><span class="p">,</span> <span class="n">dti_ad</span><span class="p">,</span>
+        <span class="n">dki_ga</span><span class="p">,</span> <span class="n">dki_rd</span><span class="p">,</span>
         <span class="n">dki_ad</span><span class="p">,</span> <span class="n">dki_rk</span><span class="p">,</span> <span class="n">dki_ak</span><span class="p">,</span> <span class="n">dti_params</span><span class="p">,</span> <span class="n">dki_params</span><span class="p">,</span> <span class="n">fwdti_params</span><span class="p">,</span>
         <span class="n">csd_params</span><span class="p">,</span> <span class="n">get_bundle_dict</span><span class="p">])</span>
 
     <span class="k">if</span> <span class="s2">&quot;scalars&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;scalars&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;dti_fa&quot;</span><span class="p">,</span> <span class="s2">&quot;dti_md&quot;</span><span class="p">]</span>
+        <span class="n">bvals</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">read_bvals_bvecs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bval&quot;</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bvec&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dpg</span><span class="o">.</span><span class="n">unique_bvals_magnitude</span><span class="p">(</span><span class="n">bvals</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;scalars&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;dki_fa&quot;</span><span class="p">,</span> <span class="s2">&quot;dki_md&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;dki_kfa&quot;</span><span class="p">,</span> <span class="s2">&quot;dki_mk&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;scalars&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;dti_fa&quot;</span><span class="p">,</span> <span class="s2">&quot;dti_md&quot;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">scalars</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">scalar</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;scalars&quot;</span><span class="p">]:</span>
@@ -1406,7 +1432,7 @@ document.write(`
         <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bids_info&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">bm_def</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bids_info&quot;</span><span class="p">][</span><span class="s2">&quot;bids_layout&quot;</span><span class="p">],</span>
-                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dwi&quot;</span><span class="p">],</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dwi_path&quot;</span><span class="p">],</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bids_info&quot;</span><span class="p">][</span><span class="s2">&quot;subject&quot;</span><span class="p">],</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bids_info&quot;</span><span class="p">][</span><span class="s2">&quot;session&quot;</span><span class="p">])</span>
         <span class="n">data_tasks</span><span class="p">[</span><span class="s2">&quot;brain_mask_res&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;brain_mask&quot;</span><span class="p">)(</span>
@@ -1446,8 +1472,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509"></script>
+  <script src="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
 
   <footer class="bd-footer">
@@ -1481,7 +1507,7 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
 </p></div>
       
     </div>

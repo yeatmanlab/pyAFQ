@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.segmentation &#8212; AFQ 1.2 documentation</title>
+    <title>AFQ.segmentation &#8212; AFQ 1.3 documentation</title>
   
   
   
@@ -18,12 +18,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
 
   
-  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=bd9e20870c6007c4c509" rel="stylesheet" />
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
@@ -39,9 +39,9 @@
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509" />
-  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=bd9e20870c6007c4c509"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -65,7 +65,6 @@
   <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>
@@ -105,10 +104,8 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
-
-  <header>
   
-    <div class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
 <div class="bd-header__inner bd-page-width">
   <label class="sidebar-toggle primary-toggle" for="__primary">
     <span class="fa-solid fa-bars"></span>
@@ -132,8 +129,8 @@
       
     
     
-    <img src="../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.2 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.2 documentation - Home"/>`);</script>
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -253,15 +250,10 @@ document.write(`
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
-      <span class="fa-solid fa-outdent"></span>
-    </label>
-  
 </div>
 
-    </div>
+    </header>
   
-  </header>
 
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
@@ -442,6 +434,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">cdist</span>
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">zscore</span>
+<span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="kn">import</span> <span class="n">binary_dilation</span>
 
 <span class="kn">import</span> <span class="nn">dipy.tracking.streamline</span> <span class="k">as</span> <span class="nn">dts</span>
 <span class="kn">import</span> <span class="nn">dipy.tracking.streamlinespeed</span> <span class="k">as</span> <span class="nn">dps</span>
@@ -574,7 +567,8 @@ document.write(`
                  <span class="n">presegment_kwargs</span><span class="o">=</span><span class="p">{},</span>
                  <span class="n">filter_by_endpoints</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">dist_to_atlas</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-                 <span class="n">save_intermediates</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                 <span class="n">save_intermediates</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">cleaning_params</span><span class="o">=</span><span class="p">{}):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Segment streamlines into bundles.</span>
 
@@ -660,7 +654,7 @@ document.write(`
 <span class="sd">            For example, if you wanted to increase tolerance for the right</span>
 <span class="sd">            arcuate waypoint ROIs by 3 each, you could make the following</span>
 <span class="sd">            modification to your bundle_dict:</span>
-<span class="sd">            bundle_dict[&quot;ARC_R&quot;][&quot;inc_addtol&quot;] = [3, 3]</span>
+<span class="sd">            bundle_dict[&quot;Right Arcuate&quot;][&quot;inc_addtol&quot;] = [3, 3]</span>
 <span class="sd">            Additional tolerances can also be negative.</span>
 <span class="sd">        rng : RandomState or int</span>
 <span class="sd">            If None, creates RandomState.</span>
@@ -695,6 +689,11 @@ document.write(`
 <span class="sd">        save_intermediates : str, optional</span>
 <span class="sd">            The full path to a folder into which intermediate products</span>
 <span class="sd">            are saved. Default: None, means no saving of intermediates.</span>
+<span class="sd">        cleaning_params : dict, optional</span>
+<span class="sd">            Cleaning params to pass to seg.clean_bundle. This will</span>
+<span class="sd">            override the default parameters of that method. However, this</span>
+<span class="sd">            can be overriden by setting the cleaning parameters in the</span>
+<span class="sd">            bundle_dict. Default: {}.</span>
 
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
@@ -732,6 +731,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">filter_by_endpoints</span> <span class="o">=</span> <span class="n">filter_by_endpoints</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dist_to_atlas</span> <span class="o">=</span> <span class="n">dist_to_atlas</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parallel_segmentation</span> <span class="o">=</span> <span class="n">parallel_segmentation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleaning_params</span> <span class="o">=</span> <span class="n">cleaning_params</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="n">save_intermediates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> \
                 <span class="p">(</span><span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">save_intermediates</span><span class="p">)):</span>
@@ -757,9 +757,9 @@ document.write(`
 
         <span class="k">return</span> <span class="n">tg</span></div>
 
-<div class="viewcode-block" id="Segmentation.segment"><a class="viewcode-back" href="../../reference/api/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.segment">[docs]</a>    <span class="k">def</span> <span class="nf">segment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="n">tg</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">fdata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fbval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">fbvec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reg_prealign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">reg_template</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">img_affine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reset_tg_space</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Segmentation.segment"><a class="viewcode-back" href="../../reference/api/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.segment">[docs]</a>    <span class="k">def</span> <span class="nf">segment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundle_dict</span><span class="p">,</span> <span class="n">tg</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span>
+                <span class="n">reg_prealign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">reg_template</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reset_tg_space</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Segment streamlines into bundles based on either waypoint ROIs</span>
 <span class="sd">        [Yeatman2012]_ or RecoBundles [Garyfallidis2017]_.</span>
@@ -777,17 +777,14 @@ document.write(`
 <span class="sd">            Bundles to segment</span>
 <span class="sd">        mapping : DiffeomorphicMap, or equivalent interface</span>
 <span class="sd">            A mapping between DWI space and a template.</span>
-<span class="sd">        fdata, fbval, fbvec : str</span>
-<span class="sd">            Full path to data, bvals, bvecs</span>
+<span class="sd">        img : Nifti1Image</span>
+<span class="sd">            Image to use as reference.</span>
 <span class="sd">        reg_prealign : array, optional.</span>
 <span class="sd">            The linear transformation to be applied to align input images to</span>
 <span class="sd">            the reference space before warping under the deformation field.</span>
 <span class="sd">            Default: None.</span>
 <span class="sd">        reg_template : str or nib.Nifti1Image, optional.</span>
 <span class="sd">            Template to use for registration. Default: MNI T2.</span>
-<span class="sd">        img_affine : array, optional.</span>
-<span class="sd">            The spatial transformation from the measurement to the scanner</span>
-<span class="sd">            space.</span>
 <span class="sd">        reset_tg_space : bool, optional</span>
 <span class="sd">            Whether to reset the space of the input tractogram after</span>
 <span class="sd">            segmentation is complete. Default: False.</span>
@@ -807,21 +804,14 @@ document.write(`
 <span class="sd">        bundles using local and global streamline-based registration and</span>
 <span class="sd">        clustering, Neuroimage, 2017.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">img_affine</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">mapping</span> <span class="ow">is</span> <span class="kc">None</span>
-                <span class="ow">or</span> <span class="n">fdata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-                <span class="ow">or</span> <span class="n">fbval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-                    <span class="ow">or</span> <span class="n">fbvec</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                    <span class="s2">&quot;Provide either the full path to data, bvals, bvecs,&quot;</span>
-                    <span class="o">+</span> <span class="s2">&quot;or provide the affine of the image and the mapping&quot;</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Preparing Segmentation Parameters&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span> <span class="o">=</span> <span class="n">img_affine</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_img</span><span class="p">(</span><span class="n">fdata</span><span class="p">,</span> <span class="n">fbval</span><span class="p">,</span> <span class="n">fbvec</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">affine</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="o">=</span> <span class="n">img</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Preprocessing Streamlines&quot;</span><span class="p">)</span>
         <span class="n">tg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_tg</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
+
+        <span class="c1"># These are calculated as-needed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fg_array</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_crosses</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># If resampling over-write the sft:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_points</span><span class="p">:</span>
@@ -852,48 +842,37 @@ document.write(`
 
         <span class="k">return</span> <span class="n">fiber_groups</span></div>
 
-<div class="viewcode-block" id="Segmentation.prepare_img"><a class="viewcode-back" href="../../reference/api/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.prepare_img">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_img</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fdata</span><span class="p">,</span> <span class="n">fbval</span><span class="p">,</span> <span class="n">fbvec</span><span class="p">):</span>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Segmentation.fgarray"><a class="viewcode-back" href="../../reference/api/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.fgarray">[docs]</a>    <span class="k">def</span> <span class="nf">fgarray</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Prepare image data from DWI data.</span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        fdata, fbval, fbvec : str</span>
-<span class="sd">            Full path to data, bvals, bvecs</span>
+<span class="sd">        Streamlines resampled to 20 points.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> \
-                <span class="n">ut</span><span class="o">.</span><span class="n">prepare_data</span><span class="p">(</span><span class="n">fdata</span><span class="p">,</span> <span class="n">fbval</span><span class="p">,</span> <span class="n">fbvec</span><span class="p">,</span>
-                                <span class="n">b0_threshold</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b0_threshold</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="o">.</span><span class="n">affine</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fg_array</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Resampling Streamlines...&quot;</span><span class="p">)</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fg_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">_resample_tg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">((</span>
+                <span class="s2">&quot;Streamlines Resampled &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;(time: </span><span class="si">{</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">start_time</span><span class="si">}</span><span class="s2">s)&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fg_array</span></div>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">fdata</span> <span class="o">=</span> <span class="n">fdata</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fbval</span> <span class="o">=</span> <span class="n">fbval</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fbvec</span> <span class="o">=</span> <span class="n">fbvec</span></div>
-
-<div class="viewcode-block" id="Segmentation.cross_streamlines"><a class="viewcode-back" href="../../reference/api/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.cross_streamlines">[docs]</a>    <span class="k">def</span> <span class="nf">cross_streamlines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fgarray</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Segmentation.crosses"><a class="viewcode-back" href="../../reference/api/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.crosses">[docs]</a>    <span class="k">def</span> <span class="nf">crosses</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Classify the streamlines by whether they cross the midline.</span>
 <span class="sd">        Creates a crosses attribute which is an array of booleans. Each boolean</span>
 <span class="sd">        corresponds to a streamline, and is whether or not that streamline</span>
 <span class="sd">        crosses the midline.</span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        fgarray : streamlines resampled to the same length.</span>
-<span class="sd">        template : nibabel.Nifti1Image class instance</span>
-<span class="sd">            An affine transformation into a template space.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">template</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">template_affine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">template_affine</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">affine</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_crosses</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># What is the x,y,z coordinate of 0,0,0 in the template space?</span>
+            <span class="n">zero_coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span><span class="p">),</span>
+                                <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
 
-        <span class="c1"># What is the x,y,z coordinate of 0,0,0 in the template space?</span>
-        <span class="n">zero_coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">template_affine</span><span class="p">),</span>
-                            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">crosses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">fgarray</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">zero_coord</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">fgarray</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">zero_coord</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_crosses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fgarray</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">zero_coord</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fgarray</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">zero_coord</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_crosses</span></div>
 
 <div class="viewcode-block" id="Segmentation._return_empty"><a class="viewcode-back" href="../../reference/api/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation._return_empty">[docs]</a>    <span class="k">def</span> <span class="nf">_return_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundle</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -941,8 +920,6 @@ document.write(`
         <span class="n">tg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_tg</span><span class="p">(</span><span class="n">tg</span><span class="o">=</span><span class="n">tg</span><span class="p">)</span>
         <span class="n">tg</span><span class="o">.</span><span class="n">to_vox</span><span class="p">()</span>
 
-        <span class="n">fgarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">_resample_tg</span><span class="p">(</span><span class="n">tg</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>  <span class="c1"># for prob map</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cross_streamlines</span><span class="p">(</span><span class="n">fgarray</span><span class="p">)</span>
         <span class="n">n_streamlines</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
 
         <span class="n">bundle_votes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
@@ -973,7 +950,7 @@ document.write(`
             <span class="n">tol</span> <span class="o">=</span> <span class="n">dts</span><span class="o">.</span><span class="n">dist_to_corner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">tol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_to_waypoint</span> <span class="o">/</span> <span class="n">vox_dim</span>
-        <span class="n">dist_to_atlas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist_to_atlas</span> <span class="o">/</span> <span class="n">vox_dim</span>
+        <span class="n">dist_to_atlas</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dist_to_atlas</span> <span class="o">/</span> <span class="n">vox_dim</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Assigning Streamlines to Bundles&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">bundle_idx</span><span class="p">,</span> <span class="n">bundle_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
@@ -981,13 +958,18 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Finding Streamlines for </span><span class="si">{</span><span class="n">bundle_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
             <span class="c1"># Warp ROIs</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Preparing ROIs for </span><span class="si">{</span><span class="n">bundle_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
             <span class="n">bundle_def</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="o">.</span><span class="n">get_b_info</span><span class="p">(</span><span class="n">bundle_name</span><span class="p">))</span>
             <span class="n">bundle_def</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_dict</span><span class="o">.</span><span class="n">transform_rois</span><span class="p">(</span>
                 <span class="n">bundle_name</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">img_affine</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Time to prep ROIs: </span><span class="si">{</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">start_time</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="s2">&quot;curvature&quot;</span> <span class="ow">in</span> <span class="n">bundle_def</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading curvature...&quot;</span><span class="p">)</span>
+                <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
                 <span class="k">if</span> <span class="s2">&quot;sft&quot;</span> <span class="ow">in</span> <span class="n">bundle_def</span><span class="p">[</span><span class="s2">&quot;curvature&quot;</span><span class="p">]:</span>
                     <span class="n">ref_sl</span> <span class="o">=</span> <span class="n">bundle_def</span><span class="p">[</span><span class="s2">&quot;curvature&quot;</span><span class="p">][</span><span class="s2">&quot;sft&quot;</span><span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -1001,6 +983,9 @@ document.write(`
                 <span class="n">moved_ref_curve</span> <span class="o">=</span> <span class="n">sl_curve</span><span class="p">(</span>
                     <span class="n">moved_ref_sl</span><span class="p">,</span>
                     <span class="nb">len</span><span class="p">(</span><span class="n">moved_ref_sl</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">((</span>
+                    <span class="s2">&quot;Time to load curves: &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">start_time</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">))</span>
 
             <span class="n">b_sls</span> <span class="o">=</span> <span class="n">_SlsBeingRecognized</span><span class="p">(</span>
                 <span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
@@ -1013,7 +998,7 @@ document.write(`
                 <span class="c1"># using entire fgarray here only because it is the first step</span>
                 <span class="n">fiber_probabilities</span> <span class="o">=</span> <span class="n">dts</span><span class="o">.</span><span class="n">values_from_volume</span><span class="p">(</span>
                     <span class="n">bundle_def</span><span class="p">[</span><span class="s2">&quot;prob_map&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span>
-                    <span class="n">fgarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fgarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
                 <span class="n">fiber_probabilities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">fiber_probabilities</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi_dist_tie_break</span><span class="p">:</span>
                     <span class="n">b_sls</span><span class="o">.</span><span class="n">bundle_vote</span> <span class="o">=</span> <span class="n">fiber_probabilities</span>
@@ -1224,6 +1209,9 @@ document.write(`
             <span class="k">if</span> <span class="n">b_sls</span><span class="p">:</span>
                 <span class="n">accept_idx</span> <span class="o">=</span> <span class="n">b_sls</span><span class="o">.</span><span class="n">initiate_selection</span><span class="p">(</span><span class="s2">&quot;Mahalanobis&quot;</span><span class="p">)</span>
                 <span class="n">clean_params</span> <span class="o">=</span> <span class="n">bundle_def</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mahal&quot;</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="n">clean_params</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">cleaning_params</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">clean_params</span><span class="p">}</span>
                 <span class="n">clean_params</span><span class="p">[</span><span class="s2">&quot;return_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="n">cut</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clip_edges</span> <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;bundlesection&quot;</span> <span class="ow">in</span> <span class="n">bundle_def</span><span class="p">)</span>
                 <span class="n">_</span><span class="p">,</span> <span class="n">cleaned_idx</span> <span class="o">=</span> <span class="n">clean_bundle</span><span class="p">(</span>
@@ -1381,9 +1369,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">presegment_bundle_dict</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">tg</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fdata</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fbval</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fbvec</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span>
                 <span class="n">reg_template</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_template</span><span class="p">,</span>
                 <span class="n">reg_prealign</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reg_prealign</span><span class="p">)</span>
             <span class="n">roiseg_fg</span> <span class="o">=</span> <span class="n">roiseg</span><span class="o">.</span><span class="n">fiber_groups</span>
@@ -1821,7 +1807,7 @@ document.write(`
     <span class="k">return</span> <span class="n">cleaned_idx</span>
 
 
-<div class="viewcode-block" id="clean_by_endpoints"><a class="viewcode-back" href="../../reference/api/AFQ/segmentation/index.html#AFQ.segmentation.clean_by_endpoints">[docs]</a><span class="k">def</span> <span class="nf">clean_by_endpoints</span><span class="p">(</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">target_idx</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="clean_by_endpoints"><a class="viewcode-back" href="../../reference/api/AFQ/segmentation/index.html#AFQ.segmentation.clean_by_endpoints">[docs]</a><span class="k">def</span> <span class="nf">clean_by_endpoints</span><span class="p">(</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">target_idx</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                        <span class="n">flip_sls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">accepted_idxs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Clean a collection of streamlines based on an endpoint ROI.</span>
@@ -1838,7 +1824,8 @@ document.write(`
 <span class="sd">        Index within each streamline to check if within the target region.</span>
 <span class="sd">        Typically 0 for startpoint ROIs or -1 for endpoint ROIs.</span>
 <span class="sd">        If using flip_sls, this becomes (len(sl) - this_idx - 1) % len(sl)</span>
-<span class="sd">    tol : float, optional A distance tolerance (in units that the coordinates</span>
+<span class="sd">    tol : int, optional</span>
+<span class="sd">        A distance tolerance (in units that the coordinates</span>
 <span class="sd">        of the streamlines are represented in). Default: 0, which means that</span>
 <span class="sd">        the endpoint is exactly in the coordinate of the target ROI.</span>
 <span class="sd">    flip_sls : 1d array, optional</span>
@@ -1850,30 +1837,25 @@ document.write(`
 <span class="sd">    -------</span>
 <span class="sd">    boolean array of streamlines that survive cleaning.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">tol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">tol</span> <span class="o">=</span> <span class="mi">0</span>
-
     <span class="k">if</span> <span class="n">accepted_idxs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">accepted_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">streamlines</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool8</span><span class="p">)</span>
-
-    <span class="c1"># We square the tolerance, because below we are using the squared Euclidean</span>
-    <span class="c1"># distance which is slightly faster:</span>
-    <span class="n">tol</span> <span class="o">=</span> <span class="n">tol</span> <span class="o">**</span> <span class="mi">2</span>
-
-    <span class="n">idxes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
 
     <span class="k">if</span> <span class="n">flip_sls</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">flip_sls</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">streamlines</span><span class="p">))</span>
     <span class="n">flip_sls</span> <span class="o">=</span> <span class="n">flip_sls</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
 
+    <span class="n">roi</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">tol</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">roi</span> <span class="o">=</span> <span class="n">binary_dilation</span><span class="p">(</span>
+            <span class="n">roi</span><span class="p">,</span>
+            <span class="n">iterations</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+
     <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">sl</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">streamlines</span><span class="p">):</span>
         <span class="n">this_idx</span> <span class="o">=</span> <span class="n">target_idx</span>
         <span class="k">if</span> <span class="n">flip_sls</span><span class="p">[</span><span class="n">ii</span><span class="p">]:</span>
             <span class="n">this_idx</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sl</span><span class="p">)</span> <span class="o">-</span> <span class="n">this_idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">sl</span><span class="p">)</span>
-        <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">cdist</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">sl</span><span class="p">[</span><span class="n">this_idx</span><span class="p">]],</span> <span class="n">idxes</span><span class="p">,</span> <span class="s1">&#39;sqeuclidean&#39;</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;=</span> <span class="n">tol</span><span class="p">:</span>
-            <span class="n">accepted_idxs</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">zz</span> <span class="o">=</span> <span class="n">sl</span><span class="p">[</span><span class="n">this_idx</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">accepted_idxs</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="n">roi</span><span class="p">[</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">zz</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">accepted_idxs</span></div>
 </pre></div>
@@ -1907,8 +1889,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=bd9e20870c6007c4c509"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=bd9e20870c6007c4c509"></script>
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
 
 
   <footer class="bd-footer">
@@ -1942,7 +1924,7 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
 </p></div>
       
     </div>

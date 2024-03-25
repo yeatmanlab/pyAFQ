@@ -35,7 +35,7 @@ cp_rois = afd.read_cp_templates()
 
 
 """
-The following lines define a bundle dictionary for the cerebellar
+The following line defines a bundle dictionary for the cerebellar
 peduncles. There are three CPs: The ICP, the MCP, and the SCP. Each CP is
 defined by two inclusion ROIs and one exclusion ROI. The Inferior CPs are
 defined by inclusion ROIs. They do not decussate, so "cross_midline" is set to
@@ -45,73 +45,13 @@ They decussate, so "cross_midline" is set to True. The Middle CPs are defined
 by two inclusion ROIs and they use the SCP intermediate ROIs as exclusion ROIs.
 """
 
-cp_bundles = abd.BundleDict(
-    {
-        "ICP_L": {
-            "include": [
-                cp_rois["ICP_L_inferior_prob"],
-                cp_rois["ICP_L_superior_prob"],
-            ],
-            "cross_midline": False,
-        },
-        "ICP_R": {
-            "include": [
-                cp_rois["ICP_R_inferior_prob"],
-                cp_rois["ICP_R_superior_prob"],
-            ],
-            "cross_midline": False,
-        },
-        "MCP_L": {
-            "include": [
-                cp_rois["MCP_L_inferior_prob"],
-                cp_rois["MCP_R_superior_prob"],
-            ],
-            "exclude": [
-                cp_rois["SCP_L_inter_prob"],
-            ],
-            "cross_midline": True,
-        },
-        "MCP_R": {
-            "include": [
-                cp_rois["MCP_R_inferior_prob"],
-                cp_rois["MCP_L_superior_prob"],
-            ],
-            "exclude": [
-                cp_rois["SCP_R_inter_prob"],
-            ],
-            "cross_midline": True,
-        },
-        "SCP_L": {
-            "include": [
-                cp_rois["SCP_L_inferior_prob"],
-                cp_rois["SCP_L_inter_prob"],
-                cp_rois["SCP_R_superior_prob"],
-            ],
-            "exclude": [
-                cp_rois["SCP_L_superior_prob"],
-            ],
-            "cross_midline": True,
-        },
-        "SCP_R": {
-            "include": [
-                cp_rois["SCP_R_inferior_prob"],
-                cp_rois["SCP_R_inter_prob"],
-                cp_rois["SCP_L_superior_prob"],
-            ],
-            "exclude": [
-                cp_rois["SCP_R_superior_prob"],
-            ],
-            "cross_midline": True,
-        },
-    }
-)
+cp_bundles = abd.cerebellar_bd()
 
 """
 The bundle dict has been defined, and now we are ready to run the AFQ pipeline.
 In this case, we are using data that has been preprocessed with QSIprep, so
 we have a brain mask that was generated from the T1w data of this subject.
 """
-
 
 brain_mask_definition = ImageFile(
     suffix="mask",

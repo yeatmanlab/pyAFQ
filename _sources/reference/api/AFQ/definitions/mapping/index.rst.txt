@@ -87,7 +87,7 @@ Classes
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: find_path(bids_layout, from_path, subject, session)
+   .. py:method:: find_path(bids_layout, from_path, subject, session, required=True)
 
 
    .. py:method:: get_for_subses(base_fname, dwi, bids_info, reg_subject, reg_template)
@@ -146,9 +146,6 @@ Classes
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: find_path(bids_layout, from_path, subject, session)
-
-
    .. py:method:: gen_mapping(base_fname, reg_subject, reg_template, subject_sls, template_sls, reg_prealign)
 
 
@@ -195,9 +192,6 @@ Classes
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: find_path(bids_layout, from_path, subject, session)
-
-
    .. py:method:: gen_mapping(base_fname, reg_template, reg_subject, subject_sls, template_sls, reg_prealign)
 
 
@@ -240,9 +234,6 @@ Classes
 
    ..
        !! processed by numpydoc !!
-   .. py:method:: find_path(bids_layout, from_path, subject, session)
-
-
    .. py:method:: gen_mapping(base_fname, reg_subject, reg_template, subject_sls, template_sls, reg_prealign)
 
 

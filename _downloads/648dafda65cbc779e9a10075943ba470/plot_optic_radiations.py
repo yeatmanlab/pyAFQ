@@ -57,33 +57,7 @@ study_dir = afd.fetch_hbn_preproc(["NDARAA948VFH"])[1]
 
 or_rois = afd.read_or_templates()
 
-bundles = abd.BundleDict({
-    "L_OR": {
-        "include": [
-            or_rois["left_OR_1"],
-            or_rois["left_OR_2"]],
-        "exclude": [
-            or_rois["left_OP_MNI"],
-            or_rois["left_TP_MNI"],
-            or_rois["left_pos_thal_MNI"]],
-        "start": or_rois['left_thal_MNI'],
-        "end": or_rois['left_V1_MNI'],
-        "cross_midline": False,
-    },
-    "R_OR": {
-        "include": [
-            or_rois["right_OR_1"],
-            or_rois["right_OR_2"]],
-        "exclude": [
-            or_rois["right_OP_MNI"],
-            or_rois["right_TP_MNI"],
-            or_rois["right_pos_thal_MNI"]],
-        "start": or_rois['right_thal_MNI'],
-        "end": or_rois['right_V1_MNI'],
-        "cross_midline": False
-    }
-})
-
+bundles = abd.OR_bd()
 
 #############################################################################
 # Custom bundle definitions such as the OR, and the standard BundleDict can be
@@ -144,8 +118,10 @@ my_afq.export_all()
 #   properly rendered into the web-page containing this example. It is not
 #   necessary to do this when running this type of analysis.
 
-my_afq.combine_bundle("L_OR")
-montage = my_afq.group_montage("L_OR", (1, 1), "Axial", "left")
+my_afq.combine_bundle("Left Optic Radiation")
+montage = my_afq.group_montage(
+    "Left Optic Radiation",
+    (1, 1), "Axial", "left")
 shutil.copy(montage[0], op.split(montage[0])[-1])
 
 #############################################################################
@@ -157,7 +133,7 @@ shutil.copy(montage[0], op.split(montage[0])[-1])
 # be navigated, zoomed, rotated, etc.
 
 bundle_html = my_afq.export("indiv_bundles_figures")
-plotly.io.show(bundle_html["NDARAA948VFH"]["L_OR"])
+plotly.io.show(bundle_html["NDARAA948VFH"]["Left Optic Radiation"])
 
 #############################################################################
 # References

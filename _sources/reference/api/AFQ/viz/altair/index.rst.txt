@@ -67,7 +67,7 @@ Functions
    ..
        !! processed by numpydoc !!
 
-.. py:function:: altair_df_to_chart(profiles, position_domain=(20, 80), column_count=1, font_size=20, line_size=10, row_label_angle=90, legend_line_size=5, **kwargs)
+.. py:function:: altair_df_to_chart(profiles, position_domain=(20, 80), column_count=1, font_size=20, line_size=10, row_label_angle=90, bundle_list=None, legend_line_size=5, alt_x_kwargs={}, alt_y_kwargs={}, **kwargs)
 
    
    Given a dataframe formatted for Altair, probably from

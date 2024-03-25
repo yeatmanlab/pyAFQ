@@ -37,7 +37,7 @@ Attributes
 .. py:function:: _viz_prepare_vol(vol, xform, mapping, scalar_dict)
 
 
-.. py:function:: viz_bundles(base_fname, dwi_affine, viz_backend, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, best_scalar, sbv_lims_bundles=[None, None], volume_opacity_bundles=0.3, n_points_bundles=40)
+.. py:function:: viz_bundles(base_fname, viz_backend, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, best_scalar, sbv_lims_bundles=[None, None], volume_opacity_bundles=0.3, n_points_bundles=40)
 
    
    figure for the visualizaion of the recognized
@@ -92,7 +92,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: viz_indivBundle(base_fname, results_dir, dwi_affine, viz_backend, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, best_scalar, sbv_lims_indiv=[None, None], volume_opacity_indiv=0.3, n_points_indiv=40)
+.. py:function:: viz_indivBundle(base_fname, results_dir, viz_backend, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, best_scalar, sbv_lims_indiv=[None, None], volume_opacity_indiv=0.3, n_points_indiv=40)
 
    
    list of full paths to html or gif files

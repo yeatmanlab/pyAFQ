@@ -19,8 +19,12 @@ gtab:
     A DIPY GradientTable with all the gradient information
 
 
-img:
-    unaltered DWI data in a Nifti1Image.
+dwi:
+    DWI data in a Nifti1Image
+
+
+dwi_affine:
+    the affine transformation of the DWI data.
 
 
 b0:
@@ -281,6 +285,10 @@ dki_awf:
 
 dki_mk:
     full path to a nifti file containing the DKI mean kurtosis file
+
+
+dki_kfa:
+    full path to a nifti file containing the DKI kurtosis FA file
 
 
 dki_ga:
