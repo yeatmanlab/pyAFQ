@@ -303,7 +303,7 @@ class GroupAFQ(object):
                     dwi_data_file,
                     bval_file, bvec_file,
                     results_dir,
-                    bids_info={
+                    _bids_info={
                         "bids_layout": bids_layout,
                         "subject": subject,
                         "session": session},
