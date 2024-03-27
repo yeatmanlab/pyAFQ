@@ -154,6 +154,11 @@ profile_weights: str, 1D array, 2D array callable, optional
 	instead of a mean or weighted mean.
 	Default: "gauss"
 
+n_points_profile: int, optional
+	Number of points to resample each streamline to before
+	calculating the tract-profiles.
+	Default: 100
+
 scalars: strings and/or scalar definitions, optional
 	List of scalars to use.
 	Can be any of: "dti_fa", "dti_md", "dki_fa", "dki_md", "dki_awf",
@@ -184,6 +189,10 @@ tractography_ngpus: int, optional
 	this algorithm is used for tractography,
 	https://github.com/dipy/GPUStreamlines
 	Default: 0
+
+chunk_size: int, optional
+	Chunk size for GPU tracking.
+	Default: 100000
 
 
 ==========================================================
