@@ -15,9 +15,10 @@ from AFQ.utils.path import drop_extension, read_json
 
 
 class SegmentedSFT():
-    def __init__(self, bundles, space):
+    def __init__(self, bundles, space, sidecar_info={}):
         reference = None
         self.bundle_names = []
+        self.sidecar_info = sidecar_info
         sls = []
         idxs = {}
         this_tracking_idxs = []
@@ -62,6 +63,10 @@ class SegmentedSFT():
     def get_bundle(self, b_name):
         return self.sft[self.bundle_idxs[b_name]]
 
+    def get_bundle_param_info(self, b_name):
+        return self.sidecar_info.get(
+            "Bundle Parameters", {}).get(b_name, {})
+
     @classmethod
     def fromfile(cls, trk_or_trx_file, reference="same", sidecar_file=None):
         if sidecar_file is None:
@@ -100,7 +105,7 @@ class SegmentedSFT():
             else:
                 bundles["whole_brain"] = sft
 
-        return cls(bundles, Space.RASMM)
+        return cls(bundles, Space.RASMM, sidecar_info)
 
 
 def split_streamline(streamlines, sl_to_split, split_idx):
