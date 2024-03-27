@@ -10,6 +10,7 @@ import pimms
 import dipy.reconst.dki as dpy_dki
 import dipy.reconst.dti as dpy_dti
 import dipy.reconst.fwdti as dpy_fwdti
+import dipy.reconst.msdki as dpy_msdki
 from dipy.reconst.gqi import GeneralizedQSamplingModel
 from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
@@ -226,6 +227,53 @@ def dki_params(brain_mask, gtab, data):
         OutlierRejection=False,
         ModelURL=f"{DIPY_GH}reconst/dki.py")
     return dkf.model_params, meta
+
+
+@pimms.calc("msdki_tf")
+def msdki_fit(msdki_params, gtab):
+    """Mean Signal DKI DiffusionKurtosisFit object"""
+    msdki_params = nib.load(msdki_params).get_fdata()
+    tm = dpy_msdki.MeanDiffusionKurtosisModel(gtab)
+    return dpy_msdki.MeanDiffusionKurtosisFit(tm, msdki_params)
+
+
+@pimms.calc("msdki_params")
+@as_file(suffix='_odfmodel-MSDKI_desc-diffmodel_dwi.nii.gz')
+@as_img
+def msdki_params(brain_mask, gtab, data):
+    """
+    full path to a nifti file containing
+    parameters for the Mean Signal DKI fit
+    """
+    mask =\
+        nib.load(brain_mask).get_fdata()
+    msdki_model = dpy_msdki.MeanDiffusionKurtosisModel(gtab)
+    msdki_fit = msdki_model.fit(data, mask=mask)
+    meta = dict(
+        ModelURL=f"{DIPY_GH}reconst/msdki.py")
+    return msdki_fit.model_params, meta
+
+
+@pimms.calc("msdki_msd")
+@as_file('_odfmodel-MSDKI_desc-MSD_dwi.nii.gz')
+@as_fit_deriv('MSDKI')
+def msdki_msd(msdki_tf):
+    """
+    full path to a nifti file containing
+    the MSDKI mean signal diffusivity
+    """
+    return msdki_tf.msd
+
+
+@pimms.calc("msdki_msk")
+@as_file('_odfmodel-MSDKI_desc-MSK_dwi.nii.gz')
+@as_fit_deriv('MSDKI')
+def msdki_msk(msdki_tf):
+    """
+    full path to a nifti file containing
+    the MSDKI mean signal kurtosis
+    """
+    return msdki_tf.msk
 
 
 @pimms.calc("csd_params")
@@ -972,8 +1020,9 @@ def get_data_plan(kwargs):
         gq, gq_pmap, gq_ai, opdt_params, opdt_pmap, opdt_ai,
         csa_params, csa_pmap, csa_ai,
         fwdti_fa, fwdti_md, fwdti_fwf,
-        dki_md, dki_awf, dki_mk, dki_kfa, dti_ga, dti_rd, dti_ad,
-        dki_ga, dki_rd,
+        msdki_fit, msdki_params, msdki_msd, msdki_msk,
+        dki_md, dki_awf, dki_mk, dki_kfa, dki_ga, dki_rd,
+        dti_ga, dti_rd, dti_ad,
         dki_ad, dki_rk, dki_ak, dti_params, dki_params, fwdti_params,
         csd_params, get_bundle_dict])
 
