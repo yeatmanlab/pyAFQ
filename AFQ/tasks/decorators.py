@@ -116,7 +116,7 @@ def as_file(suffix, include_track=False, include_seg=False):
     and only run if not already found
     """
     def _as_file(func):
-        needed_args = ["base_fname"]
+        needed_args = ["base_fname", "results_dir"]
         if include_track:
             needed_args.append("tracking_params")
         if include_seg:
@@ -125,12 +125,14 @@ def as_file(suffix, include_track=False, include_seg=False):
         @functools.wraps(func)
         @has_args(func, needed_args)
         def wrapper_as_file(*args, **kwargs):
-            og_arg_count, base_fname, tracking_params, segmentation_params =\
+            og_arg_count, base_fname, results_dir, \
+                tracking_params, segmentation_params =\
                 extract_added_args(
                     func,
-                    ["base_fname", "tracking_params", "segmentation_params"],
+                    ["base_fname", "results_dir",
+                     "tracking_params", "segmentation_params"],
                     args,
-                    includes=[True, include_track, include_seg])
+                    includes=[True, True, include_track, include_seg])
             this_file = get_fname(
                 base_fname, suffix,
                 tracking_params=tracking_params,
@@ -169,6 +171,10 @@ def as_file(suffix, include_track=False, include_seg=False):
                     meta["dependent"] = "trk"
                 else:
                     meta["dependent"] = "dwi"
+
+                # modify meta source to be relative
+                if "source" in meta:
+                    meta["source"] = op.relpath(meta["source"], results_dir)
 
                 meta_fname = get_fname(
                     base_fname, f"{drop_extension(suffix)}.json",

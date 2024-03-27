@@ -299,10 +299,16 @@ def get_tractography_plan(kwargs):
         kwargs["tracking_params"]["seed_mask"] = ScalarImage(
             kwargs["best_scalar"])
         kwargs["tracking_params"]["seed_threshold"] = 0.2
+        logger.info((
+            "No seed mask given, using FA (or first scalar if none are FA)"
+            "thresholded to 0.2"))
     if kwargs["tracking_params"]["stop_mask"] is None:
         kwargs["tracking_params"]["stop_mask"] = ScalarImage(
             kwargs["best_scalar"])
         kwargs["tracking_params"]["stop_threshold"] = 0.2
+        logger.info((
+            "No stop mask given, using FA (or first scalar if none are FA)"
+            "thresholded to 0.2"))
 
     stop_mask = kwargs["tracking_params"]['stop_mask']
     seed_mask = kwargs["tracking_params"]['seed_mask']

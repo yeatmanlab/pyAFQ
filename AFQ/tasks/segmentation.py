@@ -334,7 +334,9 @@ def tract_profiles(bundles,
 
     profile_dframe = pd.DataFrame(profile_dict)
     meta = dict(source=bundles,
-                parameters=get_default_args(afq_profile))
+                parameters=get_default_args(afq_profile),
+                scalars=list(scalar_dict.keys()),
+                bundles=list(seg_sft.bundle_names))
 
     return profile_dframe, meta
 
