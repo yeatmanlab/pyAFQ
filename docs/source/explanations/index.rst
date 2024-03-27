@@ -27,3 +27,4 @@ For further statistical analysis of pyAFQ results, see `AFQ-Insight <https://git
     :maxdepth: 2
 
     tractometry_pipeline
+    bundle_orientation

@@ -1,3 +1,5 @@
+.. _bundle-dict-label:
+
 Defining Custom Bundle Dictionaries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 pyAFQ has a system for defining custom bundles. Custom bundles are defined
