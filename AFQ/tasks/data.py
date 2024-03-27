@@ -254,17 +254,6 @@ def msdki_params(brain_mask, gtab, data):
     return msdki_fit.model_params, meta
 
 
-@pimms.calc("msdki_fa")
-@as_file('_odfmodel-MSDKI_desc-FA_dwi.nii.gz')
-@as_fit_deriv('MSDKI')
-def msdki_fa(msdki_tf):
-    """
-    full path to a nifti file containing
-    the MSDKI fractional anisotropy
-    """
-    return msdki_tf.fa
-
-
 @pimms.calc("msdki_msd")
 @as_file('_odfmodel-MSDKI_desc-MSD_dwi.nii.gz')
 @as_fit_deriv('MSDKI')
@@ -285,42 +274,6 @@ def msdki_msk(msdki_tf):
     the MSDKI mean signal kurtosis
     """
     return msdki_tf.msk
-
-
-@pimms.calc("msdki_avf")
-@as_file('_odfmodel-MSDKI_desc-AVF_dwi.nii.gz')
-@as_fit_deriv('MSDKI')
-def msdki_avf(msdki_tf):
-    """
-    full path to a nifti file containing
-    the spherical mean technique axonal volume fraction
-    calculated from MSDKI
-    """
-    return msdki_tf.smt2f
-
-
-@pimms.calc("msdki_di")
-@as_file('_odfmodel-MSDKI_desc-DI_dwi.nii.gz')
-@as_fit_deriv('MSDKI')
-def msdki_di(msdki_tf):
-    """
-    full path to a nifti file containing
-    the spherical mean technique intrisic diffusivity
-    calculated from MSDKI
-    """
-    return msdki_tf.smt2di
-
-
-@pimms.calc("msdki_ufa")
-@as_file('_odfmodel-MSDKI_desc-UFA_dwi.nii.gz')
-@as_fit_deriv('MSDKI')
-def msdki_ufa(msdki_tf):
-    """
-    full path to a nifti file containing
-    the spherical mean technique microscopic anisotropy
-    calculated from MSDKI
-    """
-    return msdki_tf.smt2uFA
 
 
 @pimms.calc("csd_params")
@@ -1067,8 +1020,7 @@ def get_data_plan(kwargs):
         gq, gq_pmap, gq_ai, opdt_params, opdt_pmap, opdt_ai,
         csa_params, csa_pmap, csa_ai,
         fwdti_fa, fwdti_md, fwdti_fwf,
-        msdki_fit, msdki_params, msdki_fa, msdki_msd, msdki_msk,
-        msdki_avf, msdki_di, msdki_ufa,
+        msdki_fit, msdki_params, msdki_msd, msdki_msk,
         dki_md, dki_awf, dki_mk, dki_kfa, dki_ga, dki_rd,
         dti_ga, dti_rd, dti_ad,
         dki_ad, dki_rk, dki_ak, dti_params, dki_params, fwdti_params,
