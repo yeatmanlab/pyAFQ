@@ -1,21 +1,22 @@
 Bundle Orientation
 ~~~~~~~~~~~~~~~~~~
 The result of tractometry is a tract profile, which describe how tissue
-properties vary along the length of a tract. These profiles are often discretized,
+properties vary along the length of a tract. These profiles are discretized,
 and represented as 100 tissue property samples equally spaced along the length of
 the tract, from the start to the end. This raises the question of how tracts are
 oriented.
 
-In pyAFQ, the orientation is defined by the bundle definition. Tracts
-start at the start ROI, go through the inclusion ROIs in the order they are
+In pyAFQ, the orientation is defined by the bundle dictionary, see:
+:ref:`bundle-dict-label`. Tracts start at the start ROI,
+go through the inclusion ROIs in the order they are
 provided, and then end in the end ROI. Of course, each of these ROIs is not
 required for each bundle. At minimum, a bundle must have either a start or end
 ROI, or at least two inclusion ROIs, so the orientation can be defined.
 This also means that the order of the inclusion ROIs must be the same as the
-order of the start and end ROIs in the bundle definition.
+order of the start and end ROIs in the bundle dictionary.
 
-Most users can ignore these nuances and use the default bundle definitions
-provided by pyAFQ. For all of our provided bundle definitions, we follow the 
+Most users can ignore these nuances and use the default bundle dictionaries
+provided by pyAFQ. For all of our default bundles, we follow the 
 LPI+ convention. This means tract profiles go from right to left, from
 anterior to posterior, or from superior to inferior, depending on the primary
 orientation of the bundle. Note that this does not mean the TRK/TRX files are
