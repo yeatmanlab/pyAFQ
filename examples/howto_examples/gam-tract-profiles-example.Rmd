@@ -41,9 +41,9 @@ ggplot(aes(x=nodeID,y=est, color=class)) +
 
 ```{r, message=FALSE, warning=FALSE}
 # The above plot looks good but now let's let the curves vary across # subjects too. What I notice here is that it dramatically effects the standard error
-g1 <- gam(md ~ s(nodeID,class, bs='fs') + s(nodeID, subjectID, bs= 're'), data=df)
+g2 <- gam(md ~ s(nodeID,class, bs='fs') + s(nodeID, subjectID, bs= 're'), data=df)
 # Get smooth estimates
-dfs <- smooth_estimates(g1) %>% add_confint(coverage=.68)
+dfs <- smooth_estimates(g2) %>% add_confint(coverage=.68)
 
 # Remove random effects and plot
 filter(dfs, type != 'Random effect') %>%
@@ -54,13 +54,23 @@ ggplot(aes(x=nodeID,y=est, color=class)) +
 
 ```{r, message=FALSE, warning=FALSE}
 # Yet another way to do the same thing and I don't get the difference
-g1 <- gam(md ~ s(nodeID,by=class, bs='fs') + s(subjectID, bs= 're'), data=df)
+g3 <- gam(md ~ s(nodeID,by=class, bs='fs') + s(subjectID, bs= 're'), data=df)
 # Get smooth estimates
-dfs <- smooth_estimates(g1) %>% add_confint(coverage=.68)
+dfs <- smooth_estimates(g3) %>% add_confint(coverage=.68)
 
 # Remove random effects and plot
 filter(dfs, type != 'Random effect') %>%
 ggplot(aes(x=nodeID,y=est, color=class)) +
   geom_line()  +
   geom_ribbon(aes(ymin = lower_ci, ymax=upper_ci),alpha = 0.2 )
+```
+
+Now calculate differences between the smooths for the different factors and plot out the difference an 95% CI
+
+```{r}
+ds<-difference_smooths(g3, smooth="s(nodeID)")
+ggplot(ds,aes(x=nodeID,y=diff)) +
+  geom_line()  +
+  geom_ribbon(aes(ymin = lower, ymax=upper),alpha = 0.2 ) +
+  geom_hline(yintercept=0)
 ```
