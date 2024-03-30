@@ -54,7 +54,7 @@ ggplot(aes(x=nodeID,y=est, color=class)) +
 
 ```{r, message=FALSE, warning=FALSE}
 # Yet another way to do the same thing and I don't get the difference
-g3 <- gam(md ~ s(nodeID,by=class, bs='fs') + s(subjectID, bs= 're'), data=df)
+g3 <- gam(md ~ s(nodeID,by=class, bs='fs', k=10) + s(subjectID, bs= 're'), data=df)
 # Get smooth estimates
 dfs <- smooth_estimates(g3) %>% add_confint(coverage=.68)
 
@@ -73,4 +73,29 @@ ggplot(ds,aes(x=nodeID,y=diff)) +
   geom_line()  +
   geom_ribbon(aes(ymin = lower, ymax=upper),alpha = 0.2 ) +
   geom_hline(yintercept=0)
+```
+
+Now look at continuous measures along the tract profile
+
+```{r}
+# Yet another way to do the same thing and I don't get the difference
+g4 <- gam(md ~  s(nodeID,ALSFRSbulbar, bs='fs', k=10) + s(subjectID, bs= 're'), data=df)
+dfs <- smooth_estimates(g4) %>% add_confint(coverage=.68)
+#filter(dfs,smooth=='s(nodeID)') %>%
+#  ggplot(aes(x=nodeID,y=est)) +
+#  geom_line()  +
+#  geom_ribbon(aes(ymin = lower_ci, ymax=upper_ci),alpha = 0.2 )
+
+# 2d plot showing how tract profiles vary as a function of AFS bulbar
+filter(dfs,smooth=='s(nodeID,ALSFRSbulbar)') %>%
+ggplot(aes(x=nodeID, y=ALSFRSbulbar))+
+  geom_raster(aes(fill=est))
+
+# Now plot separate tract profiles by bulbar
+dfs %>% mutate(ALSFRSbulbar.factor=factor(ALSFRSbulbar)) %>% filter(ALSFRSbulbar== sort(unique(dfs$ALSFRSbulbar))[2] | ALSFRSbulbar== sort(unique(dfs$ALSFRSbulbar))[99]) %>% 
+  filter(smooth=='s(nodeID,ALSFRSbulbar)') %>%
+  ggplot(aes(x=nodeID,y=est,color=ALSFRSbulbar.factor)) +
+  geom_line(show.legend = FALSE) +
+  geom_ribbon(aes(ymin = lower_ci, ymax=upper_ci),alpha = 0.2 )
+
 ```
