@@ -1,0 +1,66 @@
+---
+title: "AFQ-GAMS-Tutorial"
+author: "Jason Yeatman"
+date: "2024-03-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## GAMs Tutorial
+
+First we'll pull the Sarica data and merge nodes.csv (diffusion data) with subjects.csv (participant meta data)
+
+```{r, warning=FALSE, message=FALSE}
+library(dplyr)
+library(mgcv)
+library(gratia)
+library(ggplot2)
+df <- read.csv('https://raw.githubusercontent.com/yeatmanlab/Sarica_2017/gh-pages/data/nodes.csv')
+df <- inner_join(df, read.csv('https://raw.githubusercontent.com/yeatmanlab/Sarica_2017/gh-pages/data/subjects.csv'))
+mutate(df, class = factor(class), subjectID = factor(subjectID))-> df
+
+```
+
+```{r, message=FALSE, warning=FALSE}
+# Fit a simple GAM with a random effect of subject and smoothers that 
+# differ by class (control or ALS)
+g1 <- gam(md ~ s(nodeID,class, bs='fs') + s(subjectID, bs= 're'), data=df)
+# Get smooth estimates
+dfs <- smooth_estimates(g1) %>% add_confint(coverage=.68)
+
+# Remove random effects and plot
+filter(dfs, type != 'Random effect') %>%
+ggplot(aes(x=nodeID,y=est, color=class)) +
+  geom_line()  +
+  geom_ribbon(aes(ymin = lower_ci, ymax=upper_ci),alpha = 0.2 )
+
+```
+
+```{r, message=FALSE, warning=FALSE}
+# The above plot looks good but now let's let the curves vary across # subjects too. What I notice here is that it dramatically effects the standard error
+g1 <- gam(md ~ s(nodeID,class, bs='fs') + s(nodeID, subjectID, bs= 're'), data=df)
+# Get smooth estimates
+dfs <- smooth_estimates(g1) %>% add_confint(coverage=.68)
+
+# Remove random effects and plot
+filter(dfs, type != 'Random effect') %>%
+ggplot(aes(x=nodeID,y=est, color=class)) +
+  geom_line()  +
+  geom_ribbon(aes(ymin = lower_ci, ymax=upper_ci),alpha = 0.2 )
+```
+
+```{r, message=FALSE, warning=FALSE}
+# Yet another way to do the same thing and I don't get the difference
+g1 <- gam(md ~ s(nodeID,by=class, bs='fs') + s(subjectID, bs= 're'), data=df)
+# Get smooth estimates
+dfs <- smooth_estimates(g1) %>% add_confint(coverage=.68)
+
+# Remove random effects and plot
+filter(dfs, type != 'Random effect') %>%
+ggplot(aes(x=nodeID,y=est, color=class)) +
+  geom_line()  +
+  geom_ribbon(aes(ymin = lower_ci, ymax=upper_ci),alpha = 0.2 )
+```
