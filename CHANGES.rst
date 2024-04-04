@@ -1,3 +1,13 @@
+1.3.1 (April 04, 2024)
+======================
+Adds the mean signal diffusion kurtosis model as an option.
+Adds more information in JSON sidecars. Adds an explanation
+of our current bundle orientation system to the documentation.
+  * [ENH] add mean signal diffusion kurtosis model (#1121)
+  * [ENH] make source field relative in json sidecars (#1118)
+  * [ENH] add more information from bundle dict into jsons (#1117)
+  * [DOC] add bundle orientation explanation (#1120)
+
 1.3 (March 25, 2024)
 ====================
 All bundles are now ordered according to LPI+ and 
