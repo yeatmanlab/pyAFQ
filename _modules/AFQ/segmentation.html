@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.segmentation &#8212; AFQ 1.3 documentation</title>
+    <title>AFQ.segmentation &#8212; AFQ 1.3.1 documentation</title>
   
   
   
@@ -129,8 +129,8 @@
       
     
     
-    <img src="../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3 documentation - Home"/>`);</script>
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3.1 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -910,6 +910,15 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fiber_groups</span><span class="p">[</span><span class="n">b_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">sl</span></div>
 
+<div class="viewcode-block" id="Segmentation._add_bundle_to_meta"><a class="viewcode-back" href="../../reference/api/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation._add_bundle_to_meta">[docs]</a>    <span class="k">def</span> <span class="nf">_add_bundle_to_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundle_name</span><span class="p">,</span> <span class="n">bundle_info</span><span class="p">):</span>
+        <span class="n">bundle_info</span> <span class="o">=</span> <span class="n">bundle_info</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="c1"># remove keys that can never be serialized</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="s1">&#39;include&#39;</span><span class="p">,</span> <span class="s1">&#39;exclude&#39;</span><span class="p">,</span> <span class="s1">&#39;prob_map&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="s1">&#39;end&#39;</span><span class="p">,</span> <span class="s1">&#39;curvature&#39;</span><span class="p">]:</span>
+            <span class="n">bundle_info</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">bundle_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">bundle_info</span></div>
+
 <div class="viewcode-block" id="Segmentation.segment_afq"><a class="viewcode-back" href="../../reference/api/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.segment_afq">[docs]</a>    <span class="k">def</span> <span class="nf">segment_afq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Assign streamlines to bundles using the waypoint ROI approach</span>
@@ -937,6 +946,7 @@ document.write(`
             <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">fiber_groups</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="c1"># We need to calculate the size of a voxel, so we can transform</span>
         <span class="c1"># from mm to voxel units:</span>
@@ -1290,10 +1300,12 @@ document.write(`
                         <span class="n">sb_include_cuts</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_add_bundle_to_fiber_group</span><span class="p">(</span>
                         <span class="n">sb_name</span><span class="p">,</span> <span class="n">bundlesection_select_sl</span><span class="p">,</span> <span class="n">select_idx</span><span class="p">,</span> <span class="n">to_flip</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_add_bundle_to_meta</span><span class="p">(</span><span class="n">sb_name</span><span class="p">,</span> <span class="n">bundle_def</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_add_bundle_to_fiber_group</span><span class="p">(</span>
                     <span class="n">bundle</span><span class="p">,</span> <span class="n">select_sl</span><span class="p">,</span> <span class="n">select_idx</span><span class="p">,</span> <span class="n">to_flip</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fiber_groups</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_add_bundle_to_meta</span><span class="p">(</span><span class="n">bundle</span><span class="p">,</span> <span class="n">bundle_def</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fiber_groups</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span></div>
 
 <div class="viewcode-block" id="Segmentation.move_streamlines"><a class="viewcode-back" href="../../reference/api/AFQ/segmentation/index.html#AFQ.segmentation.Segmentation.move_streamlines">[docs]</a>    <span class="k">def</span> <span class="nf">move_streamlines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tg</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="s2">&quot;template&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Streamline-based registration of a whole-brain tractogram to</span>
@@ -1480,7 +1492,7 @@ document.write(`
                                                           <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span>
                                                           <span class="n">Space</span><span class="o">.</span><span class="n">RASMM</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fiber_groups</span> <span class="o">=</span> <span class="n">fiber_groups</span>
-        <span class="k">return</span> <span class="n">fiber_groups</span></div></div>
+        <span class="k">return</span> <span class="n">fiber_groups</span><span class="p">,</span> <span class="p">{}</span></div></div>
 
 
 <span class="k">def</span> <span class="nf">sl_curve</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span> <span class="n">n_points</span><span class="p">):</span>

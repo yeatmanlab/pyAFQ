@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.api.participant &#8212; AFQ 1.3 documentation</title>
+    <title>AFQ.api.participant &#8212; AFQ 1.3.1 documentation</title>
   
   
   
@@ -129,8 +129,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3 documentation - Home"/>`);</script>
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3.1 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -462,7 +462,7 @@ document.write(`
                  <span class="n">dwi_data_file</span><span class="p">,</span>
                  <span class="n">bval_file</span><span class="p">,</span> <span class="n">bvec_file</span><span class="p">,</span>
                  <span class="n">output_dir</span><span class="p">,</span>
-                 <span class="n">bids_info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">_bids_info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize a ParticipantAFQ object from a BIDS dataset.</span>
@@ -477,8 +477,9 @@ document.write(`
 <span class="sd">            Path to bvec file.</span>
 <span class="sd">        output_dir : str</span>
 <span class="sd">            Path to output directory.</span>
-<span class="sd">        bids_info : dict or None, optional</span>
-<span class="sd">            This is used by GroupAFQ to provide information about</span>
+<span class="sd">        _bids_info : dict or None, optional</span>
+<span class="sd">            This should be left as None in most cases. It</span>
+<span class="sd">            is used by GroupAFQ to provide information about</span>
 <span class="sd">            the BIDS layout to each participant.</span>
 <span class="sd">        kwargs : additional optional parameters</span>
 <span class="sd">            You can set additional parameters for any step</span>
@@ -530,7 +531,7 @@ document.write(`
             <span class="n">bval</span><span class="o">=</span><span class="n">bval_file</span><span class="p">,</span>
             <span class="n">bvec</span><span class="o">=</span><span class="n">bvec_file</span><span class="p">,</span>
             <span class="n">results_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">,</span>
-            <span class="n">bids_info</span><span class="o">=</span><span class="n">bids_info</span><span class="p">,</span>
+            <span class="n">bids_info</span><span class="o">=</span><span class="n">_bids_info</span><span class="p">,</span>
             <span class="n">base_fname</span><span class="o">=</span><span class="n">get_base_fname</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">dwi_data_file</span><span class="p">),</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">make_workflow</span><span class="p">()</span>

@@ -59,6 +59,22 @@ dki_params:
     full path to a nifti file containing parameters for the DKI fit
 
 
+msdki_tf:
+    Mean Signal DKI DiffusionKurtosisFit object
+
+
+msdki_params:
+    full path to a nifti file containing parameters for the Mean Signal DKI fit
+
+
+msdki_msd:
+    full path to a nifti file containing the MSDKI mean signal diffusivity
+
+
+msdki_msk:
+    full path to a nifti file containing the MSDKI mean signal kurtosis
+
+
 csd_params:
     full path to a nifti file containing parameters for the CSD fit
 

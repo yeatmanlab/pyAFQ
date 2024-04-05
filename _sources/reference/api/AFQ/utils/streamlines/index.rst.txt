@@ -38,13 +38,16 @@ Attributes
 
    
 
-.. py:class:: SegmentedSFT(bundles, space)
+.. py:class:: SegmentedSFT(bundles, space, sidecar_info={})
 
 
    .. py:method:: get_sft_and_sidecar()
 
 
    .. py:method:: get_bundle(b_name)
+
+
+   .. py:method:: get_bundle_param_info(b_name)
 
 
    .. py:method:: fromfile(trk_or_trx_file, reference='same', sidecar_file=None)

@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.segmentation &#8212; AFQ 1.3 documentation</title>
+    <title>AFQ.tasks.segmentation &#8212; AFQ 1.3.1 documentation</title>
   
   
   
@@ -129,8 +129,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3 documentation - Home"/>`);</script>
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3.1 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -495,7 +495,7 @@ document.write(`
 
     <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
     <span class="n">segmentation</span> <span class="o">=</span> <span class="n">seg</span><span class="o">.</span><span class="n">Segmentation</span><span class="p">(</span><span class="o">**</span><span class="n">segmentation_params</span><span class="p">)</span>
-    <span class="n">bundles</span> <span class="o">=</span> <span class="n">segmentation</span><span class="o">.</span><span class="n">segment</span><span class="p">(</span>
+    <span class="n">bundles</span><span class="p">,</span> <span class="n">bundle_meta</span> <span class="o">=</span> <span class="n">segmentation</span><span class="o">.</span><span class="n">segment</span><span class="p">(</span>
         <span class="n">bundle_dict</span><span class="p">,</span>
         <span class="n">tg</span><span class="p">,</span>
         <span class="n">mapping_imap</span><span class="p">[</span><span class="s2">&quot;mapping&quot;</span><span class="p">],</span>
@@ -531,6 +531,7 @@ document.write(`
 
     <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">streamlines</span>
     <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;Recognition Parameters&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">seg_params_out</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;Bundle Parameters&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bundle_meta</span>
     <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;Timing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
     <span class="k">return</span> <span class="n">tgram</span><span class="p">,</span> <span class="n">meta</span></div>
 
@@ -578,7 +579,9 @@ document.write(`
                         <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No bundle to save for </span><span class="si">{</span><span class="n">bundle</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">bundles</span><span class="p">)</span>
+            <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">source</span><span class="o">=</span><span class="n">bundles</span><span class="p">,</span>
+                <span class="n">params</span><span class="o">=</span><span class="n">seg_sft</span><span class="o">.</span><span class="n">get_bundle_param_info</span><span class="p">(</span><span class="n">bundle</span><span class="p">))</span>
             <span class="n">meta_fname</span> <span class="o">=</span> <span class="n">drop_extension</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.json&#39;</span>
             <span class="n">write_json</span><span class="p">(</span><span class="n">meta_fname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">bundles_dir</span></div>
@@ -759,7 +762,9 @@ document.write(`
 
     <span class="n">profile_dframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">profile_dict</span><span class="p">)</span>
     <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">bundles</span><span class="p">,</span>
-                <span class="n">parameters</span><span class="o">=</span><span class="n">get_default_args</span><span class="p">(</span><span class="n">afq_profile</span><span class="p">))</span>
+                <span class="n">parameters</span><span class="o">=</span><span class="n">get_default_args</span><span class="p">(</span><span class="n">afq_profile</span><span class="p">),</span>
+                <span class="n">scalars</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">scalar_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+                <span class="n">bundles</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">seg_sft</span><span class="o">.</span><span class="n">bundle_names</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">profile_dframe</span><span class="p">,</span> <span class="n">meta</span></div>
 

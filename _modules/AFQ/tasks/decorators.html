@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.decorators &#8212; AFQ 1.3 documentation</title>
+    <title>AFQ.tasks.decorators &#8212; AFQ 1.3.1 documentation</title>
   
   
   
@@ -129,8 +129,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3 documentation - Home"/>`);</script>
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3.1 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -544,7 +544,7 @@ document.write(`
 <span class="sd">    and only run if not already found</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">_as_file</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-        <span class="n">needed_args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;base_fname&quot;</span><span class="p">]</span>
+        <span class="n">needed_args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;base_fname&quot;</span><span class="p">,</span> <span class="s2">&quot;results_dir&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">include_track</span><span class="p">:</span>
             <span class="n">needed_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;tracking_params&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">include_seg</span><span class="p">:</span>
@@ -553,12 +553,14 @@ document.write(`
         <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
         <span class="nd">@has_args</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">needed_args</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">wrapper_as_file</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="n">og_arg_count</span><span class="p">,</span> <span class="n">base_fname</span><span class="p">,</span> <span class="n">tracking_params</span><span class="p">,</span> <span class="n">segmentation_params</span> <span class="o">=</span>\
+            <span class="n">og_arg_count</span><span class="p">,</span> <span class="n">base_fname</span><span class="p">,</span> <span class="n">results_dir</span><span class="p">,</span> \
+                <span class="n">tracking_params</span><span class="p">,</span> <span class="n">segmentation_params</span> <span class="o">=</span>\
                 <span class="n">extract_added_args</span><span class="p">(</span>
                     <span class="n">func</span><span class="p">,</span>
-                    <span class="p">[</span><span class="s2">&quot;base_fname&quot;</span><span class="p">,</span> <span class="s2">&quot;tracking_params&quot;</span><span class="p">,</span> <span class="s2">&quot;segmentation_params&quot;</span><span class="p">],</span>
+                    <span class="p">[</span><span class="s2">&quot;base_fname&quot;</span><span class="p">,</span> <span class="s2">&quot;results_dir&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;tracking_params&quot;</span><span class="p">,</span> <span class="s2">&quot;segmentation_params&quot;</span><span class="p">],</span>
                     <span class="n">args</span><span class="p">,</span>
-                    <span class="n">includes</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="n">include_track</span><span class="p">,</span> <span class="n">include_seg</span><span class="p">])</span>
+                    <span class="n">includes</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">include_track</span><span class="p">,</span> <span class="n">include_seg</span><span class="p">])</span>
             <span class="n">this_file</span> <span class="o">=</span> <span class="n">get_fname</span><span class="p">(</span>
                 <span class="n">base_fname</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span>
                 <span class="n">tracking_params</span><span class="o">=</span><span class="n">tracking_params</span><span class="p">,</span>
@@ -597,6 +599,10 @@ document.write(`
                     <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;dependent&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;trk&quot;</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;dependent&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;dwi&quot;</span>
+
+                <span class="c1"># modify meta source to be relative</span>
+                <span class="k">if</span> <span class="s2">&quot;source&quot;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+                    <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">],</span> <span class="n">results_dir</span><span class="p">)</span>
 
                 <span class="n">meta_fname</span> <span class="o">=</span> <span class="n">get_fname</span><span class="p">(</span>
                     <span class="n">base_fname</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">drop_extension</span><span class="p">(</span><span class="n">suffix</span><span class="p">)</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">,</span>

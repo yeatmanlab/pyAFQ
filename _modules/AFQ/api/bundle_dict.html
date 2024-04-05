@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.api.bundle_dict &#8212; AFQ 1.3 documentation</title>
+    <title>AFQ.api.bundle_dict &#8212; AFQ 1.3.1 documentation</title>
   
   
   
@@ -129,8 +129,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3 documentation - Home"/>`);</script>
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3.1 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -1215,7 +1215,7 @@ document.write(`
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">seg_algo</span> <span class="o">==</span> <span class="s2">&quot;afq&quot;</span><span class="p">:</span>
             <span class="k">if</span> <span class="s2">&quot;Forceps Major&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_names</span>\
                     <span class="ow">and</span> <span class="s2">&quot;Callosum Occipital&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_names</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">((</span>
                     <span class="s2">&quot;Forceps Major and Callosum Occipital bundles&quot;</span>
                     <span class="s2">&quot; are co-located, and AFQ&quot;</span>
                     <span class="s2">&quot; assigns each streamline to only one bundle.&quot;</span>
@@ -1223,7 +1223,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">bundle_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;Forceps Major&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="s2">&quot;Forceps Minor&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_names</span>\
                     <span class="ow">and</span> <span class="s2">&quot;Callosum Orbital&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_names</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">((</span>
                     <span class="s2">&quot;Forceps Minor and Callosum Orbital bundles&quot;</span>
                     <span class="s2">&quot; are co-located, and AFQ&quot;</span>
                     <span class="s2">&quot; assigns each streamline to only one bundle.&quot;</span>
@@ -1231,7 +1231,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">bundle_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;Forceps Minor&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="s2">&quot;Forceps Minor&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_names</span>\
                     <span class="ow">and</span> <span class="s2">&quot;Callosum Anterior Frontal&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bundle_names</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">((</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">((</span>
                     <span class="s2">&quot;Forceps Minor and Callosum Anterior Frontal bundles&quot;</span>
                     <span class="s2">&quot; are co-located, and AFQ&quot;</span>
                     <span class="s2">&quot; assigns each streamline to only one bundle.&quot;</span>

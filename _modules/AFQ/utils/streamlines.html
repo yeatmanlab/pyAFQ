@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.utils.streamlines &#8212; AFQ 1.3 documentation</title>
+    <title>AFQ.utils.streamlines &#8212; AFQ 1.3.1 documentation</title>
   
   
   
@@ -129,8 +129,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3 documentation - Home"/>`);</script>
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3.1 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -443,9 +443,10 @@ document.write(`
 
 
 <div class="viewcode-block" id="SegmentedSFT"><a class="viewcode-back" href="../../../reference/api/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.SegmentedSFT">[docs]</a><span class="k">class</span> <span class="nc">SegmentedSFT</span><span class="p">():</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundles</span><span class="p">,</span> <span class="n">space</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundles</span><span class="p">,</span> <span class="n">space</span><span class="p">,</span> <span class="n">sidecar_info</span><span class="o">=</span><span class="p">{}):</span>
         <span class="n">reference</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bundle_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sidecar_info</span> <span class="o">=</span> <span class="n">sidecar_info</span>
         <span class="n">sls</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">idxs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">this_tracking_idxs</span> <span class="o">=</span> <span class="p">[]</span>
@@ -490,6 +491,10 @@ document.write(`
 <div class="viewcode-block" id="SegmentedSFT.get_bundle"><a class="viewcode-back" href="../../../reference/api/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.SegmentedSFT.get_bundle">[docs]</a>    <span class="k">def</span> <span class="nf">get_bundle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b_name</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sft</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bundle_idxs</span><span class="p">[</span><span class="n">b_name</span><span class="p">]]</span></div>
 
+<div class="viewcode-block" id="SegmentedSFT.get_bundle_param_info"><a class="viewcode-back" href="../../../reference/api/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.SegmentedSFT.get_bundle_param_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_bundle_param_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b_name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sidecar_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;Bundle Parameters&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">b_name</span><span class="p">,</span> <span class="p">{})</span></div>
+
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="SegmentedSFT.fromfile"><a class="viewcode-back" href="../../../reference/api/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.SegmentedSFT.fromfile">[docs]</a>    <span class="k">def</span> <span class="nf">fromfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">trk_or_trx_file</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="s2">&quot;same&quot;</span><span class="p">,</span> <span class="n">sidecar_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">sidecar_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -528,7 +533,7 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">bundles</span><span class="p">[</span><span class="s2">&quot;whole_brain&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sft</span>
 
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">bundles</span><span class="p">,</span> <span class="n">Space</span><span class="o">.</span><span class="n">RASMM</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">bundles</span><span class="p">,</span> <span class="n">Space</span><span class="o">.</span><span class="n">RASMM</span><span class="p">,</span> <span class="n">sidecar_info</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="split_streamline"><a class="viewcode-back" href="../../../reference/api/AFQ/utils/streamlines/index.html#AFQ.utils.streamlines.split_streamline">[docs]</a><span class="k">def</span> <span class="nf">split_streamline</span><span class="p">(</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">sl_to_split</span><span class="p">,</span> <span class="n">split_idx</span><span class="p">):</span>

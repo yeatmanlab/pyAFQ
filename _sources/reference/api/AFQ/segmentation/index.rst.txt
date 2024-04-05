@@ -195,6 +195,9 @@ Functions
       ..
           !! processed by numpydoc !!
 
+   .. py:method:: _add_bundle_to_meta(bundle_name, bundle_info)
+
+
    .. py:method:: segment_afq(tg=None)
 
       

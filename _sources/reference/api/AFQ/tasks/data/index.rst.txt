@@ -22,6 +22,10 @@ Functions
    AFQ.tasks.data.fwdti_params
    AFQ.tasks.data.dki_fit
    AFQ.tasks.data.dki_params
+   AFQ.tasks.data.msdki_fit
+   AFQ.tasks.data.msdki_params
+   AFQ.tasks.data.msdki_msd
+   AFQ.tasks.data.msdki_msk
    AFQ.tasks.data.csd_params
    AFQ.tasks.data.anisotropic_power_map
    AFQ.tasks.data.csd_anisotropic_index
@@ -305,6 +309,101 @@ Attributes
    
    full path to a nifti file containing
    parameters for the DKI fit
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: msdki_fit(msdki_params, gtab)
+
+   
+   Mean Signal DKI DiffusionKurtosisFit object
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: msdki_params(brain_mask, gtab, data)
+
+   
+   full path to a nifti file containing
+   parameters for the Mean Signal DKI fit
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: msdki_msd(msdki_tf)
+
+   
+   full path to a nifti file containing
+   the MSDKI mean signal diffusivity
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: msdki_msk(msdki_tf)
+
+   
+   full path to a nifti file containing
+   the MSDKI mean signal kurtosis
 
 
 

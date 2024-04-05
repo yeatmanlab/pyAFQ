@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.data &#8212; AFQ 1.3 documentation</title>
+    <title>AFQ.tasks.data &#8212; AFQ 1.3.1 documentation</title>
   
   
   
@@ -129,8 +129,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3 documentation - Home"/>`);</script>
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3.1 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -438,6 +438,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">dipy.reconst.dki</span> <span class="k">as</span> <span class="nn">dpy_dki</span>
 <span class="kn">import</span> <span class="nn">dipy.reconst.dti</span> <span class="k">as</span> <span class="nn">dpy_dti</span>
 <span class="kn">import</span> <span class="nn">dipy.reconst.fwdti</span> <span class="k">as</span> <span class="nn">dpy_fwdti</span>
+<span class="kn">import</span> <span class="nn">dipy.reconst.msdki</span> <span class="k">as</span> <span class="nn">dpy_msdki</span>
 <span class="kn">from</span> <span class="nn">dipy.reconst.gqi</span> <span class="kn">import</span> <span class="n">GeneralizedQSamplingModel</span>
 <span class="kn">from</span> <span class="nn">dipy.reconst</span> <span class="kn">import</span> <span class="n">shm</span>
 <span class="kn">from</span> <span class="nn">dipy.reconst.dki_micro</span> <span class="kn">import</span> <span class="n">axonal_water_fraction</span>
@@ -654,6 +655,53 @@ document.write(`
         <span class="n">OutlierRejection</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">ModelURL</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DIPY_GH</span><span class="si">}</span><span class="s2">reconst/dki.py&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">dkf</span><span class="o">.</span><span class="n">model_params</span><span class="p">,</span> <span class="n">meta</span></div>
+
+
+<span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;msdki_tf&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="msdki_fit"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/data/index.html#AFQ.tasks.data.msdki_fit">[docs]</a><span class="k">def</span> <span class="nf">msdki_fit</span><span class="p">(</span><span class="n">msdki_params</span><span class="p">,</span> <span class="n">gtab</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mean Signal DKI DiffusionKurtosisFit object&quot;&quot;&quot;</span>
+    <span class="n">msdki_params</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">msdki_params</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+    <span class="n">tm</span> <span class="o">=</span> <span class="n">dpy_msdki</span><span class="o">.</span><span class="n">MeanDiffusionKurtosisModel</span><span class="p">(</span><span class="n">gtab</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dpy_msdki</span><span class="o">.</span><span class="n">MeanDiffusionKurtosisFit</span><span class="p">(</span><span class="n">tm</span><span class="p">,</span> <span class="n">msdki_params</span><span class="p">)</span></div>
+
+
+<span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;msdki_params&quot;</span><span class="p">)</span>
+<span class="nd">@as_file</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;_odfmodel-MSDKI_desc-diffmodel_dwi.nii.gz&#39;</span><span class="p">)</span>
+<span class="nd">@as_img</span>
+<div class="viewcode-block" id="msdki_params"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/data/index.html#AFQ.tasks.data.msdki_params">[docs]</a><span class="k">def</span> <span class="nf">msdki_params</span><span class="p">(</span><span class="n">brain_mask</span><span class="p">,</span> <span class="n">gtab</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    parameters for the Mean Signal DKI fit</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mask</span> <span class="o">=</span>\
+        <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">brain_mask</span><span class="p">)</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">()</span>
+    <span class="n">msdki_model</span> <span class="o">=</span> <span class="n">dpy_msdki</span><span class="o">.</span><span class="n">MeanDiffusionKurtosisModel</span><span class="p">(</span><span class="n">gtab</span><span class="p">)</span>
+    <span class="n">msdki_fit</span> <span class="o">=</span> <span class="n">msdki_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
+    <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">ModelURL</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DIPY_GH</span><span class="si">}</span><span class="s2">reconst/msdki.py&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">msdki_fit</span><span class="o">.</span><span class="n">model_params</span><span class="p">,</span> <span class="n">meta</span></div>
+
+
+<span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;msdki_msd&quot;</span><span class="p">)</span>
+<span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_odfmodel-MSDKI_desc-MSD_dwi.nii.gz&#39;</span><span class="p">)</span>
+<span class="nd">@as_fit_deriv</span><span class="p">(</span><span class="s1">&#39;MSDKI&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="msdki_msd"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/data/index.html#AFQ.tasks.data.msdki_msd">[docs]</a><span class="k">def</span> <span class="nf">msdki_msd</span><span class="p">(</span><span class="n">msdki_tf</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    the MSDKI mean signal diffusivity</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">msdki_tf</span><span class="o">.</span><span class="n">msd</span></div>
+
+
+<span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;msdki_msk&quot;</span><span class="p">)</span>
+<span class="nd">@as_file</span><span class="p">(</span><span class="s1">&#39;_odfmodel-MSDKI_desc-MSK_dwi.nii.gz&#39;</span><span class="p">)</span>
+<span class="nd">@as_fit_deriv</span><span class="p">(</span><span class="s1">&#39;MSDKI&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="msdki_msk"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/data/index.html#AFQ.tasks.data.msdki_msk">[docs]</a><span class="k">def</span> <span class="nf">msdki_msk</span><span class="p">(</span><span class="n">msdki_tf</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    full path to a nifti file containing</span>
+<span class="sd">    the MSDKI mean signal kurtosis</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">msdki_tf</span><span class="o">.</span><span class="n">msk</span></div>
 
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;csd_params&quot;</span><span class="p">)</span>
@@ -1400,8 +1448,9 @@ document.write(`
         <span class="n">gq</span><span class="p">,</span> <span class="n">gq_pmap</span><span class="p">,</span> <span class="n">gq_ai</span><span class="p">,</span> <span class="n">opdt_params</span><span class="p">,</span> <span class="n">opdt_pmap</span><span class="p">,</span> <span class="n">opdt_ai</span><span class="p">,</span>
         <span class="n">csa_params</span><span class="p">,</span> <span class="n">csa_pmap</span><span class="p">,</span> <span class="n">csa_ai</span><span class="p">,</span>
         <span class="n">fwdti_fa</span><span class="p">,</span> <span class="n">fwdti_md</span><span class="p">,</span> <span class="n">fwdti_fwf</span><span class="p">,</span>
-        <span class="n">dki_md</span><span class="p">,</span> <span class="n">dki_awf</span><span class="p">,</span> <span class="n">dki_mk</span><span class="p">,</span> <span class="n">dki_kfa</span><span class="p">,</span> <span class="n">dti_ga</span><span class="p">,</span> <span class="n">dti_rd</span><span class="p">,</span> <span class="n">dti_ad</span><span class="p">,</span>
-        <span class="n">dki_ga</span><span class="p">,</span> <span class="n">dki_rd</span><span class="p">,</span>
+        <span class="n">msdki_fit</span><span class="p">,</span> <span class="n">msdki_params</span><span class="p">,</span> <span class="n">msdki_msd</span><span class="p">,</span> <span class="n">msdki_msk</span><span class="p">,</span>
+        <span class="n">dki_md</span><span class="p">,</span> <span class="n">dki_awf</span><span class="p">,</span> <span class="n">dki_mk</span><span class="p">,</span> <span class="n">dki_kfa</span><span class="p">,</span> <span class="n">dki_ga</span><span class="p">,</span> <span class="n">dki_rd</span><span class="p">,</span>
+        <span class="n">dti_ga</span><span class="p">,</span> <span class="n">dti_rd</span><span class="p">,</span> <span class="n">dti_ad</span><span class="p">,</span>
         <span class="n">dki_ad</span><span class="p">,</span> <span class="n">dki_rk</span><span class="p">,</span> <span class="n">dki_ak</span><span class="p">,</span> <span class="n">dti_params</span><span class="p">,</span> <span class="n">dki_params</span><span class="p">,</span> <span class="n">fwdti_params</span><span class="p">,</span>
         <span class="n">csd_params</span><span class="p">,</span> <span class="n">get_bundle_dict</span><span class="p">])</span>
 
