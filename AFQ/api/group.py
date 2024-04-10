@@ -147,7 +147,9 @@ class GroupAFQ(object):
             raise TypeError("bids_layout_kwargs must be a dict")
 
         self.logger = logger
-
+        self.bids_path = bids_path
+        self.output_dir = output_dir
+        self.preproc_pipeline = preproc_pipeline
         self.parallel_params = parallel_params
         self.wf_dict = {}
 
@@ -914,6 +916,218 @@ class GroupAFQ(object):
             subtitle=page_subtitle,
             link=page_title_link,
             sublink=page_subtitle_link)
+
+
+class ParallelGroupAFQ(GroupAFQ):
+
+    def __init__(self,
+                 bids_path,
+                 bids_filters={"suffix": "dwi"},
+                 preproc_pipeline="all",
+                 participant_labels=None,
+                 output_dir=None,
+                 parallel_params={"engine": "serial"},
+                 bids_layout_kwargs={},
+                 plugin="cf",
+                 sbatch_args=None,
+                 cache_dir=None,
+                 **kwargs):
+        
+        super().__init__(bids_path,
+                         bids_filters,
+                         preproc_pipeline,
+                         participant_labels,
+                         output_dir,
+                         parallel_params,
+                         bids_layout_kwargs,
+                         **kwargs)
+
+        self.plugin = plugin
+        self.sbatch_args = sbatch_args
+        self.cache_dir = cache_dir
+    
+    def export_all(self, viz=True, afqbrowser=True, xforms=True, indiv=True):
+        """ Exports all the possible outputs
+
+        Parameters
+        ----------
+        viz : bool
+            Whether to output visualizations. This includes tract profile
+            plots, a figure containing all bundles, and, if using the AFQ
+            segmentation algorithm, individual bundle figures.
+            Default: True
+        afqbrowser : bool
+            Whether to output an AFQ-Browser from this AFQ instance.
+            Default: True
+        xforms : bool
+            Whether to output the reg_template image in subject space and,
+            depending on if it is possible based on the mapping used, to
+            output the b0 in template space.
+            Default: True
+        indiv : bool
+            Whether to output individual bundles in their own files, in
+            addition to the one file containing all bundles. If using
+            the AFQ segmentation algorithm, individual ROIs are also
+            output.
+            Default: True
+        """
+        import pydra
+
+        bids_contents = os.listdir(self.bids_path)
+        bids_contents.remove("derivatives")
+
+        for subject_id in bids_contents:
+            if not op.isdir(op.join(self.bids_path, subject_id)):
+                continue
+
+            export_sub_task = pydra.mark.task(
+                self.export_sub(
+                    subject_id,
+                    viz,
+                    afqbrowser,
+                    xforms,
+                    indiv
+                ),
+                cache_dir=self.cache_dir
+            )
+
+            # Replace with Ray
+            with pydra.Submitter(
+                plugin=self.plugin, sbatch_args=self.sbatch_args
+            ) as sub:
+                try:
+                    sub(runnable=export_sub_task)
+                except:
+                    self.logger.info(f"Error submitting {subject_id}")
+
+    def export_sub(self, subject_id, viz=True, afqbrowser=True, xforms=True,
+                   indiv=True):
+        """ Exports all the possible outputs
+
+        Parameters
+        ----------
+        viz : bool
+            Whether to output visualizations. This includes tract profile
+            plots, a figure containing all bundles, and, if using the AFQ
+            segmentation algorithm, individual bundle figures.
+            Default: True
+        afqbrowser : bool
+            Whether to output an AFQ-Browser from this AFQ instance.
+            Default: True
+        xforms : bool
+            Whether to output the reg_template image in subject space and,
+            depending on if it is possible based on the mapping used, to
+            output the b0 in template space.
+            Default: True
+        indiv : bool
+            Whether to output individual bundles in their own files, in
+            addition to the one file containing all bundles. If using
+            the AFQ segmentation algorithm, individual ROIs are also
+            output.
+            Default: True
+        """
+        import shutil
+        import pandas as pd
+
+        bids_path = self.bids_path
+        output_dir = self.output_dir
+
+        bids_location = op.dirname(op.abspath(bids_path))
+        bids_name = op.basename(op.abspath(bids_path))
+        output_dir_name = op.basename(op.abspath(output_dir))
+
+        self.bids_path = op.join(
+            bids_location,
+            bids_name + f"_{subject_id}"
+        )
+
+        self.output_dir = op.join(
+            self.bids_path,
+            "derivatives",
+            output_dir_name
+        )
+
+        if op.exists(self.bids_path):
+            shutil.rmtree(self.bids_path)
+
+        os.makedirs(
+            op.join(
+                self.bids_path,
+                "derivatives",
+                self.preproc_pipeline
+            )
+        )
+
+        shutil.copyfile(
+            op.join(bids_path, "dataset_description.json"),
+            op.join(self.bids_path, "dataset_description.json")
+        )
+
+        shutil.copytree(
+            op.join(bids_path, subject_id),
+            op.join(self.bids_path, subject_id)
+        )
+
+        shutil.copyfile(
+            op.join(
+                bids_path,
+                "derivatives",
+                self.preproc_pipeline,
+                "dataset_description.json"
+            ),
+            op.join(
+                self.bids_path,
+                "derivatives",
+                self.preproc_pipeline,
+                "dataset_description.json"
+            )
+        )
+
+        shutil.copytree(
+            op.join(
+                bids_path,
+                "derivatives",
+                self.preproc_pipeline,
+                subject_id
+            ),
+            op.join(
+                self.bids_path,
+                "derivatives",
+                self.preproc_pipeline,
+                subject_id
+            )
+        )
+
+        super(self.export_all(viz, afqbrowser, xforms, indiv))
+
+        if not op.exists(op.join(output_dir, "dataset_description.json")):
+            shutil.copyfile(
+                op.join(self.output_dir, "dataset_description.json"),
+                op.join(output_dir, "dataset_description.json")
+            )
+
+        if not op.exists(op.join(output_dir, "tract_profiles.csv")):
+            shutil.copyfile(op.join(self.output_dir, "tract_profiles.csv"),
+                            op.join(output_dir, "tract_profiles.csv")
+                            )
+        else:
+            df = pd.read_csv(
+                op.join(output_dir, "tract_profiles.csv"), index_col=0
+            )
+            df_sub = pd.read_csv(
+                op.join(self.output_dir, "tract_profiles.csv")
+            )
+            df = df.append(df_sub, ignore_index=True)
+            df.to_csv(op.join(output_dir, "tract_profiles.csv"))
+
+        shutil.copytree(
+            op.join(self.output_dir, subject_id),
+            op.join(output_dir, subject_id)
+        )
+
+        shutil.rmtree(self.bids_path)
+
+        self.logger.info(f"{subject_id} finished")
 
 
 def download_and_combine_afq_profiles(bucket,
