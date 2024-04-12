@@ -40,6 +40,8 @@ try:
 except ImportError:
     using_afqb = False
 
+import shutil
+
 
 __all__ = ["GroupAFQ", "get_afq_bids_entities_fname"]
 
@@ -919,33 +921,6 @@ class GroupAFQ(object):
 
 
 class ParallelGroupAFQ(GroupAFQ):
-
-    def __init__(self,
-                 bids_path,
-                 bids_filters={"suffix": "dwi"},
-                 preproc_pipeline="all",
-                 participant_labels=None,
-                 output_dir=None,
-                 parallel_params={"engine": "serial"},
-                 bids_layout_kwargs={},
-                 plugin="cf",
-                 sbatch_args=None,
-                 cache_dir=None,
-                 **kwargs):
-        
-        super().__init__(bids_path,
-                         bids_filters,
-                         preproc_pipeline,
-                         participant_labels,
-                         output_dir,
-                         parallel_params,
-                         bids_layout_kwargs,
-                         **kwargs)
-
-        self.plugin = plugin
-        self.sbatch_args = sbatch_args
-        self.cache_dir = cache_dir
-    
     def export_all(self, viz=True, afqbrowser=True, xforms=True, indiv=True):
         """ Exports all the possible outputs
 
@@ -973,27 +948,35 @@ class ParallelGroupAFQ(GroupAFQ):
         """
         import pydra
 
-        bids_contents = os.listdir(self.bids_path)
-        bids_contents.remove("derivatives")
+        if "plugin" not in self.parallel_params:
+            self.parallel_params["plugin"] = "cf"
 
-        for subject_id in bids_contents:
-            if not op.isdir(op.join(self.bids_path, subject_id)):
-                continue
+            # Assume slurm if sbatch_args are specified
+            if "sbatch_args" in self.parallel_params:
+                if self.parallel_params["sbatch_args"] is not None:
+                    self.parallel_params["plugin"] = "slurm"
 
+        if "sbatch_args" not in self.parallel_params:
+            self.parallel_params["sbatch_args"] = None
+        
+        if "cache_dir" not in self.parallel_params:
+            self.parallel_params["cache_dir"] = None
+
+        for subject_id in self.subjects:
             export_sub_task = pydra.mark.task(
                 self.export_sub(
-                    subject_id,
+                    f"sub-{subject_id}",
                     viz,
                     afqbrowser,
                     xforms,
                     indiv
                 ),
-                cache_dir=self.cache_dir
+                cache_dir=self.parallel_params["cache_dir"]
             )
 
-            # Replace with Ray
             with pydra.Submitter(
-                plugin=self.plugin, sbatch_args=self.sbatch_args
+                plugin=self.parallel_params["plugin"],
+                sbatch_args=self.parallel_params["sbatch_args"]
             ) as sub:
                 try:
                     sub(runnable=export_sub_task)
@@ -1006,6 +989,8 @@ class ParallelGroupAFQ(GroupAFQ):
 
         Parameters
         ----------
+        subject_id : String
+            BIDS subject to process
         viz : bool
             Whether to output visualizations. This includes tract profile
             plots, a figure containing all bundles, and, if using the AFQ
@@ -1026,9 +1011,7 @@ class ParallelGroupAFQ(GroupAFQ):
             output.
             Default: True
         """
-        import shutil
-        import pandas as pd
-
+        # Build temporary directory names
         bids_path = self.bids_path
         output_dir = self.output_dir
 
@@ -1038,7 +1021,7 @@ class ParallelGroupAFQ(GroupAFQ):
 
         self.bids_path = op.join(
             bids_location,
-            bids_name + f"_{subject_id}"
+            "tmp_" + bids_name + f"_{subject_id}"
         )
 
         self.output_dir = op.join(
@@ -1047,6 +1030,7 @@ class ParallelGroupAFQ(GroupAFQ):
             output_dir_name
         )
 
+        # Copy data to temporary directory
         if op.exists(self.bids_path):
             shutil.rmtree(self.bids_path)
 
@@ -1098,8 +1082,10 @@ class ParallelGroupAFQ(GroupAFQ):
             )
         )
 
-        super(self.export_all(viz, afqbrowser, xforms, indiv))
+        # Process
+        super().export_all(viz, afqbrowser, xforms, indiv)
 
+        # Copy results back to BIDS directory
         if not op.exists(op.join(output_dir, "dataset_description.json")):
             shutil.copyfile(
                 op.join(self.output_dir, "dataset_description.json"),
