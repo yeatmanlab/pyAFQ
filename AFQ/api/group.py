@@ -40,8 +40,6 @@ try:
 except ImportError:
     using_afqb = False
 
-import shutil
-
 
 __all__ = ["GroupAFQ", "get_afq_bids_entities_fname"]
 
@@ -149,9 +147,7 @@ class GroupAFQ(object):
             raise TypeError("bids_layout_kwargs must be a dict")
 
         self.logger = logger
-        self.bids_path = bids_path
-        self.output_dir = output_dir
-        self.preproc_pipeline = preproc_pipeline
+
         self.parallel_params = parallel_params
         self.wf_dict = {}
 
@@ -328,6 +324,12 @@ class GroupAFQ(object):
             self.afq_path, "tract_profiles.csv"))
         os.makedirs(op.dirname(out_file), exist_ok=True)
         _df = clean_pandas_df(_df)
+
+        if "submitter_params" in self.parallel_params:
+            if op.exists(out_file):
+                df_prev = pd.read_csv(out_file)
+                _df = _df.append(df_prev)
+            
         _df.to_csv(out_file, index=False)
         return _df
 
@@ -921,6 +923,21 @@ class GroupAFQ(object):
 
 
 class ParallelGroupAFQ(GroupAFQ):
+    def __init__(self, *args, **kwargs):
+        orig = GroupAFQ(*args, **kwargs)
+
+        if "submitter_params" not in orig.parallel_params:
+            orig.parallel_params["submitter_params"] = {"plugin": "cf"}
+
+        if "cache_dir" not in orig.parallel_params:
+            orig.parallel_params["cache_dir"] = None
+
+        self.parallel_params = orig.parallel_params
+        self.subjects = orig.subjects
+
+        self.args = args
+        self.kwargs = kwargs
+    
     def export_all(self, viz=True, afqbrowser=True, xforms=True, indiv=True):
         """ Exports all the possible outputs
 
@@ -948,172 +965,36 @@ class ParallelGroupAFQ(GroupAFQ):
         """
         import pydra
 
-        if "plugin" not in self.parallel_params:
-            self.parallel_params["plugin"] = "cf"
+        @pydra.mark.task
+        def export_sub(obj, subject_id, viz, afqbrowser, xforms, indiv):
+            afq = GroupAFQ(*obj.args, **obj.kwargs)
 
-            # Assume slurm if sbatch_args are specified
-            if "sbatch_args" in self.parallel_params:
-                if self.parallel_params["sbatch_args"] is not None:
-                    self.parallel_params["plugin"] = "slurm"
+            sub_arr = np.array(afq.valid_sub_list)
+            ses_arr = np.array(afq.valid_ses_list)
 
-        if "sbatch_args" not in self.parallel_params:
-            self.parallel_params["sbatch_args"] = None
-        
-        if "cache_dir" not in self.parallel_params:
-            self.parallel_params["cache_dir"] = None
+            afq.valid_sub_list = list(sub_arr[sub_arr == subject_id])
+            afq.valid_ses_list = list(ses_arr[sub_arr == subject_id])
 
-        for subject_id in self.subjects:
-            export_sub_task = pydra.mark.task(
-                self.export_sub(
-                    f"sub-{subject_id}",
-                    viz,
-                    afqbrowser,
-                    xforms,
-                    indiv
-                ),
-                cache_dir=self.parallel_params["cache_dir"]
-            )
+            afq.parallel_params = obj.parallel_params
 
-            with pydra.Submitter(
-                plugin=self.parallel_params["plugin"],
-                sbatch_args=self.parallel_params["sbatch_args"]
-            ) as sub:
-                try:
-                    sub(runnable=export_sub_task)
-                except:
-                    self.logger.info(f"Error submitting {subject_id}")
+            afq.export_all(viz, afqbrowser, xforms, indiv)
 
-    def export_sub(self, subject_id, viz=True, afqbrowser=True, xforms=True,
-                   indiv=True):
-        """ Exports all the possible outputs
+            return True
 
-        Parameters
-        ----------
-        subject_id : String
-            BIDS subject to process
-        viz : bool
-            Whether to output visualizations. This includes tract profile
-            plots, a figure containing all bundles, and, if using the AFQ
-            segmentation algorithm, individual bundle figures.
-            Default: True
-        afqbrowser : bool
-            Whether to output an AFQ-Browser from this AFQ instance.
-            Default: True
-        xforms : bool
-            Whether to output the reg_template image in subject space and,
-            depending on if it is possible based on the mapping used, to
-            output the b0 in template space.
-            Default: True
-        indiv : bool
-            Whether to output individual bundles in their own files, in
-            addition to the one file containing all bundles. If using
-            the AFQ segmentation algorithm, individual ROIs are also
-            output.
-            Default: True
-        """
-        # Build temporary directory names
-        bids_path = self.bids_path
-        output_dir = self.output_dir
+        export_sub_task = export_sub(
+            obj=self,
+            subject_id=self.subjects,
+            viz=viz,
+            afqbrowser=afqbrowser,
+            xforms=xforms,
+            indiv=indiv,
+            cache_dir=self.parallel_params["cache_dir"]
+        ).split("subject_id")
 
-        bids_location = op.dirname(op.abspath(bids_path))
-        bids_name = op.basename(op.abspath(bids_path))
-        output_dir_name = op.basename(op.abspath(output_dir))
-
-        self.bids_path = op.join(
-            bids_location,
-            "tmp_" + bids_name + f"_{subject_id}"
-        )
-
-        self.output_dir = op.join(
-            self.bids_path,
-            "derivatives",
-            output_dir_name
-        )
-
-        # Copy data to temporary directory
-        if op.exists(self.bids_path):
-            shutil.rmtree(self.bids_path)
-
-        os.makedirs(
-            op.join(
-                self.bids_path,
-                "derivatives",
-                self.preproc_pipeline
-            )
-        )
-
-        shutil.copyfile(
-            op.join(bids_path, "dataset_description.json"),
-            op.join(self.bids_path, "dataset_description.json")
-        )
-
-        shutil.copytree(
-            op.join(bids_path, subject_id),
-            op.join(self.bids_path, subject_id)
-        )
-
-        shutil.copyfile(
-            op.join(
-                bids_path,
-                "derivatives",
-                self.preproc_pipeline,
-                "dataset_description.json"
-            ),
-            op.join(
-                self.bids_path,
-                "derivatives",
-                self.preproc_pipeline,
-                "dataset_description.json"
-            )
-        )
-
-        shutil.copytree(
-            op.join(
-                bids_path,
-                "derivatives",
-                self.preproc_pipeline,
-                subject_id
-            ),
-            op.join(
-                self.bids_path,
-                "derivatives",
-                self.preproc_pipeline,
-                subject_id
-            )
-        )
-
-        # Process
-        super().export_all(viz, afqbrowser, xforms, indiv)
-
-        # Copy results back to BIDS directory
-        if not op.exists(op.join(output_dir, "dataset_description.json")):
-            shutil.copyfile(
-                op.join(self.output_dir, "dataset_description.json"),
-                op.join(output_dir, "dataset_description.json")
-            )
-
-        if not op.exists(op.join(output_dir, "tract_profiles.csv")):
-            shutil.copyfile(op.join(self.output_dir, "tract_profiles.csv"),
-                            op.join(output_dir, "tract_profiles.csv")
-                            )
-        else:
-            df = pd.read_csv(
-                op.join(output_dir, "tract_profiles.csv"), index_col=0
-            )
-            df_sub = pd.read_csv(
-                op.join(self.output_dir, "tract_profiles.csv")
-            )
-            df = df.append(df_sub, ignore_index=True)
-            df.to_csv(op.join(output_dir, "tract_profiles.csv"))
-
-        shutil.copytree(
-            op.join(self.output_dir, subject_id),
-            op.join(output_dir, subject_id)
-        )
-
-        shutil.rmtree(self.bids_path)
-
-        self.logger.info(f"{subject_id} finished")
+        with pydra.Submitter(
+            **self.parallel_params["submitter_params"],
+        ) as sub:
+            sub(runnable=export_sub_task)
 
 
 def download_and_combine_afq_profiles(bucket,
