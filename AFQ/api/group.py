@@ -325,6 +325,7 @@ class GroupAFQ(object):
         os.makedirs(op.dirname(out_file), exist_ok=True)
         _df = clean_pandas_df(_df)
 
+        # Append to existing csv if this is a parallelized run
         if "submitter_params" in self.parallel_params:
             if op.exists(out_file):
                 df_prev = pd.read_csv(out_file)
@@ -924,20 +925,24 @@ class GroupAFQ(object):
 
 class ParallelGroupAFQ(GroupAFQ):
     def __init__(self, *args, **kwargs):
+        # Initialize throwaway to populate subjects and parallel_params
         orig = GroupAFQ(*args, **kwargs)
 
+        # Implement defaults
         if "submitter_params" not in orig.parallel_params:
             orig.parallel_params["submitter_params"] = {"plugin": "cf"}
 
         if "cache_dir" not in orig.parallel_params:
             orig.parallel_params["cache_dir"] = None
 
+        # Pass through for convenience
         self.parallel_params = orig.parallel_params
         self.subjects = orig.subjects
 
+        # Pass through args to initialize new GroupAFQ instances later
         self.args = args
         self.kwargs = kwargs
-    
+
     def export_all(self, viz=True, afqbrowser=True, xforms=True, indiv=True):
         """ Exports all the possible outputs
 
@@ -967,20 +972,28 @@ class ParallelGroupAFQ(GroupAFQ):
 
         @pydra.mark.task
         def export_sub(obj, subject_id, viz, afqbrowser, xforms, indiv):
+            # Initialize new instance
+            # It seems this must be done inside the pydra task function
+            # or pydra starts breaking
             afq = GroupAFQ(*obj.args, **obj.kwargs)
 
+            # Trim valid_sub_list and valid_ses_list to just this subject
             sub_arr = np.array(afq.valid_sub_list)
             ses_arr = np.array(afq.valid_ses_list)
 
             afq.valid_sub_list = list(sub_arr[sub_arr == subject_id])
             afq.valid_ses_list = list(ses_arr[sub_arr == subject_id])
 
+            # Pass through augmented parallel_params
+            # This flags that this is a parallelized run in combine_profiles()
             afq.parallel_params = obj.parallel_params
 
+            # Export trimmed instance
             afq.export_all(viz, afqbrowser, xforms, indiv)
 
             return True
 
+        # Submit to pydra
         export_sub_task = export_sub(
             obj=self,
             subject_id=self.subjects,
