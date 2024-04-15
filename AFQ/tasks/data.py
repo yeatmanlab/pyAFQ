@@ -281,7 +281,8 @@ def msdki_msk(msdki_tf):
 @as_img
 def csd_params(dwi, brain_mask, gtab, data,
                csd_response=None, csd_sh_order=None,
-               csd_lambda_=1, csd_tau=0.1):
+               csd_lambda_=1, csd_tau=0.1,
+               csd_fa_thr=0.7):
     """
     full path to a nifti file containing
     parameters for the CSD fit
@@ -309,6 +310,9 @@ def csd_params(dwi, brain_mask, gtab, data,
         set to tau*100 percent of the mean fODF amplitude (here, 10 percent
         by default)
         (see [1]_). Default: 0.1
+    csd_fa_thr : float, optional.
+        The threshold on the FA used to calculate the single shell auto
+        response. Can be useful to reduce for baby subjects. Default: 0.7
 
     References
     ----------
@@ -324,7 +328,8 @@ def csd_params(dwi, brain_mask, gtab, data,
             gtab, data,
             mask=mask,
             response=csd_response, sh_order=csd_sh_order,
-            lambda_=csd_lambda_, tau=csd_tau)
+            lambda_=csd_lambda_, tau=csd_tau,
+            csd_fa_thr=csd_fa_thr)
     except CsdNanResponseError as e:
         raise CsdNanResponseError(
             'Could not compute CSD response function for file: '
@@ -334,7 +339,8 @@ def csd_params(dwi, brain_mask, gtab, data,
         SphericalHarmonicDegree=csd_sh_order,
         ResponseFunctionTensor=csd_response,
         lambda_=csd_lambda_,
-        tau=csd_tau)
+        tau=csd_tau,
+        csd_fit_model=csd_fit_model)
     meta["SphericalHarmonicBasis"] = "DESCOTEAUX"
     meta["ModelURL"] = f"{DIPY_GH}reconst/csdeconv.py"
     return csdf.shm_coeff, meta
