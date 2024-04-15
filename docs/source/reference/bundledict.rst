@@ -30,4 +30,35 @@ key-value pairs::
     - 'mahal': Dict describing the parameters for cleaning. By default, we
       use the default behavior of the seg.clean_bundle function.
 
+
 For an example, see "Plotting the Optic Radiations" in :ref:`examples`.
+
+
+When doing bundle recognition, streamlines are filtered out from the whole
+tractography according to the series of steps defined in the bundle
+dictionaries. Of course, no one bundle uses every step, but here is the order
+of the steps:
+  1. Probability Maps
+  2. Crosses midline
+  3. Startpoint
+  4. Endpoint
+  5. Min and Max length
+  6. Primary axis
+  7. Include
+  8. Curvature
+  9. Exclude
+  10. Quickbundles Cleaning
+  11. Mahalanobis Cleaning
+If a streamline passes all steps for a bundle, it is included in that bundle.
+If a streamline passess all steps for multiple bundles, one of three things
+happens. By default, the probability maps are used as the tie breaker. If
+`roi_dist_tie_break` is set in `segmentation_params`, then distance to the ROI
+is used instead. If both of these still results in a tie (or no probability
+map is provided for a given bundle), then the tie goes to whichever bundle is
+first in the bundle dictionary.
+
+
+If, for debugging purposes, you want to save out the streamlines
+remaining after each step, set `save_intermediates` to a path in
+`segmentation_params`. Then the streamlines will be saved out after each step
+to that path. Only do this for one subject at a time.
