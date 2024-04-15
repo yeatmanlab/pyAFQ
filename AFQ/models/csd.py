@@ -23,7 +23,7 @@ class CsdNanResponseError(Exception):
     pass
 
 
-def _model(gtab, data, csd_fa_thr=0.7, response=None, sh_order=None):
+def _model(gtab, data, response=None, sh_order=None, csd_fa_thr=0.7):
     """
     Helper function that defines a CSD model.
     """
