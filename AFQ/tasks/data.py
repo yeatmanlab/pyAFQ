@@ -340,7 +340,7 @@ def csd_params(dwi, brain_mask, gtab, data,
         ResponseFunctionTensor=csd_response,
         lambda_=csd_lambda_,
         tau=csd_tau,
-        csd_fit_model=csd_fit_model)
+        csd_fa_thr=csd_fa_thr)
     meta["SphericalHarmonicBasis"] = "DESCOTEAUX"
     meta["ModelURL"] = f"{DIPY_GH}reconst/csdeconv.py"
     return csdf.shm_coeff, meta
