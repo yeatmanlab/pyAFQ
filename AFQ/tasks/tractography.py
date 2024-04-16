@@ -119,6 +119,8 @@ def streamlines(data_imap, seed, stop,
         params_file = data_imap["dki_params"]
     elif odf_model == "GQ":
         params_file = data_imap["gq_params"]
+    elif odf_model == "CSA":
+        params_file = data_imap["csa_params"]
     else:
         raise TypeError((
             f"The ODF model you gave ({odf_model}) was not recognized"))
