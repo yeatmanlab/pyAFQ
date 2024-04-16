@@ -6,8 +6,10 @@ from tqdm import tqdm
 
 import dipy.data as dpd
 from dipy.align import resample
-from dipy.direction import (DeterministicMaximumDirectionGetter,
-                            ProbabilisticDirectionGetter)
+from dipy.direction import (
+    DeterministicMaximumDirectionGetter,
+    ProbabilisticDirectionGetter)
+from dipy.tracking.direction_getter import DirectionGetter
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from dipy.tracking.stopping_criterion import (ThresholdStoppingCriterion,
                                               CmcStoppingCriterion,
@@ -32,11 +34,11 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
     Parameters
     ----------
     params_file : str, nibabel img.
-        Full path to a nifti file containing CSD spherical harmonic
-        coefficients, or nibabel img with model params.
+        Nifti image or a full path to a nifti file containing
+        CSD spherical harmonic coefficients.
     directions : str
         How tracking directions are determined.
-        One of: {"det" | "prob"}
+        Must be a direction getter from dipy, or one of: {"det" | "prob"}
         Default: "prob"
     max_angle : float, optional.
         The maximum turning angle in each step. Default: 30
@@ -122,7 +124,6 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
 
     model_params = params_img.get_fdata()
     odf_model = odf_model.upper()
-    directions = directions.lower()
 
     # We need to calculate the size of a voxel, so we can transform
     # from mm to voxel units:
@@ -137,21 +138,26 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
     if sphere is None:
         sphere = dpd.default_sphere
 
-    logger.info("Getting Directions...")
-    if directions == "det":
-        dg = DeterministicMaximumDirectionGetter
-    elif directions == "prob":
-        dg = ProbabilisticDirectionGetter
+    if isinstance(directions, DirectionGetter):
+        dg = directions
+    elif isinstance(directions, str):
+        directions = directions.lower()
+        if directions == "det":
+            dg = DeterministicMaximumDirectionGetter
+        elif directions == "prob":
+            dg = ProbabilisticDirectionGetter
+        if odf_model == "DTI" or odf_model == "DKI":
+            evals = model_params[..., :3]
+            evecs = model_params[..., 3:12].reshape(
+                params_img.shape[:3] + (3, 3))
+            odf = tensor_odf(evals, evecs, sphere)
+            dg = dg.from_pmf(odf, max_angle=max_angle, sphere=sphere)
+        elif odf_model == "CSD" or odf_model == "GQ" or odf_model == "CSA":
+            dg = dg.from_shcoeff(
+                model_params, max_angle=max_angle,
+                sphere=sphere)
     else:
         raise ValueError(f"Unrecognized direction '{directions}'.")
-
-    if odf_model == "DTI" or odf_model == "DKI":
-        evals = model_params[..., :3]
-        evecs = model_params[..., 3:12].reshape(params_img.shape[:3] + (3, 3))
-        odf = tensor_odf(evals, evecs, sphere)
-        dg = dg.from_pmf(odf, max_angle=max_angle, sphere=sphere)
-    elif odf_model == "CSD" or odf_model == "GQ" or odf_model == "CSA":
-        dg = dg.from_shcoeff(model_params, max_angle=max_angle, sphere=sphere)
 
     if tracker == "local":
         if stop_mask is None:

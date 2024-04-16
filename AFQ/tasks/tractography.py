@@ -12,6 +12,14 @@ import AFQ.tractography.tractography as aft
 from AFQ.tasks.utils import get_default_args
 from AFQ.definitions.image import ScalarImage
 
+from dipy.reconst.csdeconv import (
+    ConstrainedSphericalDeconvModel,
+    auto_response_ssst)
+from dipy.direction import BootDirectionGetter
+from dipy.reconst.shm import CsaOdfModel
+from dipy.reconst.gqi import GeneralizedQSamplingModel
+import dipy.data as dpd
+
 try:
     from trx.trx_file_memmap import TrxFile
     has_trx = True
@@ -111,19 +119,49 @@ def streamlines(data_imap, seed, stop,
 
     # get odf_model
     odf_model = this_tracking_params["odf_model"]
-    if odf_model == "DTI":
-        params_file = data_imap["dti_params"]
-    elif odf_model == "CSD":
-        params_file = data_imap["csd_params"]
-    elif odf_model == "DKI":
-        params_file = data_imap["dki_params"]
-    elif odf_model == "GQ":
-        params_file = data_imap["gq_params"]
-    elif odf_model == "CSA":
-        params_file = data_imap["csa_params"]
+    if this_tracking_params["directions"] == "boot":
+        # in this case, the params img is just used as a reference
+        params_file = data_imap["b0"]
+        #  Note: you will also likely get on the order of a few
+        #  streamlines per second, ie, ~10k an hour when using
+        #  this bootstrapping implementation
+        #  TODO: we need someone to get the model params from the user
+        if odf_model == "CSD":  #
+            response, _ = auto_response_ssst(
+                data_imap["gtab"], data_imap["data"])
+            model = ConstrainedSphericalDeconvModel(
+                data_imap["gtab"], response)
+        elif odf_model == "GQ":
+            model = GeneralizedQSamplingModel(data_imap["gtab"])
+        elif odf_model == "CSA":
+            model = CsaOdfModel(data_imap["gtab"], 6)
+        else:
+            raise NotImplementedError((
+                "Bootstrap direction getter currently not implemented "
+                "for DTI, DKI"))
+        sphere = this_tracking_params["sphere"]
+        if sphere is None:
+            sphere = dpd.default_sphere
+        this_tracking_params["directions"] = BootDirectionGetter.from_data(
+            data_imap["data"],
+            model,
+            max_angle=this_tracking_params["max_angle"],
+            sphere=sphere,
+            sh_order=6)
     else:
-        raise TypeError((
-            f"The ODF model you gave ({odf_model}) was not recognized"))
+        if odf_model == "DTI":
+            params_file = data_imap["dti_params"]
+        elif odf_model == "CSD":
+            params_file = data_imap["csd_params"]
+        elif odf_model == "DKI":
+            params_file = data_imap["dki_params"]
+        elif odf_model == "GQ":
+            params_file = data_imap["gq_params"]
+        elif odf_model == "CSA":
+            params_file = data_imap["csa_params"]
+        else:
+            raise TypeError((
+                f"The ODF model you gave ({odf_model}) was not recognized"))
 
     # get masks
     this_tracking_params['seed_mask'] = nib.load(seed).get_fdata()
@@ -134,21 +172,17 @@ def streamlines(data_imap, seed, stop,
 
     is_trx = this_tracking_params.get("trx", False)
 
+    start_time = time()
+    sft = aft.track(
+        params_file,
+        **this_tracking_params)
     if is_trx:
-        start_time = time()
         dtype_dict = {'positions': np.float16, 'offsets': np.uint32}
-        lazyt = aft.track(params_file, **this_tracking_params)
         sft = TrxFile.from_lazy_tractogram(
-            lazyt,
+            sft,
             seed,
             dtype_dict=dtype_dict)
-        n_streamlines = len(sft)
-
-    else:
-        start_time = time()
-        sft = aft.track(params_file, **this_tracking_params)
-        sft.to_vox()
-        n_streamlines = len(sft.streamlines)
+    n_streamlines = len(sft)
 
     return sft, _meta_from_tracking_params(
         tracking_params, start_time,
