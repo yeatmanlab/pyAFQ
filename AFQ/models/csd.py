@@ -23,7 +23,7 @@ class CsdNanResponseError(Exception):
     pass
 
 
-def _model(gtab, data, response=None, sh_order=None):
+def _model(gtab, data, response=None, sh_order=None, csd_fa_thr=0.7):
     """
     Helper function that defines a CSD model.
     """
@@ -50,7 +50,7 @@ def _model(gtab, data, response=None, sh_order=None):
         response, _ = csd.auto_response_ssst(response_gtab,
                                              data,
                                              roi_radii=10,
-                                             fa_thr=0.7)
+                                             fa_thr=csd_fa_thr)
     # Catch conditions where an auto-response could not be calculated:
     if np.all(np.isnan(response[0])):
         raise CsdNanResponseError
@@ -59,11 +59,13 @@ def _model(gtab, data, response=None, sh_order=None):
     return csdmodel
 
 
-def _fit(gtab, data, mask, response=None, sh_order=None, lambda_=1, tau=0.1):
+def _fit(gtab, data, mask, response=None, sh_order=None,
+         lambda_=1, tau=0.1, csd_fa_thr=0.7):
     """
     Helper function that does the core of fitting a model to data.
     """
-    return _model(gtab, data, response, sh_order).fit(data, mask=mask)
+    return _model(gtab, data, response, sh_order, csd_fa_thr).fit(
+        data, mask=mask)
 
 
 def fit_csd(data_files, bval_files, bvec_files, mask=None, response=None,
