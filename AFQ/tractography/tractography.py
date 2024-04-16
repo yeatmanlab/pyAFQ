@@ -7,6 +7,7 @@ from tqdm import tqdm
 import dipy.data as dpd
 from dipy.align import resample
 from dipy.direction import (
+    PTTDirectionGetter,
     DeterministicMaximumDirectionGetter,
     ProbabilisticDirectionGetter)
 from dipy.tracking.direction_getter import DirectionGetter
@@ -38,7 +39,8 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
         CSD spherical harmonic coefficients.
     directions : str
         How tracking directions are determined.
-        Must be a direction getter from dipy, or one of: {"det" | "prob"}
+        Must be a direction getter from dipy, or one of:
+        {"det" | "prob" | "ptt"}
         Default: "prob"
     max_angle : float, optional.
         The maximum turning angle in each step. Default: 30
@@ -146,6 +148,8 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
             dg = DeterministicMaximumDirectionGetter
         elif directions == "prob":
             dg = ProbabilisticDirectionGetter
+        elif directions == "ptt":
+            dg = PTTDirectionGetter
         if odf_model == "DTI" or odf_model == "DKI":
             evals = model_params[..., :3]
             evecs = model_params[..., 3:12].reshape(
