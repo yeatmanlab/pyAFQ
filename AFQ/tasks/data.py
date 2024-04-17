@@ -471,7 +471,7 @@ def rumba_fit(gtab, data, brain_mask,
     """
 
     rumbamodel = RumbaSDModel(gtab,
-                              wm_response=rumba_wm_response,
+                              wm_response=np.asarray(rumba_wm_response),
                               gm_response=rumba_gm_response,
                               csf_response=rumba_csf_response,
                               n_iter=rumba_n_iter,
@@ -482,7 +482,9 @@ def rumba_fit(gtab, data, brain_mask,
                               use_tv=False,
                               sphere=None,
                               verbose=False)
-    rumba_fit = rumbamodel.fit(data, mask=brain_mask)
+    rumba_fit = rumbamodel.fit(
+        data,
+        mask=nib.load(brain_mask).get_fdata())
 
     return rumba_fit
 
