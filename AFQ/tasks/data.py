@@ -451,28 +451,27 @@ def gq_ai(gq_params):
 
 
 @pimms.calc("rumba_fit")
-def rumba_fit(base_fname, gtab, dwi_affine, data):
+def rumba_fit(base_fname, gtab, dwi_affine, data, brain_mask,
+              rumba_wm_response=[0.0017, 0.0002, 0.0002], rumba_gm_response=0.0008, rumba_csf_response=0.003, rumba_n_iter=600):
     """
-    full path to a nifti file containing
-    parameters for the Rumba model
-    shm_coeff,
-    full path to a nifti file containing isotropic diffusion component,
-    full path to a nifti file containing anisotropic diffusion component
+    fit for RUMBA-SD model as documented on dipy reconstruction options
 
     Parameters
     ----------
-    wm_response: able to take response[0] from auto_response_ssst. default = array([0.0017, 0.0002, 0.0002])
-    voxelwise: voxelwise fit or global fit. global fit is faster. global fit requires 4D brain volume in fit. default = False
-    n_iter: number of iterations for fODF estimation. default = 600
-    use_tv: TV regularization turned off by default for efficiency, but can provide more coherent results in fiber tracking. can be only be applied to 4D brain volumes with no singleton dimensions
-    sphere: Sphere on which to construct fODF. If None, uses repulsion724. Default: None
+    rumba_wm_response: 1D or 2D ndarray or AxSymShResponse. Able to take response[0] from auto_response_ssst. default = array([0.0017, 0.0002, 0.0002])
+    rumba_gm_response: float, optional
+    Mean diffusivity for GM compartment. If None, then grey matter volume fraction is not computed. Default: 0.8e-3
+    rumba_csf_response: float, optional
+    Mean diffusivity for CSF compartment. If None, then CSF volume fraction is not computed. Default: 3.0e-3
+    rumba_n_iter: int, optional
+    Number of iterations for fODF estimation. Must be a positive int. Default: 600
     """
 
     rumbamodel = RumbaSDModel(gtab,
-                         wm_response=array([0.0017, 0.0002, 0.0002]),
-                         gm_response=0.0008,
-                         csf_response=0.003,
-                         n_iter=600,
+                         wm_response=rumba_wm_response,
+                         gm_response=rumba_gm_response,
+                         csf_response=rumba_csf_response,
+                         n_iter=rumba_n_iter,
                          recon_type='smf',
                          n_coils=1,
                          R=1,
@@ -480,8 +479,7 @@ def rumba_fit(base_fname, gtab, dwi_affine, data):
                          use_tv=False,
                          sphere=None,
                          verbose=False)
-    white_matter = (base_fname == 1) | (base_fname == 2)
-    rumba_fit = rumbamodel.fit(data, mask=white_matter)
+    rumba_fit = rumbamodel.fit(data, mask=brain_mask)
 
     return rumba_fit
 
