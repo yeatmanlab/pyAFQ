@@ -12,6 +12,7 @@ import dipy.reconst.dti as dpy_dti
 import dipy.reconst.fwdti as dpy_fwdti
 import dipy.reconst.msdki as dpy_msdki
 from dipy.reconst.gqi import GeneralizedQSamplingModel
+from dipy.reconst.rumba import RumbaSDModel as dpy_rumba
 from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
 
@@ -448,6 +449,50 @@ def gq_ai(gq_params):
     AI = anisotropic_index(sh_coeff)
     return AI, dict(GQParamsFile=gq_params)
 
+
+
+@pimms.calc("rumba_params", "rumba_iso", "rumba_aso")
+def rumba(base_fname, gtab, dwi_affine, data):
+    """
+    full path to a nifti file containing
+    parameters for the Rumba model
+    shm_coeff,
+    full path to a nifti file containing isotropic diffusion component,
+    full path to a nifti file containing anisotropic diffusion component
+
+    Parameters
+    ----------
+    wm_response: able to take response[0] from auto_response_ssst. default = array([0.0017, 0.0002, 0.0002])
+    voxelwise: voxelwise fit or global fit. global fit is faster. global fit requires 4D brain volume in fit. default = False
+    n_iter: number of iterations for fODF estimation. default = 600
+    use_tv: TV regularization turned off by default for efficiency, but can provide more coherent results in fiber tracking. can be only be applied to 4D brain volumes with no singleton dimensions
+    sphere: Sphere on which to construct fODF. If None, uses repulsion724. Default: None
+    """
+
+    rumbamodel = RumbaSDModel(gtab, 
+                         wm_response=array([0.0017, 0.0002, 0.0002]), 
+                         gm_response=0.0008,
+                         csf_response=0.003,
+                         n_iter=600,
+                         recon_type='smf',
+                         n_coils=1,
+                         R=1,
+                         voxelwise=False, 
+                         use_tv=False, 
+                         sphere=None,
+                         verbose=False)
+    rumba_fit = rumbamodel.fit(data, mask=white_matter)
+    odf = rumba_fit.odf(rumbamodel, data)  # fODF
+    f_wm = rumba_fit.f_wm  # white matter volume fractions
+
+    GQ_shm, ASO, ISO, f_wm = extract_odf(odf)
+
+    params_suffix = "_odfmodel-RUMBA_desc-diffmodel_dwi.nii.gz"
+    params_fname = get_fname(base_fname, params_suffix)
+    nib.save(nib.Nifti1Image(GQ_shm, dwi_affine), params_fname)
+    write_json(
+        get_fname(base_fname, f"{drop_extension(params_suffix)}.json")
+    )
 
 @pimms.calc("opdt_params", "opdt_gfa")
 def opdt_params(base_fname, data, gtab,
