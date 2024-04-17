@@ -451,8 +451,11 @@ def gq_ai(gq_params):
 
 
 @pimms.calc("rumba_fit")
-def rumba_fit(base_fname, gtab, dwi_affine, data, brain_mask,
-              rumba_wm_response=[0.0017, 0.0002, 0.0002], rumba_gm_response=0.0008, rumba_csf_response=0.003, rumba_n_iter=600):
+def rumba_fit(gtab, data, brain_mask,
+              rumba_wm_response=[0.0017, 0.0002, 0.0002],
+              rumba_gm_response=0.0008,
+              rumba_csf_response=0.003,
+              rumba_n_iter=600):
     """
     fit for RUMBA-SD model as documented on dipy reconstruction options
 
@@ -468,40 +471,35 @@ def rumba_fit(base_fname, gtab, dwi_affine, data, brain_mask,
     """
 
     rumbamodel = RumbaSDModel(gtab,
-                         wm_response=rumba_wm_response,
-                         gm_response=rumba_gm_response,
-                         csf_response=rumba_csf_response,
-                         n_iter=rumba_n_iter,
-                         recon_type='smf',
-                         n_coils=1,
-                         R=1,
-                         voxelwise=False,
-                         use_tv=False,
-                         sphere=None,
-                         verbose=False)
+                              wm_response=rumba_wm_response,
+                              gm_response=rumba_gm_response,
+                              csf_response=rumba_csf_response,
+                              n_iter=rumba_n_iter,
+                              recon_type='smf',
+                              n_coils=1,
+                              R=1,
+                              voxelwise=False,
+                              use_tv=False,
+                              sphere=None,
+                              verbose=False)
     rumba_fit = rumbamodel.fit(data, mask=brain_mask)
 
     return rumba_fit
 
 
-@pimms.calc("rumba_params", "rumba_iso", "rumba_aso")
-def rumba_params(rumba_fit)
-
-
-odf = rumba_fit.odf
-GQ_shm, ASO, ISO = extract_odf(odf)
-
-params_suffix = "_odfmodel-RUMBA_desc-diffmodel_dwi.nii.gz"
-params_fname = get_fname(base_fname, params_suffix)
-nib.save(nib.Nifti1Image(GQ_shm, dwi_affine), params_fname)
-write_json(
-        get_fname(base_fname, f"{drop_extension(params_suffix)}.json")
-    )
+@pimms.calc("rumba_params")
+@as_file(suffix='_odfmodel-RUMBA_desc-diffmodel_dwi.nii.gz')
+@as_img
+def rumba_params(rumba_fit):
+    odf = rumba_fit.odf()
+    rumba_shm, _, _ = extract_odf(odf)
+    meta = dict()
+    return rumba_shm, meta
 
 
 @pimms.calc("rumba_f_csf")
 @as_file(suffix='_odfmodel-RUMBA_desc-CSF_dwi.nii.gz')
-@as_fit_deriv('f_csf')
+@as_fit_deriv('RUMBA')
 def rumba_f_csf(rumba_fit):
     """
     full path to a nifti file containing
@@ -512,7 +510,7 @@ def rumba_f_csf(rumba_fit):
 
 @pimms.calc("rumba_f_gm")
 @as_file(suffix='_odfmodel-RUMBA_desc-GM_dwi.nii.gz')
-@as_fit_deriv('f_gm')
+@as_fit_deriv('RUMBA')
 def rumba_f_gm(rumba_fit):
     """
     full path to a nifti file containing
@@ -523,7 +521,7 @@ def rumba_f_gm(rumba_fit):
 
 @pimms.calc("rumba_f_wm")
 @as_file(suffix='_odfmodel-RUMBA_desc-WM_dwi.nii.gz')
-@as_fit_deriv('f_wm')
+@as_fit_deriv('RUMBA')
 def rumba_f_wm(rumba_fit):
     """
     full path to a nifti file containing
@@ -1113,6 +1111,7 @@ def get_data_plan(kwargs):
         dki_md, dki_awf, dki_mk, dki_kfa, dki_ga, dki_rd,
         dti_ga, dti_rd, dti_ad,
         dki_ad, dki_rk, dki_ak, dti_params, dki_params, fwdti_params,
+        rumba_fit, rumba_params, rumba_f_csf, rumba_f_gm, rumba_f_wm,
         csd_params, get_bundle_dict])
 
     if "scalars" not in kwargs:
