@@ -4,6 +4,7 @@ import logging
 
 from dipy.io.gradients import read_bvals_bvecs
 import dipy.core.gradients as dpg
+from dipy.data import default_sphere
 
 import pimms
 
@@ -480,7 +481,7 @@ def rumba_fit(gtab, data, brain_mask,
                               R=1,
                               voxelwise=False,
                               use_tv=False,
-                              sphere=None,
+                              sphere=default_sphere,
                               verbose=True)
     rumba_fit = rumbamodel.fit(
         data,
@@ -494,7 +495,7 @@ def rumba_fit(gtab, data, brain_mask,
 @as_img
 def rumba_params(rumba_fit):
     """RUMBA SHM Parameters"""
-    odf = rumba_fit.odf()
+    odf = rumba_fit.odf(sphere=default_sphere)
     rumba_shm, _, _ = extract_odf(odf)
     meta = dict()
     return rumba_shm, meta
