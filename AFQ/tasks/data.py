@@ -491,6 +491,7 @@ def rumba_fit(gtab, data, brain_mask,
 @as_file(suffix='_odfmodel-RUMBA_desc-diffmodel_dwi.nii.gz')
 @as_img
 def rumba_params(rumba_fit):
+    """RUMBA SHM Parameters"""
     odf = rumba_fit.odf()
     rumba_shm, _, _ = extract_odf(odf)
     meta = dict()
