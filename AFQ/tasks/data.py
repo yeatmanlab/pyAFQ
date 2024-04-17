@@ -12,7 +12,7 @@ import dipy.reconst.dti as dpy_dti
 import dipy.reconst.fwdti as dpy_fwdti
 import dipy.reconst.msdki as dpy_msdki
 from dipy.reconst.gqi import GeneralizedQSamplingModel
-from dipy.reconst.rumba import RumbaSDModel as dpy_rumba
+from dipy.reconst.rumba import RumbaSDModel
 from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
 
@@ -450,9 +450,8 @@ def gq_ai(gq_params):
     return AI, dict(GQParamsFile=gq_params)
 
 
-
-@pimms.calc("rumba_params", "rumba_iso", "rumba_aso")
-def rumba(base_fname, gtab, dwi_affine, data):
+@pimms.calc("rumba_fit")
+def rumba_fit(base_fname, gtab, dwi_affine, data):
     """
     full path to a nifti file containing
     parameters for the Rumba model
@@ -469,30 +468,71 @@ def rumba(base_fname, gtab, dwi_affine, data):
     sphere: Sphere on which to construct fODF. If None, uses repulsion724. Default: None
     """
 
-    rumbamodel = RumbaSDModel(gtab, 
-                         wm_response=array([0.0017, 0.0002, 0.0002]), 
+    rumbamodel = RumbaSDModel(gtab,
+                         wm_response=array([0.0017, 0.0002, 0.0002]),
                          gm_response=0.0008,
                          csf_response=0.003,
                          n_iter=600,
                          recon_type='smf',
                          n_coils=1,
                          R=1,
-                         voxelwise=False, 
-                         use_tv=False, 
+                         voxelwise=False,
+                         use_tv=False,
                          sphere=None,
                          verbose=False)
+    white_matter = (base_fname == 1) | (base_fname == 2)
     rumba_fit = rumbamodel.fit(data, mask=white_matter)
-    odf = rumba_fit.odf(rumbamodel, data)  # fODF
-    f_wm = rumba_fit.f_wm  # white matter volume fractions
 
-    GQ_shm, ASO, ISO, f_wm = extract_odf(odf)
+    return rumba_fit
 
-    params_suffix = "_odfmodel-RUMBA_desc-diffmodel_dwi.nii.gz"
-    params_fname = get_fname(base_fname, params_suffix)
-    nib.save(nib.Nifti1Image(GQ_shm, dwi_affine), params_fname)
-    write_json(
+
+@pimms.calc("rumba_params", "rumba_iso", "rumba_aso")
+def rumba_params(rumba_fit)
+
+
+odf = rumba_fit.odf
+GQ_shm, ASO, ISO = extract_odf(odf)
+
+params_suffix = "_odfmodel-RUMBA_desc-diffmodel_dwi.nii.gz"
+params_fname = get_fname(base_fname, params_suffix)
+nib.save(nib.Nifti1Image(GQ_shm, dwi_affine), params_fname)
+write_json(
         get_fname(base_fname, f"{drop_extension(params_suffix)}.json")
     )
+
+
+@pimms.calc("rumba_f_csf")
+@as_file(suffix='_odfmodel-RUMBA_desc-CSF_dwi.nii.gz')
+@as_fit_deriv('f_csf')
+def rumba_f_csf(rumba_fit):
+    """
+    full path to a nifti file containing
+    the CSF volume fraction for each voxel.
+    """
+    return rumba_fit.f_csf  # CSF volume fractions
+
+
+@pimms.calc("rumba_f_gm")
+@as_file(suffix='_odfmodel-RUMBA_desc-GM_dwi.nii.gz')
+@as_fit_deriv('f_gm')
+def rumba_f_gm(rumba_fit):
+    """
+    full path to a nifti file containing
+    the GM volume fraction for each voxel..
+    """
+    return rumba_fit.f_gm  # gray matter volume fractions
+
+
+@pimms.calc("rumba_f_wm")
+@as_file(suffix='_odfmodel-RUMBA_desc-WM_dwi.nii.gz')
+@as_fit_deriv('f_wm')
+def rumba_f_wm(rumba_fit):
+    """
+    full path to a nifti file containing
+    the white matter volume fraction for each voxel.Equivalent to sum of fODF.
+    """
+    return rumba_fit.f_wm  # white matter volume fractions
+
 
 @pimms.calc("opdt_params", "opdt_gfa")
 def opdt_params(base_fname, data, gtab,
