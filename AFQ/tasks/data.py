@@ -481,7 +481,7 @@ def rumba_fit(gtab, data, brain_mask,
                               voxelwise=False,
                               use_tv=False,
                               sphere=None,
-                              verbose=False)
+                              verbose=True)
     rumba_fit = rumbamodel.fit(
         data,
         mask=nib.load(brain_mask).get_fdata())
