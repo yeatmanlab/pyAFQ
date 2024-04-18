@@ -40,6 +40,9 @@ try:
 except ImportError:
     using_afqb = False
 
+from dipy.utils.optpkg import optional_package
+pydra, has_pydra, _ = optional_package('pydra')
+
 
 __all__ = ["GroupAFQ", "get_afq_bids_entities_fname"]
 
@@ -954,8 +957,6 @@ class ParallelGroupAFQ():
             output.
             Default: True
         """
-        import pydra
-
         @pydra.mark.task
         def export_sub(pAFQ_kwargs, viz, xforms, indiv):
             pAFQ = ParticipantAFQ(**pAFQ_kwargs)
