@@ -42,7 +42,7 @@ DIPY_GH = "https://github.com/dipy/dipy/blob/master/dipy/"
 
 
 @pimms.calc("data", "gtab", "dwi", "dwi_affine")
-def get_data_gtab(dwi_path, bval, bvec, min_bval=None,
+def get_data_gtab(dwi_data_file, bval_file, bvec_file, min_bval=None,
                   max_bval=None, filter_b=True, b0_threshold=50):
     """
     DWI data as an ndarray for selected b values,
@@ -67,8 +67,8 @@ def get_data_gtab(dwi_path, bval, bvec, min_bval=None,
         The value of b under which
         it is considered to be b0. Default: 50.
     """
-    img = nib.load(dwi_path)
-    bvals, bvecs = read_bvals_bvecs(bval, bvec)
+    img = nib.load(dwi_data_file)
+    bvals, bvecs = read_bvals_bvecs(bval_file, bvec_file)
 
     data = img.get_fdata()
     if filter_b and (min_bval is not None):
@@ -92,15 +92,15 @@ def get_data_gtab(dwi_path, bval, bvec, min_bval=None,
 
 @pimms.calc("b0")
 @as_file('_desc-b0_dwi.nii.gz')
-def b0(dwi_path, gtab):
+def b0(dwi_data_file, gtab):
     """
     full path to a nifti file containing the mean b0
     """
-    data = nib.load(dwi_path)
+    data = nib.load(dwi_data_file)
     mean_b0 = np.mean(data.get_fdata()[..., gtab.b0s_mask], -1)
     mean_b0_img = nib.Nifti1Image(mean_b0, data.affine)
     meta = dict(b0_threshold=gtab.b0_threshold,
-                source=dwi_path)
+                source=dwi_data_file)
     return mean_b0_img, meta
 
 
@@ -136,7 +136,8 @@ def dti_fit(dti_params, gtab):
 @as_file(suffix='_odfmodel-DTI_desc-diffmodel_dwi.nii.gz')
 @as_img
 def dti_params(brain_mask, data, gtab,
-               bval, bvec, b0_threshold=50, robust_tensor_fitting=False):
+               bval_file, bvec_file, b0_threshold=50,
+               robust_tensor_fitting=False):
     """
     full path to a nifti file containing parameters
     for the DTI fit
@@ -155,7 +156,7 @@ def dti_params(brain_mask, data, gtab,
         nib.load(brain_mask).get_fdata()
     if robust_tensor_fitting:
         bvals, _ = read_bvals_bvecs(
-            bval, bvec)
+            bval_file, bvec_file)
         sigma = noise_from_b0(
             data, gtab, bvals,
             mask=mask, b0_threshold=b0_threshold)
@@ -1004,7 +1005,7 @@ def get_bundle_dict(segmentation_params,
     return bundle_dict, reg_template
 
 
-def get_data_plan(kwargs):
+def get_data_plan(kwargs, bids_info):
     if "scalars" in kwargs and not (
         isinstance(kwargs["scalars"], list) and isinstance(
             kwargs["scalars"][0], (str, Definition))):
@@ -1027,7 +1028,7 @@ def get_data_plan(kwargs):
         csd_params, get_bundle_dict])
 
     if "scalars" not in kwargs:
-        bvals, _ = read_bvals_bvecs(kwargs["bval"], kwargs["bvec"])
+        bvals, _ = read_bvals_bvecs(kwargs["bval_file"], kwargs["bvec_file"])
         if len(dpg.unique_bvals_magnitude(bvals)) > 2:
             kwargs["scalars"] = [
                 "dki_fa", "dki_md",
@@ -1050,12 +1051,12 @@ def get_data_plan(kwargs):
         if not isinstance(bm_def, Definition):
             raise TypeError(
                 "brain_mask_definition must be a Definition")
-        if kwargs["bids_info"] is not None:
+        if bids_info is not None:
             bm_def.find_path(
-                kwargs["bids_info"]["bids_layout"],
-                kwargs["dwi_path"],
-                kwargs["bids_info"]["subject"],
-                kwargs["bids_info"]["session"])
+                bids_info["bids_layout"],
+                kwargs["dwi_data_file"],
+                bids_info["subject"],
+                bids_info["session"])
         data_tasks["brain_mask_res"] = pimms.calc("brain_mask")(
             as_file((
                 f'_desc-{str_to_desc(bm_def.get_name())}'

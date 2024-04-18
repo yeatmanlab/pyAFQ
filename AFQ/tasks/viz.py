@@ -144,7 +144,7 @@ def viz_bundles(base_fname,
 
 @pimms.calc("indiv_bundles_figures")
 def viz_indivBundle(base_fname,
-                    results_dir,
+                    output_dir,
                     viz_backend,
                     data_imap,
                     mapping_imap,
@@ -273,7 +273,7 @@ def viz_indivBundle(base_fname,
                 interact=False,
                 figure=figure)
 
-        roi_dir = op.join(results_dir, 'viz_bundles')
+        roi_dir = op.join(output_dir, 'viz_bundles')
         os.makedirs(roi_dir, exist_ok=True)
         figures[bundle_name] = figure
         if "no_gif" not in viz_backend.backend:
@@ -288,7 +288,7 @@ def viz_indivBundle(base_fname,
             fname = op.join(roi_dir, fname[1])
             viz_backend.create_gif(figure, fname)
         if "plotly" in viz_backend.backend:
-            roi_dir = op.join(results_dir, 'viz_bundles')
+            roi_dir = op.join(output_dir, 'viz_bundles')
             os.makedirs(roi_dir, exist_ok=True)
             fname = op.split(
                 get_fname(
@@ -302,7 +302,7 @@ def viz_indivBundle(base_fname,
             figure.write_html(fname)
 
             # also do the core visualizations when using the plotly backend
-            core_dir = op.join(results_dir, 'viz_core_bundles')
+            core_dir = op.join(output_dir, 'viz_core_bundles')
             os.makedirs(core_dir, exist_ok=True)
             indiv_profile = profiles[
                 profiles.tractID == bundle_name][best_scalar].to_numpy()

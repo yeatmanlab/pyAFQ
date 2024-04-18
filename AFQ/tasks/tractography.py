@@ -243,7 +243,7 @@ def gpu_tractography(data_imap, tracking_params, seed, stop,
         sft, seed, stop)
 
 
-def get_tractography_plan(kwargs):
+def get_tractography_plan(kwargs, bids_info):
     if "tracking_params" in kwargs\
             and not isinstance(kwargs["tracking_params"], dict):
         raise TypeError(
@@ -312,19 +312,18 @@ def get_tractography_plan(kwargs):
 
     stop_mask = kwargs["tracking_params"]['stop_mask']
     seed_mask = kwargs["tracking_params"]['seed_mask']
-    bids_info = kwargs["bids_info"]
 
     if bids_info is not None:
         if isinstance(stop_mask, Definition):
             stop_mask.find_path(
                 bids_info["bids_layout"],
-                kwargs["dwi_path"],
+                kwargs["dwi_data_file"],
                 bids_info["subject"],
                 bids_info["session"])
         if isinstance(seed_mask, Definition):
             seed_mask.find_path(
                 bids_info["bids_layout"],
-                kwargs["dwi_path"],
+                kwargs["dwi_data_file"],
                 bids_info["subject"],
                 bids_info["session"])
 

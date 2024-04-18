@@ -96,14 +96,13 @@ class ParticipantAFQ(object):
                 "did you mean tracking_params ?"))
 
         self.logger = logging.getLogger('AFQ')
-        self.output_dir = output_dir
+        self.bids_info = _bids_info
 
         self.kwargs = dict(
-            dwi_path=dwi_data_file,
-            bval=bval_file,
-            bvec=bvec_file,
-            results_dir=output_dir,
-            bids_info=_bids_info,
+            dwi_data_file=dwi_data_file,
+            bval_file=bval_file,
+            bvec_file=bvec_file,
+            output_dir=output_dir,
             base_fname=get_base_fname(output_dir, dwi_data_file),
             **kwargs)
         self.make_workflow()
@@ -113,16 +112,26 @@ class ParticipantAFQ(object):
         if "mapping_definition" in self.kwargs and isinstance(
                 self.kwargs["mapping_definition"], SlrMap):
             plans = {  # if using SLR map, do tractography first
-                "data": get_data_plan(self.kwargs),
-                "tractography": get_tractography_plan(self.kwargs),
-                "mapping": get_mapping_plan(self.kwargs, use_sls=True),
+                "data": get_data_plan(self.kwargs, self.bids_info),
+                "tractography": get_tractography_plan(
+                    self.kwargs,
+                    self.bids_info
+                ),
+                "mapping": get_mapping_plan(
+                    self.kwargs,
+                    self.bids_info,
+                    use_sls=True
+                ),
                 "segmentation": get_segmentation_plan(self.kwargs),
                 "viz": get_viz_plan(self.kwargs)}
         else:
             plans = {  # Otherwise, do mapping first
-                "data": get_data_plan(self.kwargs),
-                "mapping": get_mapping_plan(self.kwargs),
-                "tractography": get_tractography_plan(self.kwargs),
+                "data": get_data_plan(self.kwargs, self.bids_info),
+                "mapping": get_mapping_plan(self.kwargs, self.bids_info),
+                "tractography": get_tractography_plan(
+                    self.kwargs,
+                    self.bids_info
+                ),
                 "segmentation": get_segmentation_plan(self.kwargs),
                 "viz": get_viz_plan(self.kwargs)}
 
@@ -130,6 +139,7 @@ class ParticipantAFQ(object):
         previous_data = {}
         for name, plan in plans.items():
             previous_data[f"{name}_imap"] = plan(
+                bids_info=self.bids_info,
                 **self.kwargs,
                 **previous_data)
 
@@ -280,7 +290,7 @@ class ParticipantAFQ(object):
 
         def _save_file(curr_img):
             save_path = op.abspath(op.join(
-                self.output_dir,
+                self.kwargs["output_dir"],
                 "bundle_montage.png"))
             curr_img.save(save_path)
             all_fnames.append(save_path)
@@ -374,7 +384,7 @@ class ParticipantAFQ(object):
                     " to a filename and will be ignored."))
 
         apply_cmd_to_afq_derivs(
-            self.output_dir,
+            self.kwargs["output_dir"],
             self.export("base_fname"),
             cmd=cmd,
             exception_file_names=exception_file_names,

@@ -47,13 +47,13 @@ def template_xform(mapping, data_imap):
 
 
 @pimms.calc("rois")
-def export_rois(base_fname, results_dir, data_imap, mapping):
+def export_rois(base_fname, output_dir, data_imap, mapping):
     """
     dictionary of full paths to Nifti1Image files of ROIs
     transformed to subject space
     """
     bundle_dict = data_imap["bundle_dict"]
-    rois_dir = op.join(results_dir, 'ROIs')
+    rois_dir = op.join(output_dir, 'ROIs')
     os.makedirs(rois_dir, exist_ok=True)
     roi_files = {}
     base_roi_fname = op.join(rois_dir, op.split(base_fname)[1])
@@ -71,7 +71,7 @@ def export_rois(base_fname, results_dir, data_imap, mapping):
 
 
 @pimms.calc("mapping")
-def mapping(base_fname, dwi_path, reg_subject, data_imap, bids_info,
+def mapping(base_fname, dwi_data_file, reg_subject, data_imap, bids_info,
             mapping_definition=None):
     """
     mapping from subject to template space.
@@ -96,7 +96,7 @@ def mapping(base_fname, dwi_path, reg_subject, data_imap, bids_info,
     if bids_info is not None:
         mapping_definition.find_path(
             bids_info["bids_layout"],
-            dwi_path,
+            dwi_data_file,
             bids_info["subject"],
             bids_info["session"])
     return mapping_definition.get_for_subses(
@@ -105,7 +105,7 @@ def mapping(base_fname, dwi_path, reg_subject, data_imap, bids_info,
 
 
 @pimms.calc("mapping")
-def sls_mapping(base_fname, dwi_path, reg_subject, data_imap, bids_info,
+def sls_mapping(base_fname, dwi_data_file, reg_subject, data_imap, bids_info,
                 tractography_imap, mapping_definition=None):
     """
     mapping from subject to template space.
@@ -130,7 +130,7 @@ def sls_mapping(base_fname, dwi_path, reg_subject, data_imap, bids_info,
     if bids_info is not None:
         mapping_definition.find_path(
             bids_info["bids_layout"],
-            dwi_path,
+            dwi_data_file,
             bids_info["subject"],
             bids_info["session"])
     streamlines_file = tractography_imap["streamlines"]
@@ -200,26 +200,25 @@ def get_reg_subject(data_imap,
     return img
 
 
-def get_mapping_plan(kwargs, use_sls=False):
+def get_mapping_plan(kwargs, bids_info, use_sls=False):
     mapping_tasks = with_name([
         export_registered_b0, template_xform, export_rois, mapping,
         get_reg_subject])
 
-    bids_info = kwargs.get("bids_info", None)
     # add custom scalars
     for scalar in kwargs["scalars"]:
         if isinstance(scalar, Definition):
             if bids_info is None:
                 scalar.find_path(
                     None,
-                    kwargs["dwi_path"],
+                    kwargs["dwi_data_file"],
                     None,
                     None)
                 scalar_found = True
             else:
                 scalar_found = scalar.find_path(
                     bids_info["bids_layout"],
-                    kwargs["dwi_path"],
+                    kwargs["dwi_data_file"],
                     bids_info["subject"],
                     bids_info["session"],
                     required=False)
@@ -238,7 +237,7 @@ def get_mapping_plan(kwargs, use_sls=False):
     if isinstance(reg_ss, ImageDefinition):
         reg_ss.find_path(
             bids_info["bids_layout"],
-            kwargs["dwi_path"],
+            kwargs["dwi_data_file"],
             bids_info["subject"],
             bids_info["session"])
         del kwargs["reg_subject_spec"]

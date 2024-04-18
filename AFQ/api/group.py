@@ -916,7 +916,7 @@ class GroupAFQ(object):
             sublink=page_subtitle_link)
 
 
-class ParallelGroupAFQ(GroupAFQ):
+class ParallelGroupAFQ():
     def __init__(self, *args, **kwargs):
         orig = GroupAFQ(*args, **kwargs)
 
@@ -928,29 +928,6 @@ class ParallelGroupAFQ(GroupAFQ):
 
         self.parallel_params = orig.parallel_params
         self.pAFQ_kwargs = [pAFQ.kwargs for pAFQ in orig.pAFQ_list]
-
-        # Rename kwargs and clear "bids_info" and "base_fname"
-        # ParticipantAFQ takes in these parameters under one name but stores
-        # and uses them under another
-        for ii in range(len(self.pAFQ_kwargs)):
-            self.pAFQ_kwargs[ii]["dwi_data_file"] = \
-                self.pAFQ_kwargs[ii]["dwi_path"]
-
-            self.pAFQ_kwargs[ii]["bval_file"] = \
-                self.pAFQ_kwargs[ii]["bval"]
-
-            self.pAFQ_kwargs[ii]["bvec_file"] = \
-                self.pAFQ_kwargs[ii]["bvec"]
-
-            self.pAFQ_kwargs[ii]["output_dir"] = \
-                self.pAFQ_kwargs[ii]["results_dir"]
-
-            del self.pAFQ_kwargs[ii]["dwi_path"]
-            del self.pAFQ_kwargs[ii]["bval"]
-            del self.pAFQ_kwargs[ii]["bvec"]
-            del self.pAFQ_kwargs[ii]["results_dir"]
-            del self.pAFQ_kwargs[ii]["bids_info"]
-            del self.pAFQ_kwargs[ii]["base_fname"]
 
     def export_all(self, viz=True, afqbrowser=True, xforms=True, indiv=True):
         """ Exports all the possible outputs
