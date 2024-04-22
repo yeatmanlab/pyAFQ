@@ -187,7 +187,7 @@ class PanelFigure():
 
     def add_img(self, fname, x_coord, y_coord, reduct_count=1,
                 subplot_label_pos=(0.1, 1.0), legend=None, legend_kwargs={},
-                add_panel_label=True):
+                add_panel_label=True, panel_label_kwargs={}):
         """
         Add image from fname into figure as a panel.
 
@@ -214,6 +214,9 @@ class PanelFigure():
         add_panel_label : bool
             Whether or not to add a panel label to the subplot
             Default: True
+        panel_label_kwargs : dict
+            Additional arguments for matplotlib's text method,
+            which is used to add panel labels to each subplot.
         """
         ax = self.fig.add_subplot(self.grid[y_coord, x_coord])
         im1 = Image.open(fname)
@@ -229,11 +232,13 @@ class PanelFigure():
         if add_panel_label:
             trans = mtransforms.ScaledTranslation(
                 10 / 72, -5 / 72, self.fig.dpi_scale_trans)
+            this_pl_kwargs = self.panel_label_kwargs.copy()
+            this_pl_kwargs.update(panel_label_kwargs)
             ax.text(
                 subplot_label_pos[0], subplot_label_pos[1],
                 f"{chr(65+self.subplot_count)}",
                 transform=ax.transAxes + trans,
-                **self.panel_label_kwargs)
+                **this_pl_kwargs)
         ax.imshow(np.asarray(im1), aspect=1)
         ax.axis('off')
         self.subplot_count = self.subplot_count + 1
