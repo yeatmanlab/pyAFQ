@@ -63,6 +63,18 @@ def get_afq_bids_entities_fname():
         aus.__file__))) + "/afq_bids_entities.json"
 
 
+class _ParticipantAFQInputs:
+    def __init__(
+            self, dwi_data_file, bval_file, bvec_file, results_dir,
+            _bids_info, kwargs):
+        self.dwi_data_file = dwi_data_file
+        self.bval_file = bval_file
+        self.bvec_file = bvec_file
+        self.results_dir = results_dir
+        self._bids_info = _bids_info
+        self.kwargs = kwargs
+
+
 class GroupAFQ(object):
     f"""{AFQclass_doc}"""
 
@@ -255,6 +267,7 @@ class GroupAFQ(object):
         self.valid_sub_list = []
         self.valid_ses_list = []
         self.pAFQ_list = []
+        self.pAFQ_inputs_list = []
         for subject in self.subjects:
             self.wf_dict[subject] = {}
             for session in self.sessions:
@@ -302,17 +315,25 @@ class GroupAFQ(object):
                 self.valid_sub_list.append(subject)
                 self.valid_ses_list.append(str(session))
 
-                this_pAFQ = ParticipantAFQ(
+                this_pAFQ_inputs = _ParticipantAFQInputs(
                     dwi_data_file,
                     bval_file, bvec_file,
                     results_dir,
-                    _bids_info={
+                    {
                         "bids_layout": bids_layout,
                         "subject": subject,
                         "session": session},
-                    **this_kwargs)
+                    this_kwargs)
+                this_pAFQ = ParticipantAFQ(
+                    this_pAFQ_inputs.dwi_data_file,
+                    this_pAFQ_inputs.bval_file,
+                    this_pAFQ_inputs.bvec_file,
+                    this_pAFQ_inputs.results_dir,
+                    this_pAFQ_inputs._bids_info,
+                    **this_pAFQ_inputs.kwargs)
                 self.wf_dict[subject][str(session)] = this_pAFQ.wf_dict
                 self.pAFQ_list.append(this_pAFQ)
+                self.pAFQ_inputs_list.append(this_pAFQ_inputs)
 
     def combine_profiles(self):
         tract_profiles_dict = self.export("profiles")
@@ -930,7 +951,7 @@ class ParallelGroupAFQ():
             orig.parallel_params["cache_dir"] = None
 
         self.parallel_params = orig.parallel_params
-        self.pAFQ_kwargs = [pAFQ.kwargs for pAFQ in orig.pAFQ_list]
+        self.pAFQ_kwargs = orig.pAFQ_inputs_list
 
     def _submit_pydra(self, runnable):
         try:
@@ -973,11 +994,10 @@ class ParallelGroupAFQ():
 
         # Submit to pydra
         export_sub_task = export_sub(
-            pAFQ_kwargs=self.pAFQ_kwargs,
             attr_name=attr_name,
             collapse=collapse,
             cache_dir=self.parallel_params["cache_dir"]
-        ).split("pAFQ_kwargs")
+        ).split("pAFQ_kwargs", pAFQ_kwargs=self.pAFQ_kwargs)
         self._submit_pydra(export_sub_task)
 
     def export_all(self, viz=True, afqbrowser=True, xforms=True, indiv=True):
@@ -1012,12 +1032,11 @@ class ParallelGroupAFQ():
 
         # Submit to pydra
         export_sub_task = export_sub(
-            pAFQ_kwargs=self.pAFQ_kwargs,
             viz=viz,
             xforms=xforms,
             indiv=indiv,
             cache_dir=self.parallel_params["cache_dir"]
-        ).split("pAFQ_kwargs")
+        ).split("pAFQ_kwargs", pAFQ_kwargs=self.pAFQ_kwargs)
         self._submit_pydra(export_sub_task)
 
 

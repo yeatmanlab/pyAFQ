@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import gc
 import random
+import concurrent.futures
 
 import toml
 
@@ -25,7 +26,7 @@ from dipy.testing.decorators import xvfb_it
 from dipy.io.streamline import load_tractogram
 
 import AFQ.api.bundle_dict as abd
-from AFQ.api.group import GroupAFQ
+from AFQ.api.group import GroupAFQ, ParallelGroupAFQ
 from AFQ.api.participant import ParticipantAFQ
 import AFQ.data.fetch as afd
 import AFQ.utils.streamlines as aus
@@ -595,6 +596,12 @@ def test_AFQ_reco80():
     seg_sft = aus.SegmentedSFT.fromfile(
         myafq.export("bundles")["01"])
     npt.assert_(len(seg_sft.get_bundle('CCMid').streamlines) > 0)
+
+
+def test_AFQ_pydra():
+    _, bids_path = afd.fetch_hbn_preproc(["NDARAA948VFH", "NDARAV554TP2"])
+    pga = ParallelGroupAFQ(bids_path, preproc_pipeline="qsiprep")
+    pga.export_all()
 
 
 @pytest.mark.nightly_pft
