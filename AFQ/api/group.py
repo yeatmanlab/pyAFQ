@@ -22,6 +22,7 @@ from dipy.io.streamline import save_tractogram
 from AFQ.version import version as pyafq_version
 from AFQ.viz.utils import trim
 import pandas as pd
+import pydra
 import numpy as np
 import os
 import os.path as op
@@ -41,7 +42,6 @@ except ImportError:
     using_afqb = False
 
 from dipy.utils.optpkg import optional_package
-pydra, has_pydra, _ = optional_package('pydra')
 
 
 __all__ = ["GroupAFQ", "get_afq_bids_entities_fname"]
@@ -932,6 +932,54 @@ class ParallelGroupAFQ():
         self.parallel_params = orig.parallel_params
         self.pAFQ_kwargs = [pAFQ.kwargs for pAFQ in orig.pAFQ_list]
 
+    def _submit_pydra(self, runnable):
+        try:
+            with pydra.Submitter(
+                **self.parallel_params["submitter_params"],
+            ) as sub:
+                sub(runnable=runnable)
+        except AttributeError as e:
+            if "'NoneType' object has no attribute 'replace'" not in str(e):
+                raise
+
+    def export(self, attr_name="help", collapse=True):
+        f"""
+        Export a specific output. To print a list of available outputs,
+        call export without arguments.
+        {valid_exports_string}
+
+        Parameters
+        ----------
+        attr_name : str
+            Name of the output to export. Default: "help"
+        collapse : bool
+            Whether to collapse session dimension if there is only 1 session.
+            Default: True
+
+        Returns
+        -------
+        output : dict
+            The specific output as a dictionary. Keys are subjects.
+            Values are dictionaries with keys of sessions
+            if multiple sessions are used. Otherwise, values are
+            the output.
+            None if called without arguments.
+        """
+
+        @pydra.mark.task
+        def export_sub(pAFQ_kwargs, attr_name, collapse):
+            pAFQ = ParticipantAFQ(**pAFQ_kwargs)
+            pAFQ.export(attr_name, collapse)
+
+        # Submit to pydra
+        export_sub_task = export_sub(
+            pAFQ_kwargs=self.pAFQ_kwargs,
+            attr_name=attr_name,
+            collapse=collapse,
+            cache_dir=self.parallel_params["cache_dir"]
+        ).split("pAFQ_kwargs")
+        self._submit_pydra(export_sub_task)
+
     def export_all(self, viz=True, afqbrowser=True, xforms=True, indiv=True):
         """ Exports all the possible outputs
 
@@ -970,11 +1018,7 @@ class ParallelGroupAFQ():
             indiv=indiv,
             cache_dir=self.parallel_params["cache_dir"]
         ).split("pAFQ_kwargs")
-
-        with pydra.Submitter(
-            **self.parallel_params["submitter_params"],
-        ) as sub:
-            sub(runnable=export_sub_task)
+        self._submit_pydra(export_sub_task)
 
 
 def download_and_combine_afq_profiles(bucket,
