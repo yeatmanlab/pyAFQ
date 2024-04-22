@@ -13,7 +13,7 @@ import dipy.reconst.dti as dpy_dti
 import dipy.reconst.fwdti as dpy_fwdti
 import dipy.reconst.msdki as dpy_msdki
 from dipy.reconst.gqi import GeneralizedQSamplingModel
-from dipy.reconst.rumba import RumbaSDModel
+from dipy.reconst.rumba import RumbaSDModel, RumbaFit
 from dipy.reconst import shm
 from dipy.reconst.dki_micro import axonal_water_fraction
 
@@ -451,54 +451,68 @@ def gq_ai(gq_params):
     return AI, dict(GQParamsFile=gq_params)
 
 
-@pimms.calc("rumba_fit")
-def rumba_fit(gtab, data, brain_mask,
-              rumba_wm_response=[0.0017, 0.0002, 0.0002],
-              rumba_gm_response=0.0008,
-              rumba_csf_response=0.003,
-              rumba_n_iter=600):
+@pimms.calc("rumba_model")
+def rumba_model(gtab,
+                rumba_wm_response=[0.0017, 0.0002, 0.0002],
+                rumba_gm_response=0.0008,
+                rumba_csf_response=0.003,
+                rumba_n_iter=600):
     """
     fit for RUMBA-SD model as documented on dipy reconstruction options
 
     Parameters
     ----------
-    rumba_wm_response: 1D or 2D ndarray or AxSymShResponse. Able to take response[0] from auto_response_ssst. default = array([0.0017, 0.0002, 0.0002])
+    rumba_wm_response: 1D or 2D ndarray or AxSymShResponse.
+        Able to take response[0] from auto_response_ssst.
+        default: array([0.0017, 0.0002, 0.0002])
     rumba_gm_response: float, optional
-    Mean diffusivity for GM compartment. If None, then grey matter volume fraction is not computed. Default: 0.8e-3
+        Mean diffusivity for GM compartment.
+        If None, then grey matter volume fraction is not computed.
+        Default: 0.8e-3
     rumba_csf_response: float, optional
-    Mean diffusivity for CSF compartment. If None, then CSF volume fraction is not computed. Default: 3.0e-3
+        Mean diffusivity for CSF compartment.
+        If None, then CSF volume fraction is not computed.
+        Default: 3.0e-3
     rumba_n_iter: int, optional
-    Number of iterations for fODF estimation. Must be a positive int. Default: 600
+        Number of iterations for fODF estimation.
+        Must be a positive int.
+        Default: 600
     """
-
-    rumbamodel = RumbaSDModel(gtab,
-                              wm_response=np.asarray(rumba_wm_response),
-                              gm_response=rumba_gm_response,
-                              csf_response=rumba_csf_response,
-                              n_iter=rumba_n_iter,
-                              recon_type='smf',
-                              n_coils=1,
-                              R=1,
-                              voxelwise=False,
-                              use_tv=False,
-                              sphere=default_sphere,
-                              verbose=True)
-    rumba_fit = rumbamodel.fit(
-        data,
-        mask=nib.load(brain_mask).get_fdata())
-
-    return rumba_fit
+    return RumbaSDModel(
+        gtab,
+        wm_response=np.asarray(rumba_wm_response),
+        gm_response=rumba_gm_response,
+        csf_response=rumba_csf_response,
+        n_iter=rumba_n_iter,
+        recon_type='smf',
+        n_coils=1,
+        R=1,
+        voxelwise=False,
+        use_tv=False,
+        sphere=default_sphere,
+        verbose=True)
 
 
 @pimms.calc("rumba_params")
 @as_file(suffix='_odfmodel-RUMBA_desc-diffmodel_dwi.nii.gz')
 @as_img
-def rumba_params(rumba_fit):
+def rumba_params(rumba_model, data, brain_mask):
     """RUMBA SHM Parameters"""
+    rumba_fit = rumba_model.fit(
+        data,
+        mask=nib.load(brain_mask).get_fdata())
     odf = rumba_fit.odf(sphere=default_sphere)
     rumba_shm, _, _ = extract_odf(odf)
     meta = dict()
     return rumba_shm, meta
+
+
+@pimms.calc("rumba_fit")
+def rumba_fit(rumba_model, rumba_params):
+    """RUMBA FIT"""
+    return RumbaFit(
+        rumba_model,
+        nib.load(rumba_params).get_fdata())
 
 
 @pimms.calc("rumba_f_csf")
@@ -1115,7 +1129,8 @@ def get_data_plan(kwargs):
         dki_md, dki_awf, dki_mk, dki_kfa, dki_ga, dki_rd,
         dti_ga, dti_rd, dti_ad,
         dki_ad, dki_rk, dki_ak, dti_params, dki_params, fwdti_params,
-        rumba_fit, rumba_params, rumba_f_csf, rumba_f_gm, rumba_f_wm,
+        rumba_fit, rumba_params, rumba_model,
+        rumba_f_csf, rumba_f_gm, rumba_f_wm,
         csd_params, get_bundle_dict])
 
     if "scalars" not in kwargs:
