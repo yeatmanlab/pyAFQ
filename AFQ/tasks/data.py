@@ -497,7 +497,10 @@ def rumba_model(gtab,
 @as_file(suffix='_odfmodel-RUMBA_desc-diffmodel_dwi.nii.gz')
 @as_img
 def rumba_params(rumba_model, data, brain_mask):
-    """RUMBA SHM Parameters"""
+    """
+    Takes the fitted RUMBA-SD model as input and returns
+    the spherical harmonics coefficients (SHM).
+    """
     rumba_fit = rumba_model.fit(
         data,
         mask=nib.load(brain_mask).get_fdata())
@@ -516,7 +519,7 @@ def rumba_fit(rumba_model, rumba_params):
 
 
 @pimms.calc("rumba_f_csf")
-@as_file(suffix='_odfmodel-RUMBA_desc-CSF_dwi.nii.gz')
+@as_file(suffix='_odfmodel-RUMBA_desc-CSF_probseg.nii.gz')
 @as_fit_deriv('RUMBA')
 def rumba_f_csf(rumba_fit):
     """
@@ -527,23 +530,23 @@ def rumba_f_csf(rumba_fit):
 
 
 @pimms.calc("rumba_f_gm")
-@as_file(suffix='_odfmodel-RUMBA_desc-GM_dwi.nii.gz')
+@as_file(suffix='_odfmodel-RUMBA_desc-GM_probseg.nii.gz')
 @as_fit_deriv('RUMBA')
 def rumba_f_gm(rumba_fit):
     """
     full path to a nifti file containing
-    the GM volume fraction for each voxel..
+    the GM volume fraction for each voxel.
     """
     return rumba_fit.f_gm  # gray matter volume fractions
 
 
 @pimms.calc("rumba_f_wm")
-@as_file(suffix='_odfmodel-RUMBA_desc-WM_dwi.nii.gz')
+@as_file(suffix='_odfmodel-RUMBA_desc-WM_probseg.nii.gz')
 @as_fit_deriv('RUMBA')
 def rumba_f_wm(rumba_fit):
     """
     full path to a nifti file containing
-    the white matter volume fraction for each voxel.Equivalent to sum of fODF.
+    the white matter volume fraction for each voxel.
     """
     return rumba_fit.f_wm  # white matter volume fractions
 
