@@ -919,7 +919,7 @@ class BundleDict(MutableMapping):
             keep_in_memory=self.keep_in_memory)
 
     def apply_to_rois(self, b_name, func, *args,
-                      dry_run=False,
+                      dry_run=False, apply_to_recobundles=False,
                       **kwargs):
         """
         Applies some transformation to all ROIs (include, exclude, end, start)
@@ -935,6 +935,11 @@ class BundleDict(MutableMapping):
         dry_run : bool
             Whether to actually apply changes returned by `func` to the ROIs.
             If has_return is False, dry_run is not used.
+        apply_to_recobundles : bool, optional
+            Whether to apply the transformation to recobundles
+            TRKs as well.
+            Default: False
+
         *args :
             Additional arguments for func
         **kwargs
@@ -959,7 +964,7 @@ class BundleDict(MutableMapping):
                         changed_rois.append(func(
                             _roi, *args, **kwargs))
                     return_vals[roi_type] = changed_rois
-        if "recobundles" in self._dict[b_name]:
+        if apply_to_recobundles and "recobundles" in self._dict[b_name]:
             return_vals["recobundles"] = {}
             for sl_type in ["sl", "centroid"]:
                 return_vals["recobundles"][sl_type] = func(
@@ -989,23 +994,28 @@ class BundleDict(MutableMapping):
             b_name,
             self._cond_load,
             resample_to,
-            dry_run=dry_run)
+            dry_run=dry_run,
+            apply_to_recobundles=True)
 
     def is_bundle_in_template(self, bundle_name):
         return "space" not in self._dict[bundle_name]\
             or self._dict[bundle_name]["space"] == "template"
 
-    def _roi_transform_helper(self, roi, mapping, new_affine, bundle_name):
-        roi = afd.read_resample_roi(roi, self.resample_to)
-        warped_img = auv.transform_inverse_roi(
-            roi.get_fdata(),
-            mapping,
-            bundle_name=bundle_name)
-        warped_img = nib.Nifti1Image(warped_img, new_affine)
-        return warped_img
+    def _roi_transform_helper(self, roi_or_sl, mapping,
+                              new_affine, bundle_name):
+        roi_or_sl = self._cond_load(roi_or_sl, self.resample_to)
+        if isinstance(roi_or_sl, nib.Nifti1Image):
+            warped_img = auv.transform_inverse_roi(
+                roi_or_sl.get_fdata(),
+                mapping,
+                bundle_name=bundle_name)
+            warped_img = nib.Nifti1Image(warped_img, new_affine)
+            return warped_img
+        else:
+            return roi_or_sl
 
     def transform_rois(self, bundle_name, mapping, new_affine,
-                       base_fname=None):
+                       base_fname=None, apply_to_recobundles=False):
         """
         Get the bundle definition with transformed ROIs
         for a given bundle into a
@@ -1026,6 +1036,10 @@ class BundleDict(MutableMapping):
             Base file path to save ROIs too. Additional BIDS
             descriptors will be added to this file path. If None,
             do not save the ROIs.
+        apply_to_recobundles : bool, optional
+            Whether to apply the transformation to recobundles
+            TRKs as well.
+            Default: False
 
         Returns
         -------
@@ -1041,13 +1055,15 @@ class BundleDict(MutableMapping):
                 mapping,
                 new_affine,
                 bundle_name,
-                dry_run=True)
+                dry_run=True,
+                apply_to_recobundles=apply_to_recobundles)
         else:
             transformed_rois = self.apply_to_rois(
                 bundle_name,
                 self._cond_load,
                 self.resample_subject_to,
-                dry_run=True)
+                dry_run=True,
+                apply_to_recobundles=apply_to_recobundles)
 
         if base_fname is not None:
             fnames = []

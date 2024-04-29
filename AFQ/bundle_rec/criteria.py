@@ -333,7 +333,8 @@ def run_bundle_rec_plan(
     bundle_def.update(bundle_dict.transform_rois(
         bundle_name,
         mapping,
-        img.affine))
+        img.affine,
+        apply_to_recobundles=True))
     logger.info(f"Time to prep ROIs: {time()-start_time}s")
 
     b_sls = abu.SlsBeingRecognized(

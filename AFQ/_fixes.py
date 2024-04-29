@@ -195,19 +195,21 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
     else:
         resample = True
     if resample:
-        sls = set_number_of_points(bundle, n_points)
+        sls = np.asarray(set_number_of_points(bundle, n_points))
     else:
         sls = bundle
 
-    # If there's only one fiber here, it gets the entire weighting:
-    if len(bundle) == 1:
-        if return_mahalnobis:
-            return np.array([np.nan])
-        else:
-            return np.array([1])
+    n_sls, n_nodes, _ = sls.shape
 
-    n_sls, n_nodes, n_dim = sls.shape
-    weights = np.zeros((n_sls, n_nodes))
+    # Only do this with sufficient streamlines:
+    if n_sls < 20:
+        weights = np.ones((n_sls, n_nodes))
+        if return_mahalnobis:
+            return np.full((n_sls, n_nodes), np.nan)
+        else:
+            return weights / np.sum(weights, 0)
+    else:
+        weights = np.zeros((n_sls, n_nodes))
     diff = stat(sls, axis=0) - sls
     for i in range(n_nodes):
         # This should come back as a 3D covariance matrix with the spatial
