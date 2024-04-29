@@ -43,6 +43,16 @@ def recognize(
 
     Parameters
     ----------
+    tg : str, StatefulTractogram
+        Tractogram to segment.
+    img : str, nib.Nifti1Image
+        Image for reference.
+    mapping : MappingDefinition
+        Mapping from subject to template.
+    bundle_dict : dict or AFQ.api.BundleDict
+        Dictionary of bundles to segment.
+    reg_template : str, nib.Nifti1Image
+        Template image for registration.
     nb_points : int, boolean
         Resample streamlines to nb_points number of points.
         If False, no resampling is done. Default: False
@@ -61,8 +71,10 @@ def recognize(
         Default: {"engine": "serial"}
     rb_recognize_params : dict
         RecoBundles parameters for the recognize function.
+        Default: dict(model_clust_thr=1.25, reduction_thr=25, pruning_thr=12)
     refine_reco : bool
         Whether to refine the RecoBundles segmentation.
+        Default: False
     prob_threshold : float.
         Using AFQ Algorithm.
         Initial cleaning of fiber groups is done using probability maps
@@ -81,6 +93,7 @@ def recognize(
         modification to your bundle_dict:
         bundle_dict["Right Arcuate"]["inc_addtol"] = [3, 3]
         Additional tolerances can also be negative.
+        Default: None.
     rng : RandomState or int
         If None, creates RandomState.
         If int, creates RandomState with seed rng.
@@ -89,12 +102,14 @@ def recognize(
     return_idx : bool
         Whether to return the indices in the original streamlines as part
         of the output of segmentation.
+        Default: False.
     filter_by_endpoints: bool
         Whether to filter the bundles based on their endpoints.
         Default: True.
     dist_to_atlas : float
         If filter_by_endpoints is True, this is the required distance
         from the endpoints to the atlas ROIs.
+        Default: 4
     save_intermediates : str, optional
         The full path to a folder into which intermediate products
         are saved. Default: None, means no saving of intermediates.

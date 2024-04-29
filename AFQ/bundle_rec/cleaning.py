@@ -4,10 +4,10 @@ import logging
 from scipy.stats import zscore
 
 import dipy.tracking.streamline as dts
-from dipy.stats.analysis import gaussian_weights
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 import AFQ.bundle_rec.utils as abu
+from AFQ._fixes import gaussian_weights
 
 
 logger = logging.getLogger('AFQ')

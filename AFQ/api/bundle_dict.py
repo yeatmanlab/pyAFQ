@@ -494,7 +494,6 @@ def baby_bd():
             "primary_axis_percentage": 40,
             "cross_midline": False,
             "mahal": {"distance_threshold": 4}}},
-        seg_algo="afq",
         resample_to=afd.read_pediatric_templates()[
             'UNCNeo-withCerebellum-for-babyAFQ'])
 
@@ -567,7 +566,7 @@ def reco_bd(n_bundles):
         Selects between 16 or 80 bundle atlas
     """
     templates = afd.read_hcp_atlas(n_bundles, as_file=True)
-    return BundleDict(templates, seg_algo="reco")
+    return BundleDict(templates)
 
 
 def cerebellar_bd():
@@ -696,12 +695,6 @@ class BundleDict(MutableMapping):
         custom bundles. See `Defining Custom Bundle Dictionaries`
         in the `usage` section of pyAFQ's documentation for details.
 
-    seg_algo: One of {"afq", "reco"}
-        The bundle segmentation algorithm to use.
-            "afq" : Use waypoint ROIs + probability maps, as described
-            in [Yeatman2012]_
-            "reco" : Use Recobundles [Garyfallidis2017]_
-
     resample_to : Nifti1Image or bool, optional
         If there are bundles in bundle_info with the 'space' attribute
         set to 'template', or with no 'space' attribute,
@@ -762,7 +755,6 @@ class BundleDict(MutableMapping):
 
     def __init__(self,
                  bundle_info,
-                 seg_algo="afq",
                  resample_to=None,
                  resample_subject_to=False,
                  keep_in_memory=False):
@@ -770,7 +762,6 @@ class BundleDict(MutableMapping):
             raise TypeError((
                 f"bundle_info must be a dict,"
                 f" currently a {type(bundle_info)}"))
-        self.seg_algo = seg_algo.lower()
         if resample_to is None:
             resample_to = afd.read_mni_template()
         self.resample_to = resample_to
@@ -784,31 +775,30 @@ class BundleDict(MutableMapping):
             self.__setitem__(key, item)
 
         self.logger = logging.getLogger('AFQ')
-        if self.seg_algo == "afq":
-            if "Forceps Major" in self.bundle_names\
-                    and "Callosum Occipital" in self.bundle_names:
-                self.logger.info((
-                    "Forceps Major and Callosum Occipital bundles"
-                    " are co-located, and AFQ"
-                    " assigns each streamline to only one bundle."
-                    " Only Callosum Occipital will be used."))
-                self.bundle_names.remove("Forceps Major")
-            if "Forceps Minor" in self.bundle_names\
-                    and "Callosum Orbital" in self.bundle_names:
-                self.logger.info((
-                    "Forceps Minor and Callosum Orbital bundles"
-                    " are co-located, and AFQ"
-                    " assigns each streamline to only one bundle."
-                    " Only Callosum Orbital will be used."))
-                self.bundle_names.remove("Forceps Minor")
-            if "Forceps Minor" in self.bundle_names\
-                    and "Callosum Anterior Frontal" in self.bundle_names:
-                self.logger.info((
-                    "Forceps Minor and Callosum Anterior Frontal bundles"
-                    " are co-located, and AFQ"
-                    " assigns each streamline to only one bundle."
-                    " Only Callosum Anterior Frontal will be used."))
-                self.bundle_names.remove("Forceps Minor")
+        if "Forceps Major" in self.bundle_names\
+                and "Callosum Occipital" in self.bundle_names:
+            self.logger.info((
+                "Forceps Major and Callosum Occipital bundles"
+                " are co-located, and AFQ"
+                " assigns each streamline to only one bundle."
+                " Only Callosum Occipital will be used."))
+            self.bundle_names.remove("Forceps Major")
+        if "Forceps Minor" in self.bundle_names\
+                and "Callosum Orbital" in self.bundle_names:
+            self.logger.info((
+                "Forceps Minor and Callosum Orbital bundles"
+                " are co-located, and AFQ"
+                " assigns each streamline to only one bundle."
+                " Only Callosum Orbital will be used."))
+            self.bundle_names.remove("Forceps Minor")
+        if "Forceps Minor" in self.bundle_names\
+                and "Callosum Anterior Frontal" in self.bundle_names:
+            self.logger.info((
+                "Forceps Minor and Callosum Anterior Frontal bundles"
+                " are co-located, and AFQ"
+                " assigns each streamline to only one bundle."
+                " Only Callosum Anterior Frontal will be used."))
+            self.bundle_names.remove("Forceps Minor")
 
     def update_max_includes(self, new_max):
         if new_max > self.max_includes:
@@ -832,11 +822,11 @@ class BundleDict(MutableMapping):
         Load ROI or streamline if not already loaded
         """
         if isinstance(roi_or_sl, str):
-            if self.seg_algo == "afq":
+            if ".nii" in roi_or_sl:
                 return afd.read_resample_roi(
                     roi_or_sl,
                     resample_to=resample_to)
-            elif self.seg_algo.startswith("reco"):
+            else:
                 return load_tractogram(
                     roi_or_sl,
                     'same',
@@ -860,7 +850,6 @@ class BundleDict(MutableMapping):
 
             return self.__class__(
                 new_bd,
-                seg_algo=self.seg_algo,
                 resample_to=self.resample_to,
                 resample_subject_to=self.resample_subject_to,
                 keep_in_memory=self.keep_in_memory)
@@ -925,7 +914,6 @@ class BundleDict(MutableMapping):
         """
         return self.__class__(
             self._dict.copy(),
-            seg_algo=self.seg_algo,
             resample_to=self.resample_to,
             resample_subject_to=self.resample_subject_to,
             keep_in_memory=self.keep_in_memory)
@@ -958,27 +946,25 @@ class BundleDict(MutableMapping):
         the roi type and values are the transformed ROIs.
         """
         return_vals = {}
-        if self.seg_algo == "afq":
-            for roi_type in ["include", "exclude", "start", "end", "prob_map"]:
-                if roi_type in self._dict[b_name]:
-                    if roi_type in ["start", "end", "prob_map"]:
-                        return_vals[roi_type] = func(
-                            self._dict[b_name][roi_type], *args, **kwargs)
-                    else:
-                        changed_rois = []
-                        for _roi in self._dict[b_name][roi_type]:
-                            changed_rois.append(func(
-                                _roi, *args, **kwargs))
-                        return_vals[roi_type] = changed_rois
-        elif self.seg_algo.startswith("reco"):
-            if b_name == "whole_brain":
-                return_vals = func(
-                    self._dict[b_name], *args, **kwargs)
-            else:
-                for sl_type in ["sl", "centroid"]:
-                    return_vals[sl_type] = func(
-                        self._dict[b_name][sl_type],
-                        *args, **kwargs)
+        for roi_type in [
+                "include", "exclude",
+                "start", "end", "prob_map"]:
+            if roi_type in self._dict[b_name]:
+                if roi_type in ["start", "end", "prob_map"]:
+                    return_vals[roi_type] = func(
+                        self._dict[b_name][roi_type], *args, **kwargs)
+                else:
+                    changed_rois = []
+                    for _roi in self._dict[b_name][roi_type]:
+                        changed_rois.append(func(
+                            _roi, *args, **kwargs))
+                    return_vals[roi_type] = changed_rois
+        if "recobundles" in self._dict[b_name]:
+            return_vals["recobundles"] = {}
+            for sl_type in ["sl", "centroid"]:
+                return_vals["recobundles"][sl_type] = func(
+                    self._dict[b_name]["recobundles"][sl_type],
+                    *args, **kwargs)
         if not dry_run:
             for roi_type, roi in return_vals.items():
                 self._dict[b_name][roi_type] = roi
@@ -995,13 +981,10 @@ class BundleDict(MutableMapping):
         b_name : str
             Name of the bundle to be resampled.
         """
-        if self.seg_algo == "afq":
-            if self.is_bundle_in_template(b_name):
-                resample_to = self.resample_to
-            else:
-                resample_to = self.resample_subject_to
+        if self.is_bundle_in_template(b_name):
+            resample_to = self.resample_to
         else:
-            resample_to = None
+            resample_to = self.resample_subject_to
         return self.apply_to_rois(
             b_name,
             self._cond_load,
@@ -1087,10 +1070,6 @@ class BundleDict(MutableMapping):
             return transformed_rois
 
     def __add__(self, other):
-        if self.seg_algo != other.seg_algo:
-            raise ValueError((
-                "Adding BundleDicts where seg_algo do not match."
-                f"seg_algo's are {self.seg_algo} and {other.seg_algo}"))
         for resample in ["resample_to", "resample_subject_to"]:
             if not getattr(self, resample)\
                     or not getattr(other, resample)\
@@ -1120,7 +1099,6 @@ class BundleDict(MutableMapping):
                         f"{getattr(other, resample).header['dim']}"))
         return self.__class__(
             {**self._dict, **other._dict},
-            self.seg_algo,
             self.resample_to,
             self.resample_subject_to,
             self.keep_in_memory)

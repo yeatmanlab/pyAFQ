@@ -137,7 +137,8 @@ def include(b_sls, bundle_def, preproc_imap, max_includes,
             include_roi_tols.append((
                 inc_tol / preproc_imap["vox_dim"] + preproc_imap["tol"])**2)
     else:
-        include_roi_tols = [preproc_imap["tol"]**2] * len(bundle_def["include"])
+        include_roi_tols = [preproc_imap["tol"]**2] * len(
+            bundle_def["include"])
 
     include_rois = []
     for include_roi in bundle_def["include"]:

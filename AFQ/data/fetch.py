@@ -1259,17 +1259,6 @@ def read_hcp_atlas(n_bundles=16, as_file=False):
         _, folder = fetch_hcp_atlas_80_bundles()
         atlas_folder = "Atlas_80_Bundles"
 
-    whole_brain = op.join(
-        folder,
-        atlas_folder,
-        'whole_brain',
-        'whole_brain_MNI.trk')
-    if not as_file:
-        whole_brain = load_tractogram(
-            whole_brain,
-            'same', bbox_valid_check=False).streamlines
-
-    bundle_dict['whole_brain'] = whole_brain
     bundle_files = glob(
         op.join(
             folder,

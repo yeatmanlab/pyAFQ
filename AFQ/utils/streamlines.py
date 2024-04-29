@@ -97,11 +97,10 @@ class SegmentedSFT():
             bundles = {}
             if "bundle_ids" in sidecar_info:
                 for b_name, b_id in sidecar_info["bundle_ids"].items():
-                    if not b_name == "whole_brain":
-                        idx = np.where(
-                            sft.data_per_streamline['bundle'] == b_id)[0]
-                        bundles[b_name] = StatefulTractogram(
-                            sft.streamlines[idx], reference, Space.RASMM)
+                    idx = np.where(
+                        sft.data_per_streamline['bundle'] == b_id)[0]
+                    bundles[b_name] = StatefulTractogram(
+                        sft.streamlines[idx], reference, Space.RASMM)
             else:
                 bundles["whole_brain"] = sft
 
