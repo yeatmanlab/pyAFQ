@@ -8,9 +8,9 @@ import logging
 
 import pimms
 
-from AFQ.tasks.decorators import as_file, as_img
+from AFQ.tasks.decorators import as_file
 from AFQ.tasks.utils import get_fname, with_name, str_to_desc
-import AFQ.segmentation as seg
+from AFQ.bundle_rec.recognize import recognize
 from AFQ.utils.path import drop_extension, write_json
 import AFQ.utils.streamlines as aus
 from AFQ.tasks.utils import get_default_args
@@ -66,13 +66,13 @@ def segment(data_imap, mapping_imap,
         logger.warning(f"{len(indices_to_remove)} invalid streamlines removed")
 
     start_time = time()
-    segmentation = seg.Segmentation(**segmentation_params)
-    bundles, bundle_meta = segmentation.segment(
-        bundle_dict,
+    bundles, bundle_meta = recognize(
         tg,
-        mapping_imap["mapping"],
         data_imap["dwi"],
-        reg_template=reg_template)
+        mapping_imap["mapping"],
+        bundle_dict,
+        reg_template,
+        **segmentation_params)
 
     seg_sft = aus.SegmentedSFT(bundles, Space.VOX)
 
@@ -381,7 +381,7 @@ def get_segmentation_plan(kwargs):
         segment,
         tract_profiles])
 
-    default_seg_params = get_default_args(seg.Segmentation.__init__)
+    default_seg_params = get_default_args(recognize)
     if "segmentation_params" in kwargs:
         for k in kwargs["segmentation_params"]:
             default_seg_params[k] = kwargs["segmentation_params"][k]

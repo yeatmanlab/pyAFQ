@@ -684,6 +684,7 @@ class _BundleEntry(Mapping):
             "in the BundleDict."))
 
 
+# TODO: refactor the recobundles parts of this
 class BundleDict(MutableMapping):
     """
     Create a bundle dictionary, needed for the segmentation.

@@ -16,6 +16,7 @@ The code closely resembles the code used in :ref:`sphx_glr_tutorial_examples_plo
 import os.path as op
 import AFQ.data.fetch as afd
 from AFQ.api.group import GroupAFQ
+import AFQ.api.bundle_dict as abd
 
 afd.organize_stanford_data(clear_previous_afq="track")
 
@@ -30,7 +31,7 @@ tracking_params = dict(n_seeds=25000,
 # We also refer to bundle recognition as the "segmentation" of the tractogram.
 # Parameters of this process are set through a dictionary input to the
 # `segmentation_params` argument of the GroupAFQ object. In this case, we
-# set the `seg_algo` to "reco", which tells pyAFQ to use the RecoBundles
+# use `abd.reco_bd(16)`, which tells pyAFQ to use the RecoBundles
 # algorithm for bundle recognition.
 
 myafq = GroupAFQ(
@@ -38,7 +39,7 @@ myafq = GroupAFQ(
                        'recobundles'),
     bids_path=op.join(afd.afq_home, 'stanford_hardi'),
     # Set the algorithm to use RecoBundles for bundle recognition:
-    segmentation_params={'seg_algo': 'reco'},
+    bundle_info=abd.reco_bd(16),
     preproc_pipeline='vistasoft',
     tracking_params=tracking_params,
     viz_backend_spec='plotly_no_gif')

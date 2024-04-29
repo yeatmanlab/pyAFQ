@@ -1283,7 +1283,7 @@ def read_hcp_atlas(n_bundles=16, as_file=False):
     for bundle_file in bundle_files:
         bundle = drop_extension(op.split(bundle_file)[-1])
         centroid_file = op.join(centroid_folder, f"{bundle}.trk")
-        bundle_dict[bundle] = {}
+        bundle_dict[bundle] = {"recobundles": {}}
         if not op.exists(centroid_file):
             bundle_sl = load_tractogram(
                 bundle_file,
@@ -1299,16 +1299,16 @@ def read_hcp_atlas(n_bundles=16, as_file=False):
                 centroid_file,
                 bbox_valid_check=False)
         if not as_file:
-            bundle_dict[bundle]['sl'] = load_tractogram(
+            bundle_dict[bundle]["recobundles"]['sl'] = load_tractogram(
                 bundle_file,
                 'same',
                 bbox_valid_check=False).streamlines
-            bundle_dict[bundle]['centroid'] = load_tractogram(
+            bundle_dict[bundle]["recobundles"]['centroid'] = load_tractogram(
                 centroid_file,
                 "same", bbox_valid_check=False).streamlines
         else:
-            bundle_dict[bundle]['sl'] = bundle_file
-            bundle_dict[bundle]['centroid'] = centroid_file
+            bundle_dict[bundle]["recobundles"]['sl'] = bundle_file
+            bundle_dict[bundle]["recobundles"]['centroid'] = centroid_file
 
     # For some reason, this file-name has a 0 in it, instead of an O:
     bundle_dict["IFOF_R"] = bundle_dict["IF0F_R"]

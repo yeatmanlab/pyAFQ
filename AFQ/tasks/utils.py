@@ -31,9 +31,8 @@ def get_fname(base_fname, suffix,
         fname = fname + (
             f'_coordsys-RASMM_trkmethod-{directions+odf_model}'
         )
-    if segmentation_params is not None and 'seg_algo' in segmentation_params:
-        seg_algo = segmentation_params['seg_algo']
-        fname = fname + f"_recogmethod-{seg_algo}"
+    if segmentation_params is not None:
+        fname = fname + f"_recogmethod-AFQ"
 
     return fname + suffix
 

@@ -109,7 +109,7 @@ def check_attribute(attr_name):
         f"{attr_name} not found for export. {valid_exports_string}")
 
 
-def export_all_helper(api_afq_object, seg_algo, xforms, indiv, viz):
+def export_all_helper(api_afq_object, xforms, indiv, viz):
     if xforms:
         try:
             api_afq_object.export("b0_warped")
@@ -122,8 +122,7 @@ def export_all_helper(api_afq_object, seg_algo, xforms, indiv, viz):
 
     if indiv:
         api_afq_object.export("indiv_bundles")
-        if seg_algo == "AFQ":
-            api_afq_object.export("rois")
+        api_afq_object.export("rois")
     api_afq_object.export("sl_counts")
     api_afq_object.export("median_bundle_lengths")
     api_afq_object.export("profiles")
@@ -138,5 +137,4 @@ def export_all_helper(api_afq_object, seg_algo, xforms, indiv, viz):
             else:
                 api_afq_object.logger.warning(plot_err_message)
         api_afq_object.export("all_bundles_figure")
-        if seg_algo == "AFQ":
-            api_afq_object.export("indiv_bundles_figures")
+        api_afq_object.export("indiv_bundles_figures")

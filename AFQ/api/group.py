@@ -590,11 +590,8 @@ class GroupAFQ(object):
             Default: True
         """
         start_time = time()
-        seg_params = self.export("segmentation_params", collapse=False)[
-            self.valid_sub_list[0]][self.valid_ses_list[0]]
-        seg_algo = seg_params.get("seg_algo", "AFQ")
 
-        export_all_helper(self, seg_algo, xforms, indiv, viz)
+        export_all_helper(self, xforms, indiv, viz)
 
         self.combine_profiles()
         if afqbrowser:

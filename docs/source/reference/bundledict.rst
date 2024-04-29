@@ -29,6 +29,15 @@ key-value pairs::
       same length as 'exclude'. optional. 
     - 'mahal': Dict describing the parameters for cleaning. By default, we
       use the default behavior of the seg.clean_bundle function.
+    - 'recobundles': Dict which should contain an 'sl' key and 'centroid'
+      key. The 'sl' key should be the reference streamline and the 'centroid'
+      key should be the centroid threshold for Recobundles.
+    - 'qb_thresh': Float which is the threshold for Quickbundles cleaning.
+    - 'primary_axis': int which is the index of the primary axis the
+      bundle should travel in.
+    - 'primary_axis_percentage': Used with primary_axis, defines what fraction
+      of a streamlines movement should be in the primary axis.
+    - 'length': dicitonary containing 'min_len' and 'max_len'
 
 
 For an example, see "Plotting the Optic Radiations" in :ref:`examples`.
@@ -47,15 +56,12 @@ of the steps:
   7. Include
   8. Curvature
   9. Exclude
-  10. Quickbundles Cleaning
-  11. Mahalanobis Cleaning
+  10. Recobundles
+  11. Quickbundles Cleaning
+  12. Mahalanobis Cleaning
 If a streamline passes all steps for a bundle, it is included in that bundle.
-If a streamline passess all steps for multiple bundles, one of three things
-happens. By default, the probability maps are used as the tie breaker. If
-`roi_dist_tie_break` is set in `segmentation_params`, then distance to the ROI
-is used instead. If both of these still results in a tie (or no probability
-map is provided for a given bundle), then the tie goes to whichever bundle is
-first in the bundle dictionary.
+If a streamline passess all steps for multiple bundles, then a warning is
+thrown and the tie goes to whichever bundle is first in the bundle dictionary.
 
 
 If, for debugging purposes, you want to save out the streamlines

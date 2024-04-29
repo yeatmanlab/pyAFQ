@@ -562,8 +562,8 @@ def test_AFQ_reco():
         preproc_pipeline='vistasoft',
         viz_backend_spec="plotly",
         profile_weights="median",
+        bundle_info=abd.reco_bd(16),
         segmentation_params={
-            'seg_algo': 'reco',
             'rng': 42})
 
     seg_sft = aus.SegmentedSFT.fromfile(
@@ -589,8 +589,8 @@ def test_AFQ_reco80():
         bids_path=bids_path,
         preproc_pipeline='vistasoft',
         tracking_params=tracking_params,
+        bundle_info=abd.reco_bd(16),
         segmentation_params={
-            'seg_algo': 'reco80',
             'rng': 42})
 
     seg_sft = aus.SegmentedSFT.fromfile(
@@ -812,7 +812,6 @@ def test_AFQ_data_waypoint():
                            random_seeds=True,
                            rng_seed=42)
     segmentation_params = dict(filter_by_endpoints=False,
-                               seg_algo="AFQ",
                                return_idx=True)
 
     afq_folder = op.join(bids_path, "derivatives/afq/sub-01/ses-01")

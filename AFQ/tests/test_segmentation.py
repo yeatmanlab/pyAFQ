@@ -12,8 +12,12 @@ from dipy.stats.analysis import afq_profile
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 import AFQ.data.fetch as afd
-import AFQ.segmentation as seg
 import AFQ.registration as reg
+import AFQ.bundle_rec.cleaning as abc
+import AFQ.bundle_rec.curvature as abv
+import AFQ.bundle_rec.utils as abu
+import AFQ.bundle_rec.roi as abr
+from AFQ.bundle_rec.recognize import recognize
 
 
 dpd.fetch_stanford_hardi()
@@ -63,12 +67,12 @@ bundles = {'Left Corticospinal': {
                     'cross_midline': None}}
 
 def test_segment():
-    segmentation = seg.Segmentation()
-    segmentation.segment(bundles,
-                         tg,
-                         mapping,
-                         nib.load(hardi_fdata))
-    fiber_groups = segmentation.fiber_groups
+    fiber_groups, _ = recognize(
+        tg,
+        nib.load(hardi_fdata),
+        mapping,
+        bundles,
+        reg_template)
 
     # We asked for 2 fiber groups:
     npt.assert_equal(len(fiber_groups), 2)
@@ -82,7 +86,7 @@ def test_segment():
         CST_R_sl.streamlines, np.eye(4))
     npt.assert_almost_equal(tract_profile, np.ones(100))
 
-    clean_sl = seg.clean_bundle(CST_R_sl)
+    clean_sl = abc.clean_bundle(CST_R_sl)
     npt.assert_equal(len(clean_sl), len(CST_R_sl))
 
 
@@ -101,12 +105,12 @@ def test_segment_no_prob():
                 templates['CST_roi2_R']],
             'cross_midline': False}}
 
-    segmentation = seg.Segmentation()
-    segmentation.segment(bundles_no_prob,
-                         tg,
-                         mapping,
-                         nib.load(hardi_fdata))
-    fiber_groups = segmentation.fiber_groups
+    fiber_groups, _ = recognize(
+        tg,
+        nib.load(hardi_fdata),
+        mapping,
+        bundles_no_prob,
+        reg_template)
 
     # This condition should still hold
     npt.assert_equal(len(fiber_groups), 2)
@@ -115,44 +119,29 @@ def test_segment_no_prob():
 
 def test_segment_return_idx():
     # Test with the return_idx kwarg set to True:
-    segmentation = seg.Segmentation(return_idx=True)
-    segmentation.segment(bundles,
-                         tg,
-                         mapping,
-                         nib.load(hardi_fdata))
-    fiber_groups = segmentation.fiber_groups
+    fiber_groups, _ = recognize(
+        tg,
+        nib.load(hardi_fdata),
+        mapping,
+        bundles,
+        reg_template,
+        return_idx=True)
 
     npt.assert_equal(len(fiber_groups), 2)
     npt.assert_(len(fiber_groups['Right Corticospinal']['sl']) > 0)
     npt.assert_(len(fiber_groups['Right Corticospinal']['idx']) > 0)
 
 
-def test_segment_keep_space():
-    # Test with the return_idx kwarg set to True:
-    segmentation = seg.Segmentation(return_idx=True)
-    # We move the tg to rasmm to make sure that it ends
-    # up there
-    tg.to_rasmm()
-    orig_space = tg.space
-    segmentation.segment(bundles,
-                         tg,
-                         mapping,
-                         nib.load(hardi_fdata),
-                         reset_tg_space=True)
-
-    npt.assert_equal(tg.space, orig_space)
-
-
 def test_segment_sl_curve():
-    sl_disp_0 = seg.sl_curve(streamlines[4], 4)
+    sl_disp_0 = abv.sl_curve(streamlines[4], 4)
     npt.assert_array_almost_equal(
         sl_disp_0,
         [[-0.236384, -0.763855,  0.60054 ],
          [ 0.232594, -0.867859, -0.439   ],
          [ 0.175343,  0.001082, -0.984507]])
 
-    sl_disp_1 = seg.sl_curve(streamlines[2], 4)
-    mean_angle_diff = seg.sl_curve_dist(sl_disp_0, sl_disp_1)
+    sl_disp_1 = abv.sl_curve(streamlines[2], 4)
+    mean_angle_diff = abv.sl_curve_dist(sl_disp_0, sl_disp_1)
     npt.assert_almost_equal(mean_angle_diff, 1.701458, decimal=3)
 
 
@@ -165,7 +154,7 @@ def test_segment_clip_edges():
     bundle_roi_dists[4, :] = [5, 10, 15]
     bundle_roi_dists[10, :] = [3, 6, 9]
     bundle_roi_dists[11, :] = [10, 10, 10]
-    cut_sls = seg._cut_sls_by_dist(
+    cut_sls = abu.cut_sls_by_dist(
         accepted_sls,
         bundle_roi_dists[accepted_ix],
         [0, 2])
@@ -183,14 +172,13 @@ def test_segment_clip_edges():
 @pytest.mark.nightly
 def test_segment_clip_edges_api():
     # Test with the clip_edges kwarg set to True:
-    segmentation = seg.Segmentation(clip_edges=True)
-
-    fiber_groups, _ = segmentation.segment(
-        bundles,
+    fiber_groups, _ = recognize(
         tg,
+        nib.load(hardi_fdata),
         mapping,
-        nib.load(hardi_fdata))
-
+        bundles,
+        reg_template,
+        clip_edges=True)
     npt.assert_equal(len(fiber_groups), 2)
     npt.assert_(len(fiber_groups['Right Corticospinal']) > 0)
 
@@ -198,20 +186,19 @@ def test_segment_clip_edges_api():
 def test_segment_reco():
     # get bundles for reco method
     bundles_reco = afd.read_hcp_atlas(16)
-    bundle_names = ['whole_brain', 'CST_R', 'CST_L']
+    bundle_names = ['CST_R', 'CST_L']
     for key in list(bundles_reco):
         if key not in bundle_names:
             bundles_reco.pop(key, None)
 
     # Try recobundles method
-    segmentation = seg.Segmentation(seg_algo='Reco',
-                                    progressive=False,
-                                    greater_than=10,
-                                    rm_small_clusters=1,
-                                    rng=np.random.RandomState(seed=8))
-    fiber_groups, _ = segmentation.segment(
-        bundles_reco, tg, mapping,
-        nib.load(hardi_fdata))
+    fiber_groups, _ = recognize(
+        tg,
+        nib.load(hardi_fdata),
+        mapping,
+        bundles_reco,
+        reg_template,
+        rng=np.random.RandomState(seed=8))
 
     # This condition should still hold
     npt.assert_equal(len(fiber_groups), 2)
@@ -246,26 +233,23 @@ def test_clean_by_endpoints():
     target_img_end = nib.Nifti1Image(
         np.logical_or(atlas==3, atlas==4).astype(np.float32), np.eye(4))
 
-    clean_idx_start = list(seg.clean_by_endpoints(
+    clean_idx_start = list(abr.clean_by_endpoints(
         sl, target_img_start, 0))
-    clean_idx_end = list(seg.clean_by_endpoints(
+    clean_idx_end = list(abr.clean_by_endpoints(
         sl, target_img_end, -1))
     npt.assert_array_equal(np.logical_and(
         clean_idx_start, clean_idx_end), np.array([1, 1, 0, 0]))
 
     # If tol=1, the third streamline also gets included
-    clean_idx_start = list(seg.clean_by_endpoints(
+    clean_idx_start = list(abr.clean_by_endpoints(
         sl, target_img_start, 0, tol=1))
-    clean_idx_end = list(seg.clean_by_endpoints(
+    clean_idx_end = list(abr.clean_by_endpoints(
         sl, target_img_end, -1, tol=1))
     npt.assert_array_equal(np.logical_and(
         clean_idx_start, clean_idx_end), np.array([1, 1, 1, 0]))
 
 
 def test_exclusion_ROI():
-    segmentation = seg.Segmentation(
-        filter_by_endpoints=False
-    )
     slf_bundle = {
         'Left Superior Longitudinal': {
             'include': [
@@ -286,50 +270,52 @@ def test_exclusion_ROI():
                     [30, 41, 62], [20, 44, 34]]
             ]).astype(float),
         hardi_img, Space.VOX)
-    fiber_groups, _ = segmentation.segment(
-        slf_bundle,
+    fiber_groups, _ = recognize(
         slf_tg,
+        nib.load(hardi_fdata),
         mapping,
-        nib.load(hardi_fdata))
+        slf_bundle,
+        reg_template,
+        filter_by_endpoints=False)
      
     npt.assert_equal(len(fiber_groups["Left Superior Longitudinal"]), 2)
 
     slf_bundle['Left Superior Longitudinal']['exclude'] =\
         [templates["SLFt_roi2_L"]]
 
-    fiber_groups, _ = segmentation.segment(
-        slf_bundle,
+    fiber_groups, _ = recognize(
         slf_tg,
+        nib.load(hardi_fdata),
         mapping,
-        nib.load(hardi_fdata))
+        slf_bundle,
+        reg_template,
+        filter_by_endpoints=False)
 
     npt.assert_equal(len(fiber_groups["Left Superior Longitudinal"]), 1)
 
 
 def test_segment_orientation():
     cleaned_idx = \
-        seg.clean_by_orientation(streamlines, primary_axis=1)
+        abc.clean_by_orientation(streamlines, primary_axis=1)
     npt.assert_equal(np.sum(cleaned_idx), 93)
     cleaned_idx_tol = \
-        seg.clean_by_orientation(streamlines, primary_axis=1, tol=50)
+        abc.clean_by_orientation(streamlines, primary_axis=1, tol=50)
     npt.assert_(np.sum(cleaned_idx_tol) < np.sum(cleaned_idx))
 
     cleaned_idx = \
-        seg.clean_by_orientation(streamlines, primary_axis=2)
+        abc.clean_by_orientation(streamlines, primary_axis=2)
     cleaned_idx_tol = \
-        seg.clean_by_orientation(streamlines, primary_axis=2, tol=33)
+        abc.clean_by_orientation(streamlines, primary_axis=2, tol=33)
     npt.assert_array_equal(cleaned_idx_tol, cleaned_idx)
 
 
 def test_segment_sampled_streamlines():
-
-    # default segmentation
-    segmentation = seg.Segmentation()
-    fiber_groups, _ = segmentation.segment(
-        bundles,
+    fiber_groups, _ = recognize(
         tg,
+        nib.load(hardi_fdata),
         mapping,
-        nib.load(hardi_fdata))
+        bundles,
+        reg_template)
 
     # Already using a subsampled tck
     # the Right Corticospinal has two streamlines and
@@ -340,25 +326,20 @@ def test_segment_sampled_streamlines():
     nb_streamlines = int(len(tg)*0.8)
 
     # sample and segment streamlines
-    sampled_segmentation = seg.Segmentation(
-        nb_streamlines=nb_streamlines
-    )
-
-    sampled_fiber_groups, _ = sampled_segmentation.segment(
-        bundles,
+    sampled_fiber_groups, _ = recognize(
         tg,
+        nib.load(hardi_fdata),
         mapping,
-        nib.load(hardi_fdata))
-
-    # sampled streamlines should equal the sample number
-    npt.assert_equal(len(sampled_segmentation.tg), nb_streamlines)
+        bundles,
+        reg_template,
+        nb_streamlines=nb_streamlines)
 
     # sampled streamlines should be subset of the original streamlines
     npt.assert_(
         np.all(
             np.isin(
-                sampled_segmentation.tg.streamlines._data,
-                tg.streamlines._data
+                sampled_fiber_groups['Right Corticospinal'].streamlines._data,
+                fiber_groups['Right Corticospinal'].streamlines._data
             )
         )
     )
