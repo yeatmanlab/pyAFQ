@@ -136,7 +136,8 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
         # This calculates the Mahalanobis for each streamline/node:
         m_dist = gaussian_weights(
             fgarray, return_mahalnobis=True,
-            n_points=n_points, stat=stat)
+            n_points=n_points, stat=stat,
+            resample=False)
         logger.debug(f"Shape of fgarray: {np.asarray(fgarray).shape}")
         logger.debug(f"Shape of m_dist: {m_dist.shape}")
         logger.debug(f"Maximum m_dist: {np.max(m_dist)}")

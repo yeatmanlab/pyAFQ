@@ -153,7 +153,7 @@ def tensor_odf(evals, evecs, sphere, num_batches=100):
 
 
 def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
-                     stat=np.mean):
+                     stat=np.mean, resample=True):
     """
     Calculate weights for each streamline/node in a bundle, based on a
     Mahalanobis distance from the core the bundle, at that node (mean, per
@@ -173,7 +173,10 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
         The statistic used to calculate the central tendency of streamlines in
         each node. Can be one of {`np.mean`, `np.median`} or other functions
         that have similar API. Default: `np.mean`
-
+    resample : bool, optional
+        Whether its necessary to resample the streamlines to the same number
+        of points. Only set to False if they are already resampled.
+        Default: True.
     Returns
     -------
     w : array of shape (n_streamlines, n_points)
@@ -182,27 +185,18 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
         coordinates at that node position across streamlines.
 
     """
-
-    # Resample to same length for each streamline
-    # if necessary
-    resample = False
-    if isinstance(bundle, np.ndarray):
-        if len(bundle.shape) > 2:
-            if bundle.shape[1] != n_points:
-                sls = bundle.tolist()
-                sls = [np.asarray(item) for item in sls]
-                resample = True
-    else:
-        resample = True
     if resample:
+        if isinstance(bundle, np.ndarray):
+            bundle = bundle.tolist()
+        if isinstance(bundle, list):
+            bundle = [np.asarray(item) for item in bundle]
         sls = np.asarray(set_number_of_points(bundle, n_points))
     else:
         sls = bundle
 
     n_sls, n_nodes, _ = sls.shape
 
-    # Only do this with sufficient streamlines:
-    if n_sls < 20:
+    if n_sls < 15:  # Cov^-1 unstable under this amount
         weights = np.ones((n_sls, n_nodes))
         if return_mahalnobis:
             return np.full((n_sls, n_nodes), np.nan)
@@ -216,6 +210,8 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
         # variance covariance of this node across the different streamlines,
         # reorganized as an upper diagonal matrix for expected Mahalanobis
         cov = np.cov(sls[:, i, :].T, ddof=0)
+        while np.any(np.linalg.eigvals(cov) < 0):
+            cov += np.eye(cov.shape[0]) * 1e-12
 
         # calculate Mahalanobis for node in every fiber
         if np.any(cov > 0):
