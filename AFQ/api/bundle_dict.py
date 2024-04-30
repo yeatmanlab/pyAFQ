@@ -683,7 +683,6 @@ class _BundleEntry(Mapping):
             "in the BundleDict."))
 
 
-# TODO: refactor the recobundles parts of this
 class BundleDict(MutableMapping):
     """
     Create a bundle dictionary, needed for the segmentation.
@@ -831,6 +830,10 @@ class BundleDict(MutableMapping):
                     roi_or_sl,
                     'same',
                     bbox_valid_check=False).streamlines
+        elif isinstance(roi_or_sl, nib.Nifti1Image):
+            return afd.read_resample_roi(
+                roi_or_sl,
+                resample_to=resample_to)
         else:
             return roi_or_sl
 
