@@ -32,6 +32,7 @@ from time import time
 import nibabel as nib
 from PIL import Image
 from s3bids.utils import S3BIDSStudy
+import glob
 
 from bids.layout import BIDSLayout, BIDSLayoutIndexer
 try:
@@ -932,6 +933,12 @@ class ParallelGroupAFQ():
         self.parallel_params = orig.parallel_params
         self.pAFQ_kwargs = [pAFQ.kwargs for pAFQ in orig.pAFQ_list]
 
+        self.finishing_params = dict()
+        self.finishing_params["args"] = args
+        self.finishing_params["kwargs"] = kwargs
+        self.finishing_params["output_dirs"] = \
+            [pAFQ.kwargs["output_dir"] for pAFQ in orig.pAFQ_list]
+
     def export_all(self, viz=True, afqbrowser=True, xforms=True, indiv=True):
         """ Exports all the possible outputs
 
@@ -958,14 +965,30 @@ class ParallelGroupAFQ():
             Default: True
         """
         @pydra.mark.task
-        def export_sub(pAFQ_kwargs, viz, xforms, indiv):
+        def export_sub(
+            pAFQ_kwargs,
+            finishing_params,
+            viz, afqbrowser,
+            xforms,
+            indiv
+        ):
             pAFQ = ParticipantAFQ(**pAFQ_kwargs)
             pAFQ.export_all(viz, xforms, indiv)
+
+            for dir in finishing_params["output_dirs"]:
+                if not glob.glob(op.join(dir, "*_desc-profiles_dwi.csv")):
+                    return
+
+            gAFQ = GroupAFQ(*finishing_params["args"],
+                            **finishing_params["kwargs"])
+            gAFQ.export_all(viz, afqbrowser, xforms, indiv)
 
         # Submit to pydra
         export_sub_task = export_sub(
             pAFQ_kwargs=self.pAFQ_kwargs,
+            finishing_params=self.finishing_params,
             viz=viz,
+            afqbrowser=afqbrowser,
             xforms=xforms,
             indiv=indiv,
             cache_dir=self.parallel_params["cache_dir"]
