@@ -100,7 +100,7 @@ class ParticipantAFQ(object):
                 "did you mean tracking_params ?"))
 
         self.logger = logging.getLogger('AFQ')
-        self.bids_info = _bids_info
+        self.output_dir = output_dir
 
         """
         bmag : int
@@ -155,10 +155,11 @@ class ParticipantAFQ(object):
                         raise ValueError("Not enough bvals for dki_md")
 
         self.kwargs = dict(
-            dwi_data_file=dwi_data_file,
-            bval_file=bval_file,
-            bvec_file=bvec_file,
-            output_dir=output_dir,
+            dwi_path=dwi_data_file,
+            bval=bval_file,
+            bvec=bvec_file,
+            results_dir=output_dir,
+            bids_info=_bids_info,
             base_fname=get_base_fname(output_dir, dwi_data_file),
             **kwargs)
         self.make_workflow()
