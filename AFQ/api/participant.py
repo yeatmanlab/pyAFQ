@@ -23,6 +23,10 @@ from AFQ.tasks.utils import get_base_fname
 from AFQ.utils.path import apply_cmd_to_afq_derivs
 from AFQ.viz.utils import BEST_BUNDLE_ORIENTATIONS, trim, get_eye
 
+from AFQ.definitions.image import ScalarImage
+import dipy.core.gradients as dpg
+from dipy.core.gradients import unique_bvals_magnitude
+
 
 __all__ = ["ParticipantAFQ"]
 
@@ -96,14 +100,65 @@ class ParticipantAFQ(object):
                 "did you mean tracking_params ?"))
 
         self.logger = logging.getLogger('AFQ')
-        self.output_dir = output_dir
+        self.bids_info = _bids_info
+
+        """
+        bmag : int
+            From dipy.core.gradients:
+            The order of magnitude that the bvalues have to differ to be
+            considered an unique b-value. B-values are also rounded up to
+            this order of magnitude. Default: derive this value from the
+            maximal b-value provided: $bmag=log_{10}(max(bvals)) - 1$.
+        """
+
+        if "bmag" not in kwargs:
+            kwargs.bmag = None
+
+        gtab = dpg.gradient_table(bval_file, bvec_file)
+        unique_bvals = unique_bvals_magnitude(gtab.bvals, kwargs.bmag)
+        
+        if len(unique_bvals) < 3:
+            if "scalars" in kwargs:
+                for ii, scalar in enumerate(kwargs["scalars"]):
+                    if scalar == "dki_fa":
+                        # kwargs["scalars"][ii] = "dti_fa"
+                        # self.logger.info("Not enough bvals, dki -> dti")
+                        raise ValueError("Not enough bvals for dki_fa")
+                    if scalar == "dki_md":
+                        # kwargs["scalars"][ii] = "dti_md"
+                        # self.logger.info("Not enough bvals, dki -> dti")
+                        raise ValueError("Not enough bvals for dki_md")
+            if "tracking_params" in kwargs:
+                if "seed_mask" in kwargs["tracking_params"]:
+                    seed_mask = kwargs["tracking_params"]["seed_mask"]
+                    if seed_mask == ScalarImage("dki_fa"):
+                        # kwargs["tracking_params"]["seed_mask"] = \
+                        #     ScalarImage("dti_fa")
+                        # self.logger.info("Not enough bvals, dki -> dti")
+                        raise ValueError("Not enough bvals for dki_fa")
+                    if seed_mask == ScalarImage("dki_md"):
+                        # kwargs["tracking_params"]["seed_mask"] = \
+                        #     ScalarImage("dti_md")
+                        # self.logger.info("Not enough bvals, dki -> dti")
+                        raise ValueError("Not enough bvals for dki_md")
+                if "stop_mask" in kwargs["tracking_params"]:
+                    stop_mask = kwargs["tracking_params"]["stop_mask"]
+                    if stop_mask == ScalarImage("dki_fa"):
+                        # kwargs["tracking_params"]["stop_mask"] = \
+                        #     ScalarImage("dti_fa")
+                        # self.logger.info("Not enough bvals, dki -> dti")
+                        raise ValueError("Not enough bvals for dki_fa")
+                    if stop_mask == ScalarImage("dki_md"):
+                        # kwargs["tracking_params"]["stop_mask"] = \
+                        #     ScalarImage("dti_md")
+                        # self.logger.info("Not enough bvals, dki -> dti")
+                        raise ValueError("Not enough bvals for dki_md")
 
         self.kwargs = dict(
-            dwi_path=dwi_data_file,
-            bval=bval_file,
-            bvec=bvec_file,
-            results_dir=output_dir,
-            bids_info=_bids_info,
+            dwi_data_file=dwi_data_file,
+            bval_file=bval_file,
+            bvec_file=bvec_file,
+            output_dir=output_dir,
             base_fname=get_base_fname(output_dir, dwi_data_file),
             **kwargs)
         self.make_workflow()
