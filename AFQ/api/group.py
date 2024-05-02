@@ -42,8 +42,6 @@ try:
 except ImportError:
     using_afqb = False
 
-from dipy.utils.optpkg import optional_package
-
 
 __all__ = ["GroupAFQ", "get_afq_bids_entities_fname"]
 
