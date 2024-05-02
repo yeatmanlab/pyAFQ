@@ -25,7 +25,6 @@ from AFQ.viz.utils import BEST_BUNDLE_ORIENTATIONS, trim, get_eye
 
 from AFQ.definitions.image import ScalarImage
 import dipy.core.gradients as dpg
-from dipy.core.gradients import unique_bvals_magnitude
 
 
 __all__ = ["ParticipantAFQ"]
@@ -115,8 +114,8 @@ class ParticipantAFQ(object):
             kwargs.bmag = None
 
         gtab = dpg.gradient_table(bval_file, bvec_file)
-        unique_bvals = unique_bvals_magnitude(gtab.bvals, kwargs.bmag)
-        
+        unique_bvals = dpg.unique_bvals_magnitude(gtab.bvals, kwargs.bmag)
+
         if len(unique_bvals) < 3:
             if "scalars" in kwargs:
                 for ii, scalar in enumerate(kwargs["scalars"]):
