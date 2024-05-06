@@ -120,15 +120,14 @@ class FnirtMap(Definition):
             bids_layout, from_path, self.space_filters, self.space_suffix,
             session, subject, required=required)
 
-        self.fnames[session][subject] = (nearest_warp, nearest_space)
+        self.fnames[from_path] = (nearest_warp, nearest_space)
 
-    def get_for_subses(self, base_fname, dwi, bids_info, reg_subject,
+    def get_for_subses(self, base_fname, dwi, dwi_data_file, reg_subject,
                        reg_template):
         if self._from_path:
             nearest_warp, nearest_space = self.fnames
         else:
-            nearest_warp, nearest_space = self.fnames[
-                bids_info['session']][bids_info['subject']]
+            nearest_warp, nearest_space = self.fnames[dwi_data_file]
 
         our_templ = reg_template
         subj = Image(dwi)
@@ -182,7 +181,7 @@ class IdentityMap(Definition):
     def __init__(self):
         pass
 
-    def get_for_subses(self, base_fname, dwi, bids_info, reg_subject,
+    def get_for_subses(self, base_fname, dwi, dwi_data_file, reg_subject,
                        reg_template):
         return ConformedAffineMapping(
             np.identity(4),
@@ -231,7 +230,7 @@ class GeneratedMapMixin(object):
             write_json(meta_fname, meta)
         return prealign_file if save else np.load(prealign_file)
 
-    def get_for_subses(self, base_fname, dwi, bids_info, reg_subject,
+    def get_for_subses(self, base_fname, dwi, dwi_data_file, reg_subject,
                        reg_template, subject_sls=None, template_sls=None):
         mapping_file, meta_fname = self.get_fnames(
             self.extension, base_fname)

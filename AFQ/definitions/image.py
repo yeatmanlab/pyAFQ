@@ -138,16 +138,13 @@ class ImageFile(ImageDefinition):
         if nearest_image is None:
             return False
 
-        if session not in self.fnames:
-            self.fnames[session] = {}
-        self.fnames[session][subject] = nearest_image
+        self.fnames[from_path] = nearest_image
 
-    def get_path_data_affine(self, bids_info):
+    def get_path_data_affine(self, dwi_path):
         if self._from_path:
             image_file = self.fname
         else:
-            image_file = self.fnames[
-                bids_info['session']][bids_info['subject']]
+            image_file = self.fnames[dwi_path]
         image_img = nib.load(image_file)
         return image_file, image_img.get_fdata(), image_img.affine
 
@@ -159,10 +156,10 @@ class ImageFile(ImageDefinition):
         return name_from_path(self.fname) if self._from_path else self.suffix
 
     def get_image_getter(self, task_name):
-        def _image_getter_helper(dwi, bids_info):
+        def _image_getter_helper(dwi, dwi_data_file):
             # Load data
             image_file, image_data_orig, image_affine = \
-                self.get_path_data_affine(bids_info)
+                self.get_path_data_affine(dwi_data_file)
 
             # Apply any conditions on the data
             image_data, meta = self.apply_conditions(
@@ -178,11 +175,11 @@ class ImageFile(ImageDefinition):
                 image_data.astype(np.float32),
                 dwi.affine), meta
         if task_name == "data":
-            def image_getter(dwi, bids_info):
-                return _image_getter_helper(dwi, bids_info)
+            def image_getter(dwi, dwi_data_file):
+                return _image_getter_helper(dwi, dwi_data_file)
         else:
-            def image_getter(data_imap, bids_info):
-                return _image_getter_helper(data_imap["dwi"], bids_info)
+            def image_getter(data_imap, dwi_data_file):
+                return _image_getter_helper(data_imap["dwi"], dwi_data_file)
         return image_getter
 
 

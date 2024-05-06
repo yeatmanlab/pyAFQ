@@ -3,6 +3,8 @@ import warnings
 import tempfile
 
 from AFQ.definitions.mapping import SynMap
+from AFQ.definitions.utils import Definition
+import AFQ.api.bundle_dict as abd
 warnings.simplefilter(action='ignore', category=FutureWarning)  # noqa
 
 import logging
@@ -65,12 +67,11 @@ def get_afq_bids_entities_fname():
 class _ParticipantAFQInputs:
     def __init__(
             self, dwi_data_file, bval_file, bvec_file, results_dir,
-            _bids_info, kwargs):
+            kwargs):
         self.dwi_data_file = dwi_data_file
         self.bval_file = bval_file
         self.bvec_file = bvec_file
         self.results_dir = results_dir
-        self._bids_info = _bids_info
         self.kwargs = kwargs
 
 
@@ -311,6 +312,73 @@ class GroupAFQ(object):
                 if suffix is not None:
                     bids_filters["suffix"] = suffix
 
+                # Call find path for all definitions
+                for key, value in this_kwargs.items():
+                    if key == "scalars":
+                        for scalar in this_kwargs["scalars"]:
+                            if isinstance(scalar, Definition):
+                                scalar_found = scalar.find_path(
+                                    bids_layout,
+                                    dwi_data_file,
+                                    subject,
+                                    session,
+                                    required=False)
+                                if scalar_found is False:
+                                    this_kwargs["scalars"].remove(scalar)
+                    elif key == "import_tract":
+                        if isinstance(this_kwargs["import_tract"], dict):
+                            it_res = \
+                                bids_layout.get(
+                                    subject=subject,
+                                    session=session,
+                                    extension=[
+                                        '.trk',
+                                        '.tck',
+                                        '.vtk',
+                                        '.fib',
+                                        '.dpy'],
+                                    return_type='filename',
+                                    **this_kwargs["import_tract"])
+                            if len(it_res) < 1:
+                                raise ValueError((
+                                    "No custom tractography found for"
+                                    f" subject {subject}"
+                                    " and session "
+                                    f"{session}."))
+                            elif len(it_res) > 1:
+                                this_kwargs["import_tract"] = it_res[0]
+                                logger.warning((
+                                    f"Multiple viable custom tractographies found for"
+                                    f" subject "
+                                    f"{subject} and session "
+                                    f"{session}. Will use: {it_res[0]}"))
+                            else:
+                                this_kwargs["import_tract"] = it_res[0]
+                    elif isinstance(value, dict):
+                        for _, subvalue in value.items():
+                            if isinstance(subvalue, Definition):
+                                subvalue.find_path(
+                                    bids_layout,
+                                    dwi_data_file,
+                                    subject,
+                                    session)
+                    elif isinstance(value, Definition):
+                        value.find_path(
+                            bids_layout,
+                            dwi_data_file,
+                            subject,
+                            session)
+
+                # call find path for all ROIs
+                if "bundle_info" in this_kwargs and isinstance(
+                        this_kwargs["bundle_info"], abd.BundleDict):
+                    for b_name in this_kwargs["bundle_info"].bundle_names:
+                        this_kwargs["bundle_info"].apply_to_rois(
+                            b_name,
+                            this_kwargs["bundle_info"]._use_bids_info,
+                            bids_layout, bids_path, subject, session,
+                            dry_run=False)
+
                 self.valid_sub_list.append(subject)
                 self.valid_ses_list.append(str(session))
 
@@ -318,17 +386,12 @@ class GroupAFQ(object):
                     dwi_data_file,
                     bval_file, bvec_file,
                     results_dir,
-                    {
-                        "bids_layout": bids_layout,
-                        "subject": subject,
-                        "session": session},
                     this_kwargs)
                 this_pAFQ = ParticipantAFQ(
                     this_pAFQ_inputs.dwi_data_file,
                     this_pAFQ_inputs.bval_file,
                     this_pAFQ_inputs.bvec_file,
                     this_pAFQ_inputs.results_dir,
-                    this_pAFQ_inputs._bids_info,
                     **this_pAFQ_inputs.kwargs)
                 self.wf_dict[subject][str(session)] = this_pAFQ.wf_dict
                 self.pAFQ_list.append(this_pAFQ)
@@ -993,14 +1056,18 @@ class ParallelGroupAFQ():
         """
 
         @pydra.mark.task
-        def export_sub(pAFQ_kwargs, attr_name, collapse):
-            pAFQ = ParticipantAFQ(**pAFQ_kwargs)
-            pAFQ.export(attr_name, collapse)
+        def export_sub(pAFQ_kwargs, attr_name):
+            pAFQ = ParticipantAFQ(
+                pAFQ_kwargs.dwi_data_file,
+                pAFQ_kwargs.bval_file,
+                pAFQ_kwargs.bvec_file,
+                pAFQ_kwargs.results_dir,
+                **pAFQ_kwargs.kwargs)
+            pAFQ.export(attr_name)
 
         # Submit to pydra
         export_sub_task = export_sub(
             attr_name=attr_name,
-            collapse=collapse,
             cache_dir=self.parallel_params["cache_dir"]
         ).split("pAFQ_kwargs", pAFQ_kwargs=self.pAFQ_kwargs)
         self._submit_pydra(export_sub_task)
@@ -1039,7 +1106,12 @@ class ParallelGroupAFQ():
             xforms,
             indiv
         ):
-            pAFQ = ParticipantAFQ(**pAFQ_kwargs)
+            pAFQ = ParticipantAFQ(
+                pAFQ_kwargs.dwi_data_file,
+                pAFQ_kwargs.bval_file,
+                pAFQ_kwargs.bvec_file,
+                pAFQ_kwargs.results_dir,
+                **pAFQ_kwargs.kwargs)
             pAFQ.export_all(viz, xforms, indiv)
 
             for dir in finishing_params["output_dirs"]:

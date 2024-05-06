@@ -34,10 +34,9 @@ class ParticipantAFQ(object):
                  dwi_data_file,
                  bval_file, bvec_file,
                  output_dir,
-                 _bids_info=None,
                  **kwargs):
         """
-        Initialize a ParticipantAFQ object from a BIDS dataset.
+        Initialize a ParticipantAFQ object.
 
         Parameters
         ----------
@@ -49,10 +48,6 @@ class ParticipantAFQ(object):
             Path to bvec file.
         output_dir : str
             Path to output directory.
-        _bids_info : dict or None, optional
-            This should be left as None in most cases. It
-            is used by GroupAFQ to provide information about
-            the BIDS layout to each participant.
         kwargs : additional optional parameters
             You can set additional parameters for any step
             of the process. See :ref:`usage/kwargs` for more details.
@@ -71,9 +66,6 @@ class ParticipantAFQ(object):
         In tracking_params, parameters with the suffix mask which are also
         an image from AFQ.definitions.image will be handled automatically by
         the api.
-
-        It is recommended that you leave the bids_info parameter as None,
-        and instead pass in the paths to the files you want to use directly.
         """
         if not isinstance(output_dir, str):
             raise TypeError(
@@ -96,7 +88,6 @@ class ParticipantAFQ(object):
                 "did you mean tracking_params ?"))
 
         self.logger = logging.getLogger('AFQ')
-        self.bids_info = _bids_info
 
         self.kwargs = dict(
             dwi_data_file=dwi_data_file,
@@ -112,25 +103,22 @@ class ParticipantAFQ(object):
         if "mapping_definition" in self.kwargs and isinstance(
                 self.kwargs["mapping_definition"], SlrMap):
             plans = {  # if using SLR map, do tractography first
-                "data": get_data_plan(self.kwargs, self.bids_info),
+                "data": get_data_plan(self.kwargs),
                 "tractography": get_tractography_plan(
-                    self.kwargs,
-                    self.bids_info
+                    self.kwargs
                 ),
                 "mapping": get_mapping_plan(
                     self.kwargs,
-                    self.bids_info,
                     use_sls=True
                 ),
                 "segmentation": get_segmentation_plan(self.kwargs),
                 "viz": get_viz_plan(self.kwargs)}
         else:
             plans = {  # Otherwise, do mapping first
-                "data": get_data_plan(self.kwargs, self.bids_info),
-                "mapping": get_mapping_plan(self.kwargs, self.bids_info),
+                "data": get_data_plan(self.kwargs),
+                "mapping": get_mapping_plan(self.kwargs),
                 "tractography": get_tractography_plan(
-                    self.kwargs,
-                    self.bids_info
+                    self.kwargs
                 ),
                 "segmentation": get_segmentation_plan(self.kwargs),
                 "viz": get_viz_plan(self.kwargs)}
@@ -139,7 +127,6 @@ class ParticipantAFQ(object):
         previous_data = {}
         for name, plan in plans.items():
             previous_data[f"{name}_imap"] = plan(
-                bids_info=self.bids_info,
                 **self.kwargs,
                 **previous_data)
 

@@ -919,7 +919,7 @@ def brain_mask(b0, brain_mask_definition=None):
 
 @pimms.calc("bundle_dict", "reg_template")
 def get_bundle_dict(segmentation_params,
-                    brain_mask, bids_info, b0,
+                    brain_mask, b0,
                     bundle_info=None, reg_template_spec="mni_T1"):
     """
     Dictionary defining the different bundles to be segmented,
@@ -996,16 +996,10 @@ def get_bundle_dict(segmentation_params,
             seg_algo=segmentation_params["seg_algo"],
             resample_to=reg_template)
 
-    if bids_info is not None:
-        bundle_dict.set_bids_info(
-            bids_info["bids_layout"],
-            b0,
-            bids_info["subject"],
-            bids_info["session"])
     return bundle_dict, reg_template
 
 
-def get_data_plan(kwargs, bids_info):
+def get_data_plan(kwargs):
     if "scalars" in kwargs and not (
         isinstance(kwargs["scalars"], list) and isinstance(
             kwargs["scalars"][0], (str, Definition))):
@@ -1051,12 +1045,6 @@ def get_data_plan(kwargs, bids_info):
         if not isinstance(bm_def, Definition):
             raise TypeError(
                 "brain_mask_definition must be a Definition")
-        if bids_info is not None:
-            bm_def.find_path(
-                bids_info["bids_layout"],
-                kwargs["dwi_data_file"],
-                bids_info["subject"],
-                bids_info["session"])
         data_tasks["brain_mask_res"] = pimms.calc("brain_mask")(
             as_file((
                 f'_desc-{str_to_desc(bm_def.get_name())}'

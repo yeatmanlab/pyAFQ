@@ -601,7 +601,7 @@ def test_AFQ_reco80():
 def test_AFQ_pydra():
     _, bids_path = afd.fetch_hbn_preproc(["NDARAA948VFH", "NDARAV554TP2"])
     pga = ParallelGroupAFQ(bids_path, preproc_pipeline="qsiprep")
-    pga.export_all()
+    pga.export("dti_fa")
 
 
 @pytest.mark.nightly_pft

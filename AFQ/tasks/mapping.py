@@ -71,7 +71,7 @@ def export_rois(base_fname, output_dir, data_imap, mapping):
 
 
 @pimms.calc("mapping")
-def mapping(base_fname, dwi_data_file, reg_subject, data_imap, bids_info,
+def mapping(base_fname, dwi_data_file, reg_subject, data_imap,
             mapping_definition=None):
     """
     mapping from subject to template space.
@@ -93,19 +93,13 @@ def mapping(base_fname, dwi_data_file, reg_subject, data_imap, bids_info,
         raise TypeError(
             "mapping must be a mapping defined"
             + " in `AFQ.definitions.mapping`")
-    if bids_info is not None:
-        mapping_definition.find_path(
-            bids_info["bids_layout"],
-            dwi_data_file,
-            bids_info["subject"],
-            bids_info["session"])
     return mapping_definition.get_for_subses(
-        base_fname, data_imap["dwi"], bids_info,
+        base_fname, data_imap["dwi"], dwi_data_file,
         reg_subject, reg_template)
 
 
 @pimms.calc("mapping")
-def sls_mapping(base_fname, dwi_data_file, reg_subject, data_imap, bids_info,
+def sls_mapping(base_fname, dwi_data_file, reg_subject, data_imap,
                 tractography_imap, mapping_definition=None):
     """
     mapping from subject to template space.
@@ -127,12 +121,6 @@ def sls_mapping(base_fname, dwi_data_file, reg_subject, data_imap, bids_info,
         raise TypeError(
             "mapping must be a mapping defined"
             + " in `AFQ.definitions.mapping`")
-    if bids_info is not None:
-        mapping_definition.find_path(
-            bids_info["bids_layout"],
-            dwi_data_file,
-            bids_info["subject"],
-            bids_info["session"])
     streamlines_file = tractography_imap["streamlines"]
     tg = load_tractogram(
         streamlines_file, reg_subject,
@@ -151,7 +139,8 @@ def sls_mapping(base_fname, dwi_data_file, reg_subject, data_imap, bids_info,
         atlas_fname,
         'same', bbox_valid_check=False)
     return mapping_definition.get_for_subses(
-        base_fname, data_imap["dwi"], bids_info,
+        base_fname, data_imap["dwi"],
+        dwi_data_file,
         reg_subject, reg_template,
         subject_sls=tg.streamlines,
         template_sls=hcp_atlas.streamlines)
@@ -200,7 +189,7 @@ def get_reg_subject(data_imap,
     return img
 
 
-def get_mapping_plan(kwargs, bids_info, use_sls=False):
+def get_mapping_plan(kwargs, use_sls=False):
     mapping_tasks = with_name([
         export_registered_b0, template_xform, export_rois, mapping,
         get_reg_subject])
@@ -208,38 +197,18 @@ def get_mapping_plan(kwargs, bids_info, use_sls=False):
     # add custom scalars
     for scalar in kwargs["scalars"]:
         if isinstance(scalar, Definition):
-            if bids_info is None:
-                scalar.find_path(
-                    None,
-                    kwargs["dwi_data_file"],
-                    None,
-                    None)
-                scalar_found = True
-            else:
-                scalar_found = scalar.find_path(
-                    bids_info["bids_layout"],
-                    kwargs["dwi_data_file"],
-                    bids_info["subject"],
-                    bids_info["session"],
-                    required=False)
-            if scalar_found != False:
-                mapping_tasks[f"{scalar.get_name()}_res"] =\
-                    pimms.calc(f"{scalar.get_name()}")(
-                        as_file((
-                            f'_desc-{str_to_desc(scalar.get_name())}'
-                            '_dwi.nii.gz'))(
-                                scalar.get_image_getter("mapping")))
+            mapping_tasks[f"{scalar.get_name()}_res"] =\
+                pimms.calc(f"{scalar.get_name()}")(
+                    as_file((
+                        f'_desc-{str_to_desc(scalar.get_name())}'
+                        '_dwi.nii.gz'))(
+                            scalar.get_image_getter("mapping")))
 
     if use_sls:
         mapping_tasks["mapping_res"] = sls_mapping
 
     reg_ss = kwargs.get("reg_subject_spec", None)
     if isinstance(reg_ss, ImageDefinition):
-        reg_ss.find_path(
-            bids_info["bids_layout"],
-            kwargs["dwi_data_file"],
-            bids_info["subject"],
-            bids_info["session"])
         del kwargs["reg_subject_spec"]
         mapping_tasks["reg_subject_spec_res"] = pimms.calc("reg_subject_spec")(
             as_file((
