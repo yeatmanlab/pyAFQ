@@ -211,49 +211,6 @@ def recognize(
         bundle_decisions, np.ones((n_streamlines, 1))), axis=1)
     bundle_decisions = np.argmax(bundle_decisions, -1)
 
-    # Helper functions for formatting the results
-    def _return_empty(bundle_name):
-        """
-        Helper function to return an empty dict under
-        some conditions.
-        """
-        if return_idx:
-            fiber_groups[bundle_name] = {}
-            fiber_groups[bundle_name]['sl'] = StatefulTractogram(
-                [], img, Space.VOX)
-            fiber_groups[bundle_name]['idx'] = np.array([])
-        else:
-            fiber_groups[bundle_name] = StatefulTractogram(
-                [], img, Space.VOX)
-
-    def _add_bundle_to_fiber_group(b_name, sl, idx, to_flip):
-        """
-        Helper function to add a bundle to a fiber group.
-        """
-        sl = abu.flip_sls(
-            sl, to_flip,
-            in_place=False)
-
-        sl = StatefulTractogram(
-            sl,
-            img,
-            Space.VOX)
-
-        if return_idx:
-            fiber_groups[b_name] = {}
-            fiber_groups[b_name]['sl'] = sl
-            fiber_groups[b_name]['idx'] = idx
-        else:
-            fiber_groups[b_name] = sl
-
-    def _add_bundle_to_meta(bundle_name, b_def):
-        # remove keys that can never be serialized
-        for key in [
-                'include', 'exclude', 'prob_map',
-                'start', 'end', 'curvature']:
-            b_def.pop(key, None)
-        meta[bundle_name] = b_def
-
     # We do another round through, so that we can orient all the
     # streamlines within a bundle in the same orientation with respect to
     # the ROIs. This order is ARBITRARY but CONSISTENT (going from ROI0
@@ -269,9 +226,9 @@ def recognize(
             if "bundlesection" in bundle_dict.get_b_info(bundle):
                 for sb_name in bundle_dict.get_b_info(bundle)[
                         "bundlesection"]:
-                    _return_empty(sb_name)
+                    _return_empty(sb_name, return_idx, fiber_groups, img)
             else:
-                _return_empty(bundle)
+                _return_empty(bundle, return_idx, fiber_groups, img)
             continue
 
         # Use a list here, because ArraySequence doesn't support item
@@ -296,10 +253,58 @@ def recognize(
                     sb_include_cuts, in_place=False)
                 _add_bundle_to_fiber_group(
                     sb_name, bundlesection_select_sl, select_idx,
-                    to_flip)
+                    to_flip, return_idx, fiber_groups, img)
                 _add_bundle_to_meta(sb_name, b_def)
         else:
             _add_bundle_to_fiber_group(
-                bundle, select_sl, select_idx, to_flip)
-            _add_bundle_to_meta(bundle, b_def)
+                bundle, select_sl, select_idx, to_flip,
+                return_idx, fiber_groups, img)
+            _add_bundle_to_meta(bundle, b_def, meta)
     return fiber_groups, meta
+
+
+# Helper functions for formatting the results
+def _return_empty(bundle_name, return_idx, fiber_groups, img):
+    """
+    Helper function to return an empty dict under
+    some conditions.
+    """
+    if return_idx:
+        fiber_groups[bundle_name] = {}
+        fiber_groups[bundle_name]['sl'] = StatefulTractogram(
+            [], img, Space.VOX)
+        fiber_groups[bundle_name]['idx'] = np.array([])
+    else:
+        fiber_groups[bundle_name] = StatefulTractogram(
+            [], img, Space.VOX)
+
+
+def _add_bundle_to_fiber_group(b_name, sl, idx, to_flip,
+                               return_idx, fiber_groups, img):
+    """
+    Helper function to add a bundle to a fiber group.
+    """
+    sl = abu.flip_sls(
+        sl, to_flip,
+        in_place=False)
+
+    sl = StatefulTractogram(
+        sl,
+        img,
+        Space.VOX)
+
+    if return_idx:
+        fiber_groups[b_name] = {}
+        fiber_groups[b_name]['sl'] = sl
+        fiber_groups[b_name]['idx'] = idx
+    else:
+        fiber_groups[b_name] = sl
+
+
+def _add_bundle_to_meta(bundle_name, b_def, meta):
+    # remove keys that can never be serialized
+    for key in [
+            'include', 'exclude', 'prob_map',
+            'start', 'end', 'curvature']:
+        b_def.pop(key, None)
+    meta[bundle_name] = b_def
