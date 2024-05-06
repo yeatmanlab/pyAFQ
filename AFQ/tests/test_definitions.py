@@ -62,7 +62,7 @@ def test_find_path(subject, session):
     image_file = ImageFile(suffix="seg", filters={'scope': 'synthetic'})
     image_file.find_path(bids_layout, test_dwi_path, subject, session)
 
-    assert image_file.fnames[session][subject] == op.join(
+    assert image_file.fnames[test_dwi_path] == op.join(
         bids_dir, "derivatives", "dmriprep", "sub-" + subject,
         "ses-" + session, "anat", "seg.nii.gz"
     )
