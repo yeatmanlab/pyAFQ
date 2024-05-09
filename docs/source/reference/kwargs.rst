@@ -181,7 +181,10 @@ tracking_params: dict, optional
 import_tract: dict or str or None, optional
 	BIDS filters for inputing a user made tractography file,
 	or a path to the tractography file. If None, DIPY is used
-	to generate the tractography.
+	to generate the tractography. Note that if you are importing 
+	tractography, you do not need to specify tracking_params as pyAFQ
+	will just load the provided tractogram rather than perform
+	tractography again.
 	Default: None
 
 tractography_ngpus: int, optional
