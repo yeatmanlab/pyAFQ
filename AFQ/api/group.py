@@ -1029,6 +1029,7 @@ class ParallelGroupAFQ():
                 **self.parallel_params["submitter_params"],
             ) as sub:
                 sub(runnable=runnable)
+        # Addresses https://github.com/nipype/pydra/issues/630
         except AttributeError as e:
             if "'NoneType' object has no attribute 'replace'" not in str(e):
                 raise
