@@ -161,6 +161,8 @@ class GroupAFQ(object):
         if not isinstance(bids_layout_kwargs, dict):
             raise TypeError("bids_layout_kwargs must be a dict")
 
+        parallel_params["engine"] = parallel_params.get("engine", "serial")
+
         self.logger = logger
 
         self.parallel_params = parallel_params
@@ -1006,11 +1008,11 @@ class ParallelGroupAFQ():
     def __init__(self, *args, **kwargs):
         orig = GroupAFQ(*args, **kwargs)
 
-        if "submitter_params" not in orig.parallel_params:
-            orig.parallel_params["submitter_params"] = {"plugin": "cf"}
-
-        if "cache_dir" not in orig.parallel_params:
-            orig.parallel_params["cache_dir"] = None
+        orig.parallel_params["submitter_params"] = \
+            orig.parallel_params.get("submitter_params", {"plugin": "cf"})
+        
+        orig.parallel_params["cache_dir"] = \
+            orig.parallel_params.get("cache_dir", None)
 
         self.parallel_params = orig.parallel_params
         self.pAFQ_kwargs = orig.pAFQ_inputs_list
