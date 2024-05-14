@@ -159,9 +159,10 @@ def streamlines(data_imap, seed, stop,
 
                 def trx_from_lazy_tractogram(self, lazyt_id, seed, dtype_dict):
                     id = self.objects[lazyt_id]
-                    return self.TrxFile.from_lazy_tractogram(id,
-                                                             seed,
-                                                             dtype_dict)
+                    return self.TrxFile.from_lazy_tractogram(
+                        id,
+                        seed,
+                        dtype_dict=dtype_dict)
 
                 def create_lazyt(self, id, *args, **kwargs):
                     self.objects[id] = self.aft.track(*args, **kwargs)
@@ -177,7 +178,7 @@ def streamlines(data_imap, seed, stop,
             tracking_params_copy['n_seeds'] = this_tracking_params['n_seeds'] // num_chunks
             # create lazyt inside each actor
             tasks = [ray_actor.create_lazyt.remote(object_id, params_file,
-                     **this_tracking_params) for ray_actor in actors]
+                     **tracking_params_copy) for ray_actor in actors]
             ray.get(tasks)
 
             # create trx from lazyt
