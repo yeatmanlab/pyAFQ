@@ -182,7 +182,7 @@ def streamlines(data_imap, seed, stop,
 
             # create trx from lazyt
             tasks = [ray_actor.trx_from_lazy_tractogram.remote(object_id, seed,
-                     dtype_dict) for ray_actor in actors]
+                     dtype_dict=dtype_dict) for ray_actor in actors]
             sfts = ray.get(tasks)
 
             # cleanup objects
