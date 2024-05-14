@@ -173,6 +173,8 @@ def streamlines(data_imap, seed, stop,
             actors = [TractActor.remote() for _ in range(num_chunks)]
             object_id = 1
 
+            tracking_params_copy = this_tracking_params.copy()
+            tracking_params_copy['n_seeds'] = this_tracking_params['n_seeds'] // num_chunks
             # create lazyt inside each actor
             tasks = [ray_actor.create_lazyt.remote(object_id, params_file,
                      **this_tracking_params) for ray_actor in actors]
