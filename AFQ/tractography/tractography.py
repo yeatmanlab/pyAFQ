@@ -165,9 +165,9 @@ def track(params_file, directions="prob", max_angle=30., sphere=None,
                 stop_threshold = get_percentile_threshold(
                     stop_mask, stop_threshold)
             stop_mask_copy = np.copy(stop_mask)
-            stop_threshold_copy = np.copy(stop_threshold)
+            stop_thresh_copy = np.copy(stop_threshold)
             stopping_criterion = ThresholdStoppingCriterion(stop_mask_copy,
-                                                            stop_threshold_copy)
+                                                            stop_thresh_copy)
 
         my_tracker = LocalTracking
 

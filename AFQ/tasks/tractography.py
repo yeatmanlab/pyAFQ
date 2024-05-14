@@ -158,7 +158,10 @@ def streamlines(data_imap, seed, stop,
                     self.objects = {}
 
                 def trx_from_lazy_tractogram(self, lazyt_id, seed, dtype_dict):
-                    return self.TrxFile.from_lazy_tractogram(self.objects[lazyt_id], seed, dtype_dict)
+                    id = self.objects[lazyt_id]
+                    return self.TrxFile.from_lazy_tractogram(id,
+                                                             seed,
+                                                             dtype_dict)
 
                 def create_lazyt(self, id, *args, **kwargs):
                     self.objects[id] = self.aft.track(*args, **kwargs)
