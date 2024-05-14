@@ -13,7 +13,12 @@ from AFQ.tasks.utils import get_default_args
 from AFQ.definitions.image import ScalarImage
 
 try:
-    from trx.trx_file_memmap import TrxFile
+    import ray
+    has_ray = True
+except ModuleNotFoundError:
+    has_ray = False
+try:
+    from trx.trx_file_memmap import TrxFile, concatenate
     has_trx = True
 except ModuleNotFoundError:
     has_trx = False
@@ -134,14 +139,59 @@ def streamlines(data_imap, seed, stop,
 
     is_trx = this_tracking_params.get("trx", False)
 
+    num_chunks = this_tracking_params.pop("num_chunks", False)
+
     if is_trx:
         start_time = time()
         dtype_dict = {'positions': np.float16, 'offsets': np.uint32}
-        lazyt = aft.track(params_file, **this_tracking_params)
-        sft = TrxFile.from_lazy_tractogram(
-            lazyt,
-            seed,
-            dtype_dict=dtype_dict)
+        if num_chunks:
+            if not has_ray:
+                raise ImportError("Ray is required to perform tractography in"
+                                  "parallel, please install ray or remove the"
+                                  " 'num_chunks' arg")
+
+            @ray.remote
+            class TractActor():
+                def __init__(self):
+                    self.TrxFile = TrxFile
+                    self.aft = aft
+                    self.objects = {}
+
+                def trx_from_lazy_tractogram(self, lazyt_id, seed, dtype_dict):
+                    return self.TrxFile.from_lazy_tractogram(self.objects[lazyt_id], seed, dtype_dict)
+
+                def create_lazyt(self, id, *args, **kwargs):
+                    self.objects[id] = self.aft.track(*args, **kwargs)
+                    return id
+
+                def delete_lazyt(self, id):
+                    if id in self.objects:
+                        del self.objects[id]
+            actors = [TractActor.remote() for _ in range(num_chunks)]
+            object_id = 1
+
+            # create lazyt inside each actor
+            tasks = [ray_actor.create_lazyt.remote(object_id, params_file,
+                     **this_tracking_params) for ray_actor in actors]
+            ray.get(tasks)
+
+            # create trx from lazyt
+            tasks = [ray_actor.trx_from_lazy_tractogram.remote(object_id, seed,
+                     dtype_dict) for ray_actor in actors]
+            sfts = ray.get(tasks)
+
+            # cleanup objects
+            tasks = [ray_actor.delete_lazyt.remote(object_id) for ray_actor in
+                     actors]
+            ray.get(tasks)
+
+            sft = concatenate(sfts)
+        else:
+            lazyt = aft.track(params_file, **this_tracking_params)
+            sft = TrxFile.from_lazy_tractogram(
+                lazyt,
+                seed,
+                dtype_dict=dtype_dict)
         n_streamlines = len(sft)
 
     else:
