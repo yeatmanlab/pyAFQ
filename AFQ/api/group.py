@@ -161,7 +161,6 @@ class GroupAFQ(object):
         if not isinstance(bids_layout_kwargs, dict):
             raise TypeError("bids_layout_kwargs must be a dict")
 
-        parallel_params["engine"] = parallel_params.get("engine", "serial")
 
         self.logger = logger
 
