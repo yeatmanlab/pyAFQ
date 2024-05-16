@@ -775,7 +775,6 @@ class BundleDict(MutableMapping):
         self.resample_to = resample_to
         self.resample_subject_to = resample_subject_to
         self.keep_in_memory = keep_in_memory
-        self.has_bids_info = False
         self.max_includes = 3
 
         self._dict = {}
@@ -814,33 +813,23 @@ class BundleDict(MutableMapping):
         if new_max > self.max_includes:
             self.max_includes = new_max
 
-    def set_bids_info(self, bids_layout, bids_path, subject, session):
-        """
-        Provide the bids_layout, a nearest path,
-        and the subject and session information
-        to load ROIS from BIDS
-        """
-        self.has_bids_info = True
-        self._bids_info = bids_layout
-        self._bids_path = bids_path
-        self._subject = subject
-        self._session = session
+    def _use_bids_info(self, roi_or_sl, bids_layout, bids_path,
+                       subject, session):
+        if isinstance(roi_or_sl, dict):
+            suffix = roi_or_sl.get("suffix", "dwi")
+            roi_or_sl = find_file(
+                bids_layout, bids_path,
+                roi_or_sl,
+                suffix,
+                session, subject)
+            return roi_or_sl
+        else:
+            return roi_or_sl
 
     def _cond_load(self, roi_or_sl, resample_to):
         """
         Load ROI or streamline if not already loaded
         """
-        if isinstance(roi_or_sl, dict):
-            if not self.has_bids_info:
-                raise ValueError((
-                    "Attempted to load an ROI using BIDS description without "
-                    "First providing BIDS information."))
-            suffix = roi_or_sl.get("suffix", "dwi")
-            roi_or_sl = find_file(
-                self._bids_info, self._bids_path,
-                roi_or_sl,
-                suffix,
-                self._session, self._subject)
         if isinstance(roi_or_sl, str):
             if self.seg_algo == "afq":
                 return afd.read_resample_roi(

@@ -156,7 +156,7 @@ def streamlines(data_imap, seed, stop,
 
 
 @pimms.calc("streamlines")
-def custom_tractography(bids_info, import_tract=None):
+def custom_tractography(import_tract=None):
     """
     full path to the complete, unsegmented tractography file
 
@@ -168,42 +168,10 @@ def custom_tractography(bids_info, import_tract=None):
         to generate the tractography.
         Default: None
     """
-    if not isinstance(import_tract, dict) and\
-            not isinstance(import_tract, str):
+    if not isinstance(import_tract, str):
         raise TypeError(
             "import_tract must be"
             + " either a dict or a str")
-    if isinstance(import_tract, dict):
-        if bids_info is None:
-            raise ValueError((
-                "bids_info must be provided if using"
-                " bids filters to find imported tracts"))
-        import_tract = \
-            bids_info["bids_layout"].get(
-                subject=bids_info["subject"],
-                session=bids_info["session"],
-                extension=[
-                    '.trk',
-                    '.tck',
-                    '.vtk',
-                    '.fib',
-                    '.dpy'],
-                return_type='filename',
-                **import_tract)
-        if len(import_tract) < 1:
-            raise ValueError((
-                "No custom tractography found for subject "
-                f"{bids_info['subject']} and session "
-                f"{bids_info['session']}."))
-        elif len(import_tract) > 1:
-            import_tract = import_tract[0]
-            logger.warning((
-                f"Multiple viable custom tractographies found for"
-                f" subject "
-                f"{bids_info['subject']} and session "
-                f"{bids_info['session']}. Will use: {import_tract}"))
-        else:
-            import_tract = import_tract[0]
     return import_tract
 
 
@@ -314,21 +282,6 @@ def get_tractography_plan(kwargs):
 
     stop_mask = kwargs["tracking_params"]['stop_mask']
     seed_mask = kwargs["tracking_params"]['seed_mask']
-    bids_info = kwargs["bids_info"]
-
-    if bids_info is not None:
-        if isinstance(stop_mask, Definition):
-            stop_mask.find_path(
-                bids_info["bids_layout"],
-                kwargs["dwi_path"],
-                bids_info["subject"],
-                bids_info["session"])
-        if isinstance(seed_mask, Definition):
-            seed_mask.find_path(
-                bids_info["bids_layout"],
-                kwargs["dwi_path"],
-                bids_info["subject"],
-                bids_info["session"])
 
     if kwargs["tracking_params"]["tracker"] == "pft":
         probseg_funcs = stop_mask.get_image_getter("tractography")

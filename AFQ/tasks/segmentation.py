@@ -109,7 +109,7 @@ def segment(data_imap, mapping_imap,
 
 
 @pimms.calc("indiv_bundles")
-def export_bundles(base_fname, results_dir,
+def export_bundles(base_fname, output_dir,
                    bundles,
                    tracking_params,
                    segmentation_params):
@@ -123,7 +123,7 @@ def export_bundles(base_fname, results_dir,
     else:
         extension = ".trk"
 
-    bundles_dir = op.join(results_dir, "bundles")
+    bundles_dir = op.join(output_dir, "bundles")
     os.makedirs(bundles_dir, exist_ok=True)
     seg_sft = aus.SegmentedSFT.fromfile(bundles)
     for bundle in seg_sft.bundle_names:

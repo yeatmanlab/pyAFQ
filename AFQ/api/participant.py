@@ -34,10 +34,9 @@ class ParticipantAFQ(object):
                  dwi_data_file,
                  bval_file, bvec_file,
                  output_dir,
-                 _bids_info=None,
                  **kwargs):
         """
-        Initialize a ParticipantAFQ object from a BIDS dataset.
+        Initialize a ParticipantAFQ object.
 
         Parameters
         ----------
@@ -49,10 +48,6 @@ class ParticipantAFQ(object):
             Path to bvec file.
         output_dir : str
             Path to output directory.
-        _bids_info : dict or None, optional
-            This should be left as None in most cases. It
-            is used by GroupAFQ to provide information about
-            the BIDS layout to each participant.
         kwargs : additional optional parameters
             You can set additional parameters for any step
             of the process. See :ref:`usage/kwargs` for more details.
@@ -71,9 +66,6 @@ class ParticipantAFQ(object):
         In tracking_params, parameters with the suffix mask which are also
         an image from AFQ.definitions.image will be handled automatically by
         the api.
-
-        It is recommended that you leave the bids_info parameter as None,
-        and instead pass in the paths to the files you want to use directly.
         """
         if not isinstance(output_dir, str):
             raise TypeError(
@@ -96,14 +88,12 @@ class ParticipantAFQ(object):
                 "did you mean tracking_params ?"))
 
         self.logger = logging.getLogger('AFQ')
-        self.output_dir = output_dir
 
         self.kwargs = dict(
-            dwi_path=dwi_data_file,
-            bval=bval_file,
-            bvec=bvec_file,
-            results_dir=output_dir,
-            bids_info=_bids_info,
+            dwi_data_file=dwi_data_file,
+            bval_file=bval_file,
+            bvec_file=bvec_file,
+            output_dir=output_dir,
             base_fname=get_base_fname(output_dir, dwi_data_file),
             **kwargs)
         self.make_workflow()
@@ -114,15 +104,22 @@ class ParticipantAFQ(object):
                 self.kwargs["mapping_definition"], SlrMap):
             plans = {  # if using SLR map, do tractography first
                 "data": get_data_plan(self.kwargs),
-                "tractography": get_tractography_plan(self.kwargs),
-                "mapping": get_mapping_plan(self.kwargs, use_sls=True),
+                "tractography": get_tractography_plan(
+                    self.kwargs
+                ),
+                "mapping": get_mapping_plan(
+                    self.kwargs,
+                    use_sls=True
+                ),
                 "segmentation": get_segmentation_plan(self.kwargs),
                 "viz": get_viz_plan(self.kwargs)}
         else:
             plans = {  # Otherwise, do mapping first
                 "data": get_data_plan(self.kwargs),
                 "mapping": get_mapping_plan(self.kwargs),
-                "tractography": get_tractography_plan(self.kwargs),
+                "tractography": get_tractography_plan(
+                    self.kwargs
+                ),
                 "segmentation": get_segmentation_plan(self.kwargs),
                 "viz": get_viz_plan(self.kwargs)}
 
@@ -280,7 +277,7 @@ class ParticipantAFQ(object):
 
         def _save_file(curr_img):
             save_path = op.abspath(op.join(
-                self.output_dir,
+                self.kwargs["output_dir"],
                 "bundle_montage.png"))
             curr_img.save(save_path)
             all_fnames.append(save_path)
@@ -374,7 +371,7 @@ class ParticipantAFQ(object):
                     " to a filename and will be ignored."))
 
         apply_cmd_to_afq_derivs(
-            self.output_dir,
+            self.kwargs["output_dir"],
             self.export("base_fname"),
             cmd=cmd,
             exception_file_names=exception_file_names,
