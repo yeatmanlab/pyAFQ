@@ -11,6 +11,7 @@ from AFQ.definitions.utils import Definition
 import AFQ.tractography.tractography as aft
 from AFQ.tasks.utils import get_default_args
 from AFQ.definitions.image import ScalarImage
+from AFQ.tractography.utils import gen_seeds
 
 try:
     import ray
@@ -18,7 +19,8 @@ try:
 except ModuleNotFoundError:
     has_ray = False
 try:
-    from trx.trx_file_memmap import TrxFile, concatenate
+    from trx.trx_file_memmap import TrxFile
+    from trx.trx_file_memmap import concatenate as trx_concatenate
     has_trx = True
 except ModuleNotFoundError:
     has_trx = False
@@ -139,7 +141,7 @@ def streamlines(data_imap, seed, stop,
 
     is_trx = this_tracking_params.get("trx", False)
 
-    num_chunks = this_tracking_params.pop("num_chunks", False)
+    num_chunks = this_tracking_params.pop("n_chunks", False)
 
     if is_trx:
         start_time = time()
@@ -173,12 +175,64 @@ def streamlines(data_imap, seed, stop,
                         del self.objects[id]
             actors = [TractActor.remote() for _ in range(num_chunks)]
             object_id = 1
+            tracking_params_list = []
 
-            tracking_params_copy = this_tracking_params.copy()
-            tracking_params_copy['n_seeds'] = this_tracking_params['n_seeds'] // num_chunks
+            if 'n_seeds' in this_tracking_params:
+                # if random seeds
+                if this_tracking_params['random_seeds']:
+
+                    if not isinstance(this_tracking_params['n_seeds'], int):
+                        raise ValueError("n_seeds must be an integer if"
+                                         "random_seeds is True")
+
+                    remainder = this_tracking_params['n_seeds'] % num_chunks
+                    for i in range(num_chunks):
+                        #create copy of tracking params
+                        copy = this_tracking_params.copy()
+                        n_seeds = this_tracking_params['n_seeds']
+                        copy['n_seeds'] = n_seeds // num_chunks
+                        # add remainder to 1st list
+                        if i == 0:
+                            copy['n_seeds'] += remainder
+                        tracking_params_list.append(copy)
+                # if list, divide the seeds evenly
+                elif not isinstance(this_tracking_params['n_seeds'], int):
+                    n_seeds = np.array(this_tracking_params['n_seeds'])
+                    seed_chunks = np.array_split(n_seeds, num_chunks)
+                    tracking_params_list = [this_tracking_params.copy() for _ in range(num_chunks)]
+
+                    for i in range(num_chunks):
+                        tracking_params_list[i]['n_seeds'] = seed_chunks[i]
+                # Final case is such that n_seeds represents the number of
+                # seeds per vox
+                else:
+                    # in this case we want to generate our seeds before hand
+                    # and then split them up
+                    # and pass as lists
+                    seeds = _gen_seeds(this_tracking_params['n_seeds'],
+                                       params_file, **this_tracking_params)
+                    seed_chunks = np.array_split(seeds, num_chunks)
+                    tracking_params_list = [this_tracking_params.copy() for _
+                                            in range(num_chunks)]
+                    for i in range(num_chunks):
+                        tracking_params_list[i]['n_seeds'] = seed_chunks[i]
+            else:
+                # If n_seeds not defined use default (1)
+                # in this case we want to generate our seeds before hand and
+                # then split them up
+                # and pass as lists
+                seeds = _gen_seeds(this_tracking_params['n_seeds'],
+                                   params_file, **this_tracking_params)
+                seed_chunks = np.array_split(seeds, num_chunks)
+                tracking_params_list = [this_tracking_params.copy() for _ in
+                                        range(num_chunks)]
+                for i in range(num_chunks):
+                    tracking_params_list[i]['n_seeds'] = seed_chunks[i]
+
             # create lazyt inside each actor
             tasks = [ray_actor.create_lazyt.remote(object_id, params_file,
-                     **tracking_params_copy) for ray_actor in actors]
+                     **tracking_params_list[i]) for i, ray_actor in
+                     enumerate(actors)]
             ray.get(tasks)
 
             # create trx from lazyt
@@ -191,7 +245,7 @@ def streamlines(data_imap, seed, stop,
                      actors]
             ray.get(tasks)
 
-            sft = concatenate(sfts)
+            sft = trx_concatenate(sfts)
         else:
             lazyt = aft.track(params_file, **this_tracking_params)
             sft = TrxFile.from_lazy_tractogram(
@@ -404,3 +458,18 @@ def get_tractography_plan(kwargs):
                 seed_mask.get_image_getter("tractography")))
 
     return pimms.plan(**tractography_tasks)
+
+
+def _gen_seeds(n_seeds, params_file, seed_mask=None, seed_threshold=0,
+               thresholds_as_percentages=False,
+               random_seeds=False, rng_seed=None):
+    if isinstance(params_file, str):
+        params_img = nib.load(params_file)
+    else:
+        params_img = params_file
+
+    affine = params_img.affine
+
+    return gen_seeds(seed_mask, seed_threshold, n_seeds,
+                     thresholds_as_percentages,
+                     random_seeds, rng_seed, affine)
