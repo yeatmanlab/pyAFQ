@@ -1,4 +1,3 @@
-import pimms
 import numpy as np
 import logging
 from time import time
@@ -26,8 +25,7 @@ bundle_criterion_order = [
 logger = logging.getLogger('AFQ')
 
 
-@pimms.calc("prob_map")
-def prob_map(b_sls, bundle_def, preproc_imap, prob_threshold):
+def prob_map(b_sls, bundle_def, preproc_imap, prob_threshold, **kwargs):
     b_sls.initiate_selection("Prob. Map")
     # using entire fgarray here only because it is the first step
     fiber_probabilities = dts.values_from_volume(
@@ -37,21 +35,17 @@ def prob_map(b_sls, bundle_def, preproc_imap, prob_threshold):
     b_sls.select(
         fiber_probabilities > prob_threshold,
         "Prob. Map")
-    return 1  # You have to return something
 
 
-@pimms.calc("cross_midline")
-def cross_midline(b_sls, bundle_def, preproc_imap):
+def cross_midline(b_sls, bundle_def, preproc_imap, **kwargs):
     b_sls.initiate_selection("Cross Mid.")
     accepted = preproc_imap["crosses"][b_sls.selected_fiber_idxs]
     if not bundle_def["cross_midline"]:
         accepted = np.invert(accepted)
     b_sls.select(accepted, "Cross Mid.")
-    return 1
 
 
-@pimms.calc("start")
-def start(b_sls, bundle_def, preproc_imap):
+def start(b_sls, bundle_def, preproc_imap, **kwargs):
     accept_idx = b_sls.initiate_selection("Startpoint")
     abr.clean_by_endpoints(
         b_sls.get_selected_sls(),
@@ -70,11 +64,9 @@ def start(b_sls, bundle_def, preproc_imap):
         accept_idx = np.logical_xor(
             accepted_idx_flipped, accept_idx)
     b_sls.select(accept_idx, "Startpoint")
-    return 1
 
 
-@pimms.calc("end")
-def end(b_sls, bundle_def, preproc_imap):
+def end(b_sls, bundle_def, preproc_imap, **kwargs):
     accept_idx = b_sls.initiate_selection("endpoint")
     abr.clean_by_endpoints(
         b_sls.get_selected_sls(),
@@ -93,11 +85,9 @@ def end(b_sls, bundle_def, preproc_imap):
         accept_idx = np.logical_xor(
             accepted_idx_flipped, accept_idx)
     b_sls.select(accept_idx, "endpoint")
-    return 1
 
 
-@pimms.calc("length")
-def length(b_sls, bundle_def, preproc_imap):
+def length(b_sls, bundle_def, preproc_imap, **kwargs):
     accept_idx = b_sls.initiate_selection("length")
     min_len = bundle_def["length"].get(
         "min_len", 0) / preproc_imap["vox_dim"]
@@ -109,11 +99,9 @@ def length(b_sls, bundle_def, preproc_imap):
         if sl_len >= min_len and sl_len <= max_len:
             accept_idx[idx] = 1
     b_sls.select(accept_idx, "length")
-    return 1
 
 
-@pimms.calc("primary_axis")
-def primary_axis(b_sls, bundle_def):
+def primary_axis(b_sls, bundle_def, **kwargs):
     b_sls.initiate_selection("orientation")
     accept_idx = abc.clean_by_orientation(
         b_sls.get_selected_sls(),
@@ -121,12 +109,10 @@ def primary_axis(b_sls, bundle_def):
         bundle_def.get(
             "primary_axis_percentage", None))
     b_sls.select(accept_idx, "orientation")
-    return 1
 
 
-@pimms.calc("include")
 def include(b_sls, bundle_def, preproc_imap, max_includes,
-            parallel_segmentation):
+            parallel_segmentation, **kwargs):
     accept_idx = b_sls.initiate_selection("include")
     flip_using_include = len(bundle_def["include"]) > 1\
         and not b_sls.oriented_yet
@@ -203,14 +189,13 @@ def include(b_sls, bundle_def, preproc_imap, max_includes,
     if flip_using_include:
         b_sls.reorient(to_flip)
     b_sls.select(accept_idx, "include")
-    return 1
-
-# Filters streamlines by how well they match
-# a curve in orientation and shape but not scale
 
 
-@pimms.calc("curvature")
-def curvature(b_sls, bundle_def, mapping, img, save_intermediates):
+def curvature(b_sls, bundle_def, mapping, img, save_intermediates, **kwargs):
+    '''
+    Filters streamlines by how well they match
+    a curve in orientation and shape but not scale
+    '''
     accept_idx = b_sls.initiate_selection("curvature")
     if "sft" in bundle_def["curvature"]:
         ref_sl = bundle_def["curvature"]["sft"]
@@ -237,11 +222,9 @@ def curvature(b_sls, bundle_def, mapping, img, save_intermediates):
             if dist <= ref_curve_threshold:
                 accept_idx[idx] = 1
     b_sls.select(accept_idx, "curvature", cut=cut)
-    return 1
 
 
-@pimms.calc("exclude")
-def exclude(b_sls, bundle_def, preproc_imap):
+def exclude(b_sls, bundle_def, preproc_imap, **kwargs):
     accept_idx = b_sls.initiate_selection("exclude")
     if f'exc_addtol' in bundle_def:
         exclude_roi_tols = []
@@ -260,12 +243,10 @@ def exclude(b_sls, bundle_def, preproc_imap):
                 sl, exclude_rois, exclude_roi_tols):
             accept_idx[sl_idx] = 1
     b_sls.select(accept_idx, "exclude")
-    return 1
 
 
-@pimms.calc("recobundles")
 def recobundles(b_sls, mapping, bundle_def, reg_template, img, refine_reco,
-                save_intermediates, rng, rb_recognize_params):
+                save_intermediates, rng, rb_recognize_params, **kwargs):
     b_sls.initiate_selection("Recobundles")
     moved_sl = abu.move_streamlines(
         StatefulTractogram(b_sls.get_selected_sls(), img, Space.VOX),
@@ -286,11 +267,9 @@ def recobundles(b_sls, mapping, bundle_def, reg_template, img, refine_reco,
             standard_sl)
         b_sls.reorient(rec_labels[oriented_idx])
     b_sls.select(rec_labels, "Recobundles")
-    return 1
 
 
-@pimms.calc("qb_thresh")
-def qb_thresh(b_sls, bundle_def, preproc_imap, clip_edges):
+def qb_thresh(b_sls, bundle_def, preproc_imap, clip_edges, **kwargs):
     b_sls.initiate_selection("qb_thresh")
     cut = clip_edges or ("bundlesection" in bundle_def)
     qbx = QuickBundles(
@@ -302,11 +281,9 @@ def qb_thresh(b_sls, bundle_def, preproc_imap, clip_edges):
     cleaned_idx = clusters[np.argmax(
         clusters.clusters_sizes())].indices
     b_sls.select(cleaned_idx, "qb_thresh", cut=cut)
-    return 1
 
 
-@pimms.calc("mahalanobis")
-def mahalanobis(b_sls, bundle_def, clip_edges, cleaning_params):
+def mahalanobis(b_sls, bundle_def, clip_edges, cleaning_params, **kwargs):
     b_sls.initiate_selection("Mahalanobis")
     clean_params = bundle_def.get("mahal", {})
     clean_params = {
@@ -318,7 +295,6 @@ def mahalanobis(b_sls, bundle_def, clip_edges, cleaning_params):
         b_sls.get_selected_sls(cut=cut, flip=True),
         **clean_params)
     b_sls.select(cleaned_idx, "Mahalanobis", cut=cut)
-    return 1
 
 
 def run_bundle_rec_plan(
@@ -343,12 +319,6 @@ def run_bundle_rec_plan(
         bundle_name,
         img, len(bundle_def.get("include", [])))
 
-    bundle_plan = {}
-    for criterion in bundle_criterion_order:
-        bundle_plan[criterion] = globals()[criterion]
-    bundle_plan["mahalanobis"] = mahalanobis
-    bundle_plan = pimms.plan(bundle_plan)
-
     inputs = {}
     inputs["b_sls"] = b_sls
     inputs["preproc_imap"] = preproc_imap
@@ -360,11 +330,11 @@ def run_bundle_rec_plan(
     for key, value in segmentation_params.items():
         inputs[key] = value
 
-    bundle_imap = bundle_plan(inputs)
     for criterion in bundle_criterion_order:
         if b_sls and criterion in bundle_def:
-            bundle_imap[criterion]
-    bundle_imap["mahalanobis"]
+            inputs[criterion] = globals()[criterion](**inputs)
+    if b_sls:
+        mahalanobis(**inputs)
 
     if b_sls and not b_sls.oriented_yet:
         raise ValueError(
