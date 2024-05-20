@@ -146,7 +146,7 @@ def streamlines(data_imap, seed, stop,
     if is_trx:
         start_time = time()
         dtype_dict = {'positions': np.float16, 'offsets': np.uint32}
-        if num_chunks:
+        if num_chunks and num_chunks > 1:
             if not has_ray:
                 raise ImportError("Ray is required to perform tractography in"
                                   "parallel, please install ray or remove the"
