@@ -141,7 +141,7 @@ def streamlines(data_imap, seed, stop,
 
     is_trx = this_tracking_params.get("trx", False)
 
-    num_chunks = this_tracking_params.pop("n_chunks", False)
+    num_chunks = this_tracking_params.pop("num_chunks", False)
 
     if is_trx:
         start_time = time()
@@ -177,55 +177,44 @@ def streamlines(data_imap, seed, stop,
             object_id = 1
             tracking_params_list = []
 
-            if 'n_seeds' in this_tracking_params:
-                # if random seeds
-                if this_tracking_params['random_seeds']:
+            # random seeds case
+            if isinstance(this_tracking_params.get("n_seeds"), int) and \
+               this_tracking_params.get("random_seeds"):
 
-                    if not isinstance(this_tracking_params['n_seeds'], int):
-                        raise ValueError("n_seeds must be an integer if"
-                                         "random_seeds is True")
+                remainder = this_tracking_params['n_seeds'] % num_chunks
+                for i in range(num_chunks):
+                    # create copy of tracking params
+                    copy = this_tracking_params.copy()
+                    n_seeds = this_tracking_params['n_seeds']
+                    copy['n_seeds'] = n_seeds // num_chunks
+                    # add remainder to 1st list
+                    if i == 0:
+                        copy['n_seeds'] += remainder
+                    tracking_params_list.append(copy)
 
-                    remainder = this_tracking_params['n_seeds'] % num_chunks
-                    for i in range(num_chunks):
-                        #create copy of tracking params
-                        copy = this_tracking_params.copy()
-                        n_seeds = this_tracking_params['n_seeds']
-                        copy['n_seeds'] = n_seeds // num_chunks
-                        # add remainder to 1st list
-                        if i == 0:
-                            copy['n_seeds'] += remainder
-                        tracking_params_list.append(copy)
-                # if list, divide the seeds evenly
-                elif not isinstance(this_tracking_params['n_seeds'], int):
-                    n_seeds = np.array(this_tracking_params['n_seeds'])
-                    seed_chunks = np.array_split(n_seeds, num_chunks)
-                    tracking_params_list = [this_tracking_params.copy() for _ in range(num_chunks)]
-
-                    for i in range(num_chunks):
-                        tracking_params_list[i]['n_seeds'] = seed_chunks[i]
-                # Final case is such that n_seeds represents the number of
-                # seeds per vox
-                else:
-                    # in this case we want to generate our seeds before hand
-                    # and then split them up
-                    # and pass as lists
-                    seeds = _gen_seeds(this_tracking_params['n_seeds'],
-                                       params_file, **this_tracking_params)
-                    seed_chunks = np.array_split(seeds, num_chunks)
-                    tracking_params_list = [this_tracking_params.copy() for _
-                                            in range(num_chunks)]
-                    for i in range(num_chunks):
-                        tracking_params_list[i]['n_seeds'] = seed_chunks[i]
-            else:
-                # If n_seeds not defined use default (1)
-                # in this case we want to generate our seeds before hand and
-                # then split them up
-                # and pass as lists
-                seeds = _gen_seeds(this_tracking_params['n_seeds'],
-                                   params_file, **this_tracking_params)
-                seed_chunks = np.array_split(seeds, num_chunks)
+            elif isinstance(this_tracking_params.get("n_seeds"), (np.ndarray,
+                                                                  list)):
+                n_seeds = np.array(this_tracking_params['n_seeds'])
+                seed_chunks = np.array_split(n_seeds, num_chunks)
                 tracking_params_list = [this_tracking_params.copy() for _ in
                                         range(num_chunks)]
+
+                for i in range(num_chunks):
+                    tracking_params_list[i]['n_seeds'] = seed_chunks[i]
+
+            else:
+                seeds = gen_seeds(
+                    this_tracking_params.get('seed_mask', None),
+                    this_tracking_params.get('seed_threshold', 0),
+                    this_tracking_params.get('n_seeds', 1),
+                    this_tracking_params.get('thresholds_as_percentages',
+                                             False),
+                    this_tracking_params.get('random_seeds', False),
+                    this_tracking_params.get('rng_seed', None),
+                    data_imap["dwi_affine"])
+                seed_chunks = np.array_split(seeds, num_chunks)
+                tracking_params_list = [this_tracking_params.copy() for _
+                                        in range(num_chunks)]
                 for i in range(num_chunks):
                     tracking_params_list[i]['n_seeds'] = seed_chunks[i]
 
