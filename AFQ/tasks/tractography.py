@@ -4,6 +4,7 @@ from time import time
 import logging
 
 import pimms
+import multiprocessing
 
 from AFQ.tasks.decorators import as_file, as_img
 from AFQ.tasks.utils import with_name
@@ -142,6 +143,9 @@ def streamlines(data_imap, seed, stop,
     is_trx = this_tracking_params.get("trx", False)
 
     num_chunks = this_tracking_params.pop("num_chunks", False)
+
+    if num_chunks is True:
+        num_chunks = multiprocessing.cpu_count() - 1
 
     if is_trx:
         start_time = time()
