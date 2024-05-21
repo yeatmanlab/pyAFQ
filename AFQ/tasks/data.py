@@ -219,6 +219,11 @@ def dki_params(brain_mask, gtab, data):
     full path to a nifti file containing
     parameters for the DKI fit
     """
+    if len(dpg.unique_bvals_magnitude(gtab.bvals)) < 3:
+        raise ValueError((
+            "The DKI model requires at least 2 non-zero b-values, "
+            f"but you provided {len(dpg.unique_bvals_magnitude(gtab.bvals))}"
+            " b-values (including b=0)."))
     mask =\
         nib.load(brain_mask).get_fdata()
     dkf = dki_fit_model(
