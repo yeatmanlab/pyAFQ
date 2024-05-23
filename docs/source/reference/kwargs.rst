@@ -177,6 +177,9 @@ tracking_params: dict, optional
 	this dict may be ``AFQ.definitions.image.ImageFile`` instances.
 	If ``tracker`` is set to "pft" then ``stop_mask`` should be
 	an instance of ``AFQ.definitions.image.PFTImage``.
+	num_chunks can be specified to cause tracking to be done in
+	parallel using ray. If set to True it will use the number of
+	cores available on the machine - 1.
 
 import_tract: dict or str or None, optional
 	BIDS filters for inputing a user made tractography file,
