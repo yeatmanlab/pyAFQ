@@ -196,8 +196,8 @@ def streamlines(data_imap, seed, stop,
                         copy['n_seeds'] += remainder
                     tracking_params_list.append(copy)
 
-            elif isinstance(this_tracking_params.get("n_seeds"), (np.ndarray,
-                                                                  list)):
+            elif isinstance(this_tracking_params['n_seeds'], (np.ndarray,
+                                                              list)):
                 n_seeds = np.array(this_tracking_params['n_seeds'])
                 seed_chunks = np.array_split(n_seeds, num_chunks)
                 tracking_params_list = [this_tracking_params.copy() for _ in
@@ -208,13 +208,12 @@ def streamlines(data_imap, seed, stop,
 
             else:
                 seeds = gen_seeds(
-                    this_tracking_params.get('seed_mask', None),
-                    this_tracking_params.get('seed_threshold', 0),
-                    this_tracking_params.get('n_seeds', 1),
-                    this_tracking_params.get('thresholds_as_percentages',
-                                             False),
-                    this_tracking_params.get('random_seeds', False),
-                    this_tracking_params.get('rng_seed', None),
+                    this_tracking_params['seed_mask'],
+                    this_tracking_params['seed_threshold'],
+                    this_tracking_params['n_seeds'],
+                    this_tracking_params['thresholds_as_percentages'],
+                    this_tracking_params['random_seeds'],
+                    this_tracking_params['rng_seed'],
                     data_imap["dwi_affine"])
                 seed_chunks = np.array_split(seeds, num_chunks)
                 tracking_params_list = [this_tracking_params.copy() for _
