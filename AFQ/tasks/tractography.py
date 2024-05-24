@@ -4,6 +4,7 @@ from time import time
 import logging
 
 import pimms
+import multiprocessing
 
 from AFQ.tasks.decorators import as_file, as_img
 from AFQ.tasks.utils import with_name
@@ -11,9 +12,16 @@ from AFQ.definitions.utils import Definition
 import AFQ.tractography.tractography as aft
 from AFQ.tasks.utils import get_default_args
 from AFQ.definitions.image import ScalarImage
+from AFQ.tractography.utils import gen_seeds
 
 try:
+    import ray
+    has_ray = True
+except ModuleNotFoundError:
+    has_ray = False
+try:
     from trx.trx_file_memmap import TrxFile
+    from trx.trx_file_memmap import concatenate as trx_concatenate
     has_trx = True
 except ModuleNotFoundError:
     has_trx = False
@@ -134,14 +142,108 @@ def streamlines(data_imap, seed, stop,
 
     is_trx = this_tracking_params.get("trx", False)
 
+    num_chunks = this_tracking_params.pop("num_chunks", False)
+
+    if num_chunks is True:
+        num_chunks = multiprocessing.cpu_count() - 1
+
     if is_trx:
         start_time = time()
         dtype_dict = {'positions': np.float16, 'offsets': np.uint32}
-        lazyt = aft.track(params_file, **this_tracking_params)
-        sft = TrxFile.from_lazy_tractogram(
-            lazyt,
-            seed,
-            dtype_dict=dtype_dict)
+        if num_chunks and num_chunks > 1:
+            if not has_ray:
+                raise ImportError("Ray is required to perform tractography in"
+                                  "parallel, please install ray or remove the"
+                                  " 'num_chunks' arg")
+
+            @ray.remote
+            class TractActor():
+                def __init__(self):
+                    self.TrxFile = TrxFile
+                    self.aft = aft
+                    self.objects = {}
+
+                def trx_from_lazy_tractogram(self, lazyt_id, seed, dtype_dict):
+                    id = self.objects[lazyt_id]
+                    return self.TrxFile.from_lazy_tractogram(
+                        id,
+                        seed,
+                        dtype_dict=dtype_dict)
+
+                def create_lazyt(self, id, *args, **kwargs):
+                    self.objects[id] = self.aft.track(*args, **kwargs)
+                    return id
+
+                def delete_lazyt(self, id):
+                    if id in self.objects:
+                        del self.objects[id]
+            actors = [TractActor.remote() for _ in range(num_chunks)]
+            object_id = 1
+            tracking_params_list = []
+
+            # random seeds case
+            if isinstance(this_tracking_params.get("n_seeds"), int) and \
+               this_tracking_params.get("random_seeds"):
+
+                remainder = this_tracking_params['n_seeds'] % num_chunks
+                for i in range(num_chunks):
+                    # create copy of tracking params
+                    copy = this_tracking_params.copy()
+                    n_seeds = this_tracking_params['n_seeds']
+                    copy['n_seeds'] = n_seeds // num_chunks
+                    # add remainder to 1st list
+                    if i == 0:
+                        copy['n_seeds'] += remainder
+                    tracking_params_list.append(copy)
+
+            elif isinstance(this_tracking_params['n_seeds'], (np.ndarray,
+                                                              list)):
+                n_seeds = np.array(this_tracking_params['n_seeds'])
+                seed_chunks = np.array_split(n_seeds, num_chunks)
+                tracking_params_list = [this_tracking_params.copy() for _ in
+                                        range(num_chunks)]
+
+                for i in range(num_chunks):
+                    tracking_params_list[i]['n_seeds'] = seed_chunks[i]
+
+            else:
+                seeds = gen_seeds(
+                    this_tracking_params['seed_mask'],
+                    this_tracking_params['seed_threshold'],
+                    this_tracking_params['n_seeds'],
+                    this_tracking_params['thresholds_as_percentages'],
+                    this_tracking_params['random_seeds'],
+                    this_tracking_params['rng_seed'],
+                    data_imap["dwi_affine"])
+                seed_chunks = np.array_split(seeds, num_chunks)
+                tracking_params_list = [this_tracking_params.copy() for _
+                                        in range(num_chunks)]
+                for i in range(num_chunks):
+                    tracking_params_list[i]['n_seeds'] = seed_chunks[i]
+
+            # create lazyt inside each actor
+            tasks = [ray_actor.create_lazyt.remote(object_id, params_file,
+                     **tracking_params_list[i]) for i, ray_actor in
+                     enumerate(actors)]
+            ray.get(tasks)
+
+            # create trx from lazyt
+            tasks = [ray_actor.trx_from_lazy_tractogram.remote(object_id, seed,
+                     dtype_dict=dtype_dict) for ray_actor in actors]
+            sfts = ray.get(tasks)
+
+            # cleanup objects
+            tasks = [ray_actor.delete_lazyt.remote(object_id) for ray_actor in
+                     actors]
+            ray.get(tasks)
+
+            sft = trx_concatenate(sfts)
+        else:
+            lazyt = aft.track(params_file, **this_tracking_params)
+            sft = TrxFile.from_lazy_tractogram(
+                lazyt,
+                seed,
+                dtype_dict=dtype_dict)
         n_streamlines = len(sft)
 
     else:
@@ -301,3 +403,18 @@ def get_tractography_plan(kwargs):
                 seed_mask.get_image_getter("tractography")))
 
     return pimms.plan(**tractography_tasks)
+
+
+def _gen_seeds(n_seeds, params_file, seed_mask=None, seed_threshold=0,
+               thresholds_as_percentages=False,
+               random_seeds=False, rng_seed=None):
+    if isinstance(params_file, str):
+        params_img = nib.load(params_file)
+    else:
+        params_img = params_file
+
+    affine = params_img.affine
+
+    return gen_seeds(seed_mask, seed_threshold, n_seeds,
+                     thresholds_as_percentages,
+                     random_seeds, rng_seed, affine)
