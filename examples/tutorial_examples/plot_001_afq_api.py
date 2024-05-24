@@ -55,11 +55,11 @@ afd.organize_stanford_data(clear_previous_afq="track")
 # ---------------------------------------
 # We make create a `tracking_params` variable, which we will pass to the
 # GroupAFQ object which specifies that we want 25,000 seeds randomly
-# distributed in the white matter. We also set num_chunks to True,
+# distributed in the white matter. We only do this to make this example 
+# faster and consume less space. We also set ``num_chunks`` to `True`,
 # which will use ray to parallelize the tracking across all cores.
-# This can be removed to process in serial or set to use a particular distribution of work by setting `n_chunks` to an integer number.
-#
-# We only do this to make this example faster and consume less space.
+# This can be removed to process in serial, or set to use a particular
+# distribution of work by setting `n_chunks` to an integer number.
 
 tracking_params = dict(n_seeds=25000,
                        random_seeds=True,
