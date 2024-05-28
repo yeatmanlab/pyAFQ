@@ -11,10 +11,10 @@ from dipy.io.streamline import load_tractogram
 from dipy.segment.bundles import RecoBundles
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
-import AFQ.bundle_rec.utils as abu
-import AFQ.bundle_rec.cleaning as abc
-import AFQ.bundle_rec.curvature as abv
-import AFQ.bundle_rec.roi as abr
+import AFQ.recognition.utils as abu
+import AFQ.recognition.cleaning as abc
+import AFQ.recognition.curvature as abv
+import AFQ.recognition.roi as abr
 
 bundle_criterion_order = [
     "prob_map", "cross_midline", "start", "end",

@@ -5,7 +5,7 @@ import logging
 
 import dipy.tracking.streamline as dts
 
-import AFQ.bundle_rec.utils as abu
+import AFQ.recognition.utils as abu
 
 
 logger = logging.getLogger('AFQ')

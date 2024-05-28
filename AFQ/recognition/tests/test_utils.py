@@ -27,9 +27,9 @@ def test_segment_sl_curve():
     sl_disp_0 = abv.sl_curve(streamlines[4], 4)
     npt.assert_array_almost_equal(
         sl_disp_0,
-        [[-0.236384, -0.763855,  0.60054 ],
-         [ 0.232594, -0.867859, -0.439   ],
-         [ 0.175343,  0.001082, -0.984507]])
+        [[-0.236384, -0.763855, 0.60054],
+         [0.232594, -0.867859, -0.439],
+         [0.175343, 0.001082, -0.984507]])
 
     sl_disp_1 = abv.sl_curve(streamlines[2], 4)
     mean_angle_diff = abv.sl_curve_dist(sl_disp_0, sl_disp_1)

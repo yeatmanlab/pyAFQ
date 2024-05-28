@@ -4,7 +4,7 @@ import nibabel as nib
 import numpy.testing as npt
 import numpy as np
 from scipy.spatial.distance import cdist
-from AFQ.bundle_rec.roi import (
+from AFQ.recognition.roi import (
     check_sls_with_inclusion,
     check_sl_with_inclusion,
     check_sl_with_exclusion)
@@ -44,9 +44,9 @@ def test_clean_by_endpoints():
     atlas[4, 1, 2] = 4
 
     target_img_start = nib.Nifti1Image(
-        np.logical_or(atlas==1, atlas==2).astype(np.float32), np.eye(4))
+        np.logical_or(atlas == 1, atlas == 2).astype(np.float32), np.eye(4))
     target_img_end = nib.Nifti1Image(
-        np.logical_or(atlas==3, atlas==4).astype(np.float32), np.eye(4))
+        np.logical_or(atlas == 3, atlas == 4).astype(np.float32), np.eye(4))
 
     clean_idx_start = list(abr.clean_by_endpoints(
         sl, target_img_start, 0))

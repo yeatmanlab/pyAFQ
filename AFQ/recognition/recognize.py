@@ -6,10 +6,10 @@ import logging
 import dipy.tracking.streamlinespeed as dps
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
-import AFQ.bundle_rec.utils as abu
+import AFQ.recognition.utils as abu
 from AFQ.api.bundle_dict import BundleDict
-from AFQ.bundle_rec.criteria import run_bundle_rec_plan
-from AFQ.bundle_rec.preprocess import get_preproc_plan
+from AFQ.recognition.criteria import run_bundle_rec_plan
+from AFQ.recognition.preprocess import get_preproc_plan
 
 
 logger = logging.getLogger('AFQ')
