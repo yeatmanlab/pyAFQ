@@ -13,11 +13,8 @@ from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
 import AFQ.data.fetch as afd
 import AFQ.registration as reg
-import AFQ.bundle_rec.cleaning as abc
-import AFQ.bundle_rec.curvature as abv
-import AFQ.bundle_rec.utils as abu
-import AFQ.bundle_rec.roi as abr
-from AFQ.bundle_rec.recognize import recognize
+import AFQ.recognition.cleaning as abc
+from AFQ.recognition.recognize import recognize
 
 
 dpd.fetch_stanford_hardi()
@@ -132,43 +129,6 @@ def test_segment_return_idx():
     npt.assert_(len(fiber_groups['Right Corticospinal']['idx']) > 0)
 
 
-def test_segment_sl_curve():
-    sl_disp_0 = abv.sl_curve(streamlines[4], 4)
-    npt.assert_array_almost_equal(
-        sl_disp_0,
-        [[-0.236384, -0.763855,  0.60054 ],
-         [ 0.232594, -0.867859, -0.439   ],
-         [ 0.175343,  0.001082, -0.984507]])
-
-    sl_disp_1 = abv.sl_curve(streamlines[2], 4)
-    mean_angle_diff = abv.sl_curve_dist(sl_disp_0, sl_disp_1)
-    npt.assert_almost_equal(mean_angle_diff, 1.701458, decimal=3)
-
-
-def test_segment_clip_edges():
-    sls = tg.streamlines
-    idx = np.arange(len(tg.streamlines))
-    accepted_sls = sls[[4, 10, 11]]
-    accepted_ix = idx[[4, 10, 11]]
-    bundle_roi_dists = np.zeros((len(sls), 3))
-    bundle_roi_dists[4, :] = [5, 10, 15]
-    bundle_roi_dists[10, :] = [3, 6, 9]
-    bundle_roi_dists[11, :] = [10, 10, 10]
-    cut_sls = abu.cut_sls_by_dist(
-        accepted_sls,
-        bundle_roi_dists[accepted_ix],
-        [0, 2])
-    npt.assert_array_equal(
-        cut_sls[0],
-        accepted_sls[0][5:15])
-    npt.assert_array_equal(
-        cut_sls[1],
-        accepted_sls[1][3:9])
-    npt.assert_array_equal(
-        cut_sls[2],
-        accepted_sls[2][9:11])
-
-
 @pytest.mark.nightly
 def test_segment_clip_edges_api():
     # Test with the clip_edges kwarg set to True:
@@ -203,50 +163,6 @@ def test_segment_reco():
     # This condition should still hold
     npt.assert_equal(len(fiber_groups), 2)
     npt.assert_(len(fiber_groups['CST_R']) > 0)
-
-
-def test_clean_by_endpoints():
-    sl = [np.array([[1, 1, 1],
-                    [2, 1, 1],
-                    [3, 1, 1],
-                    [4, 1, 1]]),
-          np.array([[1, 1, 2],
-                    [2, 1, 2],
-                    [3, 1, 2],
-                    [4, 1, 2]]),
-          np.array([[1, 1, 1],
-                    [2, 1, 1],
-                    [3, 1, 1]]),
-          np.array([[1, 1, 1],
-                    [2, 1, 1]])]
-
-    atlas = np.zeros((20, 20, 20))
-
-    # Targets:
-    atlas[1, 1, 1] = 1
-    atlas[1, 1, 2] = 2
-    atlas[4, 1, 1] = 3
-    atlas[4, 1, 2] = 4
-
-    target_img_start = nib.Nifti1Image(
-        np.logical_or(atlas==1, atlas==2).astype(np.float32), np.eye(4))
-    target_img_end = nib.Nifti1Image(
-        np.logical_or(atlas==3, atlas==4).astype(np.float32), np.eye(4))
-
-    clean_idx_start = list(abr.clean_by_endpoints(
-        sl, target_img_start, 0))
-    clean_idx_end = list(abr.clean_by_endpoints(
-        sl, target_img_end, -1))
-    npt.assert_array_equal(np.logical_and(
-        clean_idx_start, clean_idx_end), np.array([1, 1, 0, 0]))
-
-    # If tol=1, the third streamline also gets included
-    clean_idx_start = list(abr.clean_by_endpoints(
-        sl, target_img_start, 0, tol=1))
-    clean_idx_end = list(abr.clean_by_endpoints(
-        sl, target_img_end, -1, tol=1))
-    npt.assert_array_equal(np.logical_and(
-        clean_idx_start, clean_idx_end), np.array([1, 1, 1, 0]))
 
 
 def test_exclusion_ROI():
@@ -292,21 +208,6 @@ def test_exclusion_ROI():
         filter_by_endpoints=False)
 
     npt.assert_equal(len(fiber_groups["Left Superior Longitudinal"]), 1)
-
-
-def test_segment_orientation():
-    cleaned_idx = \
-        abc.clean_by_orientation(streamlines, primary_axis=1)
-    npt.assert_equal(np.sum(cleaned_idx), 93)
-    cleaned_idx_tol = \
-        abc.clean_by_orientation(streamlines, primary_axis=1, tol=50)
-    npt.assert_(np.sum(cleaned_idx_tol) < np.sum(cleaned_idx))
-
-    cleaned_idx = \
-        abc.clean_by_orientation(streamlines, primary_axis=2)
-    cleaned_idx_tol = \
-        abc.clean_by_orientation(streamlines, primary_axis=2, tol=33)
-    npt.assert_array_equal(cleaned_idx_tol, cleaned_idx)
 
 
 def test_segment_sampled_streamlines():

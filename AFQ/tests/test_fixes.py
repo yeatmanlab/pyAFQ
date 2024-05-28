@@ -67,6 +67,6 @@ def test_mahal_fix():
         [0., 0., 0., 3.415999, 2.689814]])
     npt.assert_array_almost_equal(
         gaussian_weights_fast(
-            sls_array, n_points=5,
+            sls_array, n_points=None,
             return_mahalnobis=True,
-            stat=np.mean, resample=False)[:3], results)
+            stat=np.mean)[:3], results)

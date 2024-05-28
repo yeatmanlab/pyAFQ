@@ -10,7 +10,7 @@ import pimms
 
 from AFQ.tasks.decorators import as_file
 from AFQ.tasks.utils import get_fname, with_name, str_to_desc
-from AFQ.bundle_rec.recognize import recognize
+from AFQ.recognition.recognize import recognize
 from AFQ.utils.path import drop_extension, write_json
 import AFQ.utils.streamlines as aus
 from AFQ.tasks.utils import get_default_args

@@ -6,7 +6,7 @@ from scipy.stats import zscore
 import dipy.tracking.streamline as dts
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 
-import AFQ.bundle_rec.utils as abu
+import AFQ.recognition.utils as abu
 from AFQ._fixes import gaussian_weights
 
 
@@ -25,12 +25,7 @@ def clean_by_orientation(streamlines, primary_axis, tol=None):
 
     Returns
     -------
-    cleaned_idx, indicies of streamlines that passed cleaning,
-        logical_and of other two returns
-    along_accepted_idx, indices of streamlines that passed
-        cleaning along the bundle
-    end_accepted_idx, indices of streamlines that passed
-        cleaning based on difference between endpoints of bundle
+    cleaned_idx, indicies of streamlines that passed cleaning
     """
     axis_diff = np.zeros((len(streamlines), 3))
     endpoint_diff = np.zeros((len(streamlines), 3))
@@ -111,6 +106,9 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
 
     # We don't even bother if there aren't enough streamlines:
     if len(streamlines) < min_sl:
+        logger.warning((
+            "Mahalanobis cleaning halted early"
+            " due to low streamline count"))
         if return_idx:
             return tg, np.arange(len(streamlines))
         else:
@@ -136,8 +134,7 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
         # This calculates the Mahalanobis for each streamline/node:
         m_dist = gaussian_weights(
             fgarray, return_mahalnobis=True,
-            n_points=n_points, stat=stat,
-            resample=False)
+            n_points=None, stat=stat)
         logger.debug(f"Shape of fgarray: {np.asarray(fgarray).shape}")
         logger.debug(f"Shape of m_dist: {m_dist.shape}")
         logger.debug(f"Maximum m_dist: {np.max(m_dist)}")

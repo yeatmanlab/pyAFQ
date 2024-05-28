@@ -1,4 +1,5 @@
 import numpy as np
+import logging
 
 from scipy.special import lpmv, gammaln
 
@@ -10,6 +11,9 @@ from dipy.reconst.gqi import squared_radial_component
 from dipy.data import default_sphere
 from dipy.tracking.streamline import set_number_of_points
 from scipy.linalg import blas
+
+
+logger = logging.getLogger('AFQ')
 
 
 def gwi_odf(gqmodel, data):
@@ -153,7 +157,7 @@ def tensor_odf(evals, evecs, sphere, num_batches=100):
 
 
 def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
-                     stat=np.mean, resample=True):
+                     stat=np.mean):
     """
     Calculate weights for each streamline/node in a bundle, based on a
     Mahalanobis distance from the core the bundle, at that node (mean, per
@@ -163,9 +167,9 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
     ----------
     bundle : Streamlines
         The streamlines to weight.
-    n_points : int, optional
-        The number of points to resample to. *If the `bundle` is an array,
-        this input is ignored*. Default: 100.
+    n_points : int or None, optional
+        The number of points to resample to. If this is None, we assume bundle
+        is already resampled, and do not do any resampling. Default: 100.
     return_mahalanobis : bool, optional
         Whether to return the Mahalanobis distance instead of the weights.
         Default: False.
@@ -185,7 +189,7 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
         coordinates at that node position across streamlines.
 
     """
-    if resample:
+    if n_points is not None:
         if isinstance(bundle, np.ndarray):
             bundle = bundle.tolist()
         if isinstance(bundle, list):
@@ -198,6 +202,9 @@ def gaussian_weights(bundle, n_points=100, return_mahalnobis=False,
 
     if n_sls < 15:  # Cov^-1 unstable under this amount
         weights = np.ones((n_sls, n_nodes))
+        logger.warning((
+            "Not enough streamlines for weight calculation, "
+            "weighting everything evenly"))
         if return_mahalnobis:
             return np.full((n_sls, n_nodes), np.nan)
         else:

@@ -165,8 +165,8 @@ def dict_to_json(dictionary):
 
 def func_dict_to_arg_dict(func_dict=None, logger=None):
     if func_dict is None:
-        from AFQ.bundle_rec.recognize import recognize
-        from AFQ.bundle_rec.cleaning import clean_bundle
+        from AFQ.recognition.recognize import recognize
+        from AFQ.recognition.cleaning import clean_bundle
         import AFQ.tractography.tractography as aft
         from AFQ.api.group import GroupAFQ
 
@@ -412,8 +412,8 @@ def generate_json(json_folder, overwrite=False,
         }
     ]
 }"""
-    from AFQ.bundle_rec.recognize import recognize
-    from AFQ.bundle_rec.cleaning import clean_bundle
+    from AFQ.recognition.recognize import recognize
+    from AFQ.recognition.cleaning import clean_bundle
     import AFQ.tractography.tractography as aft
 
     func_dict = {

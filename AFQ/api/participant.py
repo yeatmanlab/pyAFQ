@@ -365,7 +365,7 @@ class ParticipantAFQ(object):
             if isinstance(file_name, str):
                 exception_file_names.append(file_name)
             else:
-                self.logger.warn((
+                self.logger.warning((
                     f"The exception '{exception}' does not correspond"
                     " to a filename and will be ignored."))
 

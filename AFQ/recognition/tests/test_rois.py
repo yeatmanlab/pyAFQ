@@ -1,6 +1,9 @@
 import numpy as np
+import AFQ.recognition.roi as abr
+import nibabel as nib
+import numpy.testing as npt
+import numpy as np
 from scipy.spatial.distance import cdist
-
 from AFQ.bundle_rec.roi import (
     check_sls_with_inclusion,
     check_sl_with_inclusion,
@@ -15,6 +18,50 @@ include_rois = [roi1, roi2]
 exclude_rois = [roi1]
 include_roi_tols = [10, 10]
 exclude_roi_tols = [1]
+
+
+def test_clean_by_endpoints():
+    sl = [np.array([[1, 1, 1],
+                    [2, 1, 1],
+                    [3, 1, 1],
+                    [4, 1, 1]]),
+          np.array([[1, 1, 2],
+                    [2, 1, 2],
+                    [3, 1, 2],
+                    [4, 1, 2]]),
+          np.array([[1, 1, 1],
+                    [2, 1, 1],
+                    [3, 1, 1]]),
+          np.array([[1, 1, 1],
+                    [2, 1, 1]])]
+
+    atlas = np.zeros((20, 20, 20))
+
+    # Targets:
+    atlas[1, 1, 1] = 1
+    atlas[1, 1, 2] = 2
+    atlas[4, 1, 1] = 3
+    atlas[4, 1, 2] = 4
+
+    target_img_start = nib.Nifti1Image(
+        np.logical_or(atlas==1, atlas==2).astype(np.float32), np.eye(4))
+    target_img_end = nib.Nifti1Image(
+        np.logical_or(atlas==3, atlas==4).astype(np.float32), np.eye(4))
+
+    clean_idx_start = list(abr.clean_by_endpoints(
+        sl, target_img_start, 0))
+    clean_idx_end = list(abr.clean_by_endpoints(
+        sl, target_img_end, -1))
+    npt.assert_array_equal(np.logical_and(
+        clean_idx_start, clean_idx_end), np.array([1, 1, 0, 0]))
+
+    # If tol=1, the third streamline also gets included
+    clean_idx_start = list(abr.clean_by_endpoints(
+        sl, target_img_start, 0, tol=1))
+    clean_idx_end = list(abr.clean_by_endpoints(
+        sl, target_img_end, -1, tol=1))
+    npt.assert_array_equal(np.logical_and(
+        clean_idx_start, clean_idx_end), np.array([1, 1, 1, 0]))
 
 
 def test_check_sls_with_inclusion():

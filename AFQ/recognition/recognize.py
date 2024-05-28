@@ -211,10 +211,9 @@ def recognize(
         bundle_decisions, np.ones((n_streamlines, 1))), axis=1)
     bundle_decisions = np.argmax(bundle_decisions, -1)
 
-    # We do another round through, so that we can orient all the
-    # streamlines within a bundle in the same orientation with respect to
-    # the ROIs. This order is ARBITRARY but CONSISTENT (going from ROI0
-    # to ROI1).
+    # We do another round through, so that we can:
+    # 1. Clip streamlines according to ROIs
+    # 2. Re-orient streamlines
     logger.info("Re-orienting streamlines to consistent directions")
     for bundle_idx, bundle in enumerate(bundle_dict.bundle_names):
         logger.info(f"Processing {bundle}")
