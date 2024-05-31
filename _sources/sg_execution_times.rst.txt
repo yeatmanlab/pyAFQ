@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**173:08.851** total execution time for 16 files **from all galleries**:
+**176:30.282** total execution time for 16 files **from all galleries**:
 
 .. container::
 
@@ -33,32 +33,32 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_howto_howto_examples_plot_acoustic_radiations.py` (``../../examples/howto_examples/plot_acoustic_radiations.py``)
-     - 35:13.165
-     - 4197.3
+     - 34:25.077
+     - 4187.1
    * - :ref:`sphx_glr_howto_howto_examples_plot_afq_fwdti.py` (``../../examples/howto_examples/plot_afq_fwdti.py``)
-     - 30:58.353
-     - 3952.4
+     - 31:13.952
+     - 3413.0
    * - :ref:`sphx_glr_howto_howto_examples_plot_optic_radiations.py` (``../../examples/howto_examples/plot_optic_radiations.py``)
-     - 27:10.398
-     - 3768.0
+     - 26:59.507
+     - 3770.1
    * - :ref:`sphx_glr_howto_howto_examples_plot_stages_of_tractometry.py` (``../../examples/howto_examples/plot_stages_of_tractometry.py``)
-     - 25:43.670
-     - 4156.3
+     - 26:06.886
+     - 4155.9
    * - :ref:`sphx_glr_tutorials_tutorial_examples_plot_002_bids_layout.py` (``../../examples/tutorial_examples/plot_002_bids_layout.py``)
-     - 17:03.132
-     - 1601.2
-   * - :ref:`sphx_glr_howto_howto_examples_plot_afq_callosal.py` (``../../examples/howto_examples/plot_afq_callosal.py``)
-     - 15:24.391
-     - 2169.1
+     - 21:24.524
+     - 1457.1
    * - :ref:`sphx_glr_howto_howto_examples_plot_recobundles.py` (``../../examples/howto_examples/plot_recobundles.py``)
-     - 15:13.707
-     - 2148.4
+     - 15:20.318
+     - 2177.4
+   * - :ref:`sphx_glr_howto_howto_examples_plot_afq_callosal.py` (``../../examples/howto_examples/plot_afq_callosal.py``)
+     - 15:03.661
+     - 2166.3
    * - :ref:`sphx_glr_tutorials_tutorial_examples_plot_001_afq_api.py` (``../../examples/tutorial_examples/plot_001_afq_api.py``)
-     - 05:58.786
-     - 882.5
+     - 05:34.192
+     - 1050.0
    * - :ref:`sphx_glr_tutorials_tutorial_examples_plot_003_viz.py` (``../../examples/tutorial_examples/plot_003_viz.py``)
-     - 00:23.249
-     - 23.7
+     - 00:22.166
+     - 22.2
    * - :ref:`sphx_glr_howto_howto_examples_add_custom_bundle.py` (``../../examples/howto_examples/add_custom_bundle.py``)
      - 00:00.000
      - 0.0
