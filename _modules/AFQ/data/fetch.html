@@ -8,25 +8,25 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.data.fetch &#8212; AFQ 1.3.1 documentation</title>
+    <title>AFQ.data.fetch &#8212; AFQ 1.3.2 documentation</title>
   
   
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
 
   
-  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
@@ -35,13 +35,13 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
-  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -62,27 +62,23 @@
 
   
   
-  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -104,12 +100,17 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
   
   <div class="col-lg-3 navbar-header-items__start">
@@ -129,8 +130,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3.1 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3.1 documentation - Home"/>`);</script>
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3.2 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3.2 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -145,40 +146,40 @@
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../tutorials/index.html">
-                        Getting started with pyAFQ
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+    Getting started with pyAFQ
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../howto/index.html">
-                        How To
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../explanations/index.html">
-                        Explanations
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../howto/index.html">
+    How To
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../reference/index.html">
-                        Reference Documentation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../reference/api/index.html">
-                        API Reference
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../explanations/index.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../reference/index.html">
+    Reference Documentation
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../reference/api/index.html">
+    API Reference
+  </a>
+</li>
+
   </ul>
 </nav></div>
       
@@ -271,46 +272,49 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item">
+          
+          
+            <div class="navbar-item">
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../tutorials/index.html">
-                        Getting started with pyAFQ
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+    Getting started with pyAFQ
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../howto/index.html">
-                        How To
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../explanations/index.html">
-                        Explanations
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../howto/index.html">
+    How To
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../reference/index.html">
-                        Reference Documentation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../reference/api/index.html">
-                        API Reference
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../explanations/index.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../reference/index.html">
+    Reference Documentation
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../reference/api/index.html">
+    API Reference
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -379,13 +383,13 @@ document.write(`
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
@@ -394,7 +398,7 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
@@ -691,7 +695,7 @@ document.write(`
     <span class="s2">&quot;1c4c0823c23b676d6d35004d93b9c695&quot;</span><span class="p">,</span> <span class="s2">&quot;d4830d558cc8f707ebec912b32d197a5&quot;</span><span class="p">,</span>
     <span class="s2">&quot;c405e0dbd9a4091c77b3d1ad200229b4&quot;</span><span class="p">,</span> <span class="s2">&quot;ec0aeccc6661d2ee5ed79259383cdcee&quot;</span><span class="p">,</span>
     <span class="s2">&quot;2802cd227b550f6e85df0fec1d515c29&quot;</span><span class="p">,</span> <span class="s2">&quot;385addb999dc6d76957d2a35c4ee74bb&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;b79f01829bd95682faaf545c72b1d52c&quot;</span><span class="p">,</span> <span class="s2">&quot;b79f01829bd95682faaf545c72b1d52c&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;0dd14c02b272263adbe2246880979c9d&quot;</span><span class="p">,</span> <span class="s2">&quot;99dac5a00c10d81d222f020162fd6194&quot;</span><span class="p">,</span>
     <span class="s2">&quot;e49ba370edca96734d9376f551d413db&quot;</span><span class="p">,</span> <span class="s2">&quot;f59e9e69e06325198f70047cd63c3bdc&quot;</span><span class="p">,</span>
     <span class="s2">&quot;ae3bd2931f95adae0280a8f75cd3ca9b&quot;</span><span class="p">,</span> <span class="s2">&quot;c409a0036b8c2dd4d03d11fbc6bfbdcd&quot;</span><span class="p">,</span>
     <span class="s2">&quot;c2597a474ea5ec9e3126c35fd238f6b2&quot;</span><span class="p">,</span> <span class="s2">&quot;67af59c934147c9f9ff6e0b76c4cc6eb&quot;</span><span class="p">,</span>
@@ -731,7 +735,7 @@ document.write(`
 <span class="n">pediatric_remote_fnames</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;24880625&quot;</span><span class="p">,</span> <span class="s2">&quot;24880628&quot;</span><span class="p">,</span> <span class="s2">&quot;24880631&quot;</span><span class="p">,</span> <span class="s2">&quot;24880634&quot;</span><span class="p">,</span> <span class="s2">&quot;24880637&quot;</span><span class="p">,</span> <span class="s2">&quot;24880640&quot;</span><span class="p">,</span>
     <span class="s2">&quot;24880643&quot;</span><span class="p">,</span> <span class="s2">&quot;24880646&quot;</span><span class="p">,</span> <span class="s2">&quot;24880649&quot;</span><span class="p">,</span> <span class="s2">&quot;24880652&quot;</span><span class="p">,</span> <span class="s2">&quot;24880655&quot;</span><span class="p">,</span> <span class="s2">&quot;24880661&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;24880664&quot;</span><span class="p">,</span> <span class="s2">&quot;24880667&quot;</span><span class="p">,</span> <span class="s2">&quot;24880670&quot;</span><span class="p">,</span> <span class="s2">&quot;24880673&quot;</span><span class="p">,</span> <span class="s2">&quot;24880676&quot;</span><span class="p">,</span> <span class="s2">&quot;24880679&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;24880664&quot;</span><span class="p">,</span> <span class="s2">&quot;24880667&quot;</span><span class="p">,</span> <span class="s2">&quot;46407571&quot;</span><span class="p">,</span> <span class="s2">&quot;46407568&quot;</span><span class="p">,</span> <span class="s2">&quot;24880676&quot;</span><span class="p">,</span> <span class="s2">&quot;24880679&quot;</span><span class="p">,</span>
     <span class="s2">&quot;24880685&quot;</span><span class="p">,</span> <span class="s2">&quot;24880688&quot;</span><span class="p">,</span> <span class="s2">&quot;24880691&quot;</span><span class="p">,</span> <span class="s2">&quot;24880694&quot;</span><span class="p">,</span> <span class="s2">&quot;24880697&quot;</span><span class="p">,</span> <span class="s2">&quot;24880700&quot;</span><span class="p">,</span>
     <span class="s2">&quot;24880703&quot;</span><span class="p">,</span> <span class="s2">&quot;24880706&quot;</span><span class="p">,</span> <span class="s2">&quot;24880712&quot;</span><span class="p">,</span> <span class="s2">&quot;24880715&quot;</span><span class="p">,</span> <span class="s2">&quot;24880718&quot;</span><span class="p">,</span> <span class="s2">&quot;24880721&quot;</span><span class="p">,</span>
     <span class="s2">&quot;24880724&quot;</span><span class="p">,</span> <span class="s2">&quot;24880727&quot;</span><span class="p">,</span> <span class="s2">&quot;24880730&quot;</span><span class="p">,</span> <span class="s2">&quot;24880733&quot;</span><span class="p">,</span> <span class="s2">&quot;24880736&quot;</span><span class="p">,</span> <span class="s2">&quot;24880748&quot;</span><span class="p">,</span>
@@ -966,7 +970,7 @@ document.write(`
                           <span class="s2">&quot;11458274&quot;</span><span class="p">,</span> <span class="s2">&quot;11458277&quot;</span><span class="p">,</span>
                           <span class="s2">&quot;5273695&quot;</span><span class="p">,</span> <span class="s2">&quot;5273692&quot;</span><span class="p">,</span> <span class="s2">&quot;5273698&quot;</span><span class="p">,</span> <span class="s2">&quot;5273701&quot;</span><span class="p">,</span>
                           <span class="s2">&quot;11458268&quot;</span><span class="p">,</span> <span class="s2">&quot;11458271&quot;</span><span class="p">,</span>
-                          <span class="s2">&quot;5273704&quot;</span><span class="p">,</span> <span class="s2">&quot;5273707&quot;</span><span class="p">,</span> <span class="s2">&quot;5273710&quot;</span><span class="p">,</span> <span class="s2">&quot;5273713&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;5273704&quot;</span><span class="p">,</span> <span class="s2">&quot;5273707&quot;</span><span class="p">,</span> <span class="s2">&quot;46407574&quot;</span><span class="p">,</span> <span class="s2">&quot;46407577&quot;</span><span class="p">,</span>
                           <span class="s2">&quot;11458262&quot;</span><span class="p">,</span> <span class="s2">&quot;11458265&quot;</span><span class="p">,</span>
                           <span class="s2">&quot;5273716&quot;</span><span class="p">,</span> <span class="s2">&quot;5273719&quot;</span><span class="p">,</span>
                           <span class="s2">&quot;11458220&quot;</span><span class="p">,</span>
@@ -1040,8 +1044,8 @@ document.write(`
                        <span class="s2">&quot;7e73ab02db30a3ad6bd9e82148c2486e&quot;</span><span class="p">,</span>
                        <span class="s2">&quot;f9db3154955a20b67c2dda758800d14c&quot;</span><span class="p">,</span>
                        <span class="s2">&quot;73941510c798c1ed1b03e2bd481cd5c7&quot;</span><span class="p">,</span>
-                       <span class="s2">&quot;660cdc031ee0716d60159c7d933119ea&quot;</span><span class="p">,</span>
-                       <span class="s2">&quot;660cdc031ee0716d60159c7d933119ea&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;b20e0caa54cf35002cd06cf6033b964f&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;e751306df304af32c3ce7617913bbd30&quot;</span><span class="p">,</span>
                        <span class="s2">&quot;fd012bc89f6bed7bd54530195496bac4&quot;</span><span class="p">,</span>
                        <span class="s2">&quot;3406906a86e633cc102127cf210a1063&quot;</span><span class="p">,</span>
                        <span class="s2">&quot;9040a7953dcbbf131d135c866182d8ef&quot;</span><span class="p">,</span>
@@ -2267,7 +2271,7 @@ document.write(`
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
 </div>
@@ -2276,8 +2280,6 @@ document.write(`
             </div>
             
             
-              
-                <div class="bd-sidebar-secondary bd-toc"></div>
               
             
           </div>
@@ -2290,8 +2292,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+  <script src="../../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
 
 
   <footer class="bd-footer">
@@ -2325,7 +2327,7 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.3.
 </p></div>
       
     </div>

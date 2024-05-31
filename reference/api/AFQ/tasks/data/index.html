@@ -8,25 +8,25 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.data &#8212; AFQ 1.3.1 documentation</title>
+    <title>AFQ.tasks.data &#8212; AFQ 1.3.2 documentation</title>
   
   
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../../../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link href="../../../../../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../../../../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
 
   
-  <link href="../../../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+  <link href="../../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css" />
@@ -35,13 +35,13 @@
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/sg_gallery-rendered-html.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
-<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
-  <script src="../../../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
 
     <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
     <script src="../../../../../_static/jquery.js"></script>
@@ -64,27 +64,23 @@
 
   
   
-  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -106,12 +102,17 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
   
   <div class="col-lg-3 navbar-header-items__start">
@@ -131,8 +132,8 @@
       
     
     
-    <img src="../../../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3.1 documentation - Home"/>
-    <script>document.write(`<img src="../../../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3.1 documentation - Home"/>`);</script>
+    <img src="../../../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3.2 documentation - Home"/>
+    <script>document.write(`<img src="../../../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3.2 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -147,40 +148,40 @@
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../../../tutorials/index.html">
-                        Getting started with pyAFQ
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../../../tutorials/index.html">
+    Getting started with pyAFQ
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../../../howto/index.html">
-                        How To
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../../../explanations/index.html">
-                        Explanations
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../../../howto/index.html">
+    How To
+  </a>
+</li>
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../../../../index.html">
-                        Reference Documentation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../index.html">
-                        API Reference
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../../../explanations/index.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item current active">
+  <a class="nav-link nav-internal" href="../../../../index.html">
+    Reference Documentation
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../index.html">
+    API Reference
+  </a>
+</li>
+
   </ul>
 </nav></div>
       
@@ -252,9 +253,9 @@ document.write(`
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+    <button class="sidebar-toggle secondary-toggle" aria-label="On this page">
       <span class="fa-solid fa-outdent"></span>
-    </label>
+    </button>
   
 </div>
 
@@ -275,46 +276,49 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item">
+          
+          
+            <div class="navbar-item">
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../../../tutorials/index.html">
-                        Getting started with pyAFQ
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../../../tutorials/index.html">
+    Getting started with pyAFQ
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../../../howto/index.html">
-                        How To
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../../../explanations/index.html">
-                        Explanations
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../../../howto/index.html">
+    How To
+  </a>
+</li>
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../../../../index.html">
-                        Reference Documentation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../index.html">
-                        API Reference
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../../../explanations/index.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item current active">
+  <a class="nav-link nav-internal" href="../../../../index.html">
+    Reference Documentation
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../index.html">
+    API Reference
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -377,35 +381,35 @@ document.write(`
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l2 current active has-children"><a class="reference internal" href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../../index.html">API Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../api/bundle_dict/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.bundle_dict</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/group/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.group</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/participant/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.participant</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.utils</span></code></a></li>
 </ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../data/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../data/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../data/fetch/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data.fetch</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../data/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data.utils</span></code></a></li>
 </ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../definitions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../definitions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../definitions/image/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.image</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../definitions/mapping/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.mapping</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../definitions/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.utils</span></code></a></li>
 </ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../models/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../models/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../models/QBallTP/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.QBallTP</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../models/csd/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.csd</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../models/dki/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.dki</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../models/dti/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.dti</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../models/fwdti/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.fwdti</span></code></a></li>
 </ul>
-</li>
-<li class="toctree-l3 current active has-children"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+</details></li>
+<li class="toctree-l3 current active has-children"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks</span></code></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l4 current active"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.data</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../decorators/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.decorators</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../mapping/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.mapping</span></code></a></li>
@@ -414,14 +418,14 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.utils</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../viz/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.viz</span></code></a></li>
 </ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../tractography/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../tractography/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../tractography/gputractography/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography.gputractography</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../tractography/tractography/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography.tractography</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../tractography/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography.utils</span></code></a></li>
 </ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../utils/bin/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.bin</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../utils/docs/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.docs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../utils/models/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.models</span></code></a></li>
@@ -430,21 +434,21 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../../utils/streamlines/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.streamlines</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../utils/volume/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.volume</span></code></a></li>
 </ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../../viz/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../viz/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../viz/altair/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.altair</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../viz/fury_backend/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.fury_backend</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../viz/plot/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.plot</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../viz/plotly_backend/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.plotly_backend</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../viz/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.utils</span></code></a></li>
 </ul>
-</li>
+</details></li>
 <li class="toctree-l3"><a class="reference internal" href="../../registration/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.registration</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../segmentation/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.segmentation</span></code></a></li>
 </ul>
-</li>
+</details></li>
 </ul>
-</li>
+</details></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../bundledict.html">Defining Custom Bundle Dictionaries</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../kwargs.html">The pyAFQ API optional arguments</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../methods.html">The pyAFQ API methods</a></li>
@@ -466,13 +470,13 @@ document.write(`
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
@@ -483,7 +487,7 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
@@ -523,16 +527,16 @@ document.write(`
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">#</a></h2>
 <div class="section" id="functions">
 <h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading">#</a></h3>
-<table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.data.get_data_gtab" title="AFQ.tasks.data.get_data_gtab"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_data_gtab</span></code></a>(dwi_path, bval, bvec[, min_bval, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.data.get_data_gtab" title="AFQ.tasks.data.get_data_gtab"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_data_gtab</span></code></a>(dwi_data_file, bval_file, bvec_file[, ...])</p></td>
 <td><p>DWI data as an ndarray for selected b values,</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.data.b0" title="AFQ.tasks.data.b0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">b0</span></code></a>(dwi_path, gtab)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.data.b0" title="AFQ.tasks.data.b0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">b0</span></code></a>(dwi_data_file, gtab)</p></td>
 <td><p>full path to a nifti file containing the mean b0</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.data.b0_mask" title="AFQ.tasks.data.b0_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">b0_mask</span></code></a>(b0, brain_mask)</p></td>
@@ -541,7 +545,7 @@ document.write(`
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.data.dti_fit" title="AFQ.tasks.data.dti_fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dti_fit</span></code></a>(dti_params, gtab)</p></td>
 <td><p>DTI TensorFit object</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.data.dti_params" title="AFQ.tasks.data.dti_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dti_params</span></code></a>(brain_mask, data, gtab, bval, bvec[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.data.dti_params" title="AFQ.tasks.data.dti_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dti_params</span></code></a>(brain_mask, data, gtab, bval_file, bvec_file)</p></td>
 <td><p>full path to a nifti file containing parameters</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.data.fwdti_fit" title="AFQ.tasks.data.fwdti_fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fwdti_fit</span></code></a>(fwdti_params, gtab)</p></td>
@@ -584,6 +588,24 @@ document.write(`
 <td><p>full path to a nifti file containing</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.data.gq_ai" title="AFQ.tasks.data.gq_ai"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gq_ai</span></code></a>(gq_params)</p></td>
+<td><p>full path to a nifti file containing</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.data.rumba_model" title="AFQ.tasks.data.rumba_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rumba_model</span></code></a>(gtab[, rumba_wm_response, ...])</p></td>
+<td><p>fit for RUMBA-SD model as documented on dipy reconstruction options</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.data.rumba_params" title="AFQ.tasks.data.rumba_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rumba_params</span></code></a>(rumba_model, data, brain_mask)</p></td>
+<td><p>Takes the fitted RUMBA-SD model as input and returns</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.data.rumba_fit" title="AFQ.tasks.data.rumba_fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rumba_fit</span></code></a>(rumba_model, rumba_params)</p></td>
+<td><p>RUMBA FIT</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.data.rumba_f_csf" title="AFQ.tasks.data.rumba_f_csf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rumba_f_csf</span></code></a>(rumba_fit)</p></td>
+<td><p>full path to a nifti file containing</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.data.rumba_f_gm" title="AFQ.tasks.data.rumba_f_gm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rumba_f_gm</span></code></a>(rumba_fit)</p></td>
+<td><p>full path to a nifti file containing</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.data.rumba_f_wm" title="AFQ.tasks.data.rumba_f_wm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rumba_f_wm</span></code></a>(rumba_fit)</p></td>
 <td><p>full path to a nifti file containing</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.data.opdt_params" title="AFQ.tasks.data.opdt_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">opdt_params</span></code></a>(base_fname, data, gtab, dwi_affine, brain_mask)</p></td>
@@ -676,7 +698,7 @@ document.write(`
 <tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.data.brain_mask" title="AFQ.tasks.data.brain_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">brain_mask</span></code></a>(b0[, brain_mask_definition])</p></td>
 <td><p>full path to a nifti file containing</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.data.get_bundle_dict" title="AFQ.tasks.data.get_bundle_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_bundle_dict</span></code></a>(segmentation_params, brain_mask, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#AFQ.tasks.data.get_bundle_dict" title="AFQ.tasks.data.get_bundle_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_bundle_dict</span></code></a>(segmentation_params, brain_mask, b0[, ...])</p></td>
 <td><p>Dictionary defining the different bundles to be segmented,</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#AFQ.tasks.data.get_data_plan" title="AFQ.tasks.data.get_data_plan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_data_plan</span></code></a>(kwargs)</p></td>
@@ -685,9 +707,10 @@ document.write(`
 </tbody>
 </table>
 </div>
+</div>
 <div class="section" id="attributes">
 <h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading">#</a></h3>
-<table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -701,6 +724,7 @@ document.write(`
 </tr>
 </tbody>
 </table>
+</div>
 <dl class="py data">
 <dt class="sig sig-object py" id="AFQ.tasks.data.logger">
 <span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">logger</span></span><a class="reference internal" href="../../../../../_modules/AFQ/tasks/data.html#logger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.logger" title="Permalink to this definition">#</a></dt>
@@ -713,7 +737,7 @@ document.write(`
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.get_data_gtab">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">get_data_gtab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dwi_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bvec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_bval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_bval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/AFQ/tasks/data.html#get_data_gtab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.get_data_gtab" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">get_data_gtab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dwi_data_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bval_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bvec_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_bval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_bval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/AFQ/tasks/data.html#get_data_gtab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.get_data_gtab" title="Permalink to this definition">#</a></dt>
 <dd><p>DWI data as an ndarray for selected b values,
 A DIPY GradientTable with all the gradient information,
 and DWI data in a Nifti1Image,
@@ -742,7 +766,7 @@ it is considered to be b0. Default: 50.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.b0">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">b0</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dwi_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/AFQ/tasks/data.html#b0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.b0" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">b0</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dwi_data_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/AFQ/tasks/data.html#b0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.b0" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing the mean b0</p>
 </dd></dl>
 
@@ -761,7 +785,7 @@ mean b0 after applying the brain mask</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.dti_params">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">brain_mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bvec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robust_tensor_fitting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/AFQ/tasks/data.html#dti_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti_params" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">dti_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">brain_mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bval_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bvec_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robust_tensor_fitting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/AFQ/tasks/data.html#dti_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.dti_params" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing parameters
 for the DTI fit</p>
 <dl class="field-list simple">
@@ -834,7 +858,7 @@ the MSDKI mean signal kurtosis</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.csd_params">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">csd_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dwi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brain_mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csd_response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csd_sh_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csd_lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csd_tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/AFQ/tasks/data.html#csd_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.csd_params" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">csd_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dwi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brain_mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csd_response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csd_sh_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csd_lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csd_tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csd_fa_thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/AFQ/tasks/data.html#csd_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.csd_params" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 parameters for the CSD fit</p>
 <dl class="field-list simple">
@@ -860,6 +884,9 @@ zero. However, to improve the stability of the algorithm, tau is
 set to tau*100 percent of the mean fODF amplitude (here, 10 percent
 by default)
 (see <a class="reference internal" href="#r528d7c93b1c5-1" id="id1">[1]</a>). Default: 0.1</p>
+</dd>
+<dt><strong>csd_fa_thr</strong><span class="classifier">float, optional.</span></dt><dd><p>The threshold on the FA used to calculate the single shell auto
+response. Can be useful to reduce for baby subjects. Default: 0.7</p>
 </dd>
 </dl>
 </dd>
@@ -920,6 +947,67 @@ the anisotropic power map from GQ</p>
 <span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">gq_ai</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gq_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/AFQ/tasks/data.html#gq_ai"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.gq_ai" title="Permalink to this definition">#</a></dt>
 <dd><p>full path to a nifti file containing
 the anisotropic index from GQ</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AFQ.tasks.data.rumba_model">
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">rumba_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gtab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rumba_wm_response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0.0017,</span> <span class="pre">0.0002,</span> <span class="pre">0.0002]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rumba_gm_response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0008</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rumba_csf_response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.003</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rumba_n_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">600</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/AFQ/tasks/data.html#rumba_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.rumba_model" title="Permalink to this definition">#</a></dt>
+<dd><p>fit for RUMBA-SD model as documented on dipy reconstruction options</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>rumba_wm_response: 1D or 2D ndarray or AxSymShResponse.</strong></dt><dd><p>Able to take response[0] from auto_response_ssst.
+default: array([0.0017, 0.0002, 0.0002])</p>
+</dd>
+<dt><strong>rumba_gm_response: float, optional</strong></dt><dd><p>Mean diffusivity for GM compartment.
+If None, then grey matter volume fraction is not computed.
+Default: 0.8e-3</p>
+</dd>
+<dt><strong>rumba_csf_response: float, optional</strong></dt><dd><p>Mean diffusivity for CSF compartment.
+If None, then CSF volume fraction is not computed.
+Default: 3.0e-3</p>
+</dd>
+<dt><strong>rumba_n_iter: int, optional</strong></dt><dd><p>Number of iterations for fODF estimation.
+Must be a positive int.
+Default: 600</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AFQ.tasks.data.rumba_params">
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">rumba_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rumba_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brain_mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/AFQ/tasks/data.html#rumba_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.rumba_params" title="Permalink to this definition">#</a></dt>
+<dd><p>Takes the fitted RUMBA-SD model as input and returns
+the spherical harmonics coefficients (SHM).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AFQ.tasks.data.rumba_fit">
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">rumba_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rumba_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rumba_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/AFQ/tasks/data.html#rumba_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.rumba_fit" title="Permalink to this definition">#</a></dt>
+<dd><p>RUMBA FIT</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AFQ.tasks.data.rumba_f_csf">
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">rumba_f_csf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rumba_fit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/AFQ/tasks/data.html#rumba_f_csf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.rumba_f_csf" title="Permalink to this definition">#</a></dt>
+<dd><p>full path to a nifti file containing
+the CSF volume fraction for each voxel.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AFQ.tasks.data.rumba_f_gm">
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">rumba_f_gm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rumba_fit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/AFQ/tasks/data.html#rumba_f_gm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.rumba_f_gm" title="Permalink to this definition">#</a></dt>
+<dd><p>full path to a nifti file containing
+the GM volume fraction for each voxel.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="AFQ.tasks.data.rumba_f_wm">
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">rumba_f_wm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rumba_fit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/AFQ/tasks/data.html#rumba_f_wm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.rumba_f_wm" title="Permalink to this definition">#</a></dt>
+<dd><p>full path to a nifti file containing
+the white matter volume fraction for each voxel.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1226,7 +1314,7 @@ Default: None</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="AFQ.tasks.data.get_bundle_dict">
-<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">get_bundle_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segmentation_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brain_mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bids_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_template_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mni_T1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/AFQ/tasks/data.html#get_bundle_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.get_bundle_dict" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">AFQ.tasks.data.</span></span><span class="sig-name descname"><span class="pre">get_bundle_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segmentation_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brain_mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_template_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mni_T1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/AFQ/tasks/data.html#get_bundle_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.tasks.data.get_bundle_dict" title="Permalink to this definition">#</a></dt>
 <dd><p>Dictionary defining the different bundles to be segmented,
 and a Nifti1Image containing the template for registration</p>
 <dl class="field-list simple">
@@ -1268,7 +1356,7 @@ Default: “mni_T1”</p>
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
     <a class="left-prev"
@@ -1331,6 +1419,12 @@ Default: “mni_T1”</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#AFQ.tasks.data.gq"><code class="docutils literal notranslate"><span class="pre">gq()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#AFQ.tasks.data.gq_pmap"><code class="docutils literal notranslate"><span class="pre">gq_pmap()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#AFQ.tasks.data.gq_ai"><code class="docutils literal notranslate"><span class="pre">gq_ai()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#AFQ.tasks.data.rumba_model"><code class="docutils literal notranslate"><span class="pre">rumba_model()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#AFQ.tasks.data.rumba_params"><code class="docutils literal notranslate"><span class="pre">rumba_params()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#AFQ.tasks.data.rumba_fit"><code class="docutils literal notranslate"><span class="pre">rumba_fit()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#AFQ.tasks.data.rumba_f_csf"><code class="docutils literal notranslate"><span class="pre">rumba_f_csf()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#AFQ.tasks.data.rumba_f_gm"><code class="docutils literal notranslate"><span class="pre">rumba_f_gm()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#AFQ.tasks.data.rumba_f_wm"><code class="docutils literal notranslate"><span class="pre">rumba_f_wm()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#AFQ.tasks.data.opdt_params"><code class="docutils literal notranslate"><span class="pre">opdt_params()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#AFQ.tasks.data.opdt_pmap"><code class="docutils literal notranslate"><span class="pre">opdt_pmap()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#AFQ.tasks.data.opdt_ai"><code class="docutils literal notranslate"><span class="pre">opdt_ai()</span></code></a></li>
@@ -1408,8 +1502,8 @@ Default: “mni_T1”</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
-<script src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+  <script src="../../../../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
 
 
   <footer class="bd-footer">
@@ -1443,7 +1537,7 @@ Default: “mni_T1”</p>
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.3.
 </p></div>
       
     </div>

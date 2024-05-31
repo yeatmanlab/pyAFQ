@@ -79,7 +79,7 @@ Classes
    .. py:method:: find_path(bids_layout, from_path, subject, session, required=True)
 
 
-   .. py:method:: get_path_data_affine(bids_info)
+   .. py:method:: get_path_data_affine(dwi_path)
 
 
    .. py:method:: apply_conditions(image_data_orig, image_file)

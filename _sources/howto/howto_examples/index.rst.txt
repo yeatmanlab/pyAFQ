@@ -17,6 +17,7 @@ about the variety of pyAFQ functionality that is available.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -238,6 +239,8 @@ about the variety of pyAFQ functionality that is available.
       <div class="sphx-glr-thumbnail-title">How to segment out only some bundles</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 

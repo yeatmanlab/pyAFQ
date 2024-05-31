@@ -21,6 +21,7 @@ Functions
    AFQ.tasks.tractography.custom_tractography
    AFQ.tasks.tractography.gpu_tractography
    AFQ.tasks.tractography.get_tractography_plan
+   AFQ.tasks.tractography._gen_seeds
 
 
 
@@ -29,10 +30,16 @@ Attributes
 
 .. autoapisummary::
 
+   AFQ.tasks.tractography.has_ray
    AFQ.tasks.tractography.has_trx
    AFQ.tasks.tractography.has_gputrack
    AFQ.tasks.tractography.logger
 
+
+.. py:data:: has_ray
+   :value: True
+
+   
 
 .. py:data:: has_trx
    :value: True
@@ -156,7 +163,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: custom_tractography(bids_info, import_tract=None)
+.. py:function:: custom_tractography(import_tract=None)
 
    
    full path to the complete, unsegmented tractography file
@@ -221,5 +228,8 @@ Attributes
        !! processed by numpydoc !!
 
 .. py:function:: get_tractography_plan(kwargs)
+
+
+.. py:function:: _gen_seeds(n_seeds, params_file, seed_mask=None, seed_threshold=0, thresholds_as_percentages=False, random_seeds=False, rng_seed=None)
 
 

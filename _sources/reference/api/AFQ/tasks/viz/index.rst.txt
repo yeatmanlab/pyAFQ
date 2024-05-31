@@ -92,7 +92,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: viz_indivBundle(base_fname, results_dir, viz_backend, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, best_scalar, sbv_lims_indiv=[None, None], volume_opacity_indiv=0.3, n_points_indiv=40)
+.. py:function:: viz_indivBundle(base_fname, output_dir, viz_backend, data_imap, mapping_imap, segmentation_imap, tracking_params, segmentation_params, best_scalar, sbv_lims_indiv=[None, None], volume_opacity_indiv=0.3, n_points_indiv=40)
 
    
    list of full paths to html or gif files

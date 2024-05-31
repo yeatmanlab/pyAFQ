@@ -8,25 +8,25 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.definitions.image &#8212; AFQ 1.3.1 documentation</title>
+    <title>AFQ.definitions.image &#8212; AFQ 1.3.2 documentation</title>
   
   
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
 
   
-  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
@@ -35,13 +35,13 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
-  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -62,27 +62,23 @@
 
   
   
-  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -104,12 +100,17 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
   
   <div class="col-lg-3 navbar-header-items__start">
@@ -129,8 +130,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3.1 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3.1 documentation - Home"/>`);</script>
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3.2 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3.2 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -145,40 +146,40 @@
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../tutorials/index.html">
-                        Getting started with pyAFQ
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+    Getting started with pyAFQ
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../howto/index.html">
-                        How To
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../explanations/index.html">
-                        Explanations
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../howto/index.html">
+    How To
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../reference/index.html">
-                        Reference Documentation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../reference/api/index.html">
-                        API Reference
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../explanations/index.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../reference/index.html">
+    Reference Documentation
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../reference/api/index.html">
+    API Reference
+  </a>
+</li>
+
   </ul>
 </nav></div>
       
@@ -271,46 +272,49 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item">
+          
+          
+            <div class="navbar-item">
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../tutorials/index.html">
-                        Getting started with pyAFQ
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+    Getting started with pyAFQ
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../howto/index.html">
-                        How To
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../explanations/index.html">
-                        Explanations
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../howto/index.html">
+    How To
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../reference/index.html">
-                        Reference Documentation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../reference/api/index.html">
-                        API Reference
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../explanations/index.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../reference/index.html">
+    Reference Documentation
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../reference/api/index.html">
+    API Reference
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -379,13 +383,13 @@ document.write(`
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
@@ -394,7 +398,7 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
@@ -566,16 +570,13 @@ document.write(`
         <span class="k">if</span> <span class="n">nearest_image</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
 
-        <span class="k">if</span> <span class="n">session</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span><span class="n">session</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span><span class="n">session</span><span class="p">][</span><span class="n">subject</span><span class="p">]</span> <span class="o">=</span> <span class="n">nearest_image</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span><span class="n">from_path</span><span class="p">]</span> <span class="o">=</span> <span class="n">nearest_image</span></div>
 
-<div class="viewcode-block" id="ImageFile.get_path_data_affine"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.ImageFile.get_path_data_affine">[docs]</a>    <span class="k">def</span> <span class="nf">get_path_data_affine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">):</span>
+<div class="viewcode-block" id="ImageFile.get_path_data_affine"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.ImageFile.get_path_data_affine">[docs]</a>    <span class="k">def</span> <span class="nf">get_path_data_affine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dwi_path</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_from_path</span><span class="p">:</span>
             <span class="n">image_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fname</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">image_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span>
-                <span class="n">bids_info</span><span class="p">[</span><span class="s1">&#39;session&#39;</span><span class="p">]][</span><span class="n">bids_info</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">]]</span>
+            <span class="n">image_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnames</span><span class="p">[</span><span class="n">dwi_path</span><span class="p">]</span>
         <span class="n">image_img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">image_file</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">image_file</span><span class="p">,</span> <span class="n">image_img</span><span class="o">.</span><span class="n">get_fdata</span><span class="p">(),</span> <span class="n">image_img</span><span class="o">.</span><span class="n">affine</span></div>
 
@@ -587,10 +588,10 @@ document.write(`
         <span class="k">return</span> <span class="n">name_from_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_from_path</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span></div>
 
 <div class="viewcode-block" id="ImageFile.get_image_getter"><a class="viewcode-back" href="../../../reference/api/AFQ/definitions/image/index.html#AFQ.definitions.image.ImageFile.get_image_getter">[docs]</a>    <span class="k">def</span> <span class="nf">get_image_getter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_name</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">_image_getter_helper</span><span class="p">(</span><span class="n">dwi</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">_image_getter_helper</span><span class="p">(</span><span class="n">dwi</span><span class="p">,</span> <span class="n">dwi_data_file</span><span class="p">):</span>
             <span class="c1"># Load data</span>
             <span class="n">image_file</span><span class="p">,</span> <span class="n">image_data_orig</span><span class="p">,</span> <span class="n">image_affine</span> <span class="o">=</span> \
-                <span class="bp">self</span><span class="o">.</span><span class="n">get_path_data_affine</span><span class="p">(</span><span class="n">bids_info</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_path_data_affine</span><span class="p">(</span><span class="n">dwi_data_file</span><span class="p">)</span>
 
             <span class="c1"># Apply any conditions on the data</span>
             <span class="n">image_data</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_conditions</span><span class="p">(</span>
@@ -606,11 +607,11 @@ document.write(`
                 <span class="n">image_data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
                 <span class="n">dwi</span><span class="o">.</span><span class="n">affine</span><span class="p">),</span> <span class="n">meta</span>
         <span class="k">if</span> <span class="n">task_name</span> <span class="o">==</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span>
-            <span class="k">def</span> <span class="nf">image_getter</span><span class="p">(</span><span class="n">dwi</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">_image_getter_helper</span><span class="p">(</span><span class="n">dwi</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">)</span>
+            <span class="k">def</span> <span class="nf">image_getter</span><span class="p">(</span><span class="n">dwi</span><span class="p">,</span> <span class="n">dwi_data_file</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">_image_getter_helper</span><span class="p">(</span><span class="n">dwi</span><span class="p">,</span> <span class="n">dwi_data_file</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">def</span> <span class="nf">image_getter</span><span class="p">(</span><span class="n">data_imap</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">_image_getter_helper</span><span class="p">(</span><span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;dwi&quot;</span><span class="p">],</span> <span class="n">bids_info</span><span class="p">)</span>
+            <span class="k">def</span> <span class="nf">image_getter</span><span class="p">(</span><span class="n">data_imap</span><span class="p">,</span> <span class="n">dwi_data_file</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">_image_getter_helper</span><span class="p">(</span><span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;dwi&quot;</span><span class="p">],</span> <span class="n">dwi_data_file</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">image_getter</span></div></div>
 
 
@@ -1201,7 +1202,7 @@ document.write(`
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
 </div>
@@ -1210,8 +1211,6 @@ document.write(`
             </div>
             
             
-              
-                <div class="bd-sidebar-secondary bd-toc"></div>
               
             
           </div>
@@ -1224,8 +1223,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+  <script src="../../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
 
 
   <footer class="bd-footer">
@@ -1259,7 +1258,7 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.3.
 </p></div>
       
     </div>

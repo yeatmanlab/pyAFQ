@@ -19,6 +19,7 @@ tutorial, and will save results as it goes along.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -70,6 +71,8 @@ tutorial, and will save results as it goes along.
       <div class="sphx-glr-thumbnail-title">Visualizing AFQ derivatives</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 

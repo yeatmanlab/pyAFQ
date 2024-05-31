@@ -17,7 +17,7 @@ Classes
 
 
 
-.. py:class:: ParticipantAFQ(dwi_data_file, bval_file, bvec_file, output_dir, _bids_info=None, **kwargs)
+.. py:class:: ParticipantAFQ(dwi_data_file, bval_file, bvec_file, output_dir, **kwargs)
 
 
    Bases: :py:obj:`object`

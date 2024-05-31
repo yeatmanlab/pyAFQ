@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_tutorials_tutorial_examples_plot_003_viz.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -708,9 +708,9 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 21.639 seconds)
+   **Total running time of the script:** (0 minutes 21.942 seconds)
 
-**Estimated memory usage:**  22 MB
+**Estimated memory usage:**  25 MB
 
 
 .. _sphx_glr_download_tutorials_tutorial_examples_plot_003_viz.py:

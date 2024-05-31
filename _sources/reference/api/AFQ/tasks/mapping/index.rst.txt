@@ -83,7 +83,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: export_rois(base_fname, results_dir, data_imap, mapping)
+.. py:function:: export_rois(base_fname, output_dir, data_imap, mapping)
 
    
    dictionary of full paths to Nifti1Image files of ROIs
@@ -107,7 +107,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: mapping(base_fname, dwi_path, reg_subject, data_imap, bids_info, mapping_definition=None)
+.. py:function:: mapping(base_fname, dwi_data_file, reg_subject, data_imap, mapping_definition=None)
 
    
    mapping from subject to template space.
@@ -139,7 +139,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: sls_mapping(base_fname, dwi_path, reg_subject, data_imap, bids_info, tractography_imap, mapping_definition=None)
+.. py:function:: sls_mapping(base_fname, dwi_data_file, reg_subject, data_imap, tractography_imap, mapping_definition=None)
 
    
    mapping from subject to template space.

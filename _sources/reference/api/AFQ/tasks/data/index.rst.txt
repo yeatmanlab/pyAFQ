@@ -32,6 +32,12 @@ Functions
    AFQ.tasks.data.gq
    AFQ.tasks.data.gq_pmap
    AFQ.tasks.data.gq_ai
+   AFQ.tasks.data.rumba_model
+   AFQ.tasks.data.rumba_params
+   AFQ.tasks.data.rumba_fit
+   AFQ.tasks.data.rumba_f_csf
+   AFQ.tasks.data.rumba_f_gm
+   AFQ.tasks.data.rumba_f_wm
    AFQ.tasks.data.opdt_params
    AFQ.tasks.data.opdt_pmap
    AFQ.tasks.data.opdt_ai
@@ -85,7 +91,7 @@ Attributes
 
    
 
-.. py:function:: get_data_gtab(dwi_path, bval, bvec, min_bval=None, max_bval=None, filter_b=True, b0_threshold=50)
+.. py:function:: get_data_gtab(dwi_data_file, bval_file, bvec_file, min_bval=None, max_bval=None, filter_b=True, b0_threshold=50)
 
    
    DWI data as an ndarray for selected b values,
@@ -130,7 +136,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: b0(dwi_path, gtab)
+.. py:function:: b0(dwi_data_file, gtab)
 
    
    full path to a nifti file containing the mean b0
@@ -200,7 +206,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: dti_params(brain_mask, data, gtab, bval, bvec, b0_threshold=50, robust_tensor_fitting=False)
+.. py:function:: dti_params(brain_mask, data, gtab, bval_file, bvec_file, b0_threshold=50, robust_tensor_fitting=False)
 
    
    full path to a nifti file containing parameters
@@ -423,7 +429,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: csd_params(dwi, brain_mask, gtab, data, csd_response=None, csd_sh_order=None, csd_lambda_=1, csd_tau=0.1)
+.. py:function:: csd_params(dwi, brain_mask, gtab, data, csd_response=None, csd_sh_order=None, csd_lambda_=1, csd_tau=0.1, csd_fa_thr=0.7)
 
    
    full path to a nifti file containing
@@ -456,6 +462,10 @@ Attributes
            set to tau*100 percent of the mean fODF amplitude (here, 10 percent
            by default)
            (see [R528d7c93b1c5-1]_). Default: 0.1
+
+       **csd_fa_thr** : float, optional.
+           The threshold on the FA used to calculate the single shell auto
+           response. Can be useful to reduce for baby subjects. Default: 0.7
 
 
 
@@ -592,6 +602,168 @@ Attributes
    
    full path to a nifti file containing
    the anisotropic index from GQ
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: rumba_model(gtab, rumba_wm_response=[0.0017, 0.0002, 0.0002], rumba_gm_response=0.0008, rumba_csf_response=0.003, rumba_n_iter=600)
+
+   
+   fit for RUMBA-SD model as documented on dipy reconstruction options
+
+
+   :Parameters:
+
+       **rumba_wm_response: 1D or 2D ndarray or AxSymShResponse.**
+           Able to take response[0] from auto_response_ssst.
+           default: array([0.0017, 0.0002, 0.0002])
+
+       **rumba_gm_response: float, optional**
+           Mean diffusivity for GM compartment.
+           If None, then grey matter volume fraction is not computed.
+           Default: 0.8e-3
+
+       **rumba_csf_response: float, optional**
+           Mean diffusivity for CSF compartment.
+           If None, then CSF volume fraction is not computed.
+           Default: 3.0e-3
+
+       **rumba_n_iter: int, optional**
+           Number of iterations for fODF estimation.
+           Must be a positive int.
+           Default: 600
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: rumba_params(rumba_model, data, brain_mask)
+
+   
+   Takes the fitted RUMBA-SD model as input and returns
+   the spherical harmonics coefficients (SHM).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: rumba_fit(rumba_model, rumba_params)
+
+   
+   RUMBA FIT
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: rumba_f_csf(rumba_fit)
+
+   
+   full path to a nifti file containing
+   the CSF volume fraction for each voxel.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: rumba_f_gm(rumba_fit)
+
+   
+   full path to a nifti file containing
+   the GM volume fraction for each voxel.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: rumba_f_wm(rumba_fit)
+
+   
+   full path to a nifti file containing
+   the white matter volume fraction for each voxel.
 
 
 
@@ -1409,7 +1581,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: get_bundle_dict(segmentation_params, brain_mask, bids_info, b0, bundle_info=None, reg_template_spec='mni_T1')
+.. py:function:: get_bundle_dict(segmentation_params, brain_mask, b0, bundle_info=None, reg_template_spec='mni_T1')
 
    
    Dictionary defining the different bundles to be segmented,

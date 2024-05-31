@@ -161,30 +161,8 @@ Functions
    .. py:method:: update_max_includes(new_max)
 
 
-   .. py:method:: set_bids_info(bids_layout, bids_path, subject, session)
+   .. py:method:: _use_bids_info(roi_or_sl, bids_layout, bids_path, subject, session)
 
-      
-      Provide the bids_layout, a nearest path,
-      and the subject and session information
-      to load ROIS from BIDS
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      ..
-          !! processed by numpydoc !!
 
    .. py:method:: _cond_load(roi_or_sl, resample_to)
 

@@ -133,6 +133,10 @@ viz = myafq.export("all_bundles_figure")
 # screen. You can also zoom in and out using the mouse wheel, and rotate the
 # view by clicking and dragging with the mouse. You can also view the FA tract
 # profiles in a plot on the left side of the page.
+#
+# If the baby bundles appear dark in the html visualization due to low FA values, you
+# can reduce the upper limit of the range in the `sbv_lims_bundles` option when 
+# building your GroupAFQ object (e.g. `GroupAFQ(..., sbv_lims_bundles=[0, 0.5])`).
 
 
 ##########################################################################

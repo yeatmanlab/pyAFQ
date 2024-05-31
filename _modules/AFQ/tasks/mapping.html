@@ -8,25 +8,25 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.tasks.mapping &#8212; AFQ 1.3.1 documentation</title>
+    <title>AFQ.tasks.mapping &#8212; AFQ 1.3.2 documentation</title>
   
   
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
 
   
-  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
@@ -35,13 +35,13 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
-  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
@@ -62,27 +62,23 @@
 
   
   
-  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -104,12 +100,17 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
   
   <div class="col-lg-3 navbar-header-items__start">
@@ -129,8 +130,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3.1 documentation - Home"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3.1 documentation - Home"/>`);</script>
+    <img src="../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3.2 documentation - Home"/>
+    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3.2 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -145,40 +146,40 @@
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../tutorials/index.html">
-                        Getting started with pyAFQ
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+    Getting started with pyAFQ
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../howto/index.html">
-                        How To
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../explanations/index.html">
-                        Explanations
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../howto/index.html">
+    How To
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../reference/index.html">
-                        Reference Documentation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../reference/api/index.html">
-                        API Reference
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../explanations/index.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../reference/index.html">
+    Reference Documentation
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../reference/api/index.html">
+    API Reference
+  </a>
+</li>
+
   </ul>
 </nav></div>
       
@@ -271,46 +272,49 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item">
+          
+          
+            <div class="navbar-item">
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../tutorials/index.html">
-                        Getting started with pyAFQ
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+    Getting started with pyAFQ
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../howto/index.html">
-                        How To
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../explanations/index.html">
-                        Explanations
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../howto/index.html">
+    How To
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../reference/index.html">
-                        Reference Documentation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../reference/api/index.html">
-                        API Reference
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../explanations/index.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../reference/index.html">
+    Reference Documentation
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../reference/api/index.html">
+    API Reference
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -379,13 +383,13 @@ document.write(`
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
@@ -394,7 +398,7 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
@@ -475,13 +479,13 @@ document.write(`
 
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;rois&quot;</span><span class="p">)</span>
-<div class="viewcode-block" id="export_rois"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.export_rois">[docs]</a><span class="k">def</span> <span class="nf">export_rois</span><span class="p">(</span><span class="n">base_fname</span><span class="p">,</span> <span class="n">results_dir</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">,</span> <span class="n">mapping</span><span class="p">):</span>
+<div class="viewcode-block" id="export_rois"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.export_rois">[docs]</a><span class="k">def</span> <span class="nf">export_rois</span><span class="p">(</span><span class="n">base_fname</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">,</span> <span class="n">mapping</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    dictionary of full paths to Nifti1Image files of ROIs</span>
 <span class="sd">    transformed to subject space</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">bundle_dict</span> <span class="o">=</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;bundle_dict&quot;</span><span class="p">]</span>
-    <span class="n">rois_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results_dir</span><span class="p">,</span> <span class="s1">&#39;ROIs&#39;</span><span class="p">)</span>
+    <span class="n">rois_dir</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="s1">&#39;ROIs&#39;</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">rois_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">roi_files</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">base_roi_fname</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rois_dir</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">base_fname</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
@@ -499,7 +503,7 @@ document.write(`
 
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;mapping&quot;</span><span class="p">)</span>
-<div class="viewcode-block" id="mapping"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.mapping">[docs]</a><span class="k">def</span> <span class="nf">mapping</span><span class="p">(</span><span class="n">base_fname</span><span class="p">,</span> <span class="n">dwi_path</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">,</span>
+<div class="viewcode-block" id="mapping"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.mapping">[docs]</a><span class="k">def</span> <span class="nf">mapping</span><span class="p">(</span><span class="n">base_fname</span><span class="p">,</span> <span class="n">dwi_data_file</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">,</span>
             <span class="n">mapping_definition</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    mapping from subject to template space.</span>
@@ -521,19 +525,13 @@ document.write(`
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
             <span class="s2">&quot;mapping must be a mapping defined&quot;</span>
             <span class="o">+</span> <span class="s2">&quot; in `AFQ.definitions.mapping`&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">bids_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">mapping_definition</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
-            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;bids_layout&quot;</span><span class="p">],</span>
-            <span class="n">dwi_path</span><span class="p">,</span>
-            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">],</span>
-            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;session&quot;</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">mapping_definition</span><span class="o">.</span><span class="n">get_for_subses</span><span class="p">(</span>
-        <span class="n">base_fname</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;dwi&quot;</span><span class="p">],</span> <span class="n">bids_info</span><span class="p">,</span>
+        <span class="n">base_fname</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;dwi&quot;</span><span class="p">],</span> <span class="n">dwi_data_file</span><span class="p">,</span>
         <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">)</span></div>
 
 
 <span class="nd">@pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;mapping&quot;</span><span class="p">)</span>
-<div class="viewcode-block" id="sls_mapping"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.sls_mapping">[docs]</a><span class="k">def</span> <span class="nf">sls_mapping</span><span class="p">(</span><span class="n">base_fname</span><span class="p">,</span> <span class="n">dwi_path</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">,</span> <span class="n">bids_info</span><span class="p">,</span>
+<div class="viewcode-block" id="sls_mapping"><a class="viewcode-back" href="../../../reference/api/AFQ/tasks/mapping/index.html#AFQ.tasks.mapping.sls_mapping">[docs]</a><span class="k">def</span> <span class="nf">sls_mapping</span><span class="p">(</span><span class="n">base_fname</span><span class="p">,</span> <span class="n">dwi_data_file</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">,</span>
                 <span class="n">tractography_imap</span><span class="p">,</span> <span class="n">mapping_definition</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    mapping from subject to template space.</span>
@@ -555,12 +553,6 @@ document.write(`
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
             <span class="s2">&quot;mapping must be a mapping defined&quot;</span>
             <span class="o">+</span> <span class="s2">&quot; in `AFQ.definitions.mapping`&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">bids_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">mapping_definition</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
-            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;bids_layout&quot;</span><span class="p">],</span>
-            <span class="n">dwi_path</span><span class="p">,</span>
-            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">],</span>
-            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;session&quot;</span><span class="p">])</span>
     <span class="n">streamlines_file</span> <span class="o">=</span> <span class="n">tractography_imap</span><span class="p">[</span><span class="s2">&quot;streamlines&quot;</span><span class="p">]</span>
     <span class="n">tg</span> <span class="o">=</span> <span class="n">load_tractogram</span><span class="p">(</span>
         <span class="n">streamlines_file</span><span class="p">,</span> <span class="n">reg_subject</span><span class="p">,</span>
@@ -579,7 +571,8 @@ document.write(`
         <span class="n">atlas_fname</span><span class="p">,</span>
         <span class="s1">&#39;same&#39;</span><span class="p">,</span> <span class="n">bbox_valid_check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">mapping_definition</span><span class="o">.</span><span class="n">get_for_subses</span><span class="p">(</span>
-        <span class="n">base_fname</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;dwi&quot;</span><span class="p">],</span> <span class="n">bids_info</span><span class="p">,</span>
+        <span class="n">base_fname</span><span class="p">,</span> <span class="n">data_imap</span><span class="p">[</span><span class="s2">&quot;dwi&quot;</span><span class="p">],</span>
+        <span class="n">dwi_data_file</span><span class="p">,</span>
         <span class="n">reg_subject</span><span class="p">,</span> <span class="n">reg_template</span><span class="p">,</span>
         <span class="n">subject_sls</span><span class="o">=</span><span class="n">tg</span><span class="o">.</span><span class="n">streamlines</span><span class="p">,</span>
         <span class="n">template_sls</span><span class="o">=</span><span class="n">hcp_atlas</span><span class="o">.</span><span class="n">streamlines</span><span class="p">)</span></div>
@@ -633,42 +626,21 @@ document.write(`
         <span class="n">export_registered_b0</span><span class="p">,</span> <span class="n">template_xform</span><span class="p">,</span> <span class="n">export_rois</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span>
         <span class="n">get_reg_subject</span><span class="p">])</span>
 
-    <span class="n">bids_info</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bids_info&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="c1"># add custom scalars</span>
     <span class="k">for</span> <span class="n">scalar</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;scalars&quot;</span><span class="p">]:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scalar</span><span class="p">,</span> <span class="n">Definition</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">bids_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">scalar</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
-                    <span class="kc">None</span><span class="p">,</span>
-                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dwi_path&quot;</span><span class="p">],</span>
-                    <span class="kc">None</span><span class="p">,</span>
-                    <span class="kc">None</span><span class="p">)</span>
-                <span class="n">scalar_found</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">scalar_found</span> <span class="o">=</span> <span class="n">scalar</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
-                    <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;bids_layout&quot;</span><span class="p">],</span>
-                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dwi_path&quot;</span><span class="p">],</span>
-                    <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">],</span>
-                    <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;session&quot;</span><span class="p">],</span>
-                    <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">scalar_found</span> <span class="o">!=</span> <span class="kc">False</span><span class="p">:</span>
-                <span class="n">mapping_tasks</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">scalar</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2">_res&quot;</span><span class="p">]</span> <span class="o">=</span>\
-                    <span class="n">pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">scalar</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)(</span>
-                        <span class="n">as_file</span><span class="p">((</span>
-                            <span class="sa">f</span><span class="s1">&#39;_desc-</span><span class="si">{</span><span class="n">str_to_desc</span><span class="p">(</span><span class="n">scalar</span><span class="o">.</span><span class="n">get_name</span><span class="p">())</span><span class="si">}</span><span class="s1">&#39;</span>
-                            <span class="s1">&#39;_dwi.nii.gz&#39;</span><span class="p">))(</span>
-                                <span class="n">scalar</span><span class="o">.</span><span class="n">get_image_getter</span><span class="p">(</span><span class="s2">&quot;mapping&quot;</span><span class="p">)))</span>
+            <span class="n">mapping_tasks</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">scalar</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2">_res&quot;</span><span class="p">]</span> <span class="o">=</span>\
+                <span class="n">pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">scalar</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)(</span>
+                    <span class="n">as_file</span><span class="p">((</span>
+                        <span class="sa">f</span><span class="s1">&#39;_desc-</span><span class="si">{</span><span class="n">str_to_desc</span><span class="p">(</span><span class="n">scalar</span><span class="o">.</span><span class="n">get_name</span><span class="p">())</span><span class="si">}</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;_dwi.nii.gz&#39;</span><span class="p">))(</span>
+                            <span class="n">scalar</span><span class="o">.</span><span class="n">get_image_getter</span><span class="p">(</span><span class="s2">&quot;mapping&quot;</span><span class="p">)))</span>
 
     <span class="k">if</span> <span class="n">use_sls</span><span class="p">:</span>
         <span class="n">mapping_tasks</span><span class="p">[</span><span class="s2">&quot;mapping_res&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sls_mapping</span>
 
     <span class="n">reg_ss</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reg_subject_spec&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reg_ss</span><span class="p">,</span> <span class="n">ImageDefinition</span><span class="p">):</span>
-        <span class="n">reg_ss</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
-            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;bids_layout&quot;</span><span class="p">],</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dwi_path&quot;</span><span class="p">],</span>
-            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">],</span>
-            <span class="n">bids_info</span><span class="p">[</span><span class="s2">&quot;session&quot;</span><span class="p">])</span>
         <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;reg_subject_spec&quot;</span><span class="p">]</span>
         <span class="n">mapping_tasks</span><span class="p">[</span><span class="s2">&quot;reg_subject_spec_res&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pimms</span><span class="o">.</span><span class="n">calc</span><span class="p">(</span><span class="s2">&quot;reg_subject_spec&quot;</span><span class="p">)(</span>
             <span class="n">as_file</span><span class="p">((</span>
@@ -684,7 +656,7 @@ document.write(`
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
 </div>
@@ -693,8 +665,6 @@ document.write(`
             </div>
             
             
-              
-                <div class="bd-sidebar-secondary bd-toc"></div>
               
             
           </div>
@@ -707,8 +677,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+  <script src="../../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
 
 
   <footer class="bd-footer">
@@ -742,7 +712,7 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.3.
 </p></div>
       
     </div>

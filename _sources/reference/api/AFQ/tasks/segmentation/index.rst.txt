@@ -71,7 +71,7 @@ Attributes
    ..
        !! processed by numpydoc !!
 
-.. py:function:: export_bundles(base_fname, results_dir, bundles, tracking_params, segmentation_params)
+.. py:function:: export_bundles(base_fname, output_dir, bundles, tracking_params, segmentation_params)
 
    
    dictionary of paths, where each path is

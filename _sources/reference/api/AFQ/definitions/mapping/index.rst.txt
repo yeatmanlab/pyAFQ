@@ -90,7 +90,7 @@ Classes
    .. py:method:: find_path(bids_layout, from_path, subject, session, required=True)
 
 
-   .. py:method:: get_for_subses(base_fname, dwi, bids_info, reg_subject, reg_template)
+   .. py:method:: get_for_subses(base_fname, dwi, dwi_data_file, reg_subject, reg_template)
 
 
 

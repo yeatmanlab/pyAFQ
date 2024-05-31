@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_howto_howto_examples_baby_afq.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -166,7 +166,7 @@ segmentation, and tract profile results, as well as the visualizations.
     viz = myafq.export("all_bundles_figure")
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-136
+.. GENERATED FROM PYTHON SOURCE LINES 126-140
 
 Viewing the results
 -------------------
@@ -179,7 +179,11 @@ screen. You can also zoom in and out using the mouse wheel, and rotate the
 view by clicking and dragging with the mouse. You can also view the FA tract
 profiles in a plot on the left side of the page.
 
-.. GENERATED FROM PYTHON SOURCE LINES 139-153
+If the baby bundles appear dark in the html visualization due to low FA values, you
+can reduce the upper limit of the range in the `sbv_lims_bundles` option when 
+building your GroupAFQ object (e.g. `GroupAFQ(..., sbv_lims_bundles=[0, 0.5])`).
+
+.. GENERATED FROM PYTHON SOURCE LINES 143-157
 
 References:
 -------------------------

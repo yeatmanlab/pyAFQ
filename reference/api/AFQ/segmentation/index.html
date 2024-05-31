@@ -8,25 +8,25 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AFQ.segmentation &#8212; AFQ 1.3.1 documentation</title>
+    <title>AFQ.segmentation &#8212; AFQ 1.3.2 documentation</title>
   
   
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link href="../../../../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
 
   
-  <link href="../../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+  <link href="../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
@@ -35,13 +35,13 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sg_gallery-rendered-html.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.5ea377869091fd0449014c60fc090103.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
-<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
-  <script src="../../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
 
     <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
@@ -64,27 +64,23 @@
 
   
   
-  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -106,12 +102,17 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
   
   <div class="col-lg-3 navbar-header-items__start">
@@ -131,8 +132,8 @@
       
     
     
-    <img src="../../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3.1 documentation - Home"/>
-    <script>document.write(`<img src="../../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3.1 documentation - Home"/>`);</script>
+    <img src="../../../../_static/logo.png" class="logo__image only-light" alt="AFQ 1.3.2 documentation - Home"/>
+    <script>document.write(`<img src="../../../../_static/logo.png" class="logo__image only-dark" alt="AFQ 1.3.2 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -147,40 +148,40 @@
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../../tutorials/index.html">
-                        Getting started with pyAFQ
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../../tutorials/index.html">
+    Getting started with pyAFQ
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../../howto/index.html">
-                        How To
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../../explanations/index.html">
-                        Explanations
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../../howto/index.html">
+    How To
+  </a>
+</li>
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../../../index.html">
-                        Reference Documentation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../index.html">
-                        API Reference
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../../explanations/index.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item current active">
+  <a class="nav-link nav-internal" href="../../../index.html">
+    Reference Documentation
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../index.html">
+    API Reference
+  </a>
+</li>
+
   </ul>
 </nav></div>
       
@@ -252,9 +253,9 @@ document.write(`
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+    <button class="sidebar-toggle secondary-toggle" aria-label="On this page">
       <span class="fa-solid fa-outdent"></span>
-    </label>
+    </button>
   
 </div>
 
@@ -275,46 +276,49 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item">
+          
+          
+            <div class="navbar-item">
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../../tutorials/index.html">
-                        Getting started with pyAFQ
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../../tutorials/index.html">
+    Getting started with pyAFQ
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../../howto/index.html">
-                        How To
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../../../explanations/index.html">
-                        Explanations
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../../howto/index.html">
+    How To
+  </a>
+</li>
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../../../index.html">
-                        Reference Documentation
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../index.html">
-                        API Reference
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../../../explanations/index.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item current active">
+  <a class="nav-link nav-internal" href="../../../index.html">
+    Reference Documentation
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../index.html">
+    API Reference
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -377,35 +381,35 @@ document.write(`
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l2 current active has-children"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l3 has-children"><a class="reference internal" href="../api/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">API Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ</span></code></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="../api/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../api/bundle_dict/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.bundle_dict</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/group/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.group</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/participant/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.participant</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.api.utils</span></code></a></li>
 </ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../data/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../data/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../data/fetch/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data.fetch</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../data/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.data.utils</span></code></a></li>
 </ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../definitions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../definitions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../definitions/image/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.image</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../definitions/mapping/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.mapping</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../definitions/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.definitions.utils</span></code></a></li>
 </ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../models/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../models/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../models/QBallTP/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.QBallTP</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../models/csd/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.csd</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../models/dki/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.dki</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../models/dti/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.dti</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../models/fwdti/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.models.fwdti</span></code></a></li>
 </ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../tasks/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../tasks/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../tasks/data/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.data</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../tasks/decorators/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.decorators</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../tasks/mapping/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.mapping</span></code></a></li>
@@ -414,14 +418,14 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../tasks/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.utils</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../tasks/viz/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tasks.viz</span></code></a></li>
 </ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../tractography/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../tractography/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../tractography/gputractography/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography.gputractography</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../tractography/tractography/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography.tractography</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../tractography/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.tractography.utils</span></code></a></li>
 </ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../utils/bin/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.bin</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../utils/docs/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.docs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../utils/models/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.models</span></code></a></li>
@@ -430,21 +434,21 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="../utils/streamlines/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.streamlines</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../utils/volume/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.utils.volume</span></code></a></li>
 </ul>
-</li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="../viz/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../viz/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../viz/altair/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.altair</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../viz/fury_backend/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.fury_backend</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../viz/plot/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.plot</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../viz/plotly_backend/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.plotly_backend</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../viz/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.viz.utils</span></code></a></li>
 </ul>
-</li>
+</details></li>
 <li class="toctree-l3"><a class="reference internal" href="../registration/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.registration</span></code></a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">AFQ.segmentation</span></code></a></li>
 </ul>
-</li>
+</details></li>
 </ul>
-</li>
+</details></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../bundledict.html">Defining Custom Bundle Dictionaries</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../kwargs.html">The pyAFQ API optional arguments</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../methods.html">The pyAFQ API methods</a></li>
@@ -466,13 +470,13 @@ document.write(`
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
@@ -483,7 +487,7 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
@@ -523,7 +527,7 @@ document.write(`
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">#</a></h2>
 <div class="section" id="classes">
 <h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">#</a></h3>
-<table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -535,9 +539,10 @@ document.write(`
 </tbody>
 </table>
 </div>
+</div>
 <div class="section" id="functions">
 <h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading">#</a></h3>
-<table class="autosummary longtable table autosummary">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -551,6 +556,7 @@ document.write(`
 </tr>
 </tbody>
 </table>
+</div>
 <dl class="py class">
 <dt class="sig sig-object py" id="AFQ.segmentation.Segmentation">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">AFQ.segmentation.</span></span><span class="sig-name descname"><span class="pre">Segmentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nb_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nb_streamlines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seg_algo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'AFQ'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel_segmentation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'engine':</span> <span class="pre">'serial'}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progressive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">greater_than</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rm_small_clusters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_clust_thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction_thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pruning_thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prob_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi_dist_tie_break</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_to_waypoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">presegment_bundle_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">presegment_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_by_endpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_to_atlas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_intermediates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cleaning_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/AFQ/segmentation.html#Segmentation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#AFQ.segmentation.Segmentation" title="Permalink to this definition">#</a></dt>
@@ -785,7 +791,7 @@ and streamlines that pass cleaning will be set to 1.</p>
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
     <a class="left-prev"
@@ -887,8 +893,8 @@ and streamlines that pass cleaning will be set to 1.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
-<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+  <script src="../../../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
 
 
   <footer class="bd-footer">
@@ -922,7 +928,7 @@ and streamlines that pass cleaning will be set to 1.</p>
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.3.
 </p></div>
       
     </div>

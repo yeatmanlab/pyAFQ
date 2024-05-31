@@ -377,9 +377,32 @@ See an example configuration file below::
     # (see [1]_). Default: 0.1
     csd_tau = 0.1
     
+    # The threshold on the FA used to calculate the single shell auto
+    # response. Can be useful to reduce for baby subjects. Default: 0.7
+    csd_fa_thr = 0.7
+    
     # Diffusion sampling length.
     # Default: 1.2
     gq_sampling_length = 1.2
+    
+    # Able to take response[0] from auto_response_ssst.
+    # default: array([0.0017, 0.0002, 0.0002])
+    rumba_wm_response = "[0.0017, 0.0002, 0.0002]"
+    
+    # Mean diffusivity for GM compartment.
+    # If None, then grey matter volume fraction is not computed.
+    # Default: 0.8e-3
+    rumba_gm_response = 0.0008
+    
+    # Mean diffusivity for CSF compartment.
+    # If None, then CSF volume fraction is not computed.
+    # Default: 3.0e-3
+    rumba_csf_response = 0.003
+    
+    # Number of iterations for fODF estimation.
+    # Must be a positive int.
+    # Default: 600
+    rumba_n_iter = 600
     
     # Spherical harmonics order for OPDT model. Must be even.
     # Default: 8
