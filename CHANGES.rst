@@ -1,3 +1,21 @@
+1.3.2 (May 31, 2024)
+====================
+This release adds the ability to do tractography in parallel using ray.
+It also adds Pydra integration into GroupAFQ (ParallelGroupAFQ).
+We also added RUMBA-SD from DIPY and made other minor changes.
+  * Streamlines task in parallel using ray (#1136)
+  * Check bvals on dki (#1139)
+  * [FIX] different CST ROI 2 for L/R (#1138)
+  * Adds ParallelGroupAFQ (#1124)
+  * [DOC] Update kwargs.rst (#1135)
+  * [ENH] Added RUMBA-SD to data.py (#1129)
+  * [DOC] Update baby_afq.py (#1131)
+  * Add conversion dictionary for old acronyms (#1107)
+  * [ENH] small change to viz utils panel code (#1123)
+  * Make altair required (#1130)
+  * [DOC] Some improvements to the documentation based on conversations during the hackathon (#1126)
+  * [ENH] expose FA thresh param for autoresponse ssst for csd (#1127)
+
 1.3.1 (April 04, 2024)
 ======================
 Adds the mean signal diffusion kurtosis model as an option.
