@@ -1069,13 +1069,7 @@ def get_bundle_dict(segmentation_params,
             " a dict, or a BundleDict"))
 
     if bundle_info is None:
-        if segmentation_params["seg_algo"] == "reco" or\
-                segmentation_params["seg_algo"] == "reco16":
-            bundle_info = abd.reco_bd(16)
-        elif segmentation_params["seg_algo"] == "reco80":
-            bundle_info = abd.reco_bd(80)
-        else:
-            bundle_info = abd.default18_bd() + abd.callosal_bd()
+        bundle_info = abd.default18_bd() + abd.callosal_bd()
 
     use_brain_mask = True
     brain_mask = nib.load(brain_mask).get_fdata()
@@ -1106,7 +1100,6 @@ def get_bundle_dict(segmentation_params,
     else:
         bundle_dict = abd.BundleDict(
             bundle_info,
-            seg_algo=segmentation_params["seg_algo"],
             resample_to=reg_template)
 
     return bundle_dict, reg_template

@@ -198,8 +198,7 @@ class ParticipantAFQ(object):
             Default: True
         """
         start_time = time()
-        seg_algo = self.export("segmentation_params").get("seg_algo", "AFQ")
-        export_all_helper(self, seg_algo, xforms, indiv, viz)
+        export_all_helper(self, xforms, indiv, viz)
         self.logger.info(
             f"Time taken for export all: {time() - start_time}")
 
@@ -366,7 +365,7 @@ class ParticipantAFQ(object):
             if isinstance(file_name, str):
                 exception_file_names.append(file_name)
             else:
-                self.logger.warn((
+                self.logger.warning((
                     f"The exception '{exception}' does not correspond"
                     " to a filename and will be ignored."))
 

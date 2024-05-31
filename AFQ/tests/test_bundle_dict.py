@@ -56,6 +56,3 @@ def test_BundleDict():
 
     afq_bundles = abd.reco_bd(80)["VOF_L", "VOF_R"]
     assert len(afq_bundles) == 2
-
-    afq_bundles = abd.reco_bd(80)[["whole_brain"]]
-    assert len(afq_bundles) == 1

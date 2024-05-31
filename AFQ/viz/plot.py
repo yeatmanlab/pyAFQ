@@ -487,7 +487,7 @@ class GroupCSVComparison():
                 + ' for bundle ' + bundle
                 + ' for CSV ' + name)
             if np.sum(nans) > self.percent_nan_tol:
-                self.logger.warn(message + '. Profile ignored. ')
+                self.logger.warning(message + '. Profile ignored. ')
                 return None
             else:
                 self.logger.info(message + '. NaNs interpolated. ')
@@ -545,7 +545,7 @@ class GroupCSVComparison():
                 raters="raters",
                 ratings="ratings")
             row = stats[stats["Type"] == self.ICC_func].iloc[0]
-            return row["ICC"], row["ICC"] - row["CI95%"][0],\
+            return row["ICC"], row["ICC"] - row["CI95%"][0], \
                 row["CI95%"][1] - row["ICC"]
         elif corrtype == "Srho":
             stats = corr(
@@ -553,7 +553,7 @@ class GroupCSVComparison():
                 y=arr[1],
                 method="spearman")
             row = stats.iloc[0]
-            return row["r"], row["r"] - row["CI95%"][0],\
+            return row["r"], row["r"] - row["CI95%"][0], \
                 row["CI95%"][1] - row["r"]
         else:
             raise ValueError("corrtype not recognized")
@@ -978,7 +978,7 @@ class GroupCSVComparison():
                             bundle_profiles[j, i] = single_profile
 
                 all_sub_means[m, k] = np.nanmean(bundle_profiles, axis=2)
-                all_sub_coef[m, k], all_sub_coef_err[m, k, 0],\
+                all_sub_coef[m, k], all_sub_coef_err[m, k, 0], \
                     all_sub_coef_err[m, k, 1] =\
                     self.masked_corr(all_sub_means[m, k], "Srho")
                 if np.isnan(all_sub_coef[m, k]).all():
@@ -1359,8 +1359,8 @@ class GroupCSVComparison():
         if not show_plots:
             plt.close(fig)
             plt.ion()
-        return fig, axes, miss_counts, updated_bundles,\
-            all_sub_coef_removed, all_sub_coef_err_removed,\
+        return fig, axes, miss_counts, updated_bundles, \
+            all_sub_coef_removed, all_sub_coef_err_removed, \
             bundle_prof_means_removed, bundle_prof_stds_removed
 
     def compare_reliability(self, reliability1, reliability2,

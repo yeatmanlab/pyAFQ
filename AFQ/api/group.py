@@ -441,40 +441,39 @@ class GroupAFQ(object):
             sls_dict = {}
             load_next_subject()  # load first subject
             for b in bundle_dict.keys():
-                if b != "whole_brain":
-                    for i in range(len(self.valid_sub_list)):
-                        seg_sft, mapping = subses_info[i]
-                        idx = seg_sft.bundle_idxs[b]
-                        # use the first subses that works
-                        # otherwise try each successive subses
-                        if len(idx) == 0:
-                            # break if we run out of subses
-                            if i + 1 >= len(self.valid_sub_list):
-                                break
-                            # load subses if not already loaded
-                            if i + 1 >= len(subses_info):
-                                load_next_subject()
-                            continue
-                        if len(idx) > 100:
-                            idx = np.random.choice(
-                                idx, size=100, replace=False)
-                        these_sls = seg_sft.sft.streamlines[idx]
-                        these_sls = dps.set_number_of_points(these_sls, 100)
-                        tg = StatefulTractogram(
-                            these_sls,
-                            seg_sft.sft,
-                            Space.RASMM)
-                        delta = dts.values_from_volume(
-                            mapping.forward,
-                            tg.streamlines, np.eye(4))
-                        moved_sl = dts.Streamlines(
-                            [d + s for d, s in zip(delta, tg.streamlines)])
-                        moved_sl = np.asarray(moved_sl)
-                        median_sl = np.median(moved_sl, axis=0)
-                        sls_dict[b] = {"coreFiber": median_sl.tolist()}
-                        for ii, sl_idx in enumerate(idx):
-                            sls_dict[b][str(sl_idx)] = moved_sl[ii].tolist()
-                        break
+                for i in range(len(self.valid_sub_list)):
+                    seg_sft, mapping = subses_info[i]
+                    idx = seg_sft.bundle_idxs[b]
+                    # use the first subses that works
+                    # otherwise try each successive subses
+                    if len(idx) == 0:
+                        # break if we run out of subses
+                        if i + 1 >= len(self.valid_sub_list):
+                            break
+                        # load subses if not already loaded
+                        if i + 1 >= len(subses_info):
+                            load_next_subject()
+                        continue
+                    if len(idx) > 100:
+                        idx = np.random.choice(
+                            idx, size=100, replace=False)
+                    these_sls = seg_sft.sft.streamlines[idx]
+                    these_sls = dps.set_number_of_points(these_sls, 100)
+                    tg = StatefulTractogram(
+                        these_sls,
+                        seg_sft.sft,
+                        Space.RASMM)
+                    delta = dts.values_from_volume(
+                        mapping.forward,
+                        tg.streamlines, np.eye(4))
+                    moved_sl = dts.Streamlines(
+                        [d + s for d, s in zip(delta, tg.streamlines)])
+                    moved_sl = np.asarray(moved_sl)
+                    median_sl = np.median(moved_sl, axis=0)
+                    sls_dict[b] = {"coreFiber": median_sl.tolist()}
+                    for ii, sl_idx in enumerate(idx):
+                        sls_dict[b][str(sl_idx)] = moved_sl[ii].tolist()
+                    break
 
             with open(sls_json_fname, 'w') as fp:
                 json.dump(sls_dict, fp)
@@ -590,11 +589,8 @@ class GroupAFQ(object):
             Default: True
         """
         start_time = time()
-        seg_params = self.export("segmentation_params", collapse=False)[
-            self.valid_sub_list[0]][self.valid_ses_list[0]]
-        seg_algo = seg_params.get("seg_algo", "AFQ")
 
-        export_all_helper(self, seg_algo, xforms, indiv, viz)
+        export_all_helper(self, xforms, indiv, viz)
 
         self.combine_profiles()
         if afqbrowser:

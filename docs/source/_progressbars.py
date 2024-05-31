@@ -22,11 +22,9 @@ def reset_progressbars(gallery_conf, fname):
 
     # disable tqdm
     import AFQ._fixes as fixes
-    import AFQ.segmentation as seg
     import AFQ.viz.utils as utils
 
     fixes.tqdm = _no_tqdm
-    seg.tqdm = _no_tqdm
     utils.tqdm = _no_tqdm
 
     # disable update_progressbar
