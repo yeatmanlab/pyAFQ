@@ -283,15 +283,17 @@ pyAFQ pipeline that calculates the profiles, users can call the
 
  .. code-block:: none
 
-    (TractActor pid=5209)     0it [00:00, ?it/s]
-    (TractActor pid=5209)     1it [00:01,  1.90s/it]
-    (TractActor pid=5216)     0it [00:00, ?it/s] [repeated 2x across cluster] (Ray deduplicates logs by default. Set RAY_DEDUP_LOGS=0 to disable log deduplication, or see https://docs.ray.io/en/master/ray-observability/user-guides/configure-logging.html#log-deduplication for more options.)
-    (TractActor pid=5209)     856it [00:06, 180.74it/s] [repeated 136x across cluster]
-    (TractActor pid=5209)     1701it [00:11, 167.27it/s] [repeated 134x across cluster]
-    (TractActor pid=5209)     2771it [00:17, 211.31it/s] [repeated 136x across cluster]
-    (TractActor pid=5209)     3875it [00:22, 214.40it/s] [repeated 138x across cluster]
-    (TractActor pid=5209)     4859it [00:27, 219.83it/s] [repeated 134x across cluster]
-    (TractActor pid=5209)     5905it [00:32, 174.98it/s] [repeated 137x across cluster]
+    (TractActor pid=5253)     0it [00:00, ?it/s]
+    (TractActor pid=5253)     1it [00:01,  1.34s/it]
+    (TractActor pid=5250)     0it [00:00, ?it/s] [repeated 2x across cluster] (Ray deduplicates logs by default. Set RAY_DEDUP_LOGS=0 to disable log deduplication, or see https://docs.ray.io/en/master/ray-observability/user-guides/configure-logging.html#log-deduplication for more options.)
+    (TractActor pid=5250)     566it [00:05, 111.20it/s] [repeated 131x across cluster]
+    (TractActor pid=5250)     1135it [00:10, 91.71it/s]  [repeated 134x across cluster]
+    (TractActor pid=5250)     1672it [00:15, 108.98it/s] [repeated 134x across cluster]
+    (TractActor pid=5250)     2228it [00:20, 97.53it/s]  [repeated 135x across cluster]
+    (TractActor pid=5250)     2774it [00:25, 115.02it/s] [repeated 134x across cluster]
+    (TractActor pid=5250)     3406it [00:30, 106.00it/s] [repeated 130x across cluster]
+    (TractActor pid=5250)     4064it [00:35, 197.82it/s] [repeated 121x across cluster]
+    (TractActor pid=5250)     5057it [00:40, 190.46it/s] [repeated 91x across cluster]
 
     {'01': '/home/runner/AFQ_data/stanford_hardi/derivatives/afq/sub-01/ses-01/sub-01_ses-01_coordsys-RASMM_trkmethod-probCSD_recogmethod-AFQ_desc-profiles_dwi.csv'}
 
@@ -359,8 +361,8 @@ To make this plot, it is required that you install with
 
  .. code-block:: none
 
-      0%|          | 0/28 [00:00<?, ?it/s]      4%|▎         | 1/28 [00:00<00:07,  3.48it/s]      7%|▋         | 2/28 [00:00<00:06,  3.80it/s]     11%|█         | 3/28 [00:00<00:06,  3.91it/s]     14%|█▍        | 4/28 [00:01<00:06,  3.98it/s]     18%|█▊        | 5/28 [00:01<00:05,  4.02it/s]     21%|██▏       | 6/28 [00:01<00:05,  3.89it/s]     25%|██▌       | 7/28 [00:01<00:05,  3.96it/s]     29%|██▊       | 8/28 [00:02<00:05,  3.87it/s]     46%|████▋     | 13/28 [00:02<00:01, 10.54it/s]     54%|█████▎    | 15/28 [00:02<00:01, 10.02it/s]     64%|██████▍   | 18/28 [00:02<00:00, 10.48it/s]     82%|████████▏ | 23/28 [00:02<00:00, 16.43it/s]     93%|█████████▎| 26/28 [00:03<00:00, 14.15it/s]    100%|██████████| 28/28 [00:03<00:00, 11.80it/s]    100%|██████████| 28/28 [00:03<00:00,  8.41it/s]
-      0%|          | 0/28 [00:00<?, ?it/s]      4%|▎         | 1/28 [00:00<00:07,  3.59it/s]      7%|▋         | 2/28 [00:00<00:06,  3.73it/s]     11%|█         | 3/28 [00:00<00:06,  3.77it/s]     14%|█▍        | 4/28 [00:01<00:06,  3.74it/s]     18%|█▊        | 5/28 [00:01<00:06,  3.76it/s]     21%|██▏       | 6/28 [00:01<00:05,  3.78it/s]     25%|██▌       | 7/28 [00:01<00:05,  3.75it/s]     29%|██▊       | 8/28 [00:02<00:05,  3.83it/s]     46%|████▋     | 13/28 [00:02<00:01, 10.34it/s]     54%|█████▎    | 15/28 [00:02<00:01,  9.15it/s]     64%|██████▍   | 18/28 [00:02<00:01,  9.43it/s]     82%|████████▏ | 23/28 [00:02<00:00, 15.04it/s]     93%|█████████▎| 26/28 [00:03<00:00, 13.21it/s]    100%|██████████| 28/28 [00:03<00:00, 11.19it/s]    100%|██████████| 28/28 [00:03<00:00,  7.98it/s]
+      0%|          | 0/28 [00:00<?, ?it/s]      4%|▎         | 1/28 [00:00<00:08,  3.19it/s]      7%|▋         | 2/28 [00:00<00:07,  3.34it/s]     11%|█         | 3/28 [00:00<00:06,  3.90it/s]     14%|█▍        | 4/28 [00:01<00:05,  4.24it/s]     18%|█▊        | 5/28 [00:01<00:05,  4.01it/s]     21%|██▏       | 6/28 [00:01<00:05,  3.71it/s]     25%|██▌       | 7/28 [00:01<00:05,  3.67it/s]     29%|██▊       | 8/28 [00:02<00:05,  3.53it/s]     43%|████▎     | 12/28 [00:02<00:01,  8.38it/s]     54%|█████▎    | 15/28 [00:02<00:01,  8.69it/s]     64%|██████▍   | 18/28 [00:02<00:01,  8.72it/s]     79%|███████▊  | 22/28 [00:03<00:00, 12.85it/s]     89%|████████▉ | 25/28 [00:03<00:00, 11.58it/s]    100%|██████████| 28/28 [00:03<00:00, 10.64it/s]    100%|██████████| 28/28 [00:03<00:00,  7.53it/s]
+      0%|          | 0/28 [00:00<?, ?it/s]      4%|▎         | 1/28 [00:00<00:08,  3.22it/s]      7%|▋         | 2/28 [00:00<00:07,  3.32it/s]     11%|█         | 3/28 [00:00<00:07,  3.35it/s]     14%|█▍        | 4/28 [00:01<00:07,  3.34it/s]     18%|█▊        | 5/28 [00:01<00:06,  3.36it/s]     21%|██▏       | 6/28 [00:01<00:06,  3.36it/s]     25%|██▌       | 7/28 [00:02<00:06,  3.34it/s]     29%|██▊       | 8/28 [00:02<00:05,  3.42it/s]     43%|████▎     | 12/28 [00:02<00:01,  8.21it/s]     54%|█████▎    | 15/28 [00:02<00:01,  8.47it/s]     64%|██████▍   | 18/28 [00:03<00:01,  8.61it/s]     79%|███████▊  | 22/28 [00:03<00:00, 12.68it/s]     89%|████████▉ | 25/28 [00:03<00:00, 11.34it/s]    100%|██████████| 28/28 [00:03<00:00, 10.41it/s]    100%|██████████| 28/28 [00:03<00:00,  7.11it/s]
 
 
 
@@ -397,11 +399,11 @@ Again, to make this plot, it is required that you install with
 
  .. code-block:: none
 
-    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/scipy/stats/_distn_infrastructure.py:2246: RuntimeWarning:
+    /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/scipy/stats/_distn_infrastructure.py:2246: RuntimeWarning:
 
     invalid value encountered in multiply
 
-    /opt/hostedtoolcache/Python/3.11.9/x64/lib/python3.11/site-packages/scipy/stats/_distn_infrastructure.py:2247: RuntimeWarning:
+    /opt/hostedtoolcache/Python/3.10.14/x64/lib/python3.10/site-packages/scipy/stats/_distn_infrastructure.py:2247: RuntimeWarning:
 
     invalid value encountered in multiply
 
@@ -440,9 +442,9 @@ every bundle is found with a reasonable amount of streamlines.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (5 minutes 29.052 seconds)
+   **Total running time of the script:** (5 minutes 58.786 seconds)
 
-**Estimated memory usage:**  888 MB
+**Estimated memory usage:**  883 MB
 
 
 .. _sphx_glr_download_tutorials_tutorial_examples_plot_001_afq_api.py:
