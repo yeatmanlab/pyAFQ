@@ -539,7 +539,6 @@ def test_AFQ_slr():
             'full_segmented_cleaned_tractography.trk'),
         segmentation_params={
             "dist_to_waypoint": 10,
-            "filter_by_endpoints": False,
             "parallel_segmentation": {"engine": "serial"}},
         bundle_info=bd,
         mapping_definition=SlrMap(slr_kwargs={
@@ -811,8 +810,7 @@ def test_AFQ_data_waypoint():
                            n_seeds=200,
                            random_seeds=True,
                            rng_seed=42)
-    segmentation_params = dict(filter_by_endpoints=False,
-                               return_idx=True)
+    segmentation_params = dict(return_idx=True)
 
     afq_folder = op.join(bids_path, "derivatives/afq/sub-01/ses-01")
     os.makedirs(afq_folder, exist_ok=True)

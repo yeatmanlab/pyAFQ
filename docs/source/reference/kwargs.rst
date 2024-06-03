@@ -65,9 +65,32 @@ csd_tau: float, optional.
 	by default)
 	(see [1]_). Default: 0.1
 
+csd_fa_thr: float, optional.
+	The threshold on the FA used to calculate the single shell auto
+	response. Can be useful to reduce for baby subjects. Default: 0.7
+
 gq_sampling_length: float
 	Diffusion sampling length.
 	Default: 1.2
+
+rumba_wm_response: 1D or 2D ndarray or AxSymShResponse.
+	Able to take response[0] from auto_response_ssst.
+	default: array([0.0017, 0.0002, 0.0002])
+
+rumba_gm_response: float, optional
+	Mean diffusivity for GM compartment.
+	If None, then grey matter volume fraction is not computed.
+	Default: 0.8e-3
+
+rumba_csf_response: float, optional
+	Mean diffusivity for CSF compartment.
+	If None, then CSF volume fraction is not computed.
+	Default: 3.0e-3
+
+rumba_n_iter: int, optional
+	Number of iterations for fODF estimation.
+	Must be a positive int.
+	Default: 600
 
 opdt_sh_order: int
 	Spherical harmonics order for OPDT model. Must be even.
@@ -177,17 +200,11 @@ tracking_params: dict, optional
 	this dict may be ``AFQ.definitions.image.ImageFile`` instances.
 	If ``tracker`` is set to "pft" then ``stop_mask`` should be
 	an instance of ``AFQ.definitions.image.PFTImage``.
-	num_chunks can be specified to cause tracking to be done in
-	parallel using ray. If set to True it will use the number of
-	cores available on the machine - 1.
 
 import_tract: dict or str or None, optional
 	BIDS filters for inputing a user made tractography file,
 	or a path to the tractography file. If None, DIPY is used
-	to generate the tractography. Note that if you are importing 
-	tractography, you do not need to specify tracking_params as pyAFQ
-	will just load the provided tractogram rather than perform
-	tractography again.
+	to generate the tractography.
 	Default: None
 
 tractography_ngpus: int, optional
