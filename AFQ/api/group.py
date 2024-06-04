@@ -162,6 +162,7 @@ class GroupAFQ(object):
             raise TypeError("bids_layout_kwargs must be a dict")
 
 
+        parallel_params["engine"] = parallel_params.get("engine", "serial")
         self.logger = logger
 
         self.parallel_params = parallel_params
