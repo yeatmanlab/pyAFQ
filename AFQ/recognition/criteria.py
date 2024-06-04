@@ -15,6 +15,7 @@ import AFQ.recognition.utils as abu
 import AFQ.recognition.cleaning as abc
 import AFQ.recognition.curvature as abv
 import AFQ.recognition.roi as abr
+import AFQ.recognition.other_bundles as abo
 
 bundle_criterion_order = [
     "prob_map", "cross_midline", "start", "end",
@@ -283,6 +284,29 @@ def qb_thresh(b_sls, bundle_def, preproc_imap, clip_edges, **kwargs):
     b_sls.select(cleaned_idx, "qb_thresh", cut=cut)
 
 
+def clean_by_other_bundle(b_sls, bundle_def,
+                          img,
+                          preproc_imap,
+                          other_bundle_name,
+                          other_bundle_sls, **kwargs):
+    b_sls.initiate_selection(other_bundle_name)
+
+    cleaned_idx = abo.clean_by_other_density_map(
+        b_sls.get_selected_sls(),
+        other_bundle_sls,
+        bundle_def[other_bundle_name].get("node_thresh", 1),
+        img)
+
+    if 'core' in bundle_def[other_bundle_name]:
+        cleaned_idx_core = abo.clean_relative_to_other_core(
+            bundle_def[other_bundle_name]['core'].lower(),
+            preproc_imap["fgarray"][b_sls.selected_fiber_idxs],
+            np.array(abu.resample_tg(other_bundle_sls, 20)))
+        cleaned_idx = np.logical_and(cleaned_idx, cleaned_idx_core)
+
+    b_sls.select(cleaned_idx, other_bundle_name)
+
+
 def mahalanobis(b_sls, bundle_def, clip_edges, cleaning_params, **kwargs):
     b_sls.initiate_selection("Mahalanobis")
     clean_params = bundle_def.get("mahal", {})
@@ -333,6 +357,14 @@ def run_bundle_rec_plan(
     for criterion in bundle_criterion_order:
         if b_sls and criterion in bundle_def:
             inputs[criterion] = globals()[criterion](**inputs)
+    if b_sls:
+        for ii, bundle_name in enumerate(bundle_dict.bundle_names):
+            if bundle_name in bundle_def.keys():
+                idx = np.where(bundle_decisions[:, ii])[0]
+                clean_by_other_bundle(
+                    **inputs,
+                    other_bundle_name=bundle_name,
+                    other_bundle_sls=tg.streamlines[idx])
     if b_sls:
         mahalanobis(**inputs)
 

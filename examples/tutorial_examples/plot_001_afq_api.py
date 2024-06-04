@@ -55,7 +55,7 @@ afd.organize_stanford_data(clear_previous_afq="track")
 # ---------------------------------------
 # We make create a `tracking_params` variable, which we will pass to the
 # GroupAFQ object which specifies that we want 25,000 seeds randomly
-# distributed in the white matter. We only do this to make this example 
+# distributed in the white matter. We only do this to make this example
 # faster and consume less space. We also set ``num_chunks`` to `True`,
 # which will use ray to parallelize the tracking across all cores.
 # This can be removed to process in serial, or set to use a particular
@@ -222,6 +222,8 @@ bundle_counts = pd.read_csv(myafq.export("sl_counts")["01"], index_col=[0])
 for ind in bundle_counts.index:
     if ind == "Total Recognized":
         threshold = 1000
+    elif "Vertical Occipital" in ind:
+        threshold = 1
     else:
         threshold = 10
     if bundle_counts["n_streamlines"][ind] < threshold:
