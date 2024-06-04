@@ -368,10 +368,10 @@ def read_pediatric_templates(as_img=True, resample_to=False):
     # For the arcuate (AF/ARC), reuse the SLF ROIs
     pediatric_templates['ARC_roi1_L'] = pediatric_templates['SLF_roi1_L']
     pediatric_templates['ARC_roi1_R'] = pediatric_templates['SLF_roi1_R']
-    pediatric_templates['ARC_roi2_L'] = pediatric_templates['SLFt_roi2_L']
-    pediatric_templates['ARC_roi2_R'] = pediatric_templates['SLFt_roi2_R']
-    pediatric_templates['ARC_roi3_L'] = pediatric_templates['SLFt_roi3_L']
-    pediatric_templates['ARC_roi3_R'] = pediatric_templates['SLFt_roi3_R']
+    pediatric_templates['ARC_roi2_L'] = pediatric_templates['SLFt_roi3_L']
+    pediatric_templates['ARC_roi2_R'] = pediatric_templates['SLFt_roi3_R']
+    pediatric_templates['ARC_roi3_L'] = pediatric_templates['SLFt_roi2_L']
+    pediatric_templates['ARC_roi3_R'] = pediatric_templates['SLFt_roi2_R']
 
     # For the middle longitudinal fasciculus (MdLF) reuse ILF ROI
     pediatric_templates['MdLF_roi2_L'] = pediatric_templates['ILF_roi2_L']
