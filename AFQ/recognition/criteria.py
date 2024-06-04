@@ -289,13 +289,16 @@ def clean_by_other_bundle(b_sls, bundle_def,
                           preproc_imap,
                           other_bundle_name,
                           other_bundle_sls, **kwargs):
-    b_sls.initiate_selection(other_bundle_name)
+    cleaned_idx = b_sls.initiate_selection(other_bundle_name)
+    cleaned_idx = 1
 
-    cleaned_idx = abo.clean_by_other_density_map(
-        b_sls.get_selected_sls(),
-        other_bundle_sls,
-        bundle_def[other_bundle_name].get("node_thresh", 1),
-        img)
+    if 'node_thresh' in bundle_def[other_bundle_name]:
+        cleaned_idx_node_thresh = abo.clean_by_other_density_map(
+            b_sls.get_selected_sls(),
+            other_bundle_sls,
+            bundle_def[other_bundle_name]["node_thresh"],
+            img)
+        cleaned_idx = np.logical_and(cleaned_idx, cleaned_idx_node_thresh)
 
     if 'core' in bundle_def[other_bundle_name]:
         cleaned_idx_core = abo.clean_relative_to_other_core(

@@ -249,7 +249,6 @@ def default18_bd():
                                         'node_thresh': 1,
                                         'core': 'Anterior'},
                                     'Left Inferior Longitudinal': {
-                                        'node_thresh': 20,
                                         'core': 'Right'},
                                     'primary_axis': 2,
                                     'primary_axis_percentage': 40},
@@ -264,7 +263,6 @@ def default18_bd():
                                          'node_thresh': 1,
                                          'core': 'Anterior'},
                                      'Right Inferior Longitudinal': {
-                                         'node_thresh': 20,
                                          'core': 'Left'},
                                      'primary_axis': 2,
                                      'primary_axis_percentage': 40}})
