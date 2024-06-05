@@ -59,6 +59,22 @@ dki_params:
     full path to a nifti file containing parameters for the DKI fit
 
 
+msdki_tf:
+    Mean Signal DKI DiffusionKurtosisFit object
+
+
+msdki_params:
+    full path to a nifti file containing parameters for the Mean Signal DKI fit
+
+
+msdki_msd:
+    full path to a nifti file containing the MSDKI mean signal diffusivity
+
+
+msdki_msk:
+    full path to a nifti file containing the MSDKI mean signal kurtosis
+
+
 csd_params:
     full path to a nifti file containing parameters for the CSD fit
 
@@ -89,6 +105,30 @@ gq_pmap:
 
 gq_ai:
     full path to a nifti file containing the anisotropic index from GQ
+
+
+rumba_model:
+    fit for RUMBA-SD model as documented on dipy reconstruction options
+
+
+rumba_params:
+    Takes the fitted RUMBA-SD model as input and returns the spherical harmonics coefficients (SHM).
+
+
+rumba_fit:
+    RUMBA FIT
+
+
+rumba_f_csf:
+    full path to a nifti file containing the CSF volume fraction for each voxel.
+
+
+rumba_f_gm:
+    full path to a nifti file containing the GM volume fraction for each voxel.
+
+
+rumba_f_wm:
+    full path to a nifti file containing the white matter volume fraction for each voxel.
 
 
 opdt_params:

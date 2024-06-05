@@ -89,8 +89,6 @@ with zipfile.ZipFile(baby_zip, 'r') as zip_ref:
 # 4. In this case, tractography has already been run using
 #    `MRTRIX <https://www.mrtrix.org/>`, and is accessed using the
 #    `import_tract` key-word argument.
-# 5. We set `filter_by_endpoints = False` in the `segmentation_params` because
-#    endpoint ROIs are not defined from newborn bundles.
 
 myafq = GroupAFQ(
     bids_path=op.join(op.expanduser('~'),
@@ -102,8 +100,6 @@ myafq = GroupAFQ(
     bundle_info=abd.baby_bd(),
     import_tract={
         "suffix": "tractography", "scope": "mrtrix"},
-    segmentation_params={
-        "filter_by_endpoints": False},
 )
 
 ##########################################################################
@@ -135,7 +131,7 @@ viz = myafq.export("all_bundles_figure")
 # profiles in a plot on the left side of the page.
 #
 # If the baby bundles appear dark in the html visualization due to low FA values, you
-# can reduce the upper limit of the range in the `sbv_lims_bundles` option when 
+# can reduce the upper limit of the range in the `sbv_lims_bundles` option when
 # building your GroupAFQ object (e.g. `GroupAFQ(..., sbv_lims_bundles=[0, 0.5])`).
 
 

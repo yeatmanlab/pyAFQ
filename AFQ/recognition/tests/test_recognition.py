@@ -191,8 +191,7 @@ def test_exclusion_ROI():
         nib.load(hardi_fdata),
         mapping,
         slf_bundle,
-        reg_template,
-        filter_by_endpoints=False)
+        reg_template)
      
     npt.assert_equal(len(fiber_groups["Left Superior Longitudinal"]), 2)
 
@@ -204,8 +203,7 @@ def test_exclusion_ROI():
         nib.load(hardi_fdata),
         mapping,
         slf_bundle,
-        reg_template,
-        filter_by_endpoints=False)
+        reg_template)
 
     npt.assert_equal(len(fiber_groups["Left Superior Longitudinal"]), 1)
 

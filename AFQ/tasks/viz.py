@@ -236,33 +236,32 @@ def viz_indivBundle(base_fname,
                 "No streamlines found to visualize for "
                 + bundle_name)
 
-        if segmentation_params["filter_by_endpoints"]:
-            warped_rois = []
-            for reg_type in ['start', 'end']:
-                if reg_type in bundle_dict[
-                        roi_bname]:
-                    pp = bundle_dict[roi_bname][reg_type]
-                    pp = resample(
-                        pp.get_fdata(),
-                        reg_template,
-                        pp.affine,
-                        reg_template.affine).get_fdata()
+        warped_rois = []
+        for reg_type in ['start', 'end']:
+            if reg_type in bundle_dict[
+                    roi_bname]:
+                pp = bundle_dict[roi_bname][reg_type]
+                pp = resample(
+                    pp.get_fdata(),
+                    reg_template,
+                    pp.affine,
+                    reg_template.affine).get_fdata()
 
-                    atlas_roi = np.zeros(pp.shape)
-                    atlas_roi[np.where(pp > 0)] = 1
-                    warped_roi = auv.transform_inverse_roi(
-                        atlas_roi,
-                        mapping,
-                        bundle_name=roi_bname)
-                    warped_rois.append(warped_roi)
-            for i, roi in enumerate(warped_rois):
-                figure = viz_backend.visualize_roi(
-                    roi,
-                    name=f"{roi_bname} endpoint ROI {i}",
-                    flip_axes=flip_axes,
-                    inline=False,
-                    interact=False,
-                    figure=figure)
+                atlas_roi = np.zeros(pp.shape)
+                atlas_roi[np.where(pp > 0)] = 1
+                warped_roi = auv.transform_inverse_roi(
+                    atlas_roi,
+                    mapping,
+                    bundle_name=roi_bname)
+                warped_rois.append(warped_roi)
+        for i, roi in enumerate(warped_rois):
+            figure = viz_backend.visualize_roi(
+                roi,
+                name=f"{roi_bname} endpoint ROI {i}",
+                flip_axes=flip_axes,
+                inline=False,
+                interact=False,
+                figure=figure)
 
         for roi_fname in mapping_imap["rois"][roi_bname]:
             figure = viz_backend.visualize_roi(
