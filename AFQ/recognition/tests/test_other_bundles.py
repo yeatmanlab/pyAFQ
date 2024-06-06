@@ -36,7 +36,7 @@ def test_clean_relative_to_other_core():
 
         assert isinstance(cleaned_idx_core, np.ndarray)
         assert cleaned_idx_core.shape[0] == this_bundle_sls_sample.shape[0]
-        if core == "inferior":
-            assert np.all(cleaned_idx_core == [False, True])
+        if core == "inferior" or core == "right":
+            assert np.all(cleaned_idx_core == [True, True])
         else:
             assert np.all(cleaned_idx_core == [False, False])
