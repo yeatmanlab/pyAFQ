@@ -243,6 +243,13 @@ def default18_bd():
                                     'start': templates['VOF_L_start'],
                                     'end': templates['VOF_L_end'],
                                     'inc_addtol': [4, 0],
+                                    'Left Arcuate': {
+                                        'node_thresh': 20},
+                                    'Left Posterior Arcuate': {
+                                        'node_thresh': 1,
+                                        'core': 'Anterior'},
+                                    'Left Inferior Longitudinal': {
+                                        'core': 'Right'},
                                     'primary_axis': 2,
                                     'primary_axis_percentage': 40},
         'Right Vertical Occipital': {'cross_midline': False,
@@ -250,6 +257,13 @@ def default18_bd():
                                      'start': templates['VOF_R_start'],
                                      'end': templates['VOF_R_end'],
                                      'inc_addtol': [4, 0],
+                                     'Right Arcuate': {
+                                         'node_thresh': 20},
+                                     'Right Posterior Arcuate': {
+                                         'node_thresh': 1,
+                                         'core': 'Anterior'},
+                                     'Right Inferior Longitudinal': {
+                                         'core': 'Left'},
                                      'primary_axis': 2,
                                      'primary_axis_percentage': 40}})
 
