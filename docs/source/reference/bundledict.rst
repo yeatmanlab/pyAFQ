@@ -40,9 +40,6 @@ key-value pairs::
     - 'length': dicitonary containing 'min_len' and 'max_len'
 
 
-For an example, see "Plotting the Optic Radiations" in :ref:`examples`.
-
-
 When doing bundle recognition, streamlines are filtered out from the whole
 tractography according to the series of steps defined in the bundle
 dictionaries. Of course, no one bundle uses every step, but here is the order
@@ -68,3 +65,34 @@ If, for debugging purposes, you want to save out the streamlines
 remaining after each step, set `save_intermediates` to a path in
 `segmentation_params`. Then the streamlines will be saved out after each step
 to that path. Only do this for one subject at a time.
+
+
+Custom bundle definitions such as the OR, and the standard BundleDict can be
+combined through addition. For an example, see "Plotting the Optic Radiations" in :ref:`examples`.
+Some tracts, such as the Vertical Occipital Fasciculus, may be defined relative
+to other tracts. In those cases, the custom tract definitions should appear in the BundleDict 
+object after the reference tracts have been defined. These reference tracts can 
+be included as keys in the same dictionary for that tract. For example::
+
+   newVOF = abd.BundleDict({
+                'Left Vertical Occipital': {'cross_midline': False,
+                                    'space': 'template',
+                                    'start': templates['VOF_L_start'],
+                                    'end': templates['VOF_L_end'],
+                                    'inc_addtol': [4, 0],
+                                    'Left Arcuate': {
+                                        'node_thresh': 20},
+                                    'Left Posterior Arcuate': {
+                                        'node_thresh': 1,
+                                        'core': 'Posterior'},
+                                    'Left Inferior Longitudinal': {
+                                        'core': 'Left'},
+                                    'primary_axis': 2,
+                                    'primary_axis_percentage': 40}
+                            })
+
+This definition of the VOF in the custom BundleDict would first require left ARC, left pARC, and left ILF 
+to be defined, in the same way the tiebreaker above works. You would then construct your custom 
+BundleDict like this. The order of addition matters here::
+
+    BundleDictCustomVOF = abd.default18_bd() + newVOF

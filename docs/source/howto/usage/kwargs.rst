@@ -108,7 +108,7 @@ brain_mask_definition: instance from `AFQ.definitions.image`, optional
 bundle_info: strings, dict, or BundleDict, optional
 	List of bundle names to include in segmentation,
 	or a bundle dictionary (see BundleDict for inspiration),
-	or a BundleDict. See `Defining Custom Bundle Dictionaries`
+	or a BundleDict. See `Defining Custom Bundle Dictionaries <https://yeatmanlab.github.io/pyAFQ/reference/bundledict.html>`_
 	in the `usage` section of pyAFQ's documentation for details.
 	If None, will get all appropriate bundles for the chosen
 	segmentation algorithm.
@@ -233,6 +233,6 @@ viz_backend_spec: str, optional
 	Default: "plotly_no_gif"
 
 virtual_frame_buffer: bool, optional
-	Whether to use a virtual fram buffer. This is neccessary if
+	Whether to use a virtual fram buffer. This is necessary if
 	generating GIFs in a headless environment. Default: False
 
