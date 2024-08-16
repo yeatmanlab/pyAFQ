@@ -20,7 +20,7 @@ try:
 except ModuleNotFoundError:
     has_fslpy = False
 
-__all__ = ["FnirtMap", "SynMap", "SlrMap", "AffMap"]
+__all__ = ["FnirtMap", "SynMap", "SlrMap", "AffMap", "IdentityMap"]
 
 
 logger = logging.getLogger('AFQ')
