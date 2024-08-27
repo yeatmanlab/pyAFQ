@@ -290,6 +290,8 @@ def gpu_tractography(data_imap, tracking_params, seed, stop,
         Number of GPUs to use in tractography. If non-0,
         this algorithm is used for tractography,
         https://github.com/dipy/GPUStreamlines
+        PTT, Prob can be used with any SHM model.
+        Bootstrapped can be done with CSA/OPDT.
         Default: 0
     chunk_size : int, optional
         Chunk size for GPU tracking.
@@ -299,18 +301,15 @@ def gpu_tractography(data_imap, tracking_params, seed, stop,
     if tracking_params["directions"] == "boot":
         data = data_imap["data"]
     else:
-        from dipy.data import small_sphere
-        from AFQ.models.csd import _fit as csd_fit_model
-        data = csd_fit_model(
-            data_imap["gtab"], data_imap["data"],
-            nib.load(data_imap["brain_mask"]).get_fdata()).odf(
-                small_sphere).clip(min=0) # TODO: dont recalc this
+        data = data_imap[tracking_params["odf_model"].lower() + "_params"]
 
     sft = gpu_track(
         data, data_imap["gtab"],
         nib.load(seed), nib.load(stop),
         tracking_params["odf_model"],
+        tracking_params["sphere"],
         tracking_params["directions"],
+        nib.load(data_imap["brain_mask"]).get_fdata(),
         tracking_params["seed_threshold"],
         tracking_params["stop_threshold"],
         tracking_params["thresholds_as_percentages"],
@@ -414,18 +413,3 @@ def get_tractography_plan(kwargs):
                 seed_mask.get_image_getter("tractography")))
 
     return pimms.plan(**tractography_tasks)
-
-
-def _gen_seeds(n_seeds, params_file, seed_mask=None, seed_threshold=0,
-               thresholds_as_percentages=False,
-               random_seeds=False, rng_seed=None):
-    if isinstance(params_file, str):
-        params_img = nib.load(params_file)
-    else:
-        params_img = params_file
-
-    affine = params_img.affine
-
-    return gen_seeds(seed_mask, seed_threshold, n_seeds,
-                     thresholds_as_percentages,
-                     random_seeds, rng_seed, affine)
