@@ -149,7 +149,7 @@ ax.matshow(FA[:, :, FA.shape[-1] // 2], cmap='viridis')
 ax.axis("off")
 
 ##########################################################################
-# Recognizing the bundles and calculating act profiles:
+# Recognizing the bundles and calculating tract profiles:
 # -----------------------------------------------------
 # Typically, users of pyAFQ are interested in calculating not only an overall
 # map of the FA, but also the major white matter pathways (or bundles) and
