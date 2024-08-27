@@ -296,10 +296,21 @@ def gpu_tractography(data_imap, tracking_params, seed, stop,
         Default: 100000
     """
     start_time = time()
+    if tracking_params["directions"] == "boot":
+        data = data_imap["data"]
+    else:
+        from dipy.data import small_sphere
+        from AFQ.models.csd import _fit as csd_fit_model
+        data = csd_fit_model(
+            data_imap["gtab"], data_imap["data"],
+            nib.load(data_imap["brain_mask"]).get_fdata()).odf(
+                small_sphere).clip(min=0) # TODO: dont recalc this
+
     sft = gpu_track(
-        data_imap["data"], data_imap["gtab"],
+        data, data_imap["gtab"],
         nib.load(seed), nib.load(stop),
         tracking_params["odf_model"],
+        tracking_params["directions"],
         tracking_params["seed_threshold"],
         tracking_params["stop_threshold"],
         tracking_params["thresholds_as_percentages"],
