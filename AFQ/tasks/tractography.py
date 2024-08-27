@@ -3,6 +3,8 @@ import numpy as np
 from time import time
 import logging
 
+import dipy.data as dpd
+
 import pimms
 import multiprocessing
 
@@ -301,15 +303,18 @@ def gpu_tractography(data_imap, tracking_params, seed, stop,
     if tracking_params["directions"] == "boot":
         data = data_imap["data"]
     else:
-        data = data_imap[tracking_params["odf_model"].lower() + "_params"]
+        data = nib.load(data_imap[tracking_params["odf_model"].lower() + "_params"]).get_fdata()
+
+    sphere = tracking_params["sphere"]
+    if sphere is None:
+        sphere = dpd.default_sphere
 
     sft = gpu_track(
         data, data_imap["gtab"],
         nib.load(seed), nib.load(stop),
         tracking_params["odf_model"],
-        tracking_params["sphere"],
+        sphere,
         tracking_params["directions"],
-        nib.load(data_imap["brain_mask"]).get_fdata(),
         tracking_params["seed_threshold"],
         tracking_params["stop_threshold"],
         tracking_params["thresholds_as_percentages"],

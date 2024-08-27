@@ -19,7 +19,7 @@ logger = logging.getLogger('AFQ')
 
 # Modified from https://github.com/dipy/GPUStreamlines/blob/master/run_dipy_gpu.py
 def gpu_track(data, gtab, seed_img, stop_img,
-              odf_model, sphere, directions, brain_mask,
+              odf_model, sphere, directions,
               seed_threshold, stop_threshold, thresholds_as_percentages,
               max_angle, step_size, n_seeds, random_seeds, rng_seed, ngpus,
               chunk_size):
@@ -81,6 +81,10 @@ def gpu_track(data, gtab, seed_img, stop_img,
         stop_threshold = get_percentile_threshold(
             stop_data, stop_threshold)
 
+    theta = sphere.theta
+    phi = sphere.phi
+    sampling_matrix, _, _ = shm.real_sym_sh_basis(sh_order, theta, phi)
+
     if directions == "boot":
         if odf_model.lower() == "opdt":
             model_type = cuslines.ModelType.OPDT
@@ -109,15 +113,11 @@ def gpu_track(data, gtab, seed_img, stop_img,
         else:
             model_type = cuslines.ModelType.PTT
         model = shm.SphHarmModel(gtab)
-        model_fit = shm.SphHarmFit(model, data, brain_mask)
+        model.cache_set("sampling_matrix", sphere, sampling_matrix)
+        model_fit = shm.SphHarmFit(model, data, None)
         data = model_fit.odf(sphere).clip(min=0)
-        fit_matrix = model._fit_matrix
-        delta_b = fit_matrix
-        delta_q = fit_matrix
-
-    theta = sphere.theta
-    phi = sphere.phi
-    sampling_matrix, _, _ = shm.real_sym_sh_basis(sh_order, theta, phi)
+        delta_b = sampling_matrix
+        delta_q = sampling_matrix
 
     b0s_mask = gtab.b0s_mask
     dwi_mask = ~b0s_mask
@@ -135,11 +135,10 @@ def gpu_track(data, gtab, seed_img, stop_img,
         step_size,
         0.25,  # relative peak threshold
         radians(45),  # min separation angle
-        data, H, R,
-        delta_b, delta_q,
-        b0s_mask, stop_data,
-        sampling_matrix,
-        sphere.vertices, sphere.edges,
+        data.astype(np.float64), H.astype(np.float64), R.astype(np.float64),
+        delta_b.astype(np.float64), delta_q.astype(np.float64),
+        b0s_mask.astype(np.int32), stop_data.astype(np.float64), sampling_matrix.astype(np.float64),
+        sphere.vertices.astype(np.float64), sphere.edges.astype(np.int32),
         ngpus=ngpus, rng_seed=0)
 
     seeds = gen_seeds(
