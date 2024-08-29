@@ -94,15 +94,13 @@ def get_data_gtab(dwi_data_file, bval_file, bvec_file, min_bval=None,
 
 @pimms.calc("b0")
 @as_file('_desc-b0_dwi.nii.gz')
-def b0(dwi_data_file, gtab):
+def b0(dwi, gtab):
     """
     full path to a nifti file containing the mean b0
     """
-    data = nib.load(dwi_data_file)
-    mean_b0 = np.mean(data.get_fdata()[..., gtab.b0s_mask], -1)
-    mean_b0_img = nib.Nifti1Image(mean_b0, data.affine)
-    meta = dict(b0_threshold=gtab.b0_threshold,
-                source=dwi_data_file)
+    mean_b0 = np.mean(dwi.get_fdata()[..., gtab.b0s_mask], -1)
+    mean_b0_img = nib.Nifti1Image(mean_b0, dwi.affine)
+    meta = dict(b0_threshold=gtab.b0_threshold)
     return mean_b0_img, meta
 
 

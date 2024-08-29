@@ -604,6 +604,15 @@ def test_AFQ_pydra():
     pga.export("dti_fa")
 
 
+def test_AFQ_filterb():
+    _, bids_path, _ = get_temp_hardi()
+    myafq = GroupAFQ(
+        bids_path=bids_path,
+        preproc_pipeline='vistasoft',
+        max_bval=1000)
+    myafq.export("b0")
+
+
 @pytest.mark.nightly_pft
 def test_AFQ_pft():
     """
