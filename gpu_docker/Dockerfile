@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # upgrade
 RUN apt-get update && apt-get install --assume-yes apt-transport-https \
-	ca-certificates gnupg software-properties-common gcc git wget numactl
+	ca-certificates gnupg software-properties-common gcc git wget numactl cmake
 
 # Anaconda
 RUN wget -P /tmp https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh

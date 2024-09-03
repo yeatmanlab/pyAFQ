@@ -12,7 +12,7 @@ From: nvidia/cuda:12.0.1-devel-ubuntu20.04
 %post
     # System update and basic tools installation
     apt-get update && apt-get install --assume-yes apt-transport-https \
-        ca-certificates gnupg software-properties-common gcc git wget numactl
+        ca-certificates gnupg software-properties-common gcc git wget numactl cmake
 
     # Anaconda installation
     wget -P /tmp https://repo.anaconda.com/archive/Anaconda3-2022.10-Linux-x86_64.sh
