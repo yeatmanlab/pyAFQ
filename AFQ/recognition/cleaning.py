@@ -175,7 +175,7 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
 
     # Select based on the variable that was keeping track of things for us:
     if hasattr(tg, "streamlines"):
-        out = StatefulTractogram(tg.streamlines[idx], tg, Space.VOX)
+        out = StatefulTractogram(tg.streamlines[idx], tg, tg.space)
     else:
         out = streamlines[idx]
     if return_idx:
