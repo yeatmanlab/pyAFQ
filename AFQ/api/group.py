@@ -161,7 +161,6 @@ class GroupAFQ(object):
         if not isinstance(bids_layout_kwargs, dict):
             raise TypeError("bids_layout_kwargs must be a dict")
 
-
         parallel_params["engine"] = parallel_params.get("engine", "serial")
         self.logger = logger
 
@@ -378,7 +377,7 @@ class GroupAFQ(object):
                         this_kwargs["bundle_info"].apply_to_rois(
                             b_name,
                             this_kwargs["bundle_info"]._use_bids_info,
-                            bids_layout, bids_path, subject, session,
+                            bids_layout, dwi_data_file, subject, session,
                             dry_run=False)
 
                 self.valid_sub_list.append(subject)
@@ -1006,7 +1005,7 @@ class ParallelGroupAFQ():
 
         orig.parallel_params["submitter_params"] = \
             orig.parallel_params.get("submitter_params", {"plugin": "cf"})
-        
+
         orig.parallel_params["cache_dir"] = \
             orig.parallel_params.get("cache_dir", None)
 
