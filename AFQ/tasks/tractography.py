@@ -16,17 +16,14 @@ from AFQ.tasks.utils import get_default_args
 from AFQ.definitions.image import ScalarImage
 from AFQ.tractography.utils import gen_seeds
 
+from trx.trx_file_memmap import TrxFile
+from trx.trx_file_memmap import concatenate as trx_concatenate
+
 try:
     import ray
     has_ray = True
 except ModuleNotFoundError:
     has_ray = False
-try:
-    from trx.trx_file_memmap import TrxFile
-    from trx.trx_file_memmap import concatenate as trx_concatenate
-    has_trx = True
-except ModuleNotFoundError:
-    has_trx = False
 
 try:
     from AFQ.tractography.gputractography import gpu_track
@@ -303,7 +300,8 @@ def gpu_tractography(data_imap, tracking_params, seed, stop,
     if tracking_params["directions"] == "boot":
         data = data_imap["data"]
     else:
-        data = nib.load(data_imap[tracking_params["odf_model"].lower() + "_params"]).get_fdata()
+        data = nib.load(
+            data_imap[tracking_params["odf_model"].lower() + "_params"]).get_fdata()
 
     sphere = tracking_params["sphere"]
     if sphere is None:
@@ -322,6 +320,7 @@ def gpu_tractography(data_imap, tracking_params, seed, stop,
         tracking_params["n_seeds"],
         tracking_params["random_seeds"],
         tracking_params["rng_seed"],
+        tracking_params["trx"],
         tractography_ngpus,
         chunk_size)
 
