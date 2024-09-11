@@ -253,7 +253,7 @@ def recognize(
                 _add_bundle_to_fiber_group(
                     sb_name, bundlesection_select_sl, select_idx,
                     to_flip, return_idx, fiber_groups, img)
-                _add_bundle_to_meta(sb_name, b_def)
+                _add_bundle_to_meta(sb_name, b_def, meta)
         else:
             _add_bundle_to_fiber_group(
                 bundle, select_sl, select_idx, to_flip,

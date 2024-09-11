@@ -14,7 +14,7 @@ from AFQ.definitions.utils import Definition
 import AFQ.tractography.tractography as aft
 from AFQ.tasks.utils import get_default_args
 from AFQ.definitions.image import ScalarImage
-from AFQ.tractography.utils import gen_seeds
+from AFQ.tractography.utils import gen_seeds, get_percentile_threshold
 
 from trx.trx_file_memmap import TrxFile
 from trx.trx_file_memmap import concatenate as trx_concatenate
@@ -69,7 +69,13 @@ def export_seed_mask(data_imap, tracking_params):
     tractography seed mask
     """
     seed_mask = tracking_params['seed_mask']
-    seed_mask_desc = dict(source=tracking_params['seed_mask'])
+    seed_threshold = tracking_params['seed_threshold']
+    if tracking_params['thresholds_as_percentages']:
+        seed_threshold = get_percentile_threshold(
+            seed_mask, seed_threshold)
+    seed_mask_desc = dict(
+        source=tracking_params['seed_mask'],
+        threshold=seed_threshold)
     return nib.Nifti1Image(seed_mask, data_imap["dwi_affine"]), \
         seed_mask_desc
 
@@ -82,7 +88,13 @@ def export_stop_mask(data_imap, tracking_params):
     tractography stop mask
     """
     stop_mask = tracking_params['stop_mask']
-    stop_mask_desc = dict(source=tracking_params['stop_mask'])
+    stop_threshold = tracking_params['stop_threshold']
+    if tracking_params['thresholds_as_percentages']:
+        stop_threshold = get_percentile_threshold(
+            stop_mask, stop_threshold)
+    stop_mask_desc = dict(
+        source=tracking_params['stop_mask'],
+        stop_threshold=stop_threshold)
     return nib.Nifti1Image(stop_mask, data_imap["dwi_affine"]), \
         stop_mask_desc
 
