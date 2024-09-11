@@ -124,13 +124,7 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
     # We'll only do this for clean_rounds
     rounds_elapsed = 0
     idx_belong = idx
-    while (rounds_elapsed < clean_rounds) and (np.sum(idx_belong) > min_sl):
-        # Update by selection:
-        idx = idx[idx_belong]
-        fgarray = fgarray[idx_belong]
-        lengths = lengths[idx_belong]
-        rounds_elapsed += 1
-
+    while rounds_elapsed < clean_rounds:
         # This calculates the Mahalanobis for each streamline/node:
         m_dist = gaussian_weights(
             fgarray, return_mahalnobis=True,
@@ -150,8 +144,8 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
             f"{length_z}"))
 
         if not (
-                np.any(m_dist > distance_threshold)
-                or np.any(length_z > length_threshold)):
+                np.any(m_dist >= distance_threshold)
+                or np.any(length_z >= length_threshold)):
             break
         # Select the fibers that have Mahalanobis smaller than the
         # threshold for all their nodes:
@@ -161,17 +155,22 @@ def clean_bundle(tg, n_points=100, clean_rounds=5, distance_threshold=3,
 
         if np.sum(idx_belong) < min_sl:
             # need to sort and return exactly min_sl:
-            idx_belong = np.argsort(np.sum(
-                m_dist, axis=-1))[:min_sl].astype(int)
+            idx = idx[np.argsort(np.sum(
+                m_dist, axis=-1))[:min_sl].astype(int)]
             logger.debug((
                 f"At rounds elapsed {rounds_elapsed}, "
                 "minimum streamlines reached"))
+            break
         else:
-            idx_removed = idx_belong == 0
+            # Update by selection:
+            idx = idx[idx_belong]
+            fgarray = fgarray[idx_belong]
+            lengths = lengths[idx_belong]
+            rounds_elapsed += 1
             logger.debug((
                 f"Rounds elapsed: {rounds_elapsed}, "
-                f"num removed: {np.sum(idx_removed)}"))
-            logger.debug(f"Removed indicies: {np.where(idx_removed)[0]}")
+                f"num kept: {len(idx)}"))
+            logger.debug(f"Kept indicies: {idx}")
 
     # Select based on the variable that was keeping track of things for us:
     if hasattr(tg, "streamlines"):

@@ -275,7 +275,7 @@ def qb_thresh(b_sls, bundle_def, preproc_imap, clip_edges, **kwargs):
     qbx = QuickBundles(
         bundle_def["qb_thresh"] / preproc_imap["vox_dim"],
         AveragePointwiseEuclideanMetric(
-            ResampleFeature(nb_points=100)))
+            ResampleFeature(nb_points=12)))
     clusters = qbx.cluster(b_sls.get_selected_sls(
         cut=cut, flip=True))
     cleaned_idx = clusters[np.argmax(
