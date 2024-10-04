@@ -1,3 +1,32 @@
+1.3.3 (October 01, 2024)
+========================
+Implements option to parallelize tractography using Ray.
+Implements option to run GroupAFQ in parallel using Slurm.
+Updates to documentation and minor bug fixes.
+  * [FIX] Do not assume VOX space in clean bundles function (#1161)
+  * [FIX] bug in finding ROI from freesurfer using pybids (#1160)
+  *  (#1158)
+  * Fixes small typo in plot_001_afq_api.py (#1145)
+  * allow identity mapping from CLI (#1153)
+  * Update kwargs.rst (#1150)
+  * Update bundledict.rst (#1151)
+  * [FIX] Remove unused parameter, filter_by_endpoints (#1142)
+  * [FIX] Update fetch.py with pediatric ARC ROI mapping (#1143)
+  * Adds engine:serial default (#1141)
+  * [REF] Refactor segmentation code into many files and pimms system (#1132)
+  * Streamlines task in parallel using ray (#1136)
+  * Check bvals on dki (#1139)
+  * [FIX] different CST ROI 2 for L/R (#1138)
+  * Adds ParallelGroupAFQ (#1124)
+  * [DOC] Update kwargs.rst (#1135)
+  * [ENH] Added RUMBA-SD to data.py (#1129)
+  * [DOC] Update baby_afq.py (#1131)
+  * Add conversion dictionary for old acronyms (#1107)
+  * [ENH] small change to viz utils panel code (#1123)
+  * Make altair required (#1130)
+  * [DOC] Some improvements to the documentation based on conversations during the hackathon (#1126)
+  * [ENH] expose FA thresh param for autoresponse ssst for csd (#1127)
+
 1.3.1 (April 04, 2024)
 ======================
 Adds the mean signal diffusion kurtosis model as an option.
