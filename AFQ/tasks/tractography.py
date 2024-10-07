@@ -3,6 +3,8 @@ import numpy as np
 from time import time
 import logging
 
+import dipy.data as dpd
+
 import pimms
 import multiprocessing
 
@@ -12,19 +14,16 @@ from AFQ.definitions.utils import Definition
 import AFQ.tractography.tractography as aft
 from AFQ.tasks.utils import get_default_args
 from AFQ.definitions.image import ScalarImage
-from AFQ.tractography.utils import gen_seeds
+from AFQ.tractography.utils import gen_seeds, get_percentile_threshold
+
+from trx.trx_file_memmap import TrxFile
+from trx.trx_file_memmap import concatenate as trx_concatenate
 
 try:
     import ray
     has_ray = True
 except ModuleNotFoundError:
     has_ray = False
-try:
-    from trx.trx_file_memmap import TrxFile
-    from trx.trx_file_memmap import concatenate as trx_concatenate
-    has_trx = True
-except ModuleNotFoundError:
-    has_trx = False
 
 try:
     from AFQ.tractography.gputractography import gpu_track
@@ -70,7 +69,13 @@ def export_seed_mask(data_imap, tracking_params):
     tractography seed mask
     """
     seed_mask = tracking_params['seed_mask']
-    seed_mask_desc = dict(source=tracking_params['seed_mask'])
+    seed_threshold = tracking_params['seed_threshold']
+    if tracking_params['thresholds_as_percentages']:
+        seed_threshold = get_percentile_threshold(
+            seed_mask, seed_threshold)
+    seed_mask_desc = dict(
+        source=tracking_params['seed_mask'],
+        threshold=seed_threshold)
     return nib.Nifti1Image(seed_mask, data_imap["dwi_affine"]), \
         seed_mask_desc
 
@@ -83,7 +88,13 @@ def export_stop_mask(data_imap, tracking_params):
     tractography stop mask
     """
     stop_mask = tracking_params['stop_mask']
-    stop_mask_desc = dict(source=tracking_params['stop_mask'])
+    stop_threshold = tracking_params['stop_threshold']
+    if tracking_params['thresholds_as_percentages']:
+        stop_threshold = get_percentile_threshold(
+            stop_mask, stop_threshold)
+    stop_mask_desc = dict(
+        source=tracking_params['stop_mask'],
+        stop_threshold=stop_threshold)
     return nib.Nifti1Image(stop_mask, data_imap["dwi_affine"]), \
         stop_mask_desc
 
@@ -290,16 +301,30 @@ def gpu_tractography(data_imap, tracking_params, seed, stop,
         Number of GPUs to use in tractography. If non-0,
         this algorithm is used for tractography,
         https://github.com/dipy/GPUStreamlines
+        PTT, Prob can be used with any SHM model.
+        Bootstrapped can be done with CSA/OPDT.
         Default: 0
     chunk_size : int, optional
         Chunk size for GPU tracking.
         Default: 100000
     """
     start_time = time()
+    if tracking_params["directions"] == "boot":
+        data = data_imap["data"]
+    else:
+        data = nib.load(
+            data_imap[tracking_params["odf_model"].lower() + "_params"]).get_fdata()
+
+    sphere = tracking_params["sphere"]
+    if sphere is None:
+        sphere = dpd.default_sphere
+
     sft = gpu_track(
-        data_imap["data"], data_imap["gtab"],
+        data, data_imap["gtab"],
         nib.load(seed), nib.load(stop),
         tracking_params["odf_model"],
+        sphere,
+        tracking_params["directions"],
         tracking_params["seed_threshold"],
         tracking_params["stop_threshold"],
         tracking_params["thresholds_as_percentages"],
@@ -307,6 +332,7 @@ def gpu_tractography(data_imap, tracking_params, seed, stop,
         tracking_params["n_seeds"],
         tracking_params["random_seeds"],
         tracking_params["rng_seed"],
+        tracking_params["trx"],
         tractography_ngpus,
         chunk_size)
 
@@ -403,18 +429,3 @@ def get_tractography_plan(kwargs):
                 seed_mask.get_image_getter("tractography")))
 
     return pimms.plan(**tractography_tasks)
-
-
-def _gen_seeds(n_seeds, params_file, seed_mask=None, seed_threshold=0,
-               thresholds_as_percentages=False,
-               random_seeds=False, rng_seed=None):
-    if isinstance(params_file, str):
-        params_img = nib.load(params_file)
-    else:
-        params_img = params_file
-
-    affine = params_img.affine
-
-    return gen_seeds(seed_mask, seed_threshold, n_seeds,
-                     thresholds_as_percentages,
-                     random_seeds, rng_seed, affine)

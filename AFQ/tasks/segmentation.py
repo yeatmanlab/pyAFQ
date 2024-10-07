@@ -372,6 +372,10 @@ def get_segmentation_plan(kwargs):
             and not isinstance(kwargs["segmentation_params"], dict):
         raise TypeError(
             "segmentation_params a dict")
+    if "cleaning_params" in kwargs:
+        raise ValueError(
+            "cleaning_params should be passed inside of"
+            "segmentation_params")
     segmentation_tasks = with_name([
         get_scalar_dict,
         export_sl_counts,
