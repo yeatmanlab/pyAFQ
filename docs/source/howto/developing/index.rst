@@ -27,7 +27,7 @@ As an overview, the pyAFQ code can roughly be divided into 5 sections.
 
 4 - Code which describes 'definitions', classes which help users describe
     inputs to pyAFQ. These have particular requirements and must be
-    BIDS compatible, see `here <https://tractometry.github.io/pyAFQ/developing/definitions.html>`_ .
+    BIDS compatible, see `here <https://tractometry.org/pyAFQ/developing/definitions.html>`_ .
 
 5 - Code which contains tests, such as in the tests folder and utils/tests.
     It is important when adding new functionality to add a corresponding test.
