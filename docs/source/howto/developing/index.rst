@@ -20,7 +20,7 @@ As an overview, the pyAFQ code can roughly be divided into 5 sections.
 3 - Code which describes tasks within the tractometry workflow.
     **For most contributors, this is a good place to start**. The user-facing API/CLI
     use a workflow automatically constructed from these discrete tasks,
-    as described in `tasks <https://tractometry.github.io/pyAFQ/developing/tasks.html>`_ .
+    as described in `tasks <https://tractometry.org/pyAFQ/developing/tasks.html>`_ .
     For shorter tasks, one may only need to edit the relevant task file.
     For longer tasks, one can add to the files containing low-level
     functionality.
