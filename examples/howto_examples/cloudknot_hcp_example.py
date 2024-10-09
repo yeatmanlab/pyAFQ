@@ -8,7 +8,7 @@ This can be done by following this instructions on the webpage
 `here <https://wiki.humanconnectome.org/display/PublicData/How+To+Connect+to+Connectome+Data+via+AWS>`_.
 We will use the ``Cloudknot`` library to run our AFQ analysis in the AWS
 Batch service (see also
-`this example <http://yeatmanlab.github.io/pyAFQ/auto_examples/cloudknot_example.html>`_).
+`this example <http://tractometry.github.io/pyAFQ/auto_examples/cloudknot_example.html>`_).
 In the following we will use ``Cloudknot`` to run multiple
 configurations of pyAFQ on the HCP dataset. Specifically, here we will run
 pyAFQ with different tractography seeding strategies.
@@ -147,13 +147,13 @@ args = attach_keys(args)
 
 ##########################################################################
 # Define the :meth:`Knot` object to run your jobs on. See
-# `this example <http://yeatmanlab.github.io/pyAFQ/auto_examples/cloudknot_example.html>`_ for more
+# `this example <http://tractometry.github.io/pyAFQ/auto_examples/cloudknot_example.html>`_ for more
 # details about the arguments to the object.
 knot = ck.Knot(
     name='afq-hcp-tractography-201110-0',
     func=afq_process_subject,
     base_image='python:3.8',
-    image_github_installs="https://github.com/yeatmanlab/pyAFQ.git",
+    image_github_installs="https://github.com/tractometry/pyAFQ.git",
     pars_policies=('AmazonS3FullAccess',),
     bid_percentage=100)
 
@@ -194,7 +194,7 @@ knot2 = ck.Knot(
     name='afq_combine_subjects-201110-0',
     func=afq_combine_profiles,
     base_image='python:3.8',
-    image_github_installs="https://github.com/yeatmanlab/pyAFQ.git",
+    image_github_installs="https://github.com/tractometry/pyAFQ.git",
     pars_policies=('AmazonS3FullAccess',),
     bid_percentage=100)
 
