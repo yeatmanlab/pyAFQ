@@ -1,7 +1,7 @@
 # pyAFQ
 Automated Fiber Quantification ... in Python.
 
-For details, see [Documentation](https://tractometry.github.io/pyAFQ)
+For details, see [Documentation](https://tractometry.org/pyAFQ)
 
 For further analysis of results, see [AFQ-Insight](https://github.com/richford/AFQ-Insight)
 

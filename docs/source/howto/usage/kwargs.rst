@@ -108,7 +108,7 @@ brain_mask_definition: instance from `AFQ.definitions.image`, optional
 bundle_info: strings, dict, or BundleDict, optional
 	List of bundle names to include in segmentation,
 	or a bundle dictionary (see BundleDict for inspiration),
-	or a BundleDict. See `Defining Custom Bundle Dictionaries <https://tractometry.github.io/pyAFQ/reference/bundledict.html>`_
+	or a BundleDict. See `Defining Custom Bundle Dictionaries <https://tractometry.org/pyAFQ/reference/bundledict.html>`_
 	in the `usage` section of pyAFQ's documentation for details.
 	If None, will get all appropriate bundles for the chosen
 	segmentation algorithm.
@@ -228,7 +228,7 @@ n_points_indiv: int or None
 viz_backend_spec: str, optional
 	Which visualization backend to use.
 	See Visualization Backends page in documentation for details:
-	https://tractometry.github.io/pyAFQ/usage/viz_backend.html
+	https://tractometry.org/pyAFQ/usage/viz_backend.html
 	One of {"fury", "plotly", "plotly_no_gif"}.
 	Default: "plotly_no_gif"
 
