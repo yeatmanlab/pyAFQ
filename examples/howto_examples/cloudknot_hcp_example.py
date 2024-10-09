@@ -147,7 +147,7 @@ args = attach_keys(args)
 
 ##########################################################################
 # Define the :meth:`Knot` object to run your jobs on. See
-# `this example <http://tractometry.github.io/pyAFQ/auto_examples/cloudknot_example.html>`_ for more
+# `this example <http://tractometry.org/pyAFQ/auto_examples/cloudknot_example.html>`_ for more
 # details about the arguments to the object.
 knot = ck.Knot(
     name='afq-hcp-tractography-201110-0',
