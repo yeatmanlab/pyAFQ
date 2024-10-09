@@ -63,16 +63,16 @@ _, study_dir = afd.fetch_hbn_preproc([
 # example we download these files from the MATLAB AFQ website, but this code could
 # be commented out and paths could be used to local ROIs on disk
 
-roi_urls = ['https://github.com/tractometry/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/MFgL.nii.gz',
-            'https://github.com/tractometry/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/MFgR.nii.gz',
-            'https://github.com/tractometry/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/PaL.nii.gz',
-            'https://github.com/tractometry/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/PaR.nii.gz',
-            'https://github.com/tractometry/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/PrgL.nii.gz',
-            'https://github.com/tractometry/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/PrgR.nii.gz',
-            'https://github.com/tractometry/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/SFgL.nii.gz',
-            'https://github.com/tractometry/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/SFgR.nii.gz',
-            'https://github.com/tractometry/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/SLFt_roi2_L.nii.gz',
-            'https://github.com/tractometry/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/SLFt_roi2_R.nii.gz']
+roi_urls = ['https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/MFgL.nii.gz',
+            'https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/MFgR.nii.gz',
+            'https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/PaL.nii.gz',
+            'https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/PaR.nii.gz',
+            'https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/PrgL.nii.gz',
+            'https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/PrgR.nii.gz',
+            'https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/SFgL.nii.gz',
+            'https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/SFgR.nii.gz',
+            'https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/SLFt_roi2_L.nii.gz',
+            'https://github.com/yeatmanlab/AFQ/raw/c762ca4c393f2105d4f444c44d9e4b4702f0a646/SLF123/ROIs/SLFt_roi2_R.nii.gz']
 
 # We proceed to download the files. First, we define and create the directory
 # for the template ROIs. In the code below, ``op.expanduser("~")`` expands the
