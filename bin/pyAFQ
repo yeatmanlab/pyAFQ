@@ -104,7 +104,7 @@ def parse_cli(arg_dict):
         logger.info(
             "Your use of pyAFQ is being recorded using Google Analytics. "
             "For more information, please refer to the pyAFQ documentation: "
-            "https://tractometry.github.io/pyAFQ/usage.html#usage-tracking-with-google-analytics. "  # noqa
+            "https://tractometry.org/pyAFQ/usage.html#usage-tracking-with-google-analytics. "  # noqa
             "To turn this off, use the `--notrack` "
             "flag when using the pyAFQ CLI")
         import popylar
