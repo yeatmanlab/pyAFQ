@@ -228,7 +228,7 @@ n_points_indiv: int or None
 viz_backend_spec: str, optional
 	Which visualization backend to use.
 	See Visualization Backends page in documentation for details:
-	https://tractometry.github.io/pyAFQ/usage/viz_backend.html
+	https://tractometry.org/pyAFQ/usage/viz_backend.html
 	One of {"fury", "plotly", "plotly_no_gif"}.
 	Default: "plotly_no_gif"
 
