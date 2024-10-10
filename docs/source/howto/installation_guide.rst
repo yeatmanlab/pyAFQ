@@ -25,11 +25,11 @@ The development version is probably less stable, but might include new
 features and fixes. There are two ways to install this version. The first
 uses ``pip``::
 
-  pip install git+https://github.com/yeatmanlab/pyAFQ.git
+  pip install git+https://github.com/tractometry/pyAFQ.git
 
 The other requires that you clone the source code to your machine::
 
-  git clone https://github.com/yeatmanlab/pyAFQ.git
+  git clone https://github.com/tractometry/pyAFQ.git
 
 With both installation methods, you can include extensions to the base installation in square brackets. Change your working directory into the top-level directory of this repo
 and issue::

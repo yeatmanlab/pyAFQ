@@ -203,7 +203,7 @@ def read_callosum_templates(as_img=True, resample_to=False):
 #
 # - atlas: https://www.nitrc.org/projects/pediatricatlas
 #
-# - pediatric templates: https://github.com/yeatmanlab/AFQ/tree/babyAFQ
+# - pediatric templates: https://github.com/tractometry/AFQ/tree/babyAFQ
 #
 # Templates downloaded from:
 #

@@ -3,7 +3,7 @@ How to create a release
 
 The current release process entails the following steps:
 
-#. Make sure you have the `master` branch locally updated to the state on the `main fork of the project <https://github.com/yeatmanlab/pyAFQ/tree/master>`_.
+#. Make sure you have the `master` branch locally updated to the state on the `main fork of the project <https://github.com/tractometry/pyAFQ/tree/master>`_.
 
 #. Update CHANGES.rst: run the script `.maintenance/update_changes.sh <next_tag>`, with the tag set to the version string of the upcoming release. Further edit the notes to add a short summary at the top.
 
@@ -18,8 +18,8 @@ The current release process entails the following steps:
     git push upstream 0.5
 
 #. On GitHub:
-    - Navigate to the `"Releases" tab <https://github.com/yeatmanlab/pyAFQ/releases>`_
-    - Click on `"Draft a new release" <https://github.com/yeatmanlab/pyAFQ/releases/new>`_.
+    - Navigate to the `"Releases" tab <https://github.com/tractometry/pyAFQ/releases>`_
+    - Click on `"Draft a new release" <https://github.com/tractometry/pyAFQ/releases/new>`_.
     - In the "Tag version" box enter the version string of this release.
     - In "Release title" enter (for example) "Version 0.5".
     - In the description box copy the entry in CHANGES.rst corresponding to this release (with the exclusion of the title).

@@ -2,7 +2,7 @@ The pyAFQ docker image
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Everytime a new commit is made to master the
-`pyAFQ github <https://github.com/yeatmanlab/pyAFQ>`_,
+`pyAFQ github <https://github.com/tractometry/pyAFQ>`_,
 a new image is pushed to the
 `NRDG github <https://github.com/orgs/nrdg/packages/container/package/pyafq>`_.
 This image contains an installation of the latest version of

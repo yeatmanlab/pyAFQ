@@ -110,7 +110,7 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "GitHub",
-            "url": "https://github.com/yeatmanlab/pyAFQ",
+            "url": "https://github.com/tractometry/pyAFQ",
             "icon": "fab fa-github-square",
         }]
 
@@ -122,7 +122,7 @@ html_sidebars = {
 
 html_context = {
     "github_url": "https://github.com",
-    "github_user": "yeatmanlab",
+    "github_user": "tractometry",
     "github_repo": "pyAFQ",
     "github_version": "master",
     "doc_path": "docs/source",

@@ -69,7 +69,7 @@
   "license": "BSD-3-Clause",
   "related_identifiers": [
     {
-      "identifier": "http://yeatmanlab.github.io/pyAFQ",
+      "identifier": "http://tractometry.org/pyAFQ",
       "relation": "isPartOf",
       "scheme": "url"
     }

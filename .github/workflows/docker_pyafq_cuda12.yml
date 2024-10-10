@@ -25,9 +25,9 @@ jobs:
         sh ./gpu_docker/docker-build.sh \
           "${GITHUB_REF:10}" "nrdg" "12.0.1-devel-ubuntu20.04" "12"
 
-    - name: Login to GHCR 
+    - name: Login to GHCR
       if: github.ref == 'refs/heads/master' || startsWith(github.event.ref, 'refs/tags')
-      uses: docker/login-action@v1
+      uses: docker/login-action@v3
       with:
         registry: ghcr.io
         username: nrdg
