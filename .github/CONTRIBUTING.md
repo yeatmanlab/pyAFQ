@@ -94,19 +94,19 @@ is difficult to be described as one unit of work, please consider splitting it i
 
 The current list of issue labels are [here][link_labels] and include:
 
-* [![Good first issue](https://img.shields.io/github/labels/yeatmanlab/pyAFQ/good%20first%20issue)][link_firstissue] *These issues contain a task that is amenable to new contributors because it doesn't entail a steep learning curve.*
+* [![Good first issue](https://img.shields.io/github/labels/tractometry/pyAFQ/good%20first%20issue)][link_firstissue] *These issues contain a task that is amenable to new contributors because it doesn't entail a steep learning curve.*
 
     If you feel that you can contribute to one of these issues,
     we especially encourage you to do so!
 
-* [![Bug](https://img.shields.io/github/labels/yeatmanlab/pyAFQ/bug)][link_bugs] *These issues point to problems in the project.*
+* [![Bug](https://img.shields.io/github/labels/tractometry/pyAFQ/bug)][link_bugs] *These issues point to problems in the project.*
 
     If you find new a bug, please give as much detail as possible in your issue,
     including steps to recreate the error.
     If you experience the same bug as one already listed,
     please add any additional information that you have as a comment.
 
-* [![Enhancement](https://img.shields.io/github/labels/yeatmanlab/pyAFQ/enhancement)][link_enhancement] *These issues are asking for new features and improvements to be considered by the project.*
+* [![Enhancement](https://img.shields.io/github/labels/tractometry/pyAFQ/enhancement)][link_enhancement] *These issues are asking for new features and improvements to be considered by the project.*
 
     Please try to make sure that your requested feature is distinct from any others
     that have already been requested or implemented.
@@ -118,16 +118,16 @@ we have two sets of special labels:
 
 | Label                                                                                           | Description                                                                                           |
 |--------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|
-| ![GitHub labels](https://img.shields.io/github/labels/yeatmanlab/pyAFQ/impact%3A%20high) <br> ![GitHub labels](https://img.shields.io/github/labels/yeatmanlab/pyAFQ/impact%3A%20medium) <br> ![GitHub labels](https://img.shields.io/github/labels/yeatmanlab/pyAFQ/impact%3A%20low)    | Estimation of the downstream impact the proposed feature/bugfix will have.                |
-| ![GitHub labels](https://img.shields.io/github/labels/yeatmanlab/pyAFQ/effort%3A%20high) <br> ![GitHub labels](https://img.shields.io/github/labels/yeatmanlab/pyAFQ/effort%3A%20medium) <br> ![GitHub labels](https://img.shields.io/github/labels/yeatmanlab/pyAFQ/effort%3A%20low)    | Estimation of effort required to implement the requested feature or fix the reported bug. |
+| ![GitHub labels](https://img.shields.io/github/labels/tractometry/pyAFQ/impact%3A%20high) <br> ![GitHub labels](https://img.shields.io/github/labels/tractometry/pyAFQ/impact%3A%20medium) <br> ![GitHub labels](https://img.shields.io/github/labels/tractometry/pyAFQ/impact%3A%20low)    | Estimation of the downstream impact the proposed feature/bugfix will have.                |
+| ![GitHub labels](https://img.shields.io/github/labels/tractometry/pyAFQ/effort%3A%20high) <br> ![GitHub labels](https://img.shields.io/github/labels/tractometry/pyAFQ/effort%3A%20medium) <br> ![GitHub labels](https://img.shields.io/github/labels/tractometry/pyAFQ/effort%3A%20low)    | Estimation of effort required to implement the requested feature or fix the reported bug. |
 
 These labels help triage and set priorities to the development tasks.
 For instance, one bug regression that has been reported to affect most of the users after
 a release with an easy fix because it is a known old problem that came back.
-Such an issue will typically be assigned the following labels ![GitHub labels](https://img.shields.io/github/labels/yeatmanlab/pyAFQ/bug) ![GitHub labels](https://img.shields.io/github/labels/yeatmanlab/pyAFQ/impact%3A%20high) ![GitHub labels](https://img.shields.io/github/labels/yeatmanlab/pyAFQ/effort%3A%20low), and its priority will be maximal since addressing low-effort high-impact deliver the maximum turnout without increasing the churn by much.
+Such an issue will typically be assigned the following labels ![GitHub labels](https://img.shields.io/github/labels/tractometry/pyAFQ/bug) ![GitHub labels](https://img.shields.io/github/labels/tractometry/pyAFQ/impact%3A%20high) ![GitHub labels](https://img.shields.io/github/labels/tractometry/pyAFQ/effort%3A%20low), and its priority will be maximal since addressing low-effort high-impact deliver the maximum turnout without increasing the churn by much.
 
-Of course, the implementation of long-term goaled lines may include the scheduling of ![GitHub labels](https://img.shields.io/github/labels/yeatmanlab/pyAFQ/impact%3A%20medium) ![GitHub labels](https://img.shields.io/github/labels/yeatmanlab/pyAFQ/effort%3A%20high).
-Finally, ![GitHub labels](https://img.shields.io/github/labels/yeatmanlab/pyAFQ/impact%3A%20low) ![GitHub labels](https://img.shields.io/github/labels/yeatmanlab/pyAFQ/effort%3A%20high) issues are less likely to be addressed.
+Of course, the implementation of long-term goaled lines may include the scheduling of ![GitHub labels](https://img.shields.io/github/labels/tractometry/pyAFQ/impact%3A%20medium) ![GitHub labels](https://img.shields.io/github/labels/tractometry/pyAFQ/effort%3A%20high).
+Finally, ![GitHub labels](https://img.shields.io/github/labels/tractometry/pyAFQ/impact%3A%20low) ![GitHub labels](https://img.shields.io/github/labels/tractometry/pyAFQ/effort%3A%20high) issues are less likely to be addressed.
 
 ## Making a change
 
@@ -156,7 +156,7 @@ but those accepted fastest will follow a workflow similar to the following:
   add the ["upstream" pyAFQ repository as a remote][link_addremote]
   to your locally cloned repository.
     ```Shell
-    git remote add upstream https://github.com/yeatmanlab/pyAFQ.git
+    git remote add upstream https://github.com/tractometry/pyAFQ.git
     ```
     Make sure to [keep your fork up to date][link_updateupstreamwiki] with the upstream repository.<br />
     For example, to update your master branch on your local cloned repository:
@@ -240,7 +240,7 @@ acknowledge that any contributions will be licensed under the same terms.
     [MetPy project](https://github.com/Unidata/MetPy).
 
 [link_github]: https://github.com/
-[link_pyAFQ]: https://github.com/yeatmanlab/pyAFQ
+[link_pyAFQ]: https://github.com/tractometry/pyAFQ
 [link_signupinstructions]: https://help.github.com/articles/signing-up-for-a-new-github-account
 
 [link_neurostars]: https://neurostars.org/tags/pyAFQ
@@ -254,13 +254,13 @@ acknowledge that any contributions will be licensed under the same terms.
 [rick_roll]: https://www.youtube.com/watch?v=dQw4w9WgXcQ
 
 [autofq]: https://autofq.org/
-[link_issues]: https://github.com/yeatmanlab/pyAFQ/issues
-[link_labels]: https://github.com/yeatmanlab/pyAFQ/labels
+[link_issues]: https://github.com/tractometry/pyAFQ/issues
+[link_labels]: https://github.com/tractometry/pyAFQ/labels
 [link_discussingissues]: https://help.github.com/articles/discussing-projects-in-issues-and-pull-requests
 
-[link_bugs]: https://github.com/yeatmanlab/pyAFQ/labels/bug
-[link_firstissue]: https://github.com/yeatmanlab/pyAFQ/labels/good%20first%20issue
-[link_enhancement]: https://github.com/yeatmanlab/pyAFQ/labels/enhancement
+[link_bugs]: https://github.com/tractometry/pyAFQ/labels/bug
+[link_firstissue]: https://github.com/tractometry/pyAFQ/labels/good%20first%20issue
+[link_enhancement]: https://github.com/tractometry/pyAFQ/labels/enhancement
 
 [link_pullrequest]: https://help.github.com/articles/creating-a-pull-request-from-a-fork
 [link_fork]: https://help.github.com/articles/fork-a-repo/

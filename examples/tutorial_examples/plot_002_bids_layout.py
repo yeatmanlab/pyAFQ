@@ -213,7 +213,7 @@ print(validator.is_bids(tractography_relative_path))
 # which we already have clear definitions of the information
 # needed to segment them (e.g., waypoint ROIs and probability maps).
 # For an example that includes custom definition of bundle info, see the
-# `plot_callosal_tract_profile example <http://yeatmanlab.github.io/pyAFQ/auto_examples/plot_callosal_tract_profile.html>`_.
+# `plot_callosal_tract_profile example <http://tractometry.org/pyAFQ/auto_examples/plot_callosal_tract_profile.html>`_.
 
 bundle_info = abd.default18_bd()[
     "Left Superior Longitudinal",

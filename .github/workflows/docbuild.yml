@@ -2,6 +2,13 @@ name: Documentation build
 
 on: [push, pull_request]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -36,8 +43,6 @@ jobs:
         path: docs/build/html
     - name: Publish docs to Github Pages
       if: startsWith(github.event.ref, 'refs/tags')
-      uses: JamesIves/github-pages-deploy-action@releases/v3
+      uses: JamesIves/github-pages-deploy-action@releases/v4
       with:
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        BRANCH: gh-pages # The branch the action should deploy to.
-        FOLDER: docs/build/html # The folder the action should deploy.
+        folder: docs/build/html

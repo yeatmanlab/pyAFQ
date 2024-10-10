@@ -20,7 +20,7 @@ help:
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 upload: html
-		./upload-gh-pages.sh build/html/ pyAFQ yeatmanlab
+		./upload-gh-pages.sh build/html/ pyAFQ tractometry
 
 .PHONY: distclean realclean
 
