@@ -143,8 +143,14 @@ class GroupAFQ(object):
         if not op.exists(bids_path):
             raise ValueError("bids_path not found")
         if not op.exists(op.join(bids_path, "dataset_description.json")):
-            raise ValueError("There must be a dataset_description.json"
-                             + " in bids_path")
+            dataset_description = {
+                "Name": "unknown",
+                "BIDSVersion": "unknown",
+                "Authors": ["unknown"]
+            }
+            dd_file = op.join(bids_path, 'dataset_description.json')
+            with open(dd_file, 'w') as outfile:
+                json.dump(dataset_description, outfile)
         if not isinstance(bids_filters, dict):
             raise TypeError("bids_filters must be a dict")
         # preproc_pipeline typechecking handled by pyBIDS
